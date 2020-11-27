@@ -1,0 +1,7 @@
+<model model-name="partners" version="DEV-SNAPSHOT">
+
+    <class name="Renter" label="Арендатор">
+        <property name="inn" type="String" label="ИНН"/>
+    </class>
+
+</model>

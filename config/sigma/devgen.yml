@@ -1,0 +1,46 @@
+Installer:
+  openShiftUrl: api.dev-gen.sigma.sbrf.ru:6443
+  openShiftProject: ci00684783-edevgen-dataspace-core-dev
+  ingressGatewayName: gw-ds-ingress
+  setUniqModuleName: true
+  parameters:
+    dataspace-core-template:
+      MODULE_NAME: dataspace-core-deposit
+      standinEnabled: true
+      FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+      requestCPU: 500m
+      requestMemory: 1024Mi
+    dataspace-gigabas-template:
+      MODULE_NAME: dataspace-gigabas-deposit
+      MODEL_PACKAGE_NAME: TODODELETE
+      requestCPU: 500m
+      requestMemory: 1024Mi
+      FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+    dataspace-client-template:
+      MODULE_NAME: dataspace-client-deposit
+      dataSpaceCoreUrl: "http://svc-dataspace-core-deposit:8080"
+      requestCPU: 500m
+      requestMemory: 1024Mi
+      FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+commons:
+  ci:
+    credentials: dataspace-bot
+  openshift:
+    credentials: dataspace-bot
+    url: api.dev-gen.sigma.sbrf.ru:6443
+  nexus:
+    credentials: dataspace-bot
+    url: sbtatlas.sigma.sbrf.ru/nexus
+    snapshotRepository: corp-snapshots
+    releaseRepository: corp-releases
+  registry:
+    credentials: dataspace-bot
+    url: registry.sigma.sbrf.ru
+    snapshotProject: pprb-dev/ci00682829_cdm_dev
+    releaseProject: pprb/ci00682829_cdm
+  git:
+    credentials: dataspace-bot-ssh
+  sonar:
+    credentials: dataspace-bot-sonar-key
+    url: https://sbt-sonarqube.sigma.sbrf.ru/
+    token: 613f5c708cf709538c6ae732f47a922458b4f1db

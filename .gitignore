@@ -1,0 +1,34 @@
+# .iml files
+*.iml
+
+## File-based project format:
+*.ipr
+*.iws
+*.ids
+
+#all files in .idea directory
+.idea/
+.mvn/timing.properties
+
+# IntelliJ
+/out/
+
+### target directories
+**/target/
+**/logs/
+**/log/
+
+*.log
+test*.txt
+
+*.rds
+*.rds.dump.report
+*.rds.import.report
+
+*pom.xml.versionsBackup
+#.*
+
+# temp directory for generated test configs
+**/temp/
+
+/deployer2-*
