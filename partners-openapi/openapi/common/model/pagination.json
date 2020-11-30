@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sbrf.ufs.sbbol.estate.common.model.Pagination",
+  "type": "object",
+  "title": "Нумерация",
+  "properties": {
+    "offset": {
+      "type": "integer",
+      "title": "Смещение от начала"
+    },
+    "count": {
+      "type": "integer",
+      "title": "Количество возвращаемых записей"
+    },
+    "hasNextPage": {
+      "type": "boolean",
+      "title": "Признак наличия следующей страницы"
+    }
+  },
+  "additionalProperties": false
+}

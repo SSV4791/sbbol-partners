@@ -1,0 +1,18 @@
+post:
+  operationId: getRenter
+  summary: Получение арендатора
+  parameters:
+    - in: path
+      name: guid
+      description: GUID арендатора
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: model/renter.json
+            type: object

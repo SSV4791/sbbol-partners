@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sbrf.ufs.sbbol.rental.renters.back.model.Renter",
+  "type": "object",
+  "title": "Арендатор",
+  "properties": {
+    "guid": {
+      "type": "string",
+      "title": "Уникальный идентификатор арендатора"
+    },
+    "type": {
+      "type": "string",
+      "title": "Вид арендатора"
+    },
+    "legalName": {
+      "type": "string",
+      "title": "Наименование ЮЛ/ИП"
+    },
+    "inn": {
+      "type": "string",
+      "title": "ИНН"
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП"
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН"
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО"
+    },
+
+    "lastName": {
+      "type": "string",
+      "title": "Фамилия"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя"
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество"
+    },
+    "dulType": {
+      "type": "string",
+      "title": "Тип удостоверяющего документа (физ. лицо)"
+    },
+    "dulName": {
+      "type": "string",
+      "title": "Наименование удостоверяющего документа"
+    },
+    "dulSerie": {
+      "type": "string",
+      "title": "Серия ДУЛ"
+    },
+    "dulNumber": {
+      "type": "string",
+      "title": "Номер ДУЛ"
+    },
+    "dulDivisionIssue": {
+      "type": "string",
+      "title": "Кем выдан ДУЛ"
+    },
+    "dulDateIssue": {
+      "type": "string",
+      "format": "date",
+      "title": "Дата выдачи ДУЛ"
+    },
+    "dulDivisionCode": {
+      "type": "string",
+      "title": "Код подразделения из ДУЛ"
+    },
+
+    "account": {
+      "type": "string",
+      "title": "Номер счёта"
+    },
+    "bankBic": {
+      "type": "string",
+      "title": "БИК банка"
+    },
+    "bankName": {
+      "type": "string",
+      "title": "Наименование банка"
+    },
+    "bankAccount": {
+      "type": "string",
+      "title": "Корреспондентский счёт банка"
+    },
+    "phoneNumbers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Телефоны"
+    },
+    "emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Электронные почты"
+    },
+    "legalAddress": {
+      "$ref": "renterAddress.json",
+      "title": "Юридический адрес"
+    },
+    "physicalAddress": {
+      "$ref": "renterAddress.json",
+      "title": "Почтовый адрес"
+    }
+  },
+  "required": [
+    "guid",
+    "type"
+  ]
+}

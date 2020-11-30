@@ -1,0 +1,11 @@
+get:
+  operationId: version
+  summary: Получение версии проекта
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: model/version.json
+            type: object

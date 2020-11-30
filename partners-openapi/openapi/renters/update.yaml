@@ -1,0 +1,17 @@
+post:
+  operationId: updateRenter
+  summary: Обновление арендатора
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: model/renter.json
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: model/renter.json
+            type: object

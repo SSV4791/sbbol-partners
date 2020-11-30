@@ -1,0 +1,17 @@
+openapi: "3.0.0"
+info:
+  title: Request for renter
+  version: DEV-SNAPSHOT
+  description: OpenAPI Specification for renter
+
+paths:
+  /renter/create:
+    $ref: create.yaml
+  /renter/get/{guid}:
+    $ref: get.yaml
+  /renter/update:
+    $ref: update.yaml
+  /renter/view:
+    $ref: view.yaml
+  /renter/version:
+    $ref: version.yaml

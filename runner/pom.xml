@@ -13,6 +13,11 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+            <artifactId>partners-rest</artifactId>
+            <version>DEV-SNAPSHOT</version>
+        </dependency>
 
         <!--Для интеграции с ТС Журналированием. Json формат логов-->
         <dependency>

@@ -1,0 +1,17 @@
+post:
+  operationId: getRenters
+  summary: Получение списка арендаторов
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: model/renterFilter.json
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: model/renterListResponse.json
+            type: object

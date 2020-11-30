@@ -3,50 +3,43 @@
     <artifactVersions>
         <artifactVersion>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit-api</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-runner</artifactId>
             </artifact>
-            <version>4.1.1-build.1</version>
+            <version>1.0.0.build.1</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit-dictionary-initializer</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-api</artifactId>
             </artifact>
-            <version>4.1.1-build.1</version>
+            <version>1.0.0-build.1</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>deposit-model-sdk</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-model-sdk</artifactId>
             </artifact>
-            <version>4.1.1-build.1</version>
+            <version>1.0.0-build.1</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-rest</artifactId>
             </artifact>
-            <version>4.1.1-build.1</version>
+            <version>1.0.0-build.1</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>deposit-model-jpa</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-model-jpa</artifactId>
             </artifact>
-            <version>4.1.1-build.1</version>
+            <version>1.0.0-build.1</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-client</artifactId>
-            </artifact>
-            <version>4.1.1-build.1</version>
-        </artifactVersion>
-        <artifactVersion>
-            <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit-service</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-service</artifactId>
             </artifact>
             <version>4.1.1-build.1</version>
         </artifactVersion>
@@ -54,8 +47,64 @@
     <lastProjectDependencyTree>
         <artifactDependencyTree>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit-api</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.rentalproperty</groupId>
+                <artifactId>rental-property-runner</artifactId>
+            </artifact>
+            <dependencies>
+                <dependency>
+                    <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                    <artifactId>partners-rest</artifactId>
+                    <version>VERSION</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>net.logstash.logback</groupId>
+                    <artifactId>logstash-logback-encoder</artifactId>
+                    <version>6.3</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter</artifactId>
+                    <version>2.2.7.RELEASE</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <version>2.2.7.RELEASE</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-actuator</artifactId>
+                    <version>2.2.7.RELEASE</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-test</artifactId>
+                    <version>2.2.7.RELEASE</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </artifactDependencyTree>
+        <artifactDependencyTree>
+            <artifact>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-api</artifactId>
             </artifact>
             <dependencies>
                 <dependency>
@@ -86,32 +135,8 @@
         </artifactDependencyTree>
         <artifactDependencyTree>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit-dictionary-initializer</artifactId>
-            </artifact>
-            <dependencies>
-                <dependency>
-                    <groupId>sbp.com.sbt.dataspace</groupId>
-                    <artifactId>pdm-model</artifactId>
-                    <version>4.2.0-build.135</version>
-                    <classifier/>
-                    <packaging>jar</packaging>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.projectlombok</groupId>
-                    <artifactId>lombok</artifactId>
-                    <version>1.18.12</version>
-                    <classifier/>
-                    <packaging>jar</packaging>
-                    <scope>compile</scope>
-                </dependency>
-            </dependencies>
-        </artifactDependencyTree>
-        <artifactDependencyTree>
-            <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>deposit-model-sdk</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-model-sdk</artifactId>
             </artifact>
             <dependencies>
                 <dependency>
@@ -238,24 +263,8 @@
         </artifactDependencyTree>
         <artifactDependencyTree>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit</artifactId>
-            </artifact>
-            <dependencies>
-                <dependency>
-                    <groupId>net.logstash.logback</groupId>
-                    <artifactId>logstash-logback-encoder</artifactId>
-                    <version>6.3</version>
-                    <classifier/>
-                    <packaging>jar</packaging>
-                    <scope>compile</scope>
-                </dependency>
-            </dependencies>
-        </artifactDependencyTree>
-        <artifactDependencyTree>
-            <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>deposit-model-jpa</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-model-jpa</artifactId>
             </artifact>
             <dependencies>
                 <dependency>
@@ -382,21 +391,45 @@
         </artifactDependencyTree>
         <artifactDependencyTree>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-client</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-rest</artifactId>
+            </artifact>
+            <dependencies>
+                <dependency>
+                    <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                    <artifactId>partners-service</artifactId>
+                    <version>VERSION</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                    <version>5.2.6.RELEASE</version>
+                    <classifier/>
+                    <packaging>jar</packaging>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+        </artifactDependencyTree>
+        <artifactDependencyTree>
+            <artifact>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>sbbol-partners</artifactId>
             </artifact>
             <dependencies>
             </dependencies>
         </artifactDependencyTree>
         <artifactDependencyTree>
             <artifact>
-                <groupId>sbp.com.sbt.dataspace</groupId>
-                <artifactId>dataspace-deposit-service</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>partners-service</artifactId>
             </artifact>
             <dependencies>
                 <dependency>
-                    <groupId>sbp.com.sbt.dataspace</groupId>
-                    <artifactId>dataspace-deposit-api</artifactId>
+                    <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                    <artifactId>partners-api</artifactId>
                     <version>VERSION</version>
                     <classifier/>
                     <packaging>jar</packaging>
@@ -499,16 +532,16 @@
                     <scope>test</scope>
                 </dependency>
                 <dependency>
-                    <groupId>sbp.com.sbt.dataspace</groupId>
-                    <artifactId>deposit-model-jpa</artifactId>
+                    <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                    <artifactId>partners-model-jpa</artifactId>
                     <version>VERSION</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
-                    <groupId>sbp.com.sbt.dataspace</groupId>
-                    <artifactId>deposit-model-sdk</artifactId>
+                    <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                    <artifactId>partners-model-sdk</artifactId>
                     <version>VERSION</version>
                     <classifier/>
                     <packaging>jar</packaging>

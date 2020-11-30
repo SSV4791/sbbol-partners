@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sbrf.ufs.sbbol.rental.renters.back.model.Version",
+  "type": "object",
+  "title": "Версия",
+  "properties": {
+    "ver": {
+      "type": "string",
+      "title": "Номер версии"
+    }
+  }
+}

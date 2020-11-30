@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sbrf.ufs.sbbol.rental.renters.back.model.RenterAddress",
+  "type": "object",
+  "title": "Адрес арендатора",
+  "properties": {
+    "zipCode": {
+      "type": "string",
+      "title": "Почтовый индекс"
+    },
+    "regionCode": {
+      "type": "string",
+      "title": "Код региона"
+    },
+    "region": {
+      "type": "string",
+      "title": "Район"
+    },
+    "city": {
+      "type": "string",
+      "title": "Город"
+    },
+    "locality": {
+      "type": "string",
+      "title": "Населённый пункт"
+    },
+    "street": {
+      "type": "string",
+      "title": "Улица"
+    },
+    "building": {
+      "type": "string",
+      "title": "Здание"
+    },
+    "buildingBlock": {
+      "type": "string",
+      "title": "Корпус"
+    },
+    "flat": {
+      "type": "string",
+      "title": "Квартира"
+    }
+  }
+}
