@@ -47,8 +47,8 @@
     <lastProjectDependencyTree>
         <artifactDependencyTree>
             <artifact>
-                <groupId>ru.sberbank.pprb.sbbol.rentalproperty</groupId>
-                <artifactId>rental-property-runner</artifactId>
+                <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+                <artifactId>runner</artifactId>
             </artifact>
             <dependencies>
                 <dependency>
