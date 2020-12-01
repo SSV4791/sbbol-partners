@@ -39,15 +39,14 @@
 
     <distributionManagement>
         <repository>
-            <id>release.repo</id>
+            <id>corp-releases</id>
             <url>http://nexus.sigma.sbrf.ru:8099/nexus/content/repositories/corp-releases/</url>
         </repository>
         <snapshotRepository>
-            <id>snapshot.repo</id>
+            <id>corp-snapshots</id>
             <url>http://nexus.sigma.sbrf.ru:8099/nexus/content/repositories/corp-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
 <!--Нужно для синхронизации в клауд-->
 <!--    <dependencies>-->
 <!--        <dependency>-->
