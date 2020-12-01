@@ -23,7 +23,7 @@ objects:
       application.properties: |-
         server.port=8080
         spring.main.banner-mode=off
-        spring.application.name=deposit
+        spring.application.name=partners
 
         spring.http.encoding.charset=UTF-8
         spring.http.encoding.force=true
@@ -51,11 +51,11 @@ objects:
 
         dataspace.monitoring.enabled=true
         dataspace.monitoring.watch-metrics.enable=true
-        dataspace.monitoring.watch-metrics.category.sbp.sbt.dataspace.deposit=true
+        dataspace.monitoring.watch-metrics.category.ru.sberbank.pprb.sbbol.partners=true
 
         dataspace.monitoring.watch-log.enable=true
         dataspace.monitoring.watch-log.level=error
-        dataspace.monitoring.watch-log.category.sbp.sbt.dataspace.deposit=all
+        dataspace.monitoring.watch-log.category.ru.sberbank.pprb.sbbol.partners=all
 
         spring.sleuth.enabled=false
         dataspace.monitoring.datasource.sleuth.enabled=false
@@ -367,14 +367,14 @@ parameters:
   - description: Service name to deploy
     displayName: ServiceName
     name: VERSION
-    value: "snapshot"
+    value: "DEV-SNAPSHOT"
   - description: Url to Registry. Example sigma "registry.sigma.sbrf.ru" alpha "registry.ca.sbrf.ru"
     displayName: RegistryUrl
     name: registryUrl
   - description: Registry Project. Example "pprb/ci00682829_cdm"
     displayName: RegistryProject
     name: registryProject
-  - description: Url to instance partners-deposit
+  - description: Url to instance partners
     displayName: dataSpaceCoreUrl
     name: dataSpaceCoreUrl
   - description: Url to fluentbit image

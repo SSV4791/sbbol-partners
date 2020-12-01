@@ -1,40 +1,40 @@
 Installer:
-  openShiftUrl: api.dev-gen.sigma.sbrf.ru:6443
-  openShiftProject: ci00684783-edevgen-dataspace-core-dev
+  openShiftUrl: api.dev-gen2.sigma.sbrf.ru:6443
+  openShiftProject: ci02281165-edevgen-efs-kib-sbbol-dev-test10
   ingressGatewayName: gw-ds-ingress
   setUniqModuleName: true
   parameters:
     dataspace-core-template:
-      MODULE_NAME: dataspace-core-deposit
+      MODULE_NAME: dataspace-core-partners
       standinEnabled: true
       FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
       requestCPU: 500m
       requestMemory: 1024Mi
     dataspace-gigabas-template:
-      MODULE_NAME: dataspace-gigabas-deposit
+      MODULE_NAME: dataspace-gigabas-partners
       MODEL_PACKAGE_NAME: TODODELETE
       requestCPU: 500m
       requestMemory: 1024Mi
       FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
-    dataspace-client-template:
-      MODULE_NAME: dataspace-client-deposit
-      dataSpaceCoreUrl: "http://svc-dataspace-core-deposit:8080"
+    partners-template:
+      MODULE_NAME: sbbol-partners
+      dataSpaceCoreUrl: "http://svc-dataspace-core-partners:8080"
       requestCPU: 500m
       requestMemory: 1024Mi
       FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
 commons:
   ci:
-    credentials: dataspace-bot
+    credentials: DS_sbbol-nexus
   openshift:
-    credentials: dataspace-bot
-    url: api.dev-gen.sigma.sbrf.ru:6443
+    credentials: DS_sbbol-nexus
+    url: api.dev-gen2.sigma.sbrf.ru:6443
   nexus:
-    credentials: dataspace-bot
+    credentials: DS_sbbol-nexus
     url: sbtatlas.sigma.sbrf.ru/nexus
     snapshotRepository: corp-snapshots
     releaseRepository: corp-releases
   registry:
-    credentials: dataspace-bot
+    credentials: DS_sbbol-nexus
     url: registry.sigma.sbrf.ru
     snapshotProject: pprb-dev/ci00682829_cdm_dev
     releaseProject: pprb/ci00682829_cdm
@@ -44,3 +44,5 @@ commons:
     credentials: dataspace-bot-sonar-key
     url: https://sbt-sonarqube.sigma.sbrf.ru/
     token: 613f5c708cf709538c6ae732f47a922458b4f1db
+  maven:
+    pathSettings: ./config/sigma/settings.xml
