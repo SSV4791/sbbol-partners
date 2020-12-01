@@ -6,33 +6,33 @@
     <servers>
         <server>
             <id>PPRBAC_release</id>
-            <username>${server.username}</username>
-            <password>${server.password}</password>
+            <username>sbt_rbac_bot</username>
+            <password>{QXlhKEyq1boHhfcZHmQttUJF+pZHsco2vePXq/iuPHE=}</password>
         </server>
         <server>
             <id>PPRBAC_snapshot</id>
-            <username>${server.username}</username>
-            <password>${server.password}</password>
+            <username>sbt_rbac_bot</username>
+            <password>{QXlhKEyq1boHhfcZHmQttUJF+pZHsco2vePXq/iuPHE=}</password>
         </server>
         <server>
             <id>PPRB_dev_group</id>
-            <username>${server.username}</username>
-            <password>${server.password}</password>
+            <username>sbt_rbac_bot</username>
+            <password>{QXlhKEyq1boHhfcZHmQttUJF+pZHsco2vePXq/iuPHE=}</password>
         </server>
         <server>
             <id>INTLAB_thirdparty</id>
-            <username>${server.username}</username>
-            <password>${server.password}</password>
+            <username>sbt_rbac_bot</username>
+            <password>{QXlhKEyq1boHhfcZHmQttUJF+pZHsco2vePXq/iuPHE=}</password>
         </server>
         <server>
             <id>distribution.repo2</id>
-            <username>${server.distribution.username}</username>
-            <password>${server.distribution.password}</password>
+            <username>CI_CI00682829</username>
+            <password>{2oZJwebUJZsHgvHXrXo0dxXj0tOi6m0FWf/OQtiLmgI=}</password>
         </server>
         <server>
             <id>DOG900_thirdparty</id>
-            <username>${server.username}</username>
-            <password>${server.password}</password>
+            <username>sbt_rbac_bot</username>
+            <password>{QXlhKEyq1boHhfcZHmQttUJF+pZHsco2vePXq/iuPHE=}</password>
         </server>
     </servers>
 

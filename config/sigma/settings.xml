@@ -1,0 +1,32 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <servers>
+        <server>
+            <id>corp-releases</id>
+            <username>sbt-sbbol</username>
+            <password>{64i2sGZ2LVoHE5a54kHuR8S3XOiv24odbMVjPvcp/bw=}</password>
+        </server>
+        <server>
+            <id>corp-snapshots</id>
+            <username>sbt-sbbol</username>
+            <password>{64i2sGZ2LVoHE5a54kHuR8S3XOiv24odbMVjPvcp/bw=}</password>
+        </server>
+        <server>
+            <id>internal</id>
+            <username>sbt-sbbol</username>
+            <password>{64i2sGZ2LVoHE5a54kHuR8S3XOiv24odbMVjPvcp/bw=}</password>
+        </server>
+    </servers>
+
+    <mirrors>
+        <mirror>
+            <id>internal</id>
+            <name>Mirror of central</name>
+            <url>http://sbtatlas.sigma.sbrf.ru/nexus/content/groups/internal</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
+</settings>
