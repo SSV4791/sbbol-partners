@@ -1,15 +1,9 @@
-# Release Notes - Проект 'dataspace-client'
+# Release Notes - Проект 'partners'
 
-**Версия:** 4.1.1-build.1
+**Версия:** 1.0.0
 
-**Дата выпуска:** 16.10.2020 12:38:21
+**Дата выпуска:** 01.12.2020 15:17:16
 
-**Инициатор релиза:** Тихонов Алексей Павлович (Tikhonov.A.P@sberbank.ru)
-
-**JIRA:**
-* https://sbtatlas.sigma.sbrf.ru/jira/browse/DATASPACE
-
-**Confluence:**
-* https://sbtatlas.sigma.sbrf.ru/wiki/display/SPD/DataSpace-Core+PipelineV4
+**Инициатор релиза:** Демаков Сергей Александрович (Demakov.S.Al@sberbank.ru)
 
 ## Изменения
