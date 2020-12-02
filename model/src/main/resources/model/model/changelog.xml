@@ -202,4 +202,11 @@
     <changeSet author="partners" id="1.1.0-build.3-applied">
         <tagDatabase tag="partners-1.1.0-build.3-applied"/>
     </changeSet>
+    <changeSet author="partners" id="1.1.0-build.4-before">
+        <tagDatabase tag="partners-1.1.0-build.4-before"/>
+    </changeSet>
+
+    <changeSet author="partners" id="1.1.0-build.4-applied">
+        <tagDatabase tag="partners-1.1.0-build.4-applied"/>
+    </changeSet>
 </databaseChangeLog>
