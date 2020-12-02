@@ -2,7 +2,7 @@ ARG registryUrl
 ARG rhelOpenJdkUrl
 FROM $registryUrl$rhelOpenJdkUrl
 ARG version=DEV-SNAPSHOT
-COPY ./dataspace-deposit-service-$version.jar /usr/app/runner.jar
+COPY ./runner-$version.jar /usr/app/runner.jar
 COPY ./Starter.sh /usr/app/Starter.sh
 
 WORKDIR /usr/app
