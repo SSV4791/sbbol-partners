@@ -6,7 +6,7 @@ Installer:
   parameters:
     dataspace-core-template:
       MODULE_NAME: dataspace-core-partners
-      standinEnabled: true
+      standinEnabled: false
       FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
       requestCPU: 500m
       requestMemory: 1024Mi
