@@ -181,4 +181,11 @@
     <changeSet author="partners" id="1.0.0-applied">
         <tagDatabase tag="partners-1.0.0-applied"/>
     </changeSet>
+    <changeSet author="partners" id="1.1.0-build.1-before">
+        <tagDatabase tag="partners-1.1.0-build.1-before"/>
+    </changeSet>
+
+    <changeSet author="partners" id="1.1.0-build.1-applied">
+        <tagDatabase tag="partners-1.1.0-build.1-applied"/>
+    </changeSet>
 </databaseChangeLog>
