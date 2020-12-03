@@ -1,6 +1,6 @@
 Installer:
   openShiftUrl: api.dev-gen2.sigma.sbrf.ru:6443
-  openShiftProject: ci02281165-edevgen-efs-kib-sbbol-dev-test10
+  openShiftProject: ci02281165-edevgen2-efs-kib-sbbol-dev-test10
   ingressGatewayName: gw-ds-ingress
   setUniqModuleName: true
   parameters:
