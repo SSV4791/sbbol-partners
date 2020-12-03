@@ -1,5 +1,5 @@
 <PdmModel>
-  <model model-name="partners" component-code="НЕ ЗАДАНО" version="1.1.0-build.4" versioned-entities="false">
+  <model model-name="partners" component-code="НЕ ЗАДАНО" version="1.1.0-build.5" versioned-entities="false">
     <class name="Renter" extends="BaseEntity" label="Арендатор" tableName="T_RENTER" pk-index-name="PK_T_RENTER" description="" affinity="objectId" class-access="UPDATE" lockable="false">
       <id type="String" category="SNOWFLAKE"/>
       <property name="inn" type="String" length="254" label="ИНН" column-name="INN" description="" column-type="VARCHAR(254)"/>
