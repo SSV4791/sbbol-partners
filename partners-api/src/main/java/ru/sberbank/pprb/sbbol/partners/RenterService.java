@@ -7,7 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
 public interface RenterService {
 
     /**
-     * Получение списка договоров аренды по заданному фильтру
+     * Получение списка арендаторов по заданному фильтру
      *
      * @param renterFilter фильтр для поиска арендаторов
      * @return список арендаторов, удовлетворяющих заданному фильтру
@@ -23,7 +23,7 @@ public interface RenterService {
     Renter createRenter(Renter renter);
 
     /**
-     * Редактирование договора
+     * Редактирование арендатора
      *
      * @param renter новые данные арендатора
      * @return арендатор
