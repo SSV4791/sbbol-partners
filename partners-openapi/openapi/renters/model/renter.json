@@ -4,7 +4,7 @@
   "type": "object",
   "title": "Арендатор",
   "properties": {
-    "guid": {
+    "uuid": {
       "type": "string",
       "title": "Уникальный идентификатор арендатора"
     },
@@ -92,17 +92,11 @@
       "title": "Корреспондентский счёт банка"
     },
     "phoneNumbers": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
+      "type": "string",
       "title": "Телефоны"
     },
     "emails": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
+      "type": "string",
       "title": "Электронные почты"
     },
     "legalAddress": {
