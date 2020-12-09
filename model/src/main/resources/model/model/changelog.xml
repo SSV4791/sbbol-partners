@@ -1,0 +1,364 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"
+                   logicalFilePath="./partners/changelog.xml">
+    <changeSet author="partners" id="0.1.0-build.1-before">
+        <tagDatabase tag="partners-0.1.0-build.1-before"/>
+    </changeSet>
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251458">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="T_RENTER"/>
+            </not>
+        </preConditions>
+        <createTable
+                tablespace="${tablespace_t}"
+                tableName="T_RENTER"
+                remarks="Code: Renter&#10;Name: Арендатор">
+
+            <column name="UUID" type="VARCHAR(36)" remarks="Code: uuid&#10;Name: Используется как уникальный идентификатор записи" ><constraints nullable="false"/></column>
+            <column name="RENTERTYPE" type="VARCHAR(254)" remarks="Code: renterType&#10;Name: Тип" ><constraints nullable="false"/></column>
+            <column name="LEGALNAME" type="VARCHAR(350)" remarks="Code: legalName&#10;Name: Наименование ЮЛ/ИП" ></column>
+            <column name="INN" type="VARCHAR(12)" remarks="Code: inn&#10;Name: ИНН" ></column>
+            <column name="KPP" type="VARCHAR(9)" remarks="Code: kpp&#10;Name: КПП" ></column>
+            <column name="OGRN" type="VARCHAR(15)" remarks="Code: ogrn&#10;Name: ОГРН" ></column>
+            <column name="OKPO" type="VARCHAR(30)" remarks="Code: okpo&#10;Name: ОКПО" ></column>
+            <column name="LASTNAME" type="VARCHAR(50)" remarks="Code: lastName&#10;Name: Фамилия" ></column>
+            <column name="FIRSTNAME" type="VARCHAR(50)" remarks="Code: firstName&#10;Name: Имя" ></column>
+            <column name="MIDDLENAME" type="VARCHAR(50)" remarks="Code: middleName&#10;Name: Отчество" ></column>
+            <column name="DULTYPE" type="VARCHAR(2)" remarks="Code: dulType&#10;Name: Тип удостоверяющего документа (физ. лицо)" ></column>
+            <column name="DULSERIE" type="VARCHAR(50)" remarks="Code: dulSerie&#10;Name: Серия ДУ" ></column>
+            <column name="DULNUMBER" type="VARCHAR(50)" remarks="Code: dulNumber&#10;Name: Номер ДУЛ" ></column>
+            <column name="DULDIVISIONISSUE" type="VARCHAR(250)" remarks="Code: dulDivisionIssue&#10;Name: Кем выдан ДУЛ" ></column>
+            <column name="DULDATEISSUE" type="DATE(10)" remarks="Code: dulDateIssue&#10;Name: Дата выдачи ДУЛ" ></column>
+            <column name="DULDIVISIONCODE" type="VARCHAR(50)" remarks="Code: dulDivisionCode&#10;Name: Код подразделения из ДУЛ" ></column>
+            <column name="ACCOUNT" type="VARCHAR(20)" remarks="Code: account&#10;Name: Счет" ></column>
+            <column name="BANKBIC" type="VARCHAR(9)" remarks="Code: bankBic&#10;Name: БИК банка" ></column>
+            <column name="BANKNAME" type="VARCHAR(160)" remarks="Code: bankName&#10;Name: Наименование банка" ></column>
+            <column name="BANKACCOUNT" type="VARCHAR(20)" remarks="Code: bankAccount&#10;Name: К/с банка" ></column>
+            <column name="PHONENUMBERS" type="VARCHAR(100)" remarks="Code: phoneNumbers&#10;Name: Телефоны" ></column>
+            <column name="EMAILS" type="VARCHAR(320)" remarks="Code: emails&#10;Name: E-mail" ></column>
+            <column name="LEGALADDRESS_ENTITYID" type="VARCHAR(254)" remarks="Code: entityId&#10;Name: Id внешнего объекта" ></column>
+            <column name="PHYSICALADDRESS_ENTITYID" type="VARCHAR(254)" remarks="Code: entityId&#10;Name: Id внешнего объекта" ></column>
+            <column name="OBJECT_ID" type="VARCHAR(254)" remarks="Code: objectId&#10;Name: Прикладной ID объекта" ><constraints nullable="false"/></column>
+            <column name="TYPE" type="VARCHAR(254)" remarks="Code: type&#10;Name: Дискриминатор классов" ><constraints nullable="false"/></column>
+            <column name="SYS_ISDELETED" type="${type_boolean}" remarks="Code: isDeleted&#10;Name: System attribute: Deleted flag" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="SYS_LASTCHANGEDATE" type="TIMESTAMP(3)" remarks="Code: lastChangeDate&#10;Name: System attribute: date of the last modification" ></column>
+            <column name="SYS_PARTITIONID" type="${type_int}" remarks="Code: partitionId&#10;Name: System attribute: partitioning id" defaultValueNumeric="0"></column>
+            <column name="SYS_OWNERID" type="VARCHAR(254)" remarks="Code: ownerId&#10;Name: System attribute: record owner module id" ></column>
+            <column name="SYS_RECMODELVERSION" type="VARCHAR(254)" remarks="Code: recModelVersion&#10;Name: System attribute: Record model version" ></column>
+            <column name="CHGCNT" type="${type_long}" remarks="Code: chgCnt&#10;Name: Счетчик изменений (технический)" ></column>
+            <column name="OFFFLAG" type="${type_byte}" remarks="Code: offFlag&#10;Name: Признак деактивации записи" ></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251458-pk">
+        <preConditions onFail="MARK_RAN">
+            <or>
+                <and><dbms type="h2"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = 'T_RENTER'</sqlCheck></and>
+                <and><dbms type="postgresql"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = lower('T_RENTER')</sqlCheck></and>
+                <and><dbms type="oracle"/><sqlCheck expectedResult="0">SELECT count(*) FROM sys.user_constraints where CONSTRAINT_TYPE = 'P' and TABLE_NAME = 'T_RENTER'</sqlCheck></and>
+            </or>
+        </preConditions>
+        <addPrimaryKey tablespace="${tablespace_i}" tableName="T_RENTER" columnNames="OBJECT_ID" constraintName="PK_T_RENTER"/>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251458-index-1">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_RENTER"
+            unique="false"
+            indexName="I_RENTER_LEGALADDRESS">
+            <column name="LEGALADDRESS_ENTITYID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251458-index-2">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_RENTER"
+            unique="false"
+            indexName="I_RENTER_PHYSICALADDRESS">
+            <column name="PHYSICALADDRESS_ENTITYID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251458-index-3">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_RENTER"
+            unique="false"
+            indexName="I_RENTER_TYPE">
+            <column name="TYPE"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251459">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="T_ADDRESS"/>
+            </not>
+        </preConditions>
+        <createTable
+                tablespace="${tablespace_t}"
+                tableName="T_ADDRESS"
+                remarks="Code: Address&#10;Name: Адрес">
+
+            <column name="ZIPCODE" type="VARCHAR(6)" remarks="Code: zipCode&#10;Name: Индекс" ><constraints nullable="false"/></column>
+            <column name="REGIONCODE" type="VARCHAR(10)" remarks="Code: regionCode&#10;Name: Код региона" ></column>
+            <column name="REGION" type="VARCHAR(50)" remarks="Code: region&#10;Name: Район" ><constraints nullable="false"/></column>
+            <column name="CITY" type="VARCHAR(300)" remarks="Code: city&#10;Name: Город" ><constraints nullable="false"/></column>
+            <column name="LOCALITY" type="VARCHAR(300)" remarks="Code: locality&#10;Name: Населенный пункт" ><constraints nullable="false"/></column>
+            <column name="STREET" type="VARCHAR(300)" remarks="Code: street&#10;Name: Улица" ><constraints nullable="false"/></column>
+            <column name="BUILDING" type="VARCHAR(100)" remarks="Code: building&#10;Name: Дом" ><constraints nullable="false"/></column>
+            <column name="BUILDINGBLOCK" type="VARCHAR(20)" remarks="Code: buildingBlock&#10;Name: Корпус" ><constraints nullable="false"/></column>
+            <column name="FLAT" type="VARCHAR(20)" remarks="Code: flat&#10;Name: Квартира" ><constraints nullable="false"/></column>
+            <column name="OBJECT_ID" type="VARCHAR(254)" remarks="Code: objectId&#10;Name: Прикладной ID объекта" ><constraints nullable="false"/></column>
+            <column name="TYPE" type="VARCHAR(254)" remarks="Code: type&#10;Name: Дискриминатор классов" ><constraints nullable="false"/></column>
+            <column name="SYS_ISDELETED" type="${type_boolean}" remarks="Code: isDeleted&#10;Name: System attribute: Deleted flag" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="SYS_LASTCHANGEDATE" type="TIMESTAMP(3)" remarks="Code: lastChangeDate&#10;Name: System attribute: date of the last modification" ></column>
+            <column name="SYS_PARTITIONID" type="${type_int}" remarks="Code: partitionId&#10;Name: System attribute: partitioning id" defaultValueNumeric="0"></column>
+            <column name="SYS_OWNERID" type="VARCHAR(254)" remarks="Code: ownerId&#10;Name: System attribute: record owner module id" ></column>
+            <column name="SYS_RECMODELVERSION" type="VARCHAR(254)" remarks="Code: recModelVersion&#10;Name: System attribute: Record model version" ></column>
+            <column name="CHGCNT" type="${type_long}" remarks="Code: chgCnt&#10;Name: Счетчик изменений (технический)" ></column>
+            <column name="OFFFLAG" type="${type_byte}" remarks="Code: offFlag&#10;Name: Признак деактивации записи" ></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251459-pk">
+        <preConditions onFail="MARK_RAN">
+            <or>
+                <and><dbms type="h2"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = 'T_ADDRESS'</sqlCheck></and>
+                <and><dbms type="postgresql"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = lower('T_ADDRESS')</sqlCheck></and>
+                <and><dbms type="oracle"/><sqlCheck expectedResult="0">SELECT count(*) FROM sys.user_constraints where CONSTRAINT_TYPE = 'P' and TABLE_NAME = 'T_ADDRESS'</sqlCheck></and>
+            </or>
+        </preConditions>
+        <addPrimaryKey tablespace="${tablespace_i}" tableName="T_ADDRESS" columnNames="OBJECT_ID" constraintName="PK_T_ADDRESS"/>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251459-index-1">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_ADDRESS"
+            unique="false"
+            indexName="I_ADDRESS_TYPE">
+            <column name="TYPE"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251460">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="T_RENTERAPICALL"/>
+            </not>
+        </preConditions>
+        <createTable
+                tablespace="${tablespace_t}"
+                tableName="T_RENTERAPICALL"
+                remarks="Code: RenterApiCall&#10;Name: Результат обработки пакета Unit of Work дляRenter">
+
+            <column name="APICALLID" type="VARCHAR(254)" remarks="Code: apiCallId&#10;Name: Идентификатор пакета" ></column>
+            <column name="FIRSTCALLDATE" type="TIMESTAMP(3)" remarks="Code: firstCallDate&#10;Name: Дата первого успешного вызова пакета" ></column>
+            <column name="DATA" type="VARCHAR(4000)" remarks="Code: data&#10;Name: Результат обработки пакета" ></column>
+            <column name="BIGDATA" type="CLOB" remarks="Code: bigData&#10;Name: Результат обработки пакета, используется если результат не помещается в поле data" ></column>
+            <column name="PARENTOBJECT_ID" type="VARCHAR(254)" remarks="Code: parentObject&#10;Name: Ссылка на родительский объект" ><constraints nullable="false"/></column>
+            <column name="OBJECT_ID" type="VARCHAR(254)" remarks="Code: objectId&#10;Name: Прикладной ID объекта" ><constraints nullable="false"/></column>
+            <column name="AGGREGATEROOT_ID" type="VARCHAR(254)" remarks="Code: aggregateRoot&#10;Name: ссылка на корень агрегата" ></column>
+            <column name="SYS_ISDELETED" type="${type_boolean}" remarks="Code: isDeleted&#10;Name: System attribute: Deleted flag" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="SYS_LASTCHANGEDATE" type="TIMESTAMP(3)" remarks="Code: lastChangeDate&#10;Name: System attribute: date of the last modification" ></column>
+            <column name="SYS_PARTITIONID" type="${type_int}" remarks="Code: partitionId&#10;Name: System attribute: partitioning id" defaultValueNumeric="0"></column>
+            <column name="SYS_OWNERID" type="VARCHAR(254)" remarks="Code: ownerId&#10;Name: System attribute: record owner module id" ></column>
+            <column name="SYS_RECMODELVERSION" type="VARCHAR(254)" remarks="Code: recModelVersion&#10;Name: System attribute: Record model version" ></column>
+            <column name="CHGCNT" type="${type_long}" remarks="Code: chgCnt&#10;Name: Счетчик изменений (технический)" ></column>
+            <column name="OFFFLAG" type="${type_byte}" remarks="Code: offFlag&#10;Name: Признак деактивации записи" ></column>
+        </createTable>
+    </changeSet>
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251460-lob-4" dbms="oracle">
+        <preConditions onFail="MARK_RAN" onError="CONTINUE">
+            <sqlCheck expectedResult="0">select count (*) from T_RENTERAPICALL</sqlCheck>
+            <sqlCheck expectedResult="1">select count (*) from sys.all_lobs where owner=USER and table_name=${namecase}('T_RENTERAPICALL') and column_name=${namecase}('BIGDATA') and tablespace_name&lt;&gt;${namecase}('${tablespace_l}')</sqlCheck>
+        </preConditions>
+        <sql>alter table T_RENTERAPICALL move lob (BIGDATA) store as (tablespace ${tablespace_l})</sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251460-pk">
+        <preConditions onFail="MARK_RAN">
+            <or>
+                <and><dbms type="h2"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = 'T_RENTERAPICALL'</sqlCheck></and>
+                <and><dbms type="postgresql"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = lower('T_RENTERAPICALL')</sqlCheck></and>
+                <and><dbms type="oracle"/><sqlCheck expectedResult="0">SELECT count(*) FROM sys.user_constraints where CONSTRAINT_TYPE = 'P' and TABLE_NAME = 'T_RENTERAPICALL'</sqlCheck></and>
+            </or>
+        </preConditions>
+        <addPrimaryKey tablespace="${tablespace_i}" tableName="T_RENTERAPICALL" columnNames="OBJECT_ID" constraintName="PK_T_RENTERAPICALL"/>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251460-index-1">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_RENTERAPICALL"
+            unique="false"
+            indexName="I_RENTERAPICALL_APICALLID">
+            <column name="APICALLID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251460-index-2">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_RENTERAPICALL"
+            unique="false"
+            indexName="I_RENTERAPICALL_PARENTOBJECT_ID">
+            <column name="PARENTOBJECT_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251460-index-3">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_RENTERAPICALL"
+            unique="false"
+            indexName="I_RENTERAPICALL_AGGREGATEROOT_ID">
+            <column name="AGGREGATEROOT_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251461">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="T_ADDRESSAPICALL"/>
+            </not>
+        </preConditions>
+        <createTable
+                tablespace="${tablespace_t}"
+                tableName="T_ADDRESSAPICALL"
+                remarks="Code: AddressApiCall&#10;Name: Результат обработки пакета Unit of Work дляAddress">
+
+            <column name="APICALLID" type="VARCHAR(254)" remarks="Code: apiCallId&#10;Name: Идентификатор пакета" ></column>
+            <column name="FIRSTCALLDATE" type="TIMESTAMP(3)" remarks="Code: firstCallDate&#10;Name: Дата первого успешного вызова пакета" ></column>
+            <column name="DATA" type="VARCHAR(4000)" remarks="Code: data&#10;Name: Результат обработки пакета" ></column>
+            <column name="BIGDATA" type="CLOB" remarks="Code: bigData&#10;Name: Результат обработки пакета, используется если результат не помещается в поле data" ></column>
+            <column name="PARENTOBJECT_ID" type="VARCHAR(254)" remarks="Code: parentObject&#10;Name: Ссылка на родительский объект" ><constraints nullable="false"/></column>
+            <column name="OBJECT_ID" type="VARCHAR(254)" remarks="Code: objectId&#10;Name: Прикладной ID объекта" ><constraints nullable="false"/></column>
+            <column name="AGGREGATEROOT_ID" type="VARCHAR(254)" remarks="Code: aggregateRoot&#10;Name: ссылка на корень агрегата" ></column>
+            <column name="SYS_ISDELETED" type="${type_boolean}" remarks="Code: isDeleted&#10;Name: System attribute: Deleted flag" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="SYS_LASTCHANGEDATE" type="TIMESTAMP(3)" remarks="Code: lastChangeDate&#10;Name: System attribute: date of the last modification" ></column>
+            <column name="SYS_PARTITIONID" type="${type_int}" remarks="Code: partitionId&#10;Name: System attribute: partitioning id" defaultValueNumeric="0"></column>
+            <column name="SYS_OWNERID" type="VARCHAR(254)" remarks="Code: ownerId&#10;Name: System attribute: record owner module id" ></column>
+            <column name="SYS_RECMODELVERSION" type="VARCHAR(254)" remarks="Code: recModelVersion&#10;Name: System attribute: Record model version" ></column>
+            <column name="CHGCNT" type="${type_long}" remarks="Code: chgCnt&#10;Name: Счетчик изменений (технический)" ></column>
+            <column name="OFFFLAG" type="${type_byte}" remarks="Code: offFlag&#10;Name: Признак деактивации записи" ></column>
+        </createTable>
+    </changeSet>
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251461-lob-4" dbms="oracle">
+        <preConditions onFail="MARK_RAN" onError="CONTINUE">
+            <sqlCheck expectedResult="0">select count (*) from T_ADDRESSAPICALL</sqlCheck>
+            <sqlCheck expectedResult="1">select count (*) from sys.all_lobs where owner=USER and table_name=${namecase}('T_ADDRESSAPICALL') and column_name=${namecase}('BIGDATA') and tablespace_name&lt;&gt;${namecase}('${tablespace_l}')</sqlCheck>
+        </preConditions>
+        <sql>alter table T_ADDRESSAPICALL move lob (BIGDATA) store as (tablespace ${tablespace_l})</sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="partners" id="0.1.0-build.1-6904255597615251461-pk">
+        <preConditions onFail="MARK_RAN">
+            <or>
+                <and><dbms type="h2"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = 'T_ADDRESSAPICALL'</sqlCheck></and>
+                <and><dbms type="postgresql"/><sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'PRIMARY KEY' and TABLE_NAME = lower('T_ADDRESSAPICALL')</sqlCheck></and>
+                <and><dbms type="oracle"/><sqlCheck expectedResult="0">SELECT count(*) FROM sys.user_constraints where CONSTRAINT_TYPE = 'P' and TABLE_NAME = 'T_ADDRESSAPICALL'</sqlCheck></and>
+            </or>
+        </preConditions>
+        <addPrimaryKey tablespace="${tablespace_i}" tableName="T_ADDRESSAPICALL" columnNames="OBJECT_ID" constraintName="PK_T_ADDRESSAPICALL"/>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251461-index-1">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_ADDRESSAPICALL"
+            unique="false"
+            indexName="I_ADDRESSAPICALL_APICALLID">
+            <column name="APICALLID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251461-index-2">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_ADDRESSAPICALL"
+            unique="false"
+            indexName="I_ADDRESSAPICALL_PARENTOBJECT_ID">
+            <column name="PARENTOBJECT_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet failOnError="false" author="partners" id="0.1.0-build.1-6904255597615251461-index-3">
+        <createIndex
+            tablespace="${tablespace_i}"
+            tableName="T_ADDRESSAPICALL"
+            unique="false"
+            indexName="I_ADDRESSAPICALL_AGGREGATEROOT_ID">
+            <column name="AGGREGATEROOT_ID"/>
+        </createIndex>
+    </changeSet>
+   <changeSet author="partners" id="0.1.0-build.1-AGGLOCK-20200713-ADDRESS">
+       <preConditions onFail="MARK_RAN">
+           <not> <tableExists tableName="T_REPL_AGGLOCK_ADDRESS"/> </not>
+       </preConditions>
+       <createTable tableName="T_REPL_AGGLOCK_ADDRESS">
+           <column name="rootid" type="VARCHAR(255)"> <constraints nullable="false" primaryKey="true" primaryKeyName="PK_T_REPL_AGGLOCK_ROOT_ID_ADDRESS"/> </column>
+           <column name="silock" type="${type_long}" defaultValueNumeric="0"> <constraints nullable="false"/> </column>
+           <column name="token" type="VARCHAR(255)"/>
+           <column name="migrationstatus" type="${type_boolean}" defaultValueNumeric="0"> <constraints nullable="false"/> </column>
+           <column name="chgcnt" type="${type_long}"/>
+           <column name="sys_lastchangedate" type="datetime(3)"/>
+           <column name="version" type="${type_long}"/>
+           <column name="guid" type="VARCHAR(255)"/>
+       </createTable>
+   </changeSet>
+   <changeSet author="partners" id="0.1.0-build.1-AGGLOCK-20200713-RENTER">
+       <preConditions onFail="MARK_RAN">
+           <not> <tableExists tableName="T_REPL_AGGLOCK_RENTER"/> </not>
+       </preConditions>
+       <createTable tableName="T_REPL_AGGLOCK_RENTER">
+           <column name="rootid" type="VARCHAR(255)"> <constraints nullable="false" primaryKey="true" primaryKeyName="PK_T_REPL_AGGLOCK_ROOT_ID_RENTER"/> </column>
+           <column name="silock" type="${type_long}" defaultValueNumeric="0"> <constraints nullable="false"/> </column>
+           <column name="token" type="VARCHAR(255)"/>
+           <column name="migrationstatus" type="${type_boolean}" defaultValueNumeric="0"> <constraints nullable="false"/> </column>
+           <column name="chgcnt" type="${type_long}"/>
+           <column name="sys_lastchangedate" type="datetime(3)"/>
+           <column name="version" type="${type_long}"/>
+           <column name="guid" type="VARCHAR(255)"/>
+       </createTable>
+   </changeSet>
+   <changeSet author="partners" id="0.1.0-build.1-AGGLOCKEVENT-20200805">
+       <preConditions onFail="MARK_RAN">
+           <not> <tableExists tableName="T_REPL_AGGLOCKEVENT"/> </not>
+       </preConditions>
+       <createTable tableName="T_REPL_AGGLOCKEVENT">
+           <column name="event_id" type="VARCHAR(128)"> <constraints nullable="false" primaryKey="true" primaryKeyName="PK_T_REPL_AGGLOCKEVENT"/> </column>
+           <column name="rootclass" type="VARCHAR(255)"> <constraints nullable="false"/> </column>
+           <column name="rootid" type="VARCHAR(255)"> <constraints nullable="false"/> </column>
+           <column name="sys_lastchangedate" type="datetime(3)"> <constraints nullable="false"/> </column>
+           <column name="info" type="VARCHAR(255)"/>
+           <column name="gotdata" type="${type_boolean}" defaultValueNumeric="0"> <constraints nullable="false"/> </column>
+           <column name="gotulck" type="${type_boolean}" defaultValueNumeric="0"> <constraints nullable="false"/> </column>
+           <column name="gotlck" type="${type_boolean}" defaultValueNumeric="0"> <constraints nullable="false"/> </column>
+           <column name="idempotence_key" type="VARCHAR(255)"/>
+           <column name="version" type="${type_long}"/>
+       </createTable>
+   </changeSet>
+   <changeSet author="partners" id="0.1.0-build.1-AGGLOCKEVENT-20200806">
+       <preConditions onFail="MARK_RAN">
+           <not> <indexExists indexName="T_REPL_AGGLOCKEVENT_IDEMPOTENCE_KEY_INDEX" tableName="T_REPL_AGGLOCKEVENT"/> </not>
+       </preConditions>
+       <createIndex indexName="T_REPL_AGGLOCKEVENT_IDEMPOTENCE_KEY_INDEX" tableName="T_REPL_AGGLOCKEVENT">
+           <column name="idempotence_key"/>
+       </createIndex>
+   </changeSet>
+   <changeSet author="partners" id="0.1.0-build.1-AGGLOCKEVENT-20200807">
+       <preConditions onFail="MARK_RAN">
+           <not> <indexExists indexName="T_REPL_AGGLOCKEVENT_ROOTCLASS_ROOTID_EVENT_ID_INDEX" tableName="T_REPL_AGGLOCKEVENT"/> </not>
+       </preConditions>
+       <createIndex indexName="T_REPL_AGGLOCKEVENT_ROOTCLASS_ROOTID_EVENT_ID_INDEX" tableName="T_REPL_AGGLOCKEVENT">
+           <column name="rootclass"/>
+           <column name="rootid"/>
+           <column name="event_id"/>
+       </createIndex>
+   </changeSet>
+   <changeSet author="partners" id="0.1.0-build.1-AGGLOCKEVENT-20201026">
+       <preConditions onFail="MARK_RAN">
+           <not> <columnExists columnName="timestamp_" tableName="T_REPL_AGGLOCKEVENT"/> </not>
+       </preConditions>
+       <addColumn tableName="T_REPL_AGGLOCKEVENT"> <column name="timestamp_" type="datetime(3)"/> </addColumn>
+   </changeSet>
+    <changeSet author="partners" id="0.1.0-build.1-applied">
+        <tagDatabase tag="partners-0.1.0-build.1-applied"/>
+    </changeSet>
+</databaseChangeLog>

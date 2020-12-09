@@ -1,0 +1,184 @@
+<PdmModel>
+  <model model-name="partners" component-code="НЕ ЗАДАНО" version="0.1.0-build.1" versioned-entities="false">
+    <class name="Renter" extends="BaseEntity" label="Арендатор" tableName="T_RENTER" pk-index-name="PK_T_RENTER" description="" affinity="objectId" class-access="UPDATE" lockable="false">
+      <id type="String" category="SNOWFLAKE"/>
+      <property name="uuid" type="String" length="36" label="Используется как уникальный идентификатор записи" mandatory="true" column-name="UUID" description="" column-type="VARCHAR(36)"/>
+      <property name="renterType" type="RenterType" length="254" label="Тип" mandatory="true" column-name="RENTERTYPE" description="" column-type="VARCHAR(254)" enum="true"/>
+      <property name="legalName" type="String" length="350" label="Наименование ЮЛ/ИП" column-name="LEGALNAME" description="" column-type="VARCHAR(350)"/>
+      <property name="inn" type="String" length="12" label="ИНН" column-name="INN" description="" column-type="VARCHAR(12)"/>
+      <property name="kpp" type="String" length="9" label="КПП" column-name="KPP" description="" column-type="VARCHAR(9)"/>
+      <property name="ogrn" type="String" length="15" label="ОГРН" column-name="OGRN" description="" column-type="VARCHAR(15)"/>
+      <property name="okpo" type="String" length="30" label="ОКПО" column-name="OKPO" description="" column-type="VARCHAR(30)"/>
+      <property name="lastName" type="String" length="50" label="Фамилия" column-name="LASTNAME" description="" column-type="VARCHAR(50)"/>
+      <property name="firstName" type="String" length="50" label="Имя" column-name="FIRSTNAME" description="" column-type="VARCHAR(50)"/>
+      <property name="middleName" type="String" length="50" label="Отчество" column-name="MIDDLENAME" description="" column-type="VARCHAR(50)"/>
+      <property name="dulType" type="DulType" length="2" label="Тип удостоверяющего документа (физ. лицо)" column-name="DULTYPE" description="" column-type="VARCHAR(2)" enum="true"/>
+      <property name="dulSerie" type="String" length="50" label="Серия ДУ" column-name="DULSERIE" description="" column-type="VARCHAR(50)"/>
+      <property name="dulNumber" type="String" length="50" label="Номер ДУЛ" column-name="DULNUMBER" description="" column-type="VARCHAR(50)"/>
+      <property name="dulDivisionIssue" type="String" length="250" label="Кем выдан ДУЛ" column-name="DULDIVISIONISSUE" description="" column-type="VARCHAR(250)"/>
+      <property name="dulDateIssue" type="LocalDate" length="10" label="Дата выдачи ДУЛ" column-name="DULDATEISSUE" description="" column-type="DATE(10)"/>
+      <property name="dulDivisionCode" type="String" length="50" label="Код подразделения из ДУЛ" column-name="DULDIVISIONCODE" description="" column-type="VARCHAR(50)"/>
+      <property name="account" type="String" length="20" label="Счет" column-name="ACCOUNT" description="" column-type="VARCHAR(20)"/>
+      <property name="bankBic" type="String" length="9" label="БИК банка" column-name="BANKBIC" description="" column-type="VARCHAR(9)"/>
+      <property name="bankName" type="String" length="160" label="Наименование банка" column-name="BANKNAME" description="" column-type="VARCHAR(160)"/>
+      <property name="bankAccount" type="String" length="20" label="К/с банка" column-name="BANKACCOUNT" description="" column-type="VARCHAR(20)"/>
+      <property name="phoneNumbers" type="String" length="100" label="Телефоны" column-name="PHONENUMBERS" description="" column-type="VARCHAR(100)"/>
+      <property name="emails" type="String" length="320" label="E-mail" column-name="EMAILS" description="" column-type="VARCHAR(320)"/>
+      <property name="apiCalls" type="RenterApiCall" length="254" collection="SET" label="Коллекция с результатами идемпотентных вызовов" column-type="VARCHAR(254)" system-field="true" changeable="SYSTEM" mappedBy="parentObject" object-link="O2M"/>
+      <property name="legalAddress" type="AddressReference" length="254" label="Адрес регистрации" index="true" embedded="true" description="" column-type="VARCHAR(254)" external-link="true" changeable="READ_ONLY"/>
+      <property name="physicalAddress" type="AddressReference" length="254" label="Фактический адрес" index="true" embedded="true" description="" column-type="VARCHAR(254)" external-link="true" changeable="READ_ONLY"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="type" type="String" length="254" label="Дискриминатор классов" mandatory="true" index="true" column-name="TYPE" description="Дискриминатор" column-type="VARCHAR(254)" changeable="READ_ONLY"/>
+      <index index-name="I_RENTER_OBJECT_ID" primary-key="true">
+        <property name="objectId"/>
+      </index>
+      <index index-name="I_RENTER_LEGALADDRESS">
+        <property name="legalAddress.entityId"/>
+      </index>
+      <index index-name="I_RENTER_PHYSICALADDRESS">
+        <property name="physicalAddress.entityId"/>
+      </index>
+      <index index-name="I_RENTER_TYPE">
+        <property name="type"/>
+      </index>
+      <embedded-lists>
+        <embedded-list name="legalAddress" reference="true">
+          <property name="entityId" column-name="LEGALADDRESS_ENTITYID"/>
+        </embedded-list>
+        <embedded-list name="physicalAddress" reference="true">
+          <property name="entityId" column-name="PHYSICALADDRESS_ENTITYID"/>
+        </embedded-list>
+      </embedded-lists>
+    </class>
+    <class name="Address" extends="BaseEntity" label="Адрес" tableName="T_ADDRESS" pk-index-name="PK_T_ADDRESS" description="" affinity="objectId" class-access="UPDATE" lockable="false">
+      <id type="String" category="SNOWFLAKE"/>
+      <property name="zipCode" type="String" length="6" label="Индекс" mandatory="true" column-name="ZIPCODE" description="" column-type="VARCHAR(6)"/>
+      <property name="regionCode" type="String" length="10" label="Код региона" column-name="REGIONCODE" description="" column-type="VARCHAR(10)"/>
+      <property name="region" type="String" length="50" label="Район" mandatory="true" column-name="REGION" description="" column-type="VARCHAR(50)"/>
+      <property name="city" type="String" length="300" label="Город" mandatory="true" column-name="CITY" description="" column-type="VARCHAR(300)"/>
+      <property name="locality" type="String" length="300" label="Населенный пункт" mandatory="true" column-name="LOCALITY" description="" column-type="VARCHAR(300)"/>
+      <property name="street" type="String" length="300" label="Улица" mandatory="true" column-name="STREET" description="" column-type="VARCHAR(300)"/>
+      <property name="building" type="String" length="100" label="Дом" mandatory="true" column-name="BUILDING" description="" column-type="VARCHAR(100)"/>
+      <property name="buildingBlock" type="String" length="20" label="Корпус" mandatory="true" column-name="BUILDINGBLOCK" description="" column-type="VARCHAR(20)"/>
+      <property name="flat" type="String" length="20" label="Квартира" mandatory="true" column-name="FLAT" description="" column-type="VARCHAR(20)"/>
+      <property name="apiCalls" type="AddressApiCall" length="254" collection="SET" label="Коллекция с результатами идемпотентных вызовов" column-type="VARCHAR(254)" system-field="true" changeable="SYSTEM" mappedBy="parentObject" object-link="O2M"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="type" type="String" length="254" label="Дискриминатор классов" mandatory="true" index="true" column-name="TYPE" description="Дискриминатор" column-type="VARCHAR(254)" changeable="READ_ONLY"/>
+      <index index-name="I_ADDRESS_OBJECT_ID" primary-key="true">
+        <property name="objectId"/>
+      </index>
+      <index index-name="I_ADDRESS_TYPE">
+        <property name="type"/>
+      </index>
+    </class>
+    <class name="RenterApiCall" extends="BaseEntity" label="Результат обработки пакета Unit of Work дляRenter" tableName="T_RENTERAPICALL" pk-index-name="PK_T_RENTERAPICALL" affinity="parentObject" class-access="SYSTEM" final-class="true">
+      <id type="String" category="SNOWFLAKE"/>
+      <property name="apiCallId" type="String" length="254" label="Идентификатор пакета" index="true" column-name="APICALLID" column-type="VARCHAR(254)" system-field="true" changeable="SYSTEM"/>
+      <property name="firstCallDate" type="Date" length="3" label="Дата первого успешного вызова пакета" column-name="FIRSTCALLDATE" column-type="TIMESTAMP(3)" system-field="true" changeable="SYSTEM"/>
+      <property name="data" type="String" length="4000" label="Результат обработки пакета" column-name="DATA" column-type="VARCHAR(4000)" system-field="true" changeable="SYSTEM"/>
+      <property name="bigData" type="String" length="4001" label="Результат обработки пакета, используется если результат не помещается в поле data" column-name="BIGDATA" column-type="CLOB" system-field="true" changeable="SYSTEM"/>
+      <property name="parentObject" type="Renter" length="254" label="Ссылка на родительский объект" mandatory="true" index="true" column-name="PARENTOBJECT_ID" column-type="VARCHAR(254)" changeable="CREATE" parent="true" object-link="M2O"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="aggregateRoot" type="Renter" length="254" label="ссылка на корень агрегата" index="true" column-name="AGGREGATEROOT_ID" column-type="VARCHAR(254)" changeable="READ_ONLY" object-link="M2O"/>
+      <index index-name="I_RENTERAPICALL_OBJECT_ID" primary-key="true">
+        <property name="objectId"/>
+      </index>
+      <index index-name="I_RENTERAPICALL_APICALLID">
+        <property name="apiCallId"/>
+      </index>
+      <index index-name="I_RENTERAPICALL_PARENTOBJECT_ID">
+        <property name="parentObject"/>
+      </index>
+      <index index-name="I_RENTERAPICALL_AGGREGATEROOT_ID">
+        <property name="aggregateRoot"/>
+      </index>
+    </class>
+    <class name="AddressApiCall" extends="BaseEntity" label="Результат обработки пакета Unit of Work дляAddress" tableName="T_ADDRESSAPICALL" pk-index-name="PK_T_ADDRESSAPICALL" affinity="parentObject" class-access="SYSTEM" final-class="true">
+      <id type="String" category="SNOWFLAKE"/>
+      <property name="apiCallId" type="String" length="254" label="Идентификатор пакета" index="true" column-name="APICALLID" column-type="VARCHAR(254)" system-field="true" changeable="SYSTEM"/>
+      <property name="firstCallDate" type="Date" length="3" label="Дата первого успешного вызова пакета" column-name="FIRSTCALLDATE" column-type="TIMESTAMP(3)" system-field="true" changeable="SYSTEM"/>
+      <property name="data" type="String" length="4000" label="Результат обработки пакета" column-name="DATA" column-type="VARCHAR(4000)" system-field="true" changeable="SYSTEM"/>
+      <property name="bigData" type="String" length="4001" label="Результат обработки пакета, используется если результат не помещается в поле data" column-name="BIGDATA" column-type="CLOB" system-field="true" changeable="SYSTEM"/>
+      <property name="parentObject" type="Address" length="254" label="Ссылка на родительский объект" mandatory="true" index="true" column-name="PARENTOBJECT_ID" column-type="VARCHAR(254)" changeable="CREATE" parent="true" object-link="M2O"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="aggregateRoot" type="Address" length="254" label="ссылка на корень агрегата" index="true" column-name="AGGREGATEROOT_ID" column-type="VARCHAR(254)" changeable="READ_ONLY" object-link="M2O"/>
+      <index index-name="I_ADDRESSAPICALL_OBJECT_ID" primary-key="true">
+        <property name="objectId"/>
+      </index>
+      <index index-name="I_ADDRESSAPICALL_APICALLID">
+        <property name="apiCallId"/>
+      </index>
+      <index index-name="I_ADDRESSAPICALL_PARENTOBJECT_ID">
+        <property name="parentObject"/>
+      </index>
+      <index index-name="I_ADDRESSAPICALL_AGGREGATEROOT_ID">
+        <property name="aggregateRoot"/>
+      </index>
+    </class>
+    <class name="AddressReference" embeddable="true" label="Внешняя ссылка AddressReference" class-access="READ_ONLY" final-class="true">
+      <id type="String" category="NO_ID"/>
+      <property name="entityId" type="String" length="254" label="Id внешнего объекта" column-name="ENTITYID" column-type="VARCHAR(254)"/>
+    </class>
+    <class name="BaseEntity" label="Базовый класс модели" is-abstract="true" class-access="SYSTEM">
+      <id type="String" category="NO_ID"/>
+      <property name="isDeleted" type="Boolean" scale="0" length="1" label="System attribute: Deleted flag" mandatory="true" column-name="SYS_ISDELETED" default-value="false" column-type="NUMBER(1,0)" system-field="true" changeable="SYSTEM"/>
+      <property name="lastChangeDate" type="Date" length="3" label="System attribute: date of the last modification" column-name="SYS_LASTCHANGEDATE" column-type="TIMESTAMP(3)" changeable="READ_ONLY"/>
+      <property name="partitionId" type="Integer" scale="0" length="10" label="System attribute: partitioning id" column-name="SYS_PARTITIONID" default-value="0" column-type="NUMBER(10,0)" system-field="true" changeable="SYSTEM"/>
+      <property name="ownerId" type="String" length="254" label="System attribute: record owner module id" column-name="SYS_OWNERID" column-type="VARCHAR(254)" system-field="true" changeable="SYSTEM"/>
+      <property name="recModelVersion" type="String" length="254" label="System attribute: Record model version" column-name="SYS_RECMODELVERSION" column-type="VARCHAR(254)" system-field="true" changeable="SYSTEM"/>
+      <property name="chgCnt" type="Long" scale="0" length="19" label="Счетчик изменений (технический)" column-name="CHGCNT" column-type="NUMBER(19,0)" changeable="READ_ONLY"/>
+      <property name="offFlag" type="Byte" scale="0" length="3" label="Признак деактивации записи" column-name="OFFFLAG" column-type="NUMBER(3,0)" system-field="true" changeable="SYSTEM"/>
+    </class>
+    <import type="SysLockModelGenerator" file=""/>
+    <import type="IdempotenceModelGenerator" file=""/>
+    <import type="AggregateModelGenerator" file=""/>
+    <import type="APP_LOCKS" file=""/>
+    <import type="REFERENCE" file=""/>
+    <import type="DICTIONARY_GENERATOR" file="dictionary/"/>
+    <import type="CciModelGenerator" file=""/>
+    <import type="BASE_ENTITY" file=""/>
+    <enum name="RenterType" label="" deprecated="false">
+      <value name="LEGAL_ENTITY">
+        <extension name="desc" value="Юр. лицо"/>
+      </value>
+      <value name="ENTREPRENEUR">
+        <extension name="desc" value="ИП"/>
+      </value>
+      <value name="PHYSICAL_PERSON">
+        <extension name="desc" value="Физ. лицо"/>
+      </value>
+    </enum>
+    <enum name="DulType" label="" deprecated="false">
+      <value name="PASSPORTOFRUSSIA">
+        <extension name="desc" value="Паспорт гражданина РФ"/>
+      </value>
+      <value name="SEAMANPASSPORT">
+        <extension name="desc" value="Паспорт моряка (удостоверение личности моряка)"/>
+      </value>
+      <value name="SERVICEMANIDENTITYCARDOFRUSSIA">
+        <extension name="desc" value="Удостоверение личности военнослужащего"/>
+      </value>
+      <value name="FOREIGNPASSPORT">
+        <extension name="desc" value="Паспорт иностранного гражданина"/>
+      </value>
+      <value name="SERVICEPASSPORTOFRUSSIA">
+        <extension name="desc" value="Служебный паспорт гражданина РФ"/>
+      </value>
+      <value name="RFCITIZENDIPLOMATICPASSPORT">
+        <extension name="desc" value="Дипломатический паспорт"/>
+      </value>
+      <value name="PASSPORTOFRUSSIAWITHCHIP">
+        <extension name="desc" value="Паспорт гражданина РФ, содержащий электронный носитель информации"/>
+      </value>
+    </enum>
+  </model>
+  <status/>
+  <meta-information>
+    <plugin-version>4.2.0-build.157</plugin-version>
+  </meta-information>
+  <system-locks>
+    <system-locks-classes class="Address" table-name="T_REPL_AGGLOCK_ADDRESS"/>
+    <system-locks-classes class="Renter" table-name="T_REPL_AGGLOCK_RENTER"/>
+    <system-lockevent-table>T_REPL_AGGLOCKEVENT</system-lockevent-table>
+  </system-locks>
+</PdmModel>
