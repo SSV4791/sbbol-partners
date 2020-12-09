@@ -68,6 +68,7 @@ objects:
         dataspace.metamock.url=${URL_METAMOCK}
 
         dataspace.account.service.local.mode.enabled=false
+        dataspace.account.service.enabled=${ACCOUNT_SERVICE_ENABLED}
         dataspace.account.service.jrpc.url=${ACCOUNT_SERVICE_URL}
 
       jvm-arguments: |-
@@ -210,7 +211,7 @@ objects:
         spec:
           containers:
             - name: ${MODULE_NAME}
-              image: ${registryUrl}/${registryProject}/${imageNameWithDigest}
+              image: ${IMAGE_URL}
               env:
                 - name: NODE_NAME       #добавление имени ноды в переменные среды пода
                   valueFrom:
@@ -253,7 +254,7 @@ objects:
               readinessProbe:
                 failureThreshold: 3
                 httpGet:
-                  path: /actuator/health/readiness
+                  path: /actuator/health
                   port: 8080
                   scheme: HTTP
                 periodSeconds: 30

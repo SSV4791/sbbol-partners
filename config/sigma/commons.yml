@@ -1,0 +1,24 @@
+commons:
+  ci:
+    credentials: DS_sbbol-nexus
+  openshift:
+    credentials: DS_sbbol-nexus
+    url: api.dev-gen2.sigma.sbrf.ru:6443
+  nexus:
+    credentials: DS_sbbol-nexus
+    url: sbtatlas.sigma.sbrf.ru/nexus
+    snapshotRepository: corp-snapshots
+    releaseRepository: corp-releases
+  registry:
+    credentials: DS_sbbol-nexus
+    url: registry.sigma.sbrf.ru
+    snapshotProject: pprb-dev/ci02726020/ci02731003_corp_realty_dev
+    releaseProject: pprb/ci02726020/ci02731003_corp_realty
+  git:
+    credentials: dataspace-bot-ssh
+  sonar:
+    credentials: dataspace-bot-sonar-key
+    url: https://sbt-sonarqube.sigma.sbrf.ru/
+    token: 613f5c708cf709538c6ae732f47a922458b4f1db
+  maven:
+    pathSettings: ./config/sigma/settings.xml

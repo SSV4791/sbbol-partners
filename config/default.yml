@@ -1,4 +1,4 @@
 Deployer:
-  releasers: "16707489"
+  releasers: "16707489, 16712883"
   needBuildImage: "true"
   needChangeImageUrl: "true"
