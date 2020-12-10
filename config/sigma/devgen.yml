@@ -1,10 +1,3 @@
-LiquibaseRoll:
-  mainDb:
-    dbUrl: jdbc:postgresql://tkles-terra0264.vm.esrt.cloud.sbrf.ru:32081/dataspace
-    dbUser: dataspace
-    dbPassword: dataspace
-    tableSpace: pg_default
-    dbDriver: org.postgresql.Driver
 Installer:
   openShiftUrl: api.dev-gen2.sigma.sbrf.ru:6443
   openShiftProject: ci02281165-edevgen2-efs-kib-sbbol-dev-test10
@@ -13,8 +6,6 @@ Installer:
   parameters:
     dataspace-core-template:
       MODULE_NAME: dataspace-core-partners
-      mainDataBaseSecretId: dataspace-core-partners-16712883-pgdb
-      standinDataBaseSecretId: dataspace-core-partners-16712883-pgdb
       standinEnabled: false
       FLUENTBIT_IMAGE: registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
       requestCPU: 500m
