@@ -12,8 +12,8 @@ commons:
   registry:
     credentials: DS_sbbol-nexus
     url: registry.sigma.sbrf.ru
-    snapshotProject: pprb-dev/ci00682829_cdm_dev
-    releaseProject: pprb/ci00682829_cdm
+    snapshotProject: pprb-dev/ci00908578/ci02792425_sbbol-partners_dev
+    releaseProject: pprb/ci00908578/ci02792425_sbbol-partners
   git:
     credentials: dataspace-bot-ssh
   sonar:
