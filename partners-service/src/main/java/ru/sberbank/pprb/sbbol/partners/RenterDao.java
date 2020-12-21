@@ -67,8 +67,7 @@ public class RenterDao {
                 .withPhoneNumbers()
                 .withEmails()
                 .withLegalAddress()
-                .withPhysicalAddress()
-                .setSortingAdvanced(advancedSortBuilder -> advancedSortBuilder.desc(RenterGrasp::objectId));
+                .withPhysicalAddress();
 
         GraphCollection<RenterGet> result;
         try {
