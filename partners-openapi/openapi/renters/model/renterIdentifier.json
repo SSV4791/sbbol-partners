@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Идентификация арендатора по uuid и digitalId",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор договора ДБО"
+    },
+    "uuid": {
+      "type": "string",
+      "title": "Uuid арендатора"
+    }
+  },
+  "additionalProperties": false
+}
