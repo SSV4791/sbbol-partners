@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.renter.RenterApi;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
+import ru.sberbank.pprb.sbbol.partners.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Version;
 
@@ -25,8 +26,8 @@ public class RenterController implements RenterApi {
     }
 
     @Override
-    public ResponseEntity<Renter> getRenter(String guid) {
-        return ResponseEntity.ok(renterService.getRenter(guid));
+    public ResponseEntity<Renter> getRenter(@Valid RenterIdentifier renterIdentifier) {
+        return ResponseEntity.ok(renterService.getRenter(renterIdentifier.getUuid()));
     }
 
     @Override
