@@ -7,7 +7,7 @@ info:
 paths:
   /renter/create:
     $ref: create.yaml
-  /renter/get/{guid}:
+  /renter/get:
     $ref: get.yaml
   /renter/update:
     $ref: update.yaml

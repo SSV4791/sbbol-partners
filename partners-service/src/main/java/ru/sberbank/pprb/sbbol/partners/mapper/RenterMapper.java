@@ -3,10 +3,14 @@ package ru.sberbank.pprb.sbbol.partners.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import ru.sberbank.pprb.sbbol.partners.graph.get.AddressReferenceGet;
+import ru.sberbank.pprb.sbbol.partners.graph.get.LegalAddressGet;
+import ru.sberbank.pprb.sbbol.partners.graph.get.PhysicalAddressGet;
 import ru.sberbank.pprb.sbbol.partners.graph.get.RenterGet;
-import ru.sberbank.pprb.sbbol.partners.packet.CreateAddressParam;
+import ru.sberbank.pprb.sbbol.partners.packet.CreateLegalAddressParam;
+import ru.sberbank.pprb.sbbol.partners.packet.CreatePhysicalAddressParam;
 import ru.sberbank.pprb.sbbol.partners.packet.CreateRenterParam;
+import ru.sberbank.pprb.sbbol.partners.packet.UpdateLegalAddressParam;
+import ru.sberbank.pprb.sbbol.partners.packet.UpdatePhysicalAddressParam;
 import ru.sberbank.pprb.sbbol.partners.packet.UpdateRenterParam;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterAddress;
@@ -20,18 +24,19 @@ public interface RenterMapper {
     @Mapping(target = "type", source = "renterType")
     Renter renterToFront(RenterGet contract);
 
-    @Mapping(target = "legalAddress", ignore = true)
-    @Mapping(target = "physicalAddress", ignore = true)
     @Mapping(target = "renterType", source = "type")
     void createRenterParam(Renter contract, @MappingTarget CreateRenterParam createRenterParam);
 
-    @Mapping(target = "legalAddress", ignore = true)
-    @Mapping(target = "physicalAddress", ignore = true)
     @Mapping(target = "renterType", source = "type")
     void updateRenterParam(Renter contract, @MappingTarget UpdateRenterParam updateRenterParam);
 
-    void createAddressParam(RenterAddress address, @MappingTarget CreateAddressParam createAddressParam);
+    void createAddressParam(RenterAddress address, @MappingTarget CreateLegalAddressParam createAddressParam);
+    void createAddressParam(RenterAddress address, @MappingTarget CreatePhysicalAddressParam createAddressParam);
 
-    RenterAddress addressToFront(AddressReferenceGet address);
+    void updateAddressParam(RenterAddress address, @MappingTarget UpdateLegalAddressParam updateAddressParam);
+    void updateAddressParam(RenterAddress address, @MappingTarget UpdatePhysicalAddressParam updateAddressParam);
+
+    RenterAddress addressToFront(LegalAddressGet address);
+    RenterAddress addressToFront(PhysicalAddressGet address);
 
 }

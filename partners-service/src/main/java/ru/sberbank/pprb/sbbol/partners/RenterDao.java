@@ -1,14 +1,20 @@
 package ru.sberbank.pprb.sbbol.partners;
 
+import com.sbt.pprb.ac.graph.AbstractProxyCollectionWith;
 import com.sbt.pprb.ac.graph.collection.GraphCollection;
 import org.springframework.stereotype.Service;
 import ru.sberbank.pprb.sbbol.partners.graph.RenterGraph;
+import ru.sberbank.pprb.sbbol.partners.graph.get.LegalAddressGet;
+import ru.sberbank.pprb.sbbol.partners.graph.get.PhysicalAddressGet;
 import ru.sberbank.pprb.sbbol.partners.graph.get.RenterGet;
 import ru.sberbank.pprb.sbbol.partners.graph.with.RenterCollectionWith;
 import ru.sberbank.pprb.sbbol.partners.grasp.RenterGrasp;
 import ru.sberbank.pprb.sbbol.partners.mapper.RenterMapper;
+import ru.sberbank.pprb.sbbol.partners.packet.LegalAddressRef;
+import ru.sberbank.pprb.sbbol.partners.packet.PhysicalAddressRef;
 import ru.sberbank.pprb.sbbol.partners.packet.RenterRef;
 import ru.sberbank.pprb.sbbol.partners.packet.packet.Packet;
+import ru.sberbank.pprb.sbbol.partners.renter.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
@@ -16,7 +22,6 @@ import sbp.sbt.sdk.DataspaceCorePacketClient;
 import sbp.sbt.sdk.exception.SdkJsonRpcClientException;
 import sbp.sbt.sdk.search.DataspaceCoreSearchClient;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,7 +46,6 @@ public class RenterDao {
      * @return список арендаторов, удовлетворяющих заданному фильтру
      */
     RenterListResponse getRenters(RenterFilter renterFilter) {
-        Packet packet = new Packet();
 
         RenterCollectionWith<? extends RenterGrasp> collectionWith = RenterGraph.createCollection()
                 .withUuid()
@@ -66,8 +70,31 @@ public class RenterDao {
                 .withBankAccount()
                 .withPhoneNumbers()
                 .withEmails()
-                .withLegalAddress()
-                .withPhysicalAddress();
+                .withLegalAddress(legalAddressWith -> legalAddressWith
+                        .withZipCode()
+                        .withRegionCode()
+                        .withRegion()
+                        .withCity()
+                        .withLocality()
+                        .withStreet()
+                        .withBuilding()
+                        .withBuildingBlock()
+                        .withFlat()
+                )
+                .withPhysicalAddress(physicalAddressWith -> physicalAddressWith
+                        .withZipCode()
+                        .withRegionCode()
+                        .withRegion()
+                        .withCity()
+                        .withLocality()
+                        .withStreet()
+                        .withBuilding()
+                        .withBuildingBlock()
+                        .withFlat())
+                .setSortingAdvanced(advancedSortBuilder -> advancedSortBuilder.desc(RenterGrasp::objectId));
+
+        Paginator paginator = new Paginator(renterFilter.getPagination());
+        paginator.update(collectionWith);
 
         GraphCollection<RenterGet> result;
         try {
@@ -78,7 +105,6 @@ public class RenterDao {
 
         List<Renter> contracts = result.getCollection()
                 .stream()
-                .sorted(Comparator.comparing(RenterGet::getObjectId).reversed())
                 .map(mapper::renterToFront)
                 .collect(Collectors.toList());
 
@@ -101,6 +127,19 @@ public class RenterDao {
                 param.setUuid(uuid);
             });
 
+            if (renter.getPhysicalAddress() != null) {
+                packet.physicalAddress.create(param -> {
+                    mapper.createAddressParam(renter.getPhysicalAddress(), param);
+                    param.setRenter(renterRef);
+                });
+            }
+
+            if (renter.getLegalAddress() != null) {
+                packet.legalAddress.create(param -> {
+                    mapper.createAddressParam(renter.getLegalAddress(), param);
+                    param.setRenter(renterRef);
+                });
+            }
             packetClient.execute(packet);
             return getRenter(uuid);
         } catch (SdkJsonRpcClientException e) {
@@ -119,11 +158,12 @@ public class RenterDao {
         try {
             GraphCollection<RenterGet> renterCollection = searchClient.searchRenter(
                     with -> with
+                            .withPhysicalAddress()
+                            .withLegalAddress()
                             .setWhere(where -> where.uuidEq(renter.getUuid())));
 
-
-            if (renterCollection.size() == 0) {
-                throw new RuntimeException("Запись не найдена для редактирования");
+            if (renterCollection.size() != 1) {
+                throw new RuntimeException("Запись не найдена или записей больше 1");
             }
             RenterGet renterGet = renterCollection.get(0);
 
@@ -132,6 +172,21 @@ public class RenterDao {
                     updateChargeParam -> {
                         mapper.updateRenterParam(renter, updateChargeParam);
                     });
+
+            PhysicalAddressGet physicalAddress = renterGet.getPhysicalAddress();
+            packet.physicalAddress.update(
+                    PhysicalAddressRef.of(physicalAddress.getObjectId()),
+                    updateAddressParam -> {
+                        mapper.updateAddressParam(renter.getPhysicalAddress(), updateAddressParam);
+                    });
+
+            LegalAddressGet legalAddress = renterGet.getLegalAddress();
+            packet.legalAddress.update(
+                    LegalAddressRef.of(legalAddress.getObjectId()),
+                    updateAddressParam -> {
+                        mapper.updateAddressParam(renter.getLegalAddress(), updateAddressParam);
+                    });
+
             packetClient.execute(packet);
 
             return getRenter(renter.getUuid());
@@ -147,7 +202,6 @@ public class RenterDao {
      * @return арендатор
      */
     Renter getRenter(String renterGuid) {
-        Packet packet = new Packet();
         RenterCollectionWith<? extends RenterGrasp> renterCollectionWith =
                 RenterGraph.createCollection()
                         .withUuid()
@@ -172,8 +226,27 @@ public class RenterDao {
                         .withBankAccount()
                         .withPhoneNumbers()
                         .withEmails()
-                        .withLegalAddress()
-                        .withPhysicalAddress()
+                        .withLegalAddress(legalAddressWith -> legalAddressWith
+                                    .withZipCode()
+                                    .withRegionCode()
+                                    .withRegion()
+                                    .withCity()
+                                    .withLocality()
+                                    .withStreet()
+                                    .withBuilding()
+                                    .withBuildingBlock()
+                                    .withFlat()
+                        )
+                        .withPhysicalAddress(physicalAddressWith -> physicalAddressWith
+                                .withZipCode()
+                                .withRegionCode()
+                                .withRegion()
+                                .withCity()
+                                .withLocality()
+                                .withStreet()
+                                .withBuilding()
+                                .withBuildingBlock()
+                                .withFlat())
                         .setWhere(where -> where.uuidEq(renterGuid));
 
         GraphCollection<RenterGet> renterSearchResult;
@@ -191,6 +264,37 @@ public class RenterDao {
 
         RenterGet renterGet = renterSearchResult.get(0);
         return mapper.renterToFront(renterGet);
+    }
+
+    public class Paginator {
+        private final Pagination pagination;
+
+        public Paginator(Pagination pagination) {
+            this.pagination = pagination;
+        }
+
+        public void update(AbstractProxyCollectionWith collectionWith) {
+            if (pagination != null) {
+                if (pagination.getOffset() != null) {
+                    collectionWith.setOffset(pagination.getOffset());
+                }
+                if (pagination.getCount() != null) {
+                    collectionWith.setLimit(pagination.getCount() + 1);
+                }
+            }
+        }
+
+        public Pagination create(GraphCollection graphCollection) {
+            int offset = pagination != null && pagination.getOffset() != null ? pagination.getOffset() : 0;
+            boolean hasNextPage = pagination != null && pagination.getCount() != null ? graphCollection.size() > pagination.getCount() : false;
+            int count = hasNextPage ? pagination.getCount() : graphCollection.size();
+
+            return new Pagination().offset(offset).count(count).hasNextPage(hasNextPage);
+        }
+
+        public int getLimit() {
+            return pagination != null && pagination.getCount() != null ? pagination.getCount() : Integer.MAX_VALUE;
+        }
     }
 
 }
