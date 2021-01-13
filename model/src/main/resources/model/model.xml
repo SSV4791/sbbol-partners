@@ -1,7 +1,7 @@
 <model model-name="partners" version="DEV-SNAPSHOT">
 
     <class name="Renter" label="Арендатор">
-        <property name="uuid" type="String" mandatory="true" length="36" label="Используется как уникальный идентификатор записи"/>
+        <property name="uuid" type="String" mandatory="true" length="36" label="Используется как уникальный идентификатор записи" index="true" unique="true"/>
         <property name="renterType" type="RenterType" label="Тип" mandatory="true"/>
         <property name="legalName" type="String" label="Наименование ЮЛ/ИП" length="350"/>
         <property name="inn" type="String" label="ИНН" length="12"/>
@@ -24,11 +24,25 @@
         <property name="bankAccount" type="String" label="К/с банка" length="20"/>
         <property name="phoneNumbers" type="String" label="Телефоны" length="100"/>
         <property name="emails" type="String" label="E-mail" length="320"/>
-        <reference name="legalAddress" type="Address" label="Адрес регистрации"/>
-        <reference name="physicalAddress" type="Address" label="Фактический адрес"/>
+        <property name="legalAddress" type="LegalAddress" mappedBy="renter" label="Адрес регистрации"/>
+        <property name="physicalAddress" type="PhysicalAddress" mappedBy="renter" label="Фактический адрес"/>
     </class>
 
-    <class name="Address" label="Адрес">
+    <class name="LegalAddress" label="Адрес регистрации">
+        <property name="renter" type="Renter" parent="true"/>
+        <property name="zipCode" type="String" label="Индекс" length="6" mandatory="true"/>
+        <property name="regionCode" type="String" label="Код региона" length="10"/>
+        <property name="region" type="String" label="Район" length="50" mandatory="true"/>
+        <property name="city" type="String" label="Город" length="300" mandatory="true"/>
+        <property name="locality" type="String" label="Населенный пункт" length="300" mandatory="true"/>
+        <property name="street" type="String" label="Улица" length="300" mandatory="true"/>
+        <property name="building" type="String" label="Дом" length="100" mandatory="true"/>
+        <property name="buildingBlock" type="String" label="Корпус" length="20" mandatory="true"/>
+        <property name="flat" type="String" label="Квартира" length="20" mandatory="true"/>
+    </class>
+
+    <class name="PhysicalAddress" label="Фактический адрес">
+        <property name="renter" type="Renter" parent="true"/>
         <property name="zipCode" type="String" label="Индекс" length="6" mandatory="true"/>
         <property name="regionCode" type="String" label="Код региона" length="10"/>
         <property name="region" type="String" label="Район" length="50" mandatory="true"/>
@@ -75,5 +89,7 @@
             <extension name="desc" value="Паспорт гражданина РФ, содержащий электронный носитель информации"/>
         </value>
     </enum>
+
+
 
 </model>
