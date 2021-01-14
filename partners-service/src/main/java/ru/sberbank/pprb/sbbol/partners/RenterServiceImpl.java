@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners;
 import org.springframework.stereotype.Service;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
+import ru.sberbank.pprb.sbbol.partners.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
 
 import javax.annotation.Nonnull;
@@ -35,7 +36,7 @@ public class RenterServiceImpl implements RenterService {
     }
 
     @Override
-    public Renter getRenter(@Nonnull String renterGuid) {
-        return renterDao.getRenter(renterGuid);
+    public Renter getRenter(@Nonnull RenterIdentifier renterIdentifier) {
+        return renterDao.getRenter(renterIdentifier.getUuid(), renterIdentifier.getDigitalId());
     }
 }

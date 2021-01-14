@@ -27,7 +27,7 @@ public class RenterController implements RenterApi {
 
     @Override
     public ResponseEntity<Renter> getRenter(@Valid RenterIdentifier renterIdentifier) {
-        return ResponseEntity.ok(renterService.getRenter(renterIdentifier.getUuid()));
+        return ResponseEntity.ok(renterService.getRenter(renterIdentifier));
     }
 
     @Override

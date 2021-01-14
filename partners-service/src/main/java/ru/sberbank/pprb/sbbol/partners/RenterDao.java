@@ -49,6 +49,7 @@ public class RenterDao {
 
         RenterCollectionWith<? extends RenterGrasp> collectionWith = RenterGraph.createCollection()
                 .withUuid()
+                .withDigitalId()
                 .withRenterType()
                 .withLegalName()
                 .withInn()
@@ -91,6 +92,7 @@ public class RenterDao {
                         .withBuilding()
                         .withBuildingBlock()
                         .withFlat())
+                .setWhere(where -> where.digitalIdEq(renterFilter.getDigitalId()))
                 .setSortingAdvanced(advancedSortBuilder -> advancedSortBuilder.desc(RenterGrasp::objectId));
 
         Paginator paginator = new Paginator(renterFilter.getPagination());
@@ -141,7 +143,7 @@ public class RenterDao {
                 });
             }
             packetClient.execute(packet);
-            return getRenter(uuid);
+            return getRenter(uuid, renter.getDigitalId());
         } catch (SdkJsonRpcClientException e) {
             throw new RuntimeException(e);
         }
@@ -189,7 +191,7 @@ public class RenterDao {
 
             packetClient.execute(packet);
 
-            return getRenter(renter.getUuid());
+            return getRenter(renter.getUuid(), renter.getDigitalId());
         } catch (SdkJsonRpcClientException e) {
             throw new RuntimeException(e);
         }
@@ -198,13 +200,14 @@ public class RenterDao {
     /**
      * Получение арендатора по идентификатору договора
      *
-     * @param renterGuid Идентификатор арендатора
+     * @param renterUuid Идентификатор арендатора
      * @return арендатор
      */
-    Renter getRenter(String renterGuid) {
+    Renter getRenter(String renterUuid, String digitalId) {
         RenterCollectionWith<? extends RenterGrasp> renterCollectionWith =
                 RenterGraph.createCollection()
                         .withUuid()
+                        .withDigitalId()
                         .withRenterType()
                         .withLegalName()
                         .withInn()
@@ -247,7 +250,7 @@ public class RenterDao {
                                 .withBuilding()
                                 .withBuildingBlock()
                                 .withFlat())
-                        .setWhere(where -> where.uuidEq(renterGuid));
+                        .setWhere(where -> where.uuidEq(renterUuid).and(where.digitalIdEq(digitalId)));
 
         GraphCollection<RenterGet> renterSearchResult;
         try {

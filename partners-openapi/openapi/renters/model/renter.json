@@ -8,6 +8,10 @@
       "type": "string",
       "title": "Уникальный идентификатор арендатора"
     },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор договора ДБО"
+    },
     "type": {
       "type": "string",
       "title": "Вид арендатора"

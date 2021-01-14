@@ -2,6 +2,7 @@
 
     <class name="Renter" label="Арендатор">
         <property name="uuid" type="String" mandatory="true" length="36" label="Используется как уникальный идентификатор записи" index="true" unique="true"/>
+        <property name="digitalId" type="String" label="Идентификатор договора ДБО" index="true" mandatory="true"/>
         <property name="renterType" type="RenterType" label="Тип" mandatory="true"/>
         <property name="legalName" type="String" label="Наименование ЮЛ/ИП" length="350"/>
         <property name="inn" type="String" label="ИНН" length="12"/>
