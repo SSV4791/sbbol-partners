@@ -47,30 +47,14 @@
             <url>http://nexus.sigma.sbrf.ru:8099/nexus/content/repositories/corp-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-<!--Нужно для синхронизации в клауд-->
-<!--    <dependencies>-->
-<!--        <dependency>-->
-<!--            <groupId>sbp.com.sbt.dataspace</groupId>-->
-<!--            <artifactId>dataspace-core</artifactId>-->
-<!--            <version>4.1.0-build.63</version>-->
-<!--            <type>zip</type>-->
-<!--            <classifier>distrib</classifier>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>sbp.com.sbt.dataspace</groupId>-->
-<!--            <artifactId>dataspace-gigabas</artifactId>-->
-<!--            <version>4.1.0-build.63</version>-->
-<!--            <type>zip</type>-->
-<!--            <classifier>distrib</classifier>-->
-<!--        </dependency>-->
-<!--    </dependencies>-->
+
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>sbp.com.sbt.dataspace.support</groupId>
                 <artifactId>support-bom</artifactId>
-                <version>4.2.0-build.28</version>
+                <version>4.1.0-build.10</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -83,13 +67,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
                 <version>5.2.6.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.2.7.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -107,6 +84,11 @@
                 <groupId>org.openapitools</groupId>
                 <artifactId>jackson-databind-nullable</artifactId>
                 <version>0.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
             </dependency>
             <dependency>
                 <groupId>org.openapitools</groupId>
