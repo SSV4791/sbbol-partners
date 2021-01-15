@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners;
 
 import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
+import ru.sberbank.pprb.sbbol.partners.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
 
 public interface RenterService {
@@ -33,8 +34,8 @@ public interface RenterService {
     /**
      * Получение арендатора по идентификатору договора
      *
-     * @param renterGuid Идентификатор арендатора
+     * @param renterIdentifier Идентификатор арендатора
      * @return арендатор
      */
-    Renter getRenter(String renterGuid);
+    Renter getRenter(RenterIdentifier renterIdentifier);
 }

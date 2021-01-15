@@ -3,6 +3,10 @@
   "type": "object",
   "title": "Фильтр для арендаторов",
   "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор договора ДБО"
+    },
     "pagination": {
       "$ref": "../../common/model/pagination.json",
       "title": "Нумерация"
