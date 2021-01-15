@@ -31,28 +31,28 @@
 
     <class name="LegalAddress" label="Адрес регистрации">
         <property name="renter" type="Renter" parent="true"/>
-        <property name="zipCode" type="String" label="Индекс" length="6" mandatory="true"/>
+        <property name="zipCode" type="String" label="Индекс" length="6"/>
         <property name="regionCode" type="String" label="Код региона" length="10"/>
-        <property name="region" type="String" label="Район" length="50" mandatory="true"/>
-        <property name="city" type="String" label="Город" length="300" mandatory="true"/>
-        <property name="locality" type="String" label="Населенный пункт" length="300" mandatory="true"/>
-        <property name="street" type="String" label="Улица" length="300" mandatory="true"/>
-        <property name="building" type="String" label="Дом" length="100" mandatory="true"/>
-        <property name="buildingBlock" type="String" label="Корпус" length="20" mandatory="true"/>
-        <property name="flat" type="String" label="Квартира" length="20" mandatory="true"/>
+        <property name="region" type="String" label="Район" length="50"/>
+        <property name="city" type="String" label="Город" length="300"/>
+        <property name="locality" type="String" label="Населенный пункт" length="300"/>
+        <property name="street" type="String" label="Улица" length="300"/>
+        <property name="building" type="String" label="Дом" length="100"/>
+        <property name="buildingBlock" type="String" label="Корпус" length="20"/>
+        <property name="flat" type="String" label="Квартира" length="20"/>
     </class>
 
     <class name="PhysicalAddress" label="Фактический адрес">
         <property name="renter" type="Renter" parent="true"/>
-        <property name="zipCode" type="String" label="Индекс" length="6" mandatory="true"/>
+        <property name="zipCode" type="String" label="Индекс" length="6"/>
         <property name="regionCode" type="String" label="Код региона" length="10"/>
-        <property name="region" type="String" label="Район" length="50" mandatory="true"/>
-        <property name="city" type="String" label="Город" length="300" mandatory="true"/>
-        <property name="locality" type="String" label="Населенный пункт" length="300" mandatory="true"/>
-        <property name="street" type="String" label="Улица" length="300" mandatory="true"/>
-        <property name="building" type="String" label="Дом" length="100" mandatory="true"/>
-        <property name="buildingBlock" type="String" label="Корпус" length="20" mandatory="true"/>
-        <property name="flat" type="String" label="Квартира" length="20" mandatory="true"/>
+        <property name="region" type="String" label="Район" length="50"/>
+        <property name="city" type="String" label="Город" length="300"/>
+        <property name="locality" type="String" label="Населенный пункт" length="300"/>
+        <property name="street" type="String" label="Улица" length="300"/>
+        <property name="building" type="String" label="Дом" length="100"/>
+        <property name="buildingBlock" type="String" label="Корпус" length="20"/>
+        <property name="flat" type="String" label="Квартира" length="20"/>
     </class>
 
     <enum name="RenterType">
