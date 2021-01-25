@@ -14,7 +14,12 @@
     },
     "type": {
       "type": "string",
-      "title": "Вид арендатора"
+      "title": "Тип арендатора\n\nphysicalPerson Физическое лицо\nlegalEntity Юридическое лицо\nentrepreneur Индивидуальный предприниматель",
+      "enum": [
+        "PHYSICAL_PERSON",
+        "LEGAL_ENTITY",
+        "ENTREPRENEUR"
+      ]
     },
     "legalName": {
       "type": "string",
@@ -110,6 +115,13 @@
     "physicalAddress": {
       "$ref": "renterAddress.json",
       "title": "Почтовый адрес"
+    },
+    "checkResults": {
+      "title": "Ошибки валидации договора",
+      "type": "array",
+      "items": {
+        "$ref": "../../common/model/checkResult.json"
+      }
     }
   },
   "required": [

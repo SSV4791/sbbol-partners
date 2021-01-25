@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sbrf.ufs.sbbol.estate.common.model.CheckResult",
+  "type": "object",
+  "title": "Результат валидации",
+  "properties": {
+    "message": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Сообщение об ошибке"
+      }
+    },
+    "field": {
+      "type": "string",
+      "title": "Наименование поля"
+    }
+  },
+  "required": [
+  ],
+  "additionalProperties": false
+}
