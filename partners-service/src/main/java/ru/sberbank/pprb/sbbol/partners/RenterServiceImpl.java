@@ -1,20 +1,24 @@
 package ru.sberbank.pprb.sbbol.partners;
 
 import org.springframework.stereotype.Service;
+import ru.sberbank.pprb.sbbol.partners.renter.model.CheckResult;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 @Service
 public class RenterServiceImpl implements RenterService {
 
     private final RenterDao renterDao;
+    private final ValidationService validationService;
 
-    public RenterServiceImpl(RenterDao renterDao) {
+    public RenterServiceImpl(RenterDao renterDao, ValidationService validationService) {
         this.renterDao = renterDao;
+        this.validationService = validationService;
     }
 
     private static String phoneNumbers = "+79991112233";
@@ -27,12 +31,26 @@ public class RenterServiceImpl implements RenterService {
 
     @Override
     public Renter createRenter(@Nonnull Renter renter) {
-        return renterDao.createRenter(renter);
+        List<CheckResult> checkResults = validationService.check(renter);
+        if (checkResults.isEmpty()) {
+            return renterDao.createRenter(renter);
+        } else {
+            Renter result = new Renter();
+            result.setCheckResults(checkResults);
+            return result;
+        }
     }
 
     @Override
     public Renter updateRenter(@Nonnull Renter renter) {
-        return renterDao.updateRenter(renter);
+        List<CheckResult> checkResults = validationService.check(renter);
+        if (checkResults.isEmpty()) {
+            return renterDao.updateRenter(renter);
+        } else {
+            Renter result = new Renter();
+            result.setCheckResults(checkResults);
+            return result;
+        }
     }
 
     @Override
