@@ -56,7 +56,16 @@
     },
     "dulType": {
       "type": "string",
-      "title": "Тип удостоверяющего документа (физ. лицо)"
+      "title": "Тип удостоверяющего документа (физ. лицо)\n\nPASSPORTOFRUSSIA - паспорт гражданина РФ\nSEAMANPASSPORT - паспорт моряка (удостоверение личности моряка)\nSERVICEMANIDENTITYCARDOFRUSSIA - удостоверение личности военнослужащего\nFOREIGNPASSPORT - паспорт иностранного гражданина\nSERVICEPASSPORTOFRUSSIA - служебный паспорт гражданина РФ\nRFCITIZENDIPLOMATICPASSPORT - дипломатический паспорт\nPASSPORTOFRUSSIAWITHCHIP - паспорт гражданина РФ, содержащий электронный носитель информации",
+      "enum": [
+        "PASSPORTOFRUSSIA",
+        "SEAMANPASSPORT",
+        "SERVICEMANIDENTITYCARDOFRUSSIA",
+        "FOREIGNPASSPORT",
+        "SERVICEPASSPORTOFRUSSIA",
+        "RFCITIZENDIPLOMATICPASSPORT",
+        "PASSPORTOFRUSSIAWITHCHIP"
+      ]
     },
     "dulName": {
       "type": "string",
