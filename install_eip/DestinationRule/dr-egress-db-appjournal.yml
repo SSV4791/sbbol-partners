@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dr-egress-db-appjournal
+spec:
+  host: ${APPJOURNAL_HOST}
+  subsets:
+    - name: appjournal
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+        portLevelSettings:
+          - port:
+              number: ${APPJOURNAL_PORT}
+            tls:
+              mode: ISTIO_MUTUAL

@@ -1,0 +1,155 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: event-feed
+  labels:
+    app: ${EVENT_FEED_MODULE_NAME}
+    app.kubernetes.io/part-of: istio
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ${EVENT_FEED_MODULE_NAME}
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+        sidecar.istio.io/proxyLimitsCPU: 200m
+        sidecar.istio.io/proxyLimitsMemory: 256Mi
+        sidecar.istio.io/proxyRequestsCPU: 200m
+        sidecar.istio.io/proxyRequestsMemory: 256Mi
+      labels:
+        app: ${EVENT_FEED_MODULE_NAME}
+    spec:
+      containers:
+        - name: ${EVENT_FEED_MODULE_NAME}
+          image: ${IMAGE_BASE_URL}/event-feed@sha256:${REGISTY_IMAGE_HASH}
+          env:
+            - name: NODE_NAME       #добавление имени ноды в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAMESPACE    #добавление имени неймспейса в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME        #добавление имени пода в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODEID
+              value: ${EVENT_FEED_MODULE_NAME}
+            - name: RUN_DEBUG
+              value: 'false'
+            - name: JVM_OPTION
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-event-feed-app-properties
+                  key: jvm-arguments
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 8000
+              name: tcp-debug
+          envFrom:
+            - configMapRef:
+                name: cm-event-feed-app-properties
+          volumeMounts:
+            - name: app-config
+              mountPath: /deployments/config
+              readOnly: true
+            - name: logback-config
+              mountPath: /deployments/config/logback
+              readOnly: true
+            - name: logsshare
+              mountPath: /app/logs
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+            initialDelaySeconds: 80
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+            initialDelaySeconds: 80
+          resources:
+            limits:
+              cpu: ${EVENT_FEED_LIMIT_CPU}
+              memory: ${EVENT_FEED_LIMIT_MEMORY}
+            requests:
+              cpu: ${EVENT_FEED_REQUEST_CPU}
+              memory: ${EVENT_FEED_REQUEST_MEMORY}
+        - name: fluentbit
+          image: ${FLUENTBIT_IMAGE}
+          resources:
+            limits:
+              cpu: ${FLUENTBIT_LIMIT_CPU}
+              memory: ${FLUENTBIT_LIMIT_MEMORY}
+            requests:
+              cpu: ${FLUENTBIT_REQUEST_CPU}
+              memory: ${FLUENTBIT_REQUEST_MEMORY}
+          env:
+            - name: service
+              value: ${EVENT_FEED_MODULE_NAME}
+            - name: cluster
+              value: ${OPENSHIFT_CLUSTER}
+            - name: moduleId
+              value: ${EVENT_FEED_MODULE_NAME}
+            - name: moduleVersion
+              value: latest
+            - name: nodeId
+              value: ${EVENT_FEED_MODULE_NAME}
+            - name: standId
+              value: ${FLUENT_BIT_STAND_ID}
+            - name: zoneId
+              value: ${FLUENT_BIT_ZONE_ID}
+            - name: pod
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: namespace
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: logsshare
+              mountPath: /app/logs
+            - mountPath: /fluent-bit/etc
+              name: cm-ds-fluentbit
+              readOnly: true
+      volumes:
+        - name: app-config
+          configMap:
+            name: cm-event-feed-app-properties
+            items:
+              - key: application.properties
+                path: application.properties
+        - name: logback-config
+          configMap:
+            name: cm-event-feed-logback
+            items:
+              - key: logback.xml
+                path: logback.xml
+        - name: cm-ds-fluentbit
+          configMap:
+            defaultMode: 420
+            name: cm-ds-fluentbit
+        - name: logsshare
+          emptyDir: {}

@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ingressgateway-gw
+spec:
+  selector:
+    istio: ingressgateway-${NAMESPACE}
+  servers:
+    - hosts:
+        - ingress-${NAMESPACE}.ingress.apps.${OPENSHIFT_CLUSTER}
+      port:
+        name: https-${INGRESS_PORT_HTTPS}
+        number: ${INGRESS_PORT_HTTPS}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-certs/ca-chain.cert.pem
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+    - hosts:
+        - ingress-${NAMESPACE}.apps.${OPENSHIFT_CLUSTER}
+      port:
+        name: http-${INGRESS_PORT}
+        number: ${INGRESS_PORT}
+        protocol: HTTP

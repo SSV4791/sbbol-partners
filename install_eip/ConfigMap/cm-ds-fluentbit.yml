@@ -1,0 +1,48 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cm-ds-fluentbit
+data:
+  fluent-bit.conf: >-
+    [SERVICE]
+        Flush        1
+        Daemon       Off
+        Parsers_File /fluent-bit/etc/parsers.conf
+    [INPUT]
+        Name tail
+        Path /app/logs/*.json
+        Mem_Buf_Limit 5MB
+        Skip_Long_Lines On
+        Parser custom
+    [FILTER]
+        Name modify
+        Match *
+        Add cluster ${cluster}
+        Add pod ${pod}
+        Add moduleId ${moduleId}
+        Add moduleVersion ${moduleVersion}
+        Add nodeId ${nodeId}
+        Add standId ${standId}
+    [OUTPUT]
+        Name http
+        Match *
+        # Hostname сервиса приема событий
+        # Например: logger-endpoint-demo-http-ci00641491-idevlg-pprbtsloggertest.apps.test-ose.ca.sbrf.ru
+        Host ${FLUENT_BIT_HTTP_HOST}
+        # Порт сервиса приема событий 80 для http и 443 для https
+        Port ${FLUENT_BIT_SERVICE_PORT}
+        # Метод сервиса приема событий
+        URI /v1/events
+        # Параметры для защищеннного соединения
+        #tls On/Off
+        #tls.verify On/Off
+        #tls.ca_file /fluent-bit/ssl/certname.pem
+        Format json
+        json_date_key timestamp
+    [OUTPUT]
+        Name stdout
+        Match *
+  parsers.conf: |-
+    [PARSER]
+        Name custom
+        Format json

@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vs-egress-fluentbit-https
+spec:
+  exportTo:
+    - .
+  gateways:
+    - mesh
+    - egress-fluentbit-https-gw
+  hosts:
+    - ${FLUENT_BIT_HTTPS_HOST}
+  http:
+    - match:
+        - gateways:
+            - mesh
+          port: 8443
+      rewrite:
+        authority: ${FLUENT_BIT_HTTPS_HOST}
+      route:
+        - destination:
+            host: egressgateway-svc
+            port:
+              number: ${FLUENT_BIT_HTTPS_PORT}
+          weight: 100
+    - match:
+        - gateways:
+            - egress-fluentbit-https-gw
+          port: ${FLUENT_BIT_HTTPS_PORT}
+      route:
+        - destination:
+            host: ${FLUENT_BIT_HTTPS_HOST}
+            port:
+              number: 443
+          weight: 100

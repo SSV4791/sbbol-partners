@@ -1,0 +1,201 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  labels:
+    app: ingressgateway-${NAMESPACE}
+    app.kubernetes.io/component: gateways
+    app.kubernetes.io/instance: ${ISTIO_CONTROL_PLANE}
+    app.kubernetes.io/managed-by: maistra-istio-operator
+    app.kubernetes.io/name: gateways
+    app.kubernetes.io/part-of: istio
+    app.kubernetes.io/version: 1.0.2-7.el8-1
+    chart: gateways
+    heritage: Tiller
+    istio: ingressgateway-${NAMESPACE}
+    maistra.io/owner: ${ISTIO_CONTROL_PLANE}
+    release: istio
+  name: ingressgateway-${NAMESPACE}
+spec:
+  progressDeadlineSeconds: 1200
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: ingressgateway-${NAMESPACE}
+      istio: ingressgateway-${NAMESPACE}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      creationTimestamp: null
+      labels:
+        app: ingressgateway-${NAMESPACE}
+        chart: gateways
+        heritage: Tiller
+        istio: ingressgateway-${NAMESPACE}
+        release: istio
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: beta.kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+              weight: 2
+            - preference:
+                matchExpressions:
+                  - key: beta.kubernetes.io/arch
+                    operator: In
+                    values:
+                      - ppc64le
+              weight: 2
+            - preference:
+                matchExpressions:
+                  - key: beta.kubernetes.io/arch
+                    operator: In
+                    values:
+                      - s390x
+              weight: 2
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: beta.kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - ppc64le
+                      - s390x
+      containers:
+        - args:
+            - proxy
+            - router
+            - --domain
+            - $(POD_NAMESPACE).svc.cluster.local
+            - --log_output_level=default:info
+            - --drainDuration
+            - 45s
+            - --parentShutdownDuration
+            - 1m0s
+            - --connectTimeout
+            - 10s
+            - --serviceCluster
+            - ingressgateway-${NAMESPACE}
+            - --zipkinAddress
+            - zipkin.${ISTIO_CONTROL_PLANE}:9411
+            - --proxyAdminPort
+            - "15000"
+            - --statusPort
+            - "15020"
+            - --controlPlaneAuthPolicy
+            - NONE
+            - --discoveryAddress
+            - istio-pilot.${ISTIO_CONTROL_PLANE}:15010
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: INSTANCE_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+            - name: ISTIO_META_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: ISTIO_META_CONFIG_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: ISTIO_META_ROUTER_MODE
+              value: sni-dnat
+          image: ${PROXY_IMAGE}
+          imagePullPolicy: IfNotPresent
+          name: istio-proxy
+          ports:
+            - containerPort: 15020
+              name: status-port
+              protocol: TCP
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 5443
+              name: https
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz/ready
+              port: 15020
+              scheme: HTTP
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: ${INGRESS_LIMIT_CPU}
+              memory: ${INGRESS_LIMIT_MEMORY}
+            requests:
+              cpu: ${INGRESS_REQUEST_CPU}
+              memory: ${INGRESS_REQUEST_MEMORY}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/istio/proxy
+              name: istio-envoy
+            - mountPath: /etc/certs/
+              name: istio-certs
+              readOnly: true
+            - mountPath: /etc/istio/ingressgateway-certs
+              name: ingressgateway-certs
+              readOnly: true
+            - mountPath: /etc/istio/ingressgateway-ca-certs
+              name: ingressgateway-ca-certs
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: istio-envoy
+        - name: istio-certs
+          secret:
+            defaultMode: 400
+            optional: true
+            secretName: istio.default
+        - name: ingressgateway-certs
+          secret:
+            defaultMode: 400
+            optional: true
+            secretName: ingressgateway-certs
+        - name: ingressgateway-ca-certs
+          secret:
+            defaultMode: 400
+            optional: true
+            secretName: ingressgateway-ca-certs

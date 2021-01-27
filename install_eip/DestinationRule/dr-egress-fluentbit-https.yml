@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dr-egress-fluentbit-https
+spec:
+  exportTo:
+    - .
+  host: ${FLUENT_BIT_HTTPS_HOST}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+      - port:
+          number: 443
+        tls:
+          caCertificates: /etc/istio/egressgateway-ca-certs/ca-chain.cert.pem
+          clientCertificate: /etc/istio/egressgateway-certs/tls.crt
+          mode: MUTUAL
+          privateKey: /etc/istio/egressgateway-certs/tls.key
+          sni: ci00641491-idevgen-logger-ift.ingress.apps.dev-gen.ca.sbrf.ru

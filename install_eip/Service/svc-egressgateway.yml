@@ -1,0 +1,26 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: egressgateway-svc
+  labels:
+    app: egressgateway-${EVENT_FEED_MODULE_NAME}
+    istio: egressgateway-${EVENT_FEED_MODULE_NAME}
+spec:
+  ports:
+    - name: tcp-aj-${APPJOURNAL_PORT}
+      port: ${APPJOURNAL_PORT}
+      protocol: TCP
+    - name: tcp-db
+      port: ${DB_PORT}
+      protocol: TCP
+    - name: http-fluent-${FLUENT_BIT_HTTP_PORT}
+      port: ${FLUENT_BIT_HTTP_PORT}
+      protocol: TCP
+    - name: https-fluent-${FLUENT_BIT_HTTPS_PORT}
+      port: ${FLUENT_BIT_HTTPS_PORT}
+      protocol: TCP
+  selector:
+    app: egressgateway-${EVENT_FEED_MODULE_NAME}
+    istio: egressgateway-${EVENT_FEED_MODULE_NAME}
+  type: ClusterIP
+  sessionAffinity: None
