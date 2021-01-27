@@ -13,12 +13,12 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /event-feed/
+            prefix: /sbbol-partners/
       rewrite:
         uri: /
       route:
         - destination:
-            host: svc-event-feed
+            host: svc-partners
             port:
               number: 8080
           weight: 100

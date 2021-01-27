@@ -13,16 +13,16 @@ pipeline {
     }
     parameters {
         string(name: 'version', defaultValue: '0.0.0', description: 'Версия сборки')
-        string(name: 'eventFeedDistrib', defaultValue: '', description: 'Ссылка на дистрибутив фабрики')
+        string(name: 'partnersDistrib', defaultValue: '', description: 'Ссылка на дистрибутив фабрики')
         string(name: 'dataspaceDistrib', defaultValue: '', description: 'Ссылка на дистрибутив dataspace')
         booleanParam(name: 'dynamicVersion', defaultValue: true, description: 'Добавлять номер сборки к версии (0.0.0_0022)')
         booleanParam(name: 'release', defaultValue: false, description: 'Публиковать в релизный или dev нексус')
     }
     environment {
         GIT_PROJECT = 'CIBPPRB'
-        GIT_REPOSITORY = 'event-feed'
-        GROUP_ID = 'Nexus_PROD.CI02764622_event_feed'
-        ARTIFACT_ID = 'event-feed'
+        GIT_REPOSITORY = 'sbbol-partners'
+        GROUP_ID = 'Nexus_PROD.CI02792425_sbbol-partners'
+        ARTIFACT_ID = 'partners'
         ARTIFACT_NAME_OS = ''
         VERSION = ''
         NEXUSSBRF_RELEASE_REPOSITORY = 'https://sbrf-nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
@@ -37,8 +37,8 @@ pipeline {
                 script {
                     if (!params.version) {
                         error("Version is required")
-                    } else if (!params.eventFeedDistrib) {
-                        error("EventFeed distrib is required")
+                    } else if (!params.partnersDistrib) {
+                        error("Partners distrib is required")
                     } else if (!params.dataspaceDistrib) {
                         error("Dataspace distrib is required")
                     }
@@ -65,9 +65,9 @@ pipeline {
             steps {
                 script {
                     httpRequest authentication: "sbbol-nexus",
-                            outputFile: "eventfeed-distrib.zip",
+                            outputFile: "partners-distrib.zip",
                             responseHandle: 'NONE',
-                            url: "${params.eventFeedDistrib}"
+                            url: "${params.partnersDistrib}"
                     httpRequest authentication: "sbbol-nexus",
                             outputFile: "dataspace-distrib.zip",
                             responseHandle: 'NONE',
@@ -80,20 +80,20 @@ pipeline {
             steps {
                 script {
                     dir('install_eip') {
-                        // extract event-feed distrib
-                        sh "mv ../eventfeed-distrib.zip ./eventfeed-distrib.zip"
-                        sh "unzip eventfeed-distrib.zip && rm eventfeed-distrib.zip"
-                        // find image hash for event-feed
-                        def eventFeedImage = sh(
-                                script: "cat configs/dataspace-eventfeed-java.yaml" +
-                                        " | sed -n 's/.*event\\-feed@sha256:\\(.*\\)/\\1/p'" +
+                        // extract partners distrib
+                        sh "mv ../partners-distrib.zip ./partners-distrib.zip"
+                        sh "unzip partners-distrib.zip && rm partners-distrib.zip"
+                        // find image hash for partners
+                        def partnersImage = sh(
+                                script: "cat configs/dataspace-partners-java.yaml" +
+                                        " | sed -n 's/.*partners@sha256:\\(.*\\)/\\1/p'" +
                                         " | head -1",
                                 returnStdout: true).trim()
-                        sh "echo \"EventFeed hash: ${eventFeedImage}\""
+                        sh "echo \"Partners hash: ${partnersImage}\""
 
-                        sh "sed -i 's/\${REGISTY_IMAGE_HASH}/${eventFeedImage}/' Deployment/deployment-event-feed.yml"
+                        sh "sed -i 's/\${REGISTY_IMAGE_HASH}/${partnersImage}/' Deployment/deployment-partners.yml"
                         sh "rm -r configs"
-                        sh "cat Deployment/deployment-event-feed.yml"
+                        sh "cat Deployment/deployment-partners.yml"
 
                         // extract dataspace distrib
                         sh "mv ../dataspace-distrib.zip ./dataspace-distrib.zip"
@@ -253,7 +253,7 @@ pipeline {
                         sh "echo \"${gigabasParams}\" >> configs/dataspace-gigabas-template.yaml"
 
                         // package archive
-                        ARTIFACT_NAME_OS = "event-feed-${VERSION}.zip"
+                        ARTIFACT_NAME_OS = "partners-${VERSION}.zip"
                         sh "zip -rq ${WORKSPACE}/distrib/${ARTIFACT_NAME_OS} *"
                     }
                 }
@@ -268,7 +268,7 @@ pipeline {
                         publishDev(
                                 credentialId: "sbbol-nexus",
                                 repository: "corp-releases",
-                                groupId: "ru.sberbank.pprb.sbbol.eventfeed",
+                                groupId: "ru.sberbank.pprb.sbbol.partners",
                                 artifactId: ARTIFACT_ID,
                                 version: "D-${VERSION}",
                                 extension: 'zip',
@@ -276,12 +276,12 @@ pipeline {
                                 classifier: "distrib",
                                 file: ARTIFACT_NAME_OS
                         )
-                        log.info("Successfully published to https://nexus.sigma.sbrf.ru/nexus/content/repositories/corp-releases/ru/sberbank/pprb/sbbol/eventfeed/event-feed/D-${VERSION}/")
-                        log.info("Distrib url: http://nexus.sigma.sbrf.ru:8099/nexus/service/local/repositories/corp-releases/content/ru/sberbank/pprb/sbbol/eventfeed/event-feed/D-${VERSION}/event-feed-D-${VERSION}-distrib.zip")
+                        log.info("Successfully published to https://nexus.sigma.sbrf.ru/nexus/content/repositories/corp-releases/ru/sberbank/pprb/sbbol/partners/partners/D-${VERSION}/")
+                        log.info("Distrib url: http://nexus.sigma.sbrf.ru:8099/nexus/service/local/repositories/corp-releases/content/ru/sberbank/pprb/sbbol/partners/partners/D-${VERSION}/partners-D-${VERSION}-distrib.zip")
                         if (params.release) {
                             log.info("Publishing artifact to ${NEXUSSBRF_RELEASE_REPOSITORY}")
                             nexus.publishZip(GROUP_ID, ARTIFACT_ID, "distrib", ARTIFACT_NAME_OS, VERSION)
-                            log.info("Successfully published to https://sbrf-nexus.sigma.sbrf.ru/nexus/content/repositories/Nexus_PROD/Nexus_PROD/CI02764622_event_feed/event-feed/D-${VERSION}/event-feed-D-${VERSION}-distrib.zip/")
+                            log.info("Successfully published to https://sbrf-nexus.sigma.sbrf.ru/nexus/content/repositories/Nexus_PROD/Nexus_PROD/CI02792425_sbbol-partners/partners/D-${VERSION}/partners-D-${VERSION}-distrib.zip/")
                         }
                         archiveArtifacts artifacts: "*.zip"
                     }

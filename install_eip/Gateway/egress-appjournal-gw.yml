@@ -4,7 +4,7 @@ metadata:
   name: egress-appjournal-gw
 spec:
   selector:
-    istio: egressgateway-${EVENT_FEED_MODULE_NAME}
+    istio: egressgateway-${PARTNERS_MODULE_NAME}
   servers:
     - hosts:
         - ${APPJOURNAL_HOST}

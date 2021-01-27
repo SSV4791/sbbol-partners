@@ -4,7 +4,7 @@ metadata:
   name: egress-fluentbit-https-gw
 spec:
   selector:
-    istio: egressgateway-${EVENT_FEED_MODULE_NAME}
+    istio: egressgateway-${PARTNERS_MODULE_NAME}
   servers:
     - hosts:
         -  ${FLUENT_BIT_HTTPS_HOST}

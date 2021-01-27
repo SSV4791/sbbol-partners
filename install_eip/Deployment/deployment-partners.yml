@@ -1,9 +1,9 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: event-feed
+  name: partners
   labels:
-    app: ${EVENT_FEED_MODULE_NAME}
+    app: ${PARTNERS_MODULE_NAME}
     app.kubernetes.io/part-of: istio
 spec:
   replicas: 1
@@ -13,7 +13,7 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: ${EVENT_FEED_MODULE_NAME}
+      app: ${PARTNERS_MODULE_NAME}
   template:
     metadata:
       annotations:
@@ -23,11 +23,11 @@ spec:
         sidecar.istio.io/proxyRequestsCPU: 200m
         sidecar.istio.io/proxyRequestsMemory: 256Mi
       labels:
-        app: ${EVENT_FEED_MODULE_NAME}
+        app: ${PARTNERS_MODULE_NAME}
     spec:
       containers:
-        - name: ${EVENT_FEED_MODULE_NAME}
-          image: ${IMAGE_BASE_URL}/event-feed@sha256:${REGISTY_IMAGE_HASH}
+        - name: ${PARTNERS_MODULE_NAME}
+          image: ${IMAGE_BASE_URL}/partners@sha256:${REGISTY_IMAGE_HASH}
           env:
             - name: NODE_NAME       #добавление имени ноды в переменные среды пода
               valueFrom:
@@ -42,13 +42,13 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: NODEID
-              value: ${EVENT_FEED_MODULE_NAME}
+              value: ${PARTNERS_MODULE_NAME}
             - name: RUN_DEBUG
               value: 'false'
             - name: JVM_OPTION
               valueFrom:
                 configMapKeyRef:
-                  name: cm-event-feed-app-properties
+                  name: cm-partners-app-properties
                   key: jvm-arguments
           ports:
             - containerPort: 8080
@@ -57,7 +57,7 @@ spec:
               name: tcp-debug
           envFrom:
             - configMapRef:
-                name: cm-event-feed-app-properties
+                name: cm-partners-app-properties
           volumeMounts:
             - name: app-config
               mountPath: /deployments/config
@@ -70,7 +70,7 @@ spec:
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: /actuator/health/readiness
+              path: /actuator/health
               port: 8080
               scheme: HTTP
             periodSeconds: 30
@@ -89,11 +89,11 @@ spec:
             initialDelaySeconds: 80
           resources:
             limits:
-              cpu: ${EVENT_FEED_LIMIT_CPU}
-              memory: ${EVENT_FEED_LIMIT_MEMORY}
+              cpu: ${PARTNERS_LIMIT_CPU}
+              memory: ${PARTNERS_LIMIT_MEMORY}
             requests:
-              cpu: ${EVENT_FEED_REQUEST_CPU}
-              memory: ${EVENT_FEED_REQUEST_MEMORY}
+              cpu: ${PARTNERS_REQUEST_CPU}
+              memory: ${PARTNERS_REQUEST_MEMORY}
         - name: fluentbit
           image: ${FLUENTBIT_IMAGE}
           resources:
@@ -105,15 +105,15 @@ spec:
               memory: ${FLUENTBIT_REQUEST_MEMORY}
           env:
             - name: service
-              value: ${EVENT_FEED_MODULE_NAME}
+              value: ${PARTNERS_MODULE_NAME}
             - name: cluster
               value: ${OPENSHIFT_CLUSTER}
             - name: moduleId
-              value: ${EVENT_FEED_MODULE_NAME}
+              value: ${PARTNERS_MODULE_NAME}
             - name: moduleVersion
               value: latest
             - name: nodeId
-              value: ${EVENT_FEED_MODULE_NAME}
+              value: ${PARTNERS_MODULE_NAME}
             - name: standId
               value: ${FLUENT_BIT_STAND_ID}
             - name: zoneId
@@ -137,13 +137,13 @@ spec:
       volumes:
         - name: app-config
           configMap:
-            name: cm-event-feed-app-properties
+            name: cm-partners-app-properties
             items:
               - key: application.properties
                 path: application.properties
         - name: logback-config
           configMap:
-            name: cm-event-feed-logback
+            name: cm-partners-logback
             items:
               - key: logback.xml
                 path: logback.xml

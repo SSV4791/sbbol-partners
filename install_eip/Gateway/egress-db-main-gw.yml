@@ -4,7 +4,7 @@ metadata:
   name: egress-db-main-gw
 spec:
   selector:
-    istio: egressgateway-${EVENT_FEED_MODULE_NAME}
+    istio: egressgateway-${PARTNERS_MODULE_NAME}
   servers:
     - hosts:
         - ${MAIN_DB_HOST}

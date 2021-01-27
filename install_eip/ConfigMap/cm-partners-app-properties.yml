@@ -1,18 +1,18 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: cm-event-feed-app-properties
+  name: cm-partners-app-properties
 data:
   application.properties: |-
     server.port=8080
     spring.main.banner-mode=off
-    spring.application.name=event-feed
+    spring.application.name=partners
     spring.profiles.active=default
     spring.http.encoding.charset=UTF-8
     spring.http.encoding.force=true
     spring.http.encoding.enabled=true
     server.tomcat.uri-encoding=UTF-8
-    management.metrics.tags.application=event-feed
+    management.metrics.tags.application=partners
     management.metrics.export.prometheus.enabled=true
     management.endpoints.enabled-by-default=true
     management.endpoints.web.exposure.include=*
@@ -35,10 +35,10 @@ data:
     synapse.endpoint=${SBBOL_SYNAPSE_URL}
     dataspace.monitoring.enabled=true
     dataspace.monitoring.watch-metrics.enable=true
-    dataspace.monitoring.watch-metrics.category.sbp.sbt.dataspace.eventfeed=true
+    dataspace.monitoring.watch-metrics.category.ru.sberbank.pprb.sbbol.partners=true
     dataspace.monitoring.watch-log.enable=true
     dataspace.monitoring.watch-log.level=info
-    dataspace.monitoring.watch-log.category.sbp.sbt.dataspace.eventfeed=all
+    dataspace.monitoring.watch-log.category.ru.sberbank.pprb.sbbol.partners=all
     spring.sleuth.enabled=false
     dataspace.monitoring.datasource.sleuth.enabled=false
     dataspace.monitoring.datasource.enabled=false
