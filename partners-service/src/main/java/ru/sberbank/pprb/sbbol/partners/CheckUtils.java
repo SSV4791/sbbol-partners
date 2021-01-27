@@ -55,10 +55,12 @@ public class CheckUtils {
 
     public static Set<Character> filterValidCharacters(String target, String validCharacters) {
         Set<Character> invalid = new TreeSet<Character>();
-        char[] chars = target.toCharArray();
-        for (char ch : chars) {
-            if (validCharacters.indexOf(ch) < 0) {
-                invalid.add(ch);
+        if (!StringUtils.isEmpty(target)) {
+            char[] chars = target.toCharArray();
+            for (char ch : chars) {
+                if (validCharacters.indexOf(ch) < 0) {
+                    invalid.add(ch);
+                }
             }
         }
         return invalid;

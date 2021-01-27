@@ -36,6 +36,7 @@ public class RenterServiceImpl implements RenterService {
             return renterDao.createRenter(renter);
         } else {
             Renter result = new Renter();
+            result.setType(Renter.TypeEnum.PHYSICAL_PERSON);
             result.setCheckResults(checkResults);
             return result;
         }
@@ -48,6 +49,7 @@ public class RenterServiceImpl implements RenterService {
             return renterDao.updateRenter(renter);
         } else {
             Renter result = new Renter();
+            result.setType(Renter.TypeEnum.PHYSICAL_PERSON);
             result.setCheckResults(checkResults);
             return result;
         }

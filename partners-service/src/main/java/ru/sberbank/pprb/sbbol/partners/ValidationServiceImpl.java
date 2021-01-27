@@ -61,7 +61,7 @@ public class ValidationServiceImpl implements ValidationService {
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
                         !isEmpty(renter.getInn()) &&
-                        (renter.getInn().length() != 10 || renter.getInn().length() != 12)) {
+                        renter.getInn().length() != 10 && renter.getInn().length() != 12) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -77,7 +77,7 @@ public class ValidationServiceImpl implements ValidationService {
                 return null;
             }
         },
-        ACC_FORMAT("Проверьте «счёт арендатора». Он содержит ${INVALIDCHARS} символ(-ы)", "account") {
+        ACC_FORMAT("Проверьте Счёт арендатора. Он содержит ${INVALIDCHARS} символ(-ы)", "account") {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if (!isEmpty(renter.getAccount())) {
@@ -120,7 +120,7 @@ public class ValidationServiceImpl implements ValidationService {
         BIC_FORMAT("Проверьте БИК банка арендатора. Он содержит ${INVALIDCHARS} символ(-ы)", "bankBic") {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
-                if (!isEmpty(renter.getInn())) {
+                if (!isEmpty(renter.getBankBic())) {
                     String invalidChars = CheckUtils.filterValidCharacters(renter.getBankBic(), CheckUtils.DIGIT_CHAR, ",");
                     if (StringUtils.isNotBlank(invalidChars)) {
                         String msg = this.message.replace("${INVALIDCHARS}", invalidChars);
@@ -142,7 +142,7 @@ public class ValidationServiceImpl implements ValidationService {
         EMAIL_FORMAT("Адрес введён с ошибкой. Введите адрес электронной почты в правильном формате: mail@vashakompania.ru", "emails") {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
-                if (!CheckUtils.checkEmail(renter.getEmails())) {
+                if (!isEmpty(renter.getEmails()) && !CheckUtils.checkEmail(renter.getEmails())) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -212,9 +212,9 @@ public class ValidationServiceImpl implements ValidationService {
         OKPO_SIZE_8("Проверьте ОКПО арендатора. Он состоит из 8 цифр", "okpo") {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
-                if (PHYSICAL_PERSON == renter.getType() && !isEmpty(renter.getInn()) &&
-                        renter.getInn().length() != 10 && !isEmpty(renter.getOkpo()) &&
-                        renter.getOkpo().length() != 8) {
+                if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
+                        !isEmpty(renter.getInn()) && renter.getInn().length() == 10 &&
+                        !isEmpty(renter.getOkpo()) && renter.getOkpo().length() != 8) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -223,9 +223,9 @@ public class ValidationServiceImpl implements ValidationService {
         OKPO_SIZE_10("Проверьте ОКПО арендатора. Он состоит из 10 цифр", "okpo") {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
-                if (PHYSICAL_PERSON == renter.getType() && !isEmpty(renter.getInn()) &&
-                        renter.getInn().length() != 12 && !isEmpty(renter.getOkpo()) &&
-                        renter.getOkpo().length() != 10) {
+                if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
+                        !isEmpty(renter.getInn()) && renter.getInn().length() == 12 &&
+                        !isEmpty(renter.getOkpo()) && renter.getOkpo().length() != 10) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -253,8 +253,6 @@ public class ValidationServiceImpl implements ValidationService {
                 return null;
             }
         },
-
-
         ;
 
 
