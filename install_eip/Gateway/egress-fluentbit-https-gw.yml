@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: egress-fluentbit-https-gw
+spec:
+  selector:
+    istio: egressgateway-${PARTNERS_MODULE_NAME}
+  servers:
+    - hosts:
+        -  ${FLUENT_BIT_HTTPS_HOST}
+      port:
+        name: https-fluent-${FLUENT_BIT_HTTPS_PORT}
+        number: ${FLUENT_BIT_HTTPS_PORT}
+        protocol: HTTP

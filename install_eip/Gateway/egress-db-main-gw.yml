@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: egress-db-main-gw
+spec:
+  selector:
+    istio: egressgateway-${PARTNERS_MODULE_NAME}
+  servers:
+    - hosts:
+        - ${MAIN_DB_HOST}
+      port:
+        name: tcp
+        number: ${DB_PORT}
+        protocol: TCP

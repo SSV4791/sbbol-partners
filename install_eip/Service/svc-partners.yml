@@ -1,0 +1,23 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: svc-partners
+  annotations:
+    description: "Service for partners"
+    # Аннотация для включения сбора метрик
+    prometheus.io.scrape: "true"
+    # Аннотация для указания HTTP endpoint с метриками приложения
+    prometheus.io.path: "/actuator/prometheus"
+    # Аннотация для указания порта подключения к HTTP endpoint с метриками
+    prometheus.io.port: "8080"
+spec:
+  selector:
+    app: ${PARTNERS_MODULE_NAME}
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: tcp-debug
+      port: 8000
+      targetPort: 8000
+  type: LoadBalancer

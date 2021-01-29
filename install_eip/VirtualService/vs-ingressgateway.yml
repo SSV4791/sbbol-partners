@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vs-ingressgateway
+spec:
+  exportTo:
+    - .
+  gateways:
+    - ingressgateway-gw
+  hosts:
+    - ingress-${NAMESPACE}.ingress.apps.${OPENSHIFT_CLUSTER}
+    - ingress-${NAMESPACE}.apps.${OPENSHIFT_CLUSTER}
+  http:
+    - match:
+        - uri:
+            prefix: /sbbol-partners/
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: svc-partners
+            port:
+              number: 8080
+          weight: 100

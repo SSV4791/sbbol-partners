@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dr-egress-db-si
+spec:
+  host: ${SI_DB_HOST}
+  subsets:
+    - name: db-si
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+        portLevelSettings:
+          - port:
+              number: ${DB_PORT}
+            tls:
+              mode: ISTIO_MUTUAL
