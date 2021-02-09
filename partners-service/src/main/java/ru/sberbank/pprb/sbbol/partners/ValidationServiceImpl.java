@@ -198,17 +198,6 @@ public class ValidationServiceImpl implements ValidationService {
                 return null;
             }
         },
-        KPP_SIZE_PP("Укажите КПП арендатора. Он состоит из 9 символов", "kpp") {
-            @Override
-            CheckFailure validate(@Nonnull Renter renter) {
-                if (PHYSICAL_PERSON == renter.getType() && !isEmpty(renter.getInn()) &&
-                        renter.getInn().length() != 10 && !isEmpty(renter.getKpp()) &&
-                        renter.getKpp().length() != 9) {
-                    return new CheckFailure(this.message, this.field);
-                }
-                return null;
-            }
-        },
         OKPO_SIZE_8("Проверьте ОКПО арендатора. Он состоит из 8 цифр", "okpo") {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
