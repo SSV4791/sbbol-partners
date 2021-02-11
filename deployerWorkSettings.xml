@@ -348,7 +348,7 @@
                 <dependency>
                     <groupId>sbp.com.sbt.dataspace</groupId>
                     <artifactId>dataspace-core-module</artifactId>
-                    <version>4.1.0-build.86</version>
+                    <version>4.1.0-build.87</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>test</scope>
