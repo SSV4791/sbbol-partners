@@ -52,13 +52,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>sbp.com.sbt.dataspace.support</groupId>
-                <artifactId>support-bom</artifactId>
-                <version>4.1.0-build.10</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>1.5.23</version>
@@ -66,7 +59,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.2.6.RELEASE</version>
+                <version>5.2.12.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
