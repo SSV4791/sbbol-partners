@@ -6,56 +6,56 @@
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-service</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-openapi</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>runner</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-api</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-model-jpa</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-rest</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-model-sdk</artifactId>
             </artifact>
-            <version>1.000.00</version>
+            <version>1.000.00-build.2</version>
         </artifactVersion>
     </artifactVersions>
     <lastProjectDependencyTree>
@@ -92,7 +92,7 @@
                 <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
-                    <version>5.2.6.RELEASE</version>
+                    <version>5.2.12.RELEASE</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>compile</scope>
@@ -204,7 +204,7 @@
                 <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
-                    <version>5.2.6.RELEASE</version>
+                    <version>5.2.12.RELEASE</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>compile</scope>
@@ -236,7 +236,7 @@
                 <dependency>
                     <groupId>sbp.com.sbt.dataspace</groupId>
                     <artifactId>sdk-api</artifactId>
-                    <version>4.2.0-build.174</version>
+                    <version>4.2.0-build.188</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>compile</scope>
@@ -268,7 +268,7 @@
                 <dependency>
                     <groupId>sbp.com.sbt.dataspace</groupId>
                     <artifactId>liquibase-deployer</artifactId>
-                    <version>4.2.0-build.159</version>
+                    <version>4.2.0-build.165</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>test</scope>
@@ -348,7 +348,7 @@
                 <dependency>
                     <groupId>sbp.com.sbt.dataspace</groupId>
                     <artifactId>dataspace-core-module</artifactId>
-                    <version>4.1.0-build.87</version>
+                    <version>4.1.0-build.100</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>test</scope>
@@ -372,7 +372,7 @@
                 <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
-                    <version>5.2.6.RELEASE</version>
+                    <version>5.2.12.RELEASE</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>compile</scope>
@@ -396,7 +396,7 @@
                 <dependency>
                     <groupId>sbp.com.sbt.dataspace</groupId>
                     <artifactId>sdk-api</artifactId>
-                    <version>4.2.0-build.174</version>
+                    <version>4.2.0-build.188</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>compile</scope>
@@ -428,7 +428,7 @@
                 <dependency>
                     <groupId>sbp.com.sbt.dataspace</groupId>
                     <artifactId>liquibase-deployer</artifactId>
-                    <version>4.2.0-build.159</version>
+                    <version>4.2.0-build.165</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>test</scope>
@@ -500,7 +500,7 @@
                 <dependency>
                     <groupId>sbp.com.sbt.dataspace</groupId>
                     <artifactId>status-service</artifactId>
-                    <version>4.2.0-build.174</version>
+                    <version>4.2.0-build.188</version>
                     <classifier/>
                     <packaging>jar</packaging>
                     <scope>test</scope>
@@ -516,5 +516,5 @@
             </dependencies>
         </artifactDependencyTree>
     </lastProjectDependencyTree>
-    <lastCommitRevisionNumber>bfa2dd0286718e77b3638fb1c246c45cbd7697eb</lastCommitRevisionNumber>
+    <lastCommitRevisionNumber>7c8bec2b43c8f80dda036c4a6c24121e63c593ef</lastCommitRevisionNumber>
 </workSettings>
