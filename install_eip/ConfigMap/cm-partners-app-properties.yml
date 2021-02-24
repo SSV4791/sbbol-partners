@@ -32,7 +32,6 @@ data:
     standin.cloud.client.mmtProxyUrl=localhost
     dataspace.replicator.ormtools-integration=false
     core.url=${DATASPACE_URL}
-    synapse.endpoint=${SBBOL_SYNAPSE_URL}
     dataspace.monitoring.enabled=true
     dataspace.monitoring.watch-metrics.enable=true
     dataspace.monitoring.watch-metrics.category.ru.sberbank.pprb.sbbol.partners=true

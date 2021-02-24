@@ -4,13 +4,11 @@ metadata:
   labels:
     app: ingressgateway-${NAMESPACE}
     istio: ingressgateway-${NAMESPACE}
-  name: ingressgateway-svc
+  name: ingressgateway-http-svc
 spec:
   ports:
-    - name: https-${INGRESS_PORT_HTTPS}
-      port: ${INGRESS_PORT_HTTPS}
-    - name: https-${INGRESS_OTT_PORT}
-      port: ${INGRESS_OTT_PORT}
+    - name: http-${INGRESS_PORT}
+      port: ${INGRESS_PORT}
   selector:
     app: ingressgateway-${NAMESPACE}
     istio: ingressgateway-${NAMESPACE}

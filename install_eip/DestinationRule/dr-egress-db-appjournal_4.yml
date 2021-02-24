@@ -1,9 +1,9 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: dr-egress-db-appjournal
+  name: dr-egress-db-appjournal-4
 spec:
-  host: ${APPJOURNAL_HOST}
+  host: ${APPJOURNAL_HOST_4}
   subsets:
     - name: appjournal
       trafficPolicy:

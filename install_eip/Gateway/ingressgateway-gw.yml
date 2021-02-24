@@ -8,9 +8,24 @@ spec:
   servers:
     - hosts:
         - ingress-${NAMESPACE}.ingress.apps.${OPENSHIFT_CLUSTER}
+        - ${INGRESS_HOST_GEO_TLS}
       port:
         name: https-${INGRESS_PORT_HTTPS}
         number: ${INGRESS_PORT_HTTPS}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-certs/ca-chain.cert.pem
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+        subjectAltNames:
+          - ${SUBJECT_ALT_NAME_1}
+          - ${SUBJECT_ALT_NAME_2}
+    - hosts:
+        - ${INGRESS_HOST_GEO_OTT}
+      port:
+        name: https-${INGRESS_OTT_PORT}
+        number: ${INGRESS_OTT_PORT}
         protocol: HTTPS
       tls:
         caCertificates: /etc/istio/ingressgateway-ca-certs/ca-chain.cert.pem

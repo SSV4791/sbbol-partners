@@ -3,6 +3,8 @@ kind: ServiceEntry
 metadata:
   name: se-egress-db-main
 spec:
+  exportTo:
+    - .
   hosts:
     - ${MAIN_DB_HOST}
   location: MESH_EXTERNAL

@@ -74,6 +74,42 @@ spec:
                       - ppc64le
                       - s390x
       containers:
+        - resources:
+            limits:
+              cpu: 400m
+              memory: 500Mi
+            requests:
+              cpu: 300m
+              memory: 300Mi
+          terminationMessagePath: /dev/termination-log
+          name: ott-sidecar
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 8778
+              protocol: TCP
+            - name: http-envoy-prom
+              containerPort: 15090
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: ott-secret
+              readOnly: true
+              mountPath: /mnt/secrets
+            - name: ott-uds-socket
+              mountPath: /mnt/ott-uds-socket
+            - name: ott-logback
+              readOnly: true
+              mountPath: /tmp/ott-logback.xml
+          terminationMessagePolicy: File
+          envFrom:
+            - secretRef:
+                name: ott-ingress-passwords
+            - configMapRef:
+                name: cm-ingress-ott-settings
+          image: ${OTT_REGISTRY_URL}
         - args:
             - proxy
             - router
@@ -166,6 +202,12 @@ spec:
             - mountPath: /etc/certs/
               name: istio-certs
               readOnly: true
+            - name: egressgateway-certs
+              readOnly: true
+              mountPath: /etc/istio/egressgateway-certs
+            - name: egressgateway-ca-certs
+              readOnly: true
+              mountPath: /etc/istio/egressgateway-ca-certs
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -180,3 +222,24 @@ spec:
             secretName: istio.default
             defaultMode: 400
             optional: true
+        - name: egressgateway-certs
+          secret:
+            secretName: istio-egressgateway-certs
+            defaultMode: 400
+            optional: true
+        - name: egressgateway-ca-certs
+          secret:
+            secretName: istio-egressgateway-ca-certs
+            defaultMode: 400
+            optional: true
+        - name: ott-secret
+          secret:
+            secretName: ott-secret
+            defaultMode: 400
+        - name: ott-uds-socket
+          emptyDir:
+            medium: Memory
+        - name: ott-logback
+          configMap:
+            name: cm-egress-ott-logback
+            defaultMode: 400

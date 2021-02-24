@@ -10,7 +10,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: ${PARTNERS_MODULE_NAME}
@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: ${PARTNERS_MODULE_NAME}
-          image: ${IMAGE_BASE_URL}/partners@sha256:${REGISTY_IMAGE_HASH}
+          image: ${registryUrl}/${registryProject}/${imageNameWithDigest}
           env:
             - name: NODE_NAME       #добавление имени ноды в переменные среды пода
               valueFrom:
@@ -98,26 +98,26 @@ spec:
           image: ${FLUENTBIT_IMAGE}
           resources:
             limits:
-              cpu: ${FLUENTBIT_LIMIT_CPU}
-              memory: ${FLUENTBIT_LIMIT_MEMORY}
+              cpu: ${fluentBitLimitCPU}
+              memory: ${fluentBitLimitMemory}
             requests:
-              cpu: ${FLUENTBIT_REQUEST_CPU}
-              memory: ${FLUENTBIT_REQUEST_MEMORY}
+              cpu: ${fluentBitRequestCPU}
+              memory: ${fluentBitRequestMemory}
           env:
             - name: service
               value: ${PARTNERS_MODULE_NAME}
             - name: cluster
-              value: ${OPENSHIFT_CLUSTER}
+              value: ${fluentBitEnvCluster}
             - name: moduleId
               value: ${PARTNERS_MODULE_NAME}
             - name: moduleVersion
-              value: latest
+              value: ${VERSION}
             - name: nodeId
               value: ${PARTNERS_MODULE_NAME}
             - name: standId
-              value: ${FLUENT_BIT_STAND_ID}
+              value: ${fluentBitEnvStandId}
             - name: zoneId
-              value: ${FLUENT_BIT_ZONE_ID}
+              value: ${fluentBitEnvZoneId}
             - name: pod
               valueFrom:
                 fieldRef:
