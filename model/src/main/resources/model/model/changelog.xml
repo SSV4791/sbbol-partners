@@ -838,4 +838,15 @@
     <changeSet author="partners" id="1.000.00-build.2-applied">
         <tagDatabase tag="partners-1.000.00-build.2-applied"/>
     </changeSet>
+    <changeSet author="partners" id="1.000.00_0005-before">
+        <tagDatabase tag="partners-1.000.00_0005-before"/>
+    </changeSet>
+    <changeSet author="partners" id="DICTIONARY-H2-DECODER-BASE64" dbms="h2">
+        <sql>CREATE ALIAS IF NOT EXISTS BASE64_DECODE AS 'byte[] encode(String source) {return java.util.Base64.getDecoder().decode(source);}'</sql>
+        <rollback/>
+    </changeSet>
+
+    <changeSet author="partners" id="1.000.00_0005-applied">
+        <tagDatabase tag="partners-1.000.00_0005-applied"/>
+    </changeSet>
 </databaseChangeLog>

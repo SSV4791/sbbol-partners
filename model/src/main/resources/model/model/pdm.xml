@@ -1,5 +1,5 @@
 <PdmModel>
-  <model model-name="partners" component-code="НЕ ЗАДАНО" version="1.000.00-build.2" versioned-entities="false">
+  <model model-name="partners" component-code="НЕ ЗАДАНО" version="1.000.00_0005" versioned-entities="false">
     <class name="Renter" extends="BaseEntity" label="Арендатор" tableName="T_RENTER" pk-index-name="PK_T_RENTER" description="" affinity="objectId" class-access="UPDATE" lockable="false">
       <id type="String" category="SNOWFLAKE"/>
       <property name="uuid" type="String" length="36" label="Используется как уникальный идентификатор записи" mandatory="true" unique="true" index="true" column-name="UUID" description="" column-type="VARCHAR(36)"/>
@@ -131,17 +131,17 @@
       <property name="chgCnt" type="Long" label="Счетчик изменений (технический)" column-name="CHGCNT" description="" column-type="${type_long}" changeable="READ_ONLY"/>
       <property name="offFlag" type="Byte" label="Признак деактивации записи" column-name="OFFFLAG" description="" column-type="${type_byte}" system-field="true" changeable="SYSTEM"/>
     </class>
-    <class name="CREpkEvent" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENT" pk-index-name="PK_T_REPL_CR_CREPKEVENT" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CREpkEvent" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENT" pk-index-name="PK_T_REPL_CR_CREPKEVENT" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" column-type="VARCHAR(254)"/>
-      <property name="epkId" type="String" length="254" label="Идентификатор EPK" unique="true" index="true" column-name="EPKID" column-type="VARCHAR(254)"/>
-      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" column-type="VARCHAR(254)"/>
-      <property name="fromClientVersion" type="Long" label="Версия старого клиента" column-name="FROMCLIENTVERSION" column-type="${type_long}"/>
-      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" column-type="VARCHAR(254)"/>
-      <property name="toClientVersion" type="Long" label="Версия нового клиента" column-name="TOCLIENTVERSION" column-type="${type_long}"/>
-      <property name="currentSpace" type="String" length="254" label="Текущее пространство обслуживания" column-name="CURRENTSPACE" column-type="VARCHAR(254)"/>
-      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" column-type="TIMESTAMP(3)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
+      <property name="epkId" type="String" length="254" label="Идентификатор EPK" unique="true" index="true" column-name="EPKID" description="" column-type="VARCHAR(254)"/>
+      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="fromClientVersion" type="Long" label="Версия старого клиента" column-name="FROMCLIENTVERSION" description="" column-type="${type_long}"/>
+      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="toClientVersion" type="Long" label="Версия нового клиента" column-name="TOCLIENTVERSION" description="" column-type="${type_long}"/>
+      <property name="currentSpace" type="String" length="254" label="Текущее пространство обслуживания" column-name="CURRENTSPACE" description="" column-type="VARCHAR(254)"/>
+      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" description="" column-type="TIMESTAMP(3)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index unique="true" index-name="I_CREPKEVENT_EPKID">
         <property name="epkId"/>
       </index>
@@ -149,16 +149,16 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CREpkEventBuffer" extends="BaseEntity" label="Буферная таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENTBUFFER" pk-index-name="PK_T_REPL_CR_CREPKEVENTBUFFER" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CREpkEventBuffer" extends="BaseEntity" label="Буферная таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENTBUFFER" pk-index-name="PK_T_REPL_CR_CREPKEVENTBUFFER" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="status" type="String" length="254" label="Статус обработки события" unique="false" index="true" column-name="STATUS" column-type="VARCHAR(254)"/>
-      <property name="epkId" type="String" length="254" label="Идентификатор EPK" unique="true" index="true" column-name="EPKID" column-type="VARCHAR(254)"/>
-      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" column-type="VARCHAR(254)"/>
-      <property name="fromClientVersion" type="Long" label="Версия старого клиента" column-name="FROMCLIENTVERSION" column-type="${type_long}"/>
-      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" column-type="VARCHAR(254)"/>
-      <property name="toClientVersion" type="Long" label="Версия нового клиента" column-name="TOCLIENTVERSION" column-type="${type_long}"/>
-      <property name="timeCreated" type="Date" length="3" label="Время создания события" unique="false" index="true" column-name="TIMECREATED" column-type="TIMESTAMP(3)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="status" type="String" length="254" label="Статус обработки события" unique="false" index="true" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
+      <property name="epkId" type="String" length="254" label="Идентификатор EPK" unique="true" index="true" column-name="EPKID" description="" column-type="VARCHAR(254)"/>
+      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="fromClientVersion" type="Long" label="Версия старого клиента" column-name="FROMCLIENTVERSION" description="" column-type="${type_long}"/>
+      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="toClientVersion" type="Long" label="Версия нового клиента" column-name="TOCLIENTVERSION" description="" column-type="${type_long}"/>
+      <property name="timeCreated" type="Date" length="3" label="Время создания события" unique="false" index="true" column-name="TIMECREATED" description="" column-type="TIMESTAMP(3)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index unique="true" index-name="I_CREPKEVENTBUFFER_EPKID">
         <property name="epkId"/>
       </index>
@@ -172,57 +172,57 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRRequestEvent" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CRRequestEvent" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" column-type="VARCHAR(254)"/>
-      <property name="fromSpace" type="String" length="254" label="Из какого пространства (SPACE/ZONE)" column-name="FROMSPACE" column-type="VARCHAR(254)"/>
-      <property name="toSpace" type="String" length="254" label="В какое пространство (SPACE/ZONE)" column-name="TOSPACE" column-type="VARCHAR(254)"/>
-      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" column-type="VARCHAR(254)"/>
-      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" column-type="VARCHAR(254)"/>
-      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" column-type="TIMESTAMP(3)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
+      <property name="fromSpace" type="String" length="254" label="Из какого пространства (SPACE/ZONE)" column-name="FROMSPACE" description="" column-type="VARCHAR(254)"/>
+      <property name="toSpace" type="String" length="254" label="В какое пространство (SPACE/ZONE)" column-name="TOSPACE" description="" column-type="VARCHAR(254)"/>
+      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" description="" column-type="TIMESTAMP(3)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index index-name="I_CRREQUESTEVENT_OBJECT_ID" primary-key="true">
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRRequestEventDupByAggregate" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CRRequestEventDupByAggregate" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" column-type="VARCHAR(254)"/>
-      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" column-type="VARCHAR(254)"/>
-      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" column-type="VARCHAR(254)"/>
-      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" column-type="TIMESTAMP(3)"/>
-      <property name="aggregateRootId" type="String" length="254" label="ID корня агрегата" column-name="AGGREGATEROOTID" column-type="VARCHAR(254)"/>
-      <property name="aggregateRootClass" type="String" length="254" label="Тип корня агрегата" column-name="AGGREGATEROOTCLASS" column-type="VARCHAR(254)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
+      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" description="" column-type="TIMESTAMP(3)"/>
+      <property name="aggregateRootId" type="String" length="254" label="ID корня агрегата" column-name="AGGREGATEROOTID" description="" column-type="VARCHAR(254)"/>
+      <property name="aggregateRootClass" type="String" length="254" label="Тип корня агрегата" column-name="AGGREGATEROOTCLASS" description="" column-type="VARCHAR(254)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index index-name="I_CRREQUESTEVENTDUPBYAGGREGATE_OBJECT_ID" primary-key="true">
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRBatch" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CRBATCH" pk-index-name="PK_T_REPL_CR_CRBATCH" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CRBatch" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CRBATCH" pk-index-name="PK_T_REPL_CR_CRBATCH" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="fieldName" type="String" length="254" label="Наименования поля" column-name="FIELDNAME" column-type="VARCHAR(254)"/>
-      <property name="eventId" type="String" length="254" label="Сквозной идентификатор события EventId" column-name="EVENTID" column-type="VARCHAR(254)"/>
-      <property name="entityName" type="String" length="254" label="Наименования таблицы" column-name="ENTITYNAME" column-type="VARCHAR(254)"/>
-      <property name="identifiers" type="String" length="254" collection="SET" label="Идентфикаторы обработанных сущностей" column-name="IDENTIFIERS" collection-table-name="LC_REPL_CR_CRBATCH_IDENTIFIERS" key-column-name="CRBATCH_ID" column-type="VARCHAR(254)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="fieldName" type="String" length="254" label="Наименования поля" column-name="FIELDNAME" description="" column-type="VARCHAR(254)"/>
+      <property name="eventId" type="String" length="254" label="Сквозной идентификатор события EventId" column-name="EVENTID" description="" column-type="VARCHAR(254)"/>
+      <property name="entityName" type="String" length="254" label="Наименования таблицы" column-name="ENTITYNAME" description="" column-type="VARCHAR(254)"/>
+      <property name="identifiers" type="String" length="254" collection="SET" label="Идентфикаторы обработанных сущностей" column-name="IDENTIFIERS" collection-table-name="LC_REPL_CR_CRBATCH_IDENTIFIERS" key-column-name="CRBATCH_ID" description="" column-type="VARCHAR(254)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index index-name="I_CRBATCH_OBJECT_ID" primary-key="true">
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRTask" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRTASK" pk-index-name="PK_T_REPL_CR_CRTASK" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CRTask" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRTASK" pk-index-name="PK_T_REPL_CR_CRTASK" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="status" type="String" length="254" label="Статус выполнения задачи" unique="false" index="true" column-name="STATUS" column-type="VARCHAR(254)"/>
-      <property name="retryCount" type="Integer" label="Колличество перезапусков задачи" column-name="RETRYCOUNT" column-type="${type_int}"/>
-      <property name="referenceType" type="String" length="254" label="Тип обрабатываемой ссылки [Client, Individual, etc]" column-name="REFERENCETYPE" column-type="VARCHAR(254)"/>
-      <property name="fromSpace" type="String" length="254" label="Из какого пространства (SPACE/ZONE)" column-name="FROMSPACE" column-type="VARCHAR(254)"/>
-      <property name="toSpace" type="String" length="254" label="В какое пространство (SPACE/ZONE)" column-name="TOSPACE" column-type="VARCHAR(254)"/>
-      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" column-type="VARCHAR(254)"/>
-      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" column-type="VARCHAR(254)"/>
-      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" column-type="TIMESTAMP(3)"/>
-      <property name="operationType" type="String" length="254" label="TYPE [RELOCATION, DUPLICATION]" column-name="OPERATIONTYPE" column-type="VARCHAR(254)"/>
-      <property name="heartbeat" type="Date" length="3" label="Время когда последний раз был установлен Heartbeat" column-name="HEARTBEAT" column-type="TIMESTAMP(3)"/>
-      <property name="retryAfter" type="Date" length="3" label="Время после которого можно перезапустить задачу" column-name="RETRYAFTER" column-type="TIMESTAMP(3)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="status" type="String" length="254" label="Статус выполнения задачи" unique="false" index="true" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
+      <property name="retryCount" type="Integer" label="Колличество перезапусков задачи" column-name="RETRYCOUNT" description="" column-type="${type_int}"/>
+      <property name="referenceType" type="String" length="254" label="Тип обрабатываемой ссылки [Client, Individual, etc]" column-name="REFERENCETYPE" description="" column-type="VARCHAR(254)"/>
+      <property name="fromSpace" type="String" length="254" label="Из какого пространства (SPACE/ZONE)" column-name="FROMSPACE" description="" column-type="VARCHAR(254)"/>
+      <property name="toSpace" type="String" length="254" label="В какое пространство (SPACE/ZONE)" column-name="TOSPACE" description="" column-type="VARCHAR(254)"/>
+      <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="toClient" type="String" length="254" label="Новый клиент" column-name="TOCLIENT" description="" column-type="VARCHAR(254)"/>
+      <property name="timeCreated" type="Date" length="3" label="Время создания события" column-name="TIMECREATED" description="" column-type="TIMESTAMP(3)"/>
+      <property name="operationType" type="String" length="254" label="TYPE [RELOCATION, DUPLICATION]" column-name="OPERATIONTYPE" description="" column-type="VARCHAR(254)"/>
+      <property name="heartbeat" type="Date" length="3" label="Время когда последний раз был установлен Heartbeat" column-name="HEARTBEAT" description="" column-type="TIMESTAMP(3)"/>
+      <property name="retryAfter" type="Date" length="3" label="Время после которого можно перезапустить задачу" column-name="RETRYAFTER" description="" column-type="TIMESTAMP(3)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index index-name="I_CRTASK_STATUS">
         <property name="status"/>
       </index>
@@ -230,38 +230,38 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRProcess" extends="BaseEntity" label="Таблица с попыткой запуска задачи" tableName="T_REPL_CR_CRPROCESS" pk-index-name="PK_T_REPL_CR_CRPROCESS" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CRProcess" extends="BaseEntity" label="Таблица с попыткой запуска задачи" tableName="T_REPL_CR_CRPROCESS" pk-index-name="PK_T_REPL_CR_CRPROCESS" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="startTime" type="Date" length="3" label="Время начала обработки" column-name="STARTTIME" column-type="TIMESTAMP(3)"/>
-      <property name="status" type="String" length="254" label="Статус выполнения процесса" column-name="STATUS" column-type="VARCHAR(254)"/>
-      <property name="eventId" type="String" length="254" label="Сквозной идентификатор события EventId" column-name="EVENTID" column-type="VARCHAR(254)"/>
-      <property name="finishTime" type="Date" length="3" label="Время окончания обработки" column-name="FINISHTIME" column-type="TIMESTAMP(3)"/>
-      <property name="notice" type="String" length="4000" label="Результат выполнения" column-name="NOTICE" column-type="VARCHAR(4000)"/>
-      <property name="node" type="String" length="254" label="Node на которой выполнялась обработка процесса" column-name="NODE" column-type="VARCHAR(254)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="startTime" type="Date" length="3" label="Время начала обработки" column-name="STARTTIME" description="" column-type="TIMESTAMP(3)"/>
+      <property name="status" type="String" length="254" label="Статус выполнения процесса" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
+      <property name="eventId" type="String" length="254" label="Сквозной идентификатор события EventId" column-name="EVENTID" description="" column-type="VARCHAR(254)"/>
+      <property name="finishTime" type="Date" length="3" label="Время окончания обработки" column-name="FINISHTIME" description="" column-type="TIMESTAMP(3)"/>
+      <property name="notice" type="String" length="4000" label="Результат выполнения" column-name="NOTICE" description="" column-type="VARCHAR(4000)"/>
+      <property name="node" type="String" length="254" label="Node на которой выполнялась обработка процесса" column-name="NODE" description="" column-type="VARCHAR(254)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index index-name="I_CRPROCESS_OBJECT_ID" primary-key="true">
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRLock" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRLOCK" pk-index-name="PK_T_REPL_CR_CRLOCK" affinity="objectId" class-access="CREATE" final-class="true" generate-jpa="false">
+    <class name="CRLock" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRLOCK" pk-index-name="PK_T_REPL_CR_CRLOCK" description="" affinity="objectId" class-access="CREATE" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="token" type="String" length="254" label="TOKEN" column-name="TOKEN" column-type="VARCHAR(254)"/>
-      <property name="migrationStatus" type="Long" label="Миграционная блокировка по клиенту" column-name="MIGRATIONSTATUS" column-type="${type_long}"/>
-      <property name="duplicationFrom" type="Long" label="Блокировка по from клиенту" column-name="DUPLICATIONFROM" column-type="${type_long}"/>
-      <property name="duplicationTo" type="Long" label="Блокировка по to клиенту" column-name="DUPLICATIONTO" column-type="${type_long}"/>
-      <property name="clientType" type="String" length="254" label="Тип клиента [Client, Individual, Organization, etc]" column-name="CLIENTTYPE" column-type="VARCHAR(254)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="token" type="String" length="254" label="TOKEN" column-name="TOKEN" description="" column-type="VARCHAR(254)"/>
+      <property name="migrationStatus" type="Long" label="Миграционная блокировка по клиенту" column-name="MIGRATIONSTATUS" description="" column-type="${type_long}"/>
+      <property name="duplicationFrom" type="Long" label="Блокировка по from клиенту" column-name="DUPLICATIONFROM" description="" column-type="${type_long}"/>
+      <property name="duplicationTo" type="Long" label="Блокировка по to клиенту" column-name="DUPLICATIONTO" description="" column-type="${type_long}"/>
+      <property name="clientType" type="String" length="254" label="Тип клиента [Client, Individual, Organization, etc]" column-name="CLIENTTYPE" description="" column-type="VARCHAR(254)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index index-name="I_CRLOCK_OBJECT_ID" primary-key="true">
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRAggregateTask" extends="BaseEntity" label="Таблица с задачами обработки конкретного агрегата" tableName="T_REPL_CR_CRAGGREGATETASK" pk-index-name="PK_T_REPL_CR_CRAGGREGATETASK" class-access="READ_ONLY" final-class="true" generate-jpa="false">
+    <class name="CRAggregateTask" extends="BaseEntity" label="Таблица с задачами обработки конкретного агрегата" tableName="T_REPL_CR_CRAGGREGATETASK" pk-index-name="PK_T_REPL_CR_CRAGGREGATETASK" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
       <id type="String" category="MANUAL"/>
-      <property name="status" type="String" length="254" label="Статус выполнения задачи" unique="false" index="true" column-name="STATUS" column-type="VARCHAR(254)"/>
-      <property name="aggregateRootId" type="String" length="254" label="ID корня агрегата" unique="false" index="true" column-name="AGGREGATEROOTID" column-type="VARCHAR(254)"/>
-      <property name="aggregateRootClass" type="String" length="254" label="Тип корня агрегата" column-name="AGGREGATEROOTCLASS" column-type="VARCHAR(254)"/>
-      <property name="eventId" type="String" length="254" label="Сквозной идентификатор события EventId" column-name="EVENTID" column-type="VARCHAR(254)"/>
-      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
+      <property name="status" type="String" length="254" label="Статус выполнения задачи" unique="false" index="true" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
+      <property name="aggregateRootId" type="String" length="254" label="ID корня агрегата" unique="false" index="true" column-name="AGGREGATEROOTID" description="" column-type="VARCHAR(254)"/>
+      <property name="aggregateRootClass" type="String" length="254" label="Тип корня агрегата" column-name="AGGREGATEROOTCLASS" description="" column-type="VARCHAR(254)"/>
+      <property name="eventId" type="String" length="254" label="Сквозной идентификатор события EventId" column-name="EVENTID" description="" column-type="VARCHAR(254)"/>
+      <property name="objectId" type="String" length="254" label="Прикладной ID объекта" mandatory="true" column-name="OBJECT_ID" description="" column-type="VARCHAR(254)" id="true" changeable="READ_ONLY"/>
       <index index-name="I_CRAGGREGATETASK_STATUS">
         <property name="status"/>
       </index>
