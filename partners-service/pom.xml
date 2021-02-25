@@ -3,28 +3,27 @@
     <parent>
         <artifactId>partners</artifactId>
         <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
-        <version>1.000.00_0005</version>
+        <version>DEV-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>partners-service</artifactId>
-    <version>1.000.00_0005</version>
 
     <dependencies>
         <dependency>
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-api</artifactId>
-            <version>1.000.00_0005</version>
+            <version>DEV-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-model-jpa</artifactId>
-            <version>1.000.00_0005</version>
+            <version>DEV-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-model-sdk</artifactId>
-            <version>1.000.00_0005</version>
+            <version>DEV-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
