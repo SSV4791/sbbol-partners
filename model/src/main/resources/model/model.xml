@@ -12,7 +12,7 @@
         <property name="lastName" type="String" label="Фамилия" length="50"/>
         <property name="firstName" type="String" label="Имя" length="50"/>
         <property name="middleName" type="String" label="Отчество" length="50"/>
-        <property name="dulType" type="DulType" label="Тип удостоверяющего документа (физ. лицо)" length="2"/>
+        <property name="dulType" type="DulType" label="Тип удостоверяющего документа (физ. лицо)"/>
         <property name="dulSerie" type="String" label="Серия ДУ" length="50"/>
         <property name="dulNumber" type="String" label="Номер ДУЛ" length="50"/>
         <property name="dulDivisionIssue" type="String" label="Кем выдан ДУЛ" length="250"/>
