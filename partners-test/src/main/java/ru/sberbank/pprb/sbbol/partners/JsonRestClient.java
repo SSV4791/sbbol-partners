@@ -29,14 +29,6 @@ public class JsonRestClient {
         return request(urlTemplate, HttpMethod.GET, object, valueType);
     }
 
-    public <T> T put(String urlTemplate, Object object, Class<T> valueType) {
-        return request(urlTemplate, HttpMethod.PUT, object, valueType);
-    }
-
-    public <T> T delete(String urlTemplate, Object object, Class<T> valueType) {
-        return request(urlTemplate, HttpMethod.DELETE, object, valueType);
-    }
-
     public <T> T request(String urlTemplate, HttpMethod httpMethod, Object object, Class<T> valueType) {
         try {
             String inputJSON = objectMapper.writeValueAsString(object);
