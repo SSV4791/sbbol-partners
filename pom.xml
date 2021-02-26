@@ -22,6 +22,7 @@
         <module>partners-rest</module>
         <module>partners-service</module>
         <module>partners-api</module>
+        <module>partners-test</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -94,6 +95,16 @@
                 <artifactId>lombok</artifactId>
                 <version>1.18.16</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>6.2.0.Final</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
