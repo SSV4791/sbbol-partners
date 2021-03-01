@@ -9,7 +9,12 @@ spec:
     - egress-appjournal-gw
     - mesh
   hosts:
-    - ${APPJOURNAL_HOST}
+    - ${APPJOURNAL_HOST_1}
+    - ${APPJOURNAL_HOST_2}
+    - ${APPJOURNAL_HOST_3}
+    - ${APPJOURNAL_HOST_4}
+    - ${APPJOURNAL_HOST_5}
+    - ${APPJOURNAL_HOST_6}
   http:
     - match:
         - gateways:
@@ -28,7 +33,32 @@ spec:
           port: ${APPJOURNAL_PORT}
       route:
         - destination:
-            host: ${APPJOURNAL_HOST}
+            host: ${APPJOURNAL_HOST_1}
             port:
               number: ${APPJOURNAL_PORT}
           weight: 100
+        - destination:
+            host: ${APPJOURNAL_HOST_2}
+            port:
+              number: ${APPJOURNAL_PORT}
+            weight: 100
+        - destination:
+            host: ${APPJOURNAL_HOST_3}
+            port:
+              number: ${APPJOURNAL_PORT}
+            weight: 100
+        - destination:
+            host: ${APPJOURNAL_HOST_4}
+            port:
+              number: ${APPJOURNAL_PORT}
+            weight: 100
+        - destination:
+            host: ${APPJOURNAL_HOST_5}
+            port:
+              number: ${APPJOURNAL_PORT}
+            weight: 100
+        - destination:
+            host: ${APPJOURNAL_HOST_6}
+            port:
+              number: ${APPJOURNAL_PORT}
+            weight: 100

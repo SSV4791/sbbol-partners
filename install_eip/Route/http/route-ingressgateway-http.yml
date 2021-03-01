@@ -11,4 +11,4 @@ spec:
     targetPort: http-${INGRESS_PORT}
   to:
     kind: Service
-    name: ingressgateway-svc
+    name: ingressgateway-http-svc
