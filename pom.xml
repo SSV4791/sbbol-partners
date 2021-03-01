@@ -109,7 +109,7 @@
             <dependency>
                 <groupId>sbp.com.sbt.dataspace</groupId>
                 <artifactId>dataspace-core-local-runner</artifactId>
-                <version>4.6.0-build.3</version>
+                <version>4.6.0-build.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
