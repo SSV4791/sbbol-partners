@@ -849,4 +849,32 @@
     <changeSet author="partners" id="1.000.00_0005-applied">
         <tagDatabase tag="partners-1.000.00_0005-applied"/>
     </changeSet>
+    <changeSet author="partners" id="1.000.00_0006-before">
+        <tagDatabase tag="partners-1.000.00_0006-before"/>
+    </changeSet>
+    <changeSet author="partners" id="1.000.00_0006-6935072248983977987">
+        <modifyDataType columnName="DULTYPE" newDataType="VARCHAR(254)" tableName="T_RENTER"/>
+    </changeSet>
+    <changeSet author="partners" id="1.000.00_0006-6935072248983977992">
+        <preConditions onFail="MARK_RAN"><not><columnExists tableName="T_REPL_CR_CREPKEVENT" columnName="ORIGINALTOCLIENT"/></not></preConditions>
+        <addColumn tableName="T_REPL_CR_CREPKEVENT">
+            <column name="ORIGINALTOCLIENT" remarks="Code: originalToClient&#10;Name: Новый клиент. То же, что и toClient, но это поле остаётся неизменным после схлопывания" type="VARCHAR(254)" ></column>
+        </addColumn>
+    </changeSet>
+        <changeSet author="partners" id="1.000.00_0006-6935072248983977993">
+        <preConditions onFail="MARK_RAN"><not><columnExists tableName="T_REPL_CR_CREPKEVENT" columnName="NEWCLIENT"/></not></preConditions>
+        <addColumn tableName="T_REPL_CR_CREPKEVENT">
+            <column name="NEWCLIENT" remarks="Code: newClient&#10;Name: ЕПК-ID клиента, который был создан вместо ошибочно слитого" type="VARCHAR(254)" ></column>
+        </addColumn>
+    </changeSet>
+        <changeSet author="partners" id="1.000.00_0006-6935072248983978000">
+        <preConditions onFail="MARK_RAN"><not><columnExists tableName="T_REPL_CR_CRPROCESS" columnName="RECONCILIATIONCOUNT"/></not></preConditions>
+        <addColumn tableName="T_REPL_CR_CRPROCESS">
+            <column name="RECONCILIATIONCOUNT" remarks="Code: reconciliationCount&#10;Name: Колличество выполненых проверок реконсиляции" type="${type_int}" ></column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet author="partners" id="1.000.00_0006-applied">
+        <tagDatabase tag="partners-1.000.00_0006-applied"/>
+    </changeSet>
 </databaseChangeLog>
