@@ -1,4 +1,4 @@
-<model model-name="partners" version="1.000.00_0006">
+<model model-name="partners" version="DEV-SNAPSHOT">
 
     <class name="Renter" label="Арендатор">
         <property name="uuid" type="String" mandatory="true" length="36" label="Используется как уникальный идентификатор записи" index="true" unique="true"/>
