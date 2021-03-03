@@ -6,63 +6,63 @@
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-service</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-openapi</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>runner</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-api</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-test</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-model-jpa</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-rest</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
         <artifactVersion>
             <artifact>
                 <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
                 <artifactId>partners-model-sdk</artifactId>
             </artifact>
-            <version>1.000.00_0006</version>
+            <version>1.000.00_0007</version>
         </artifactVersion>
     </artifactVersions>
     <lastProjectDependencyTree>
@@ -675,5 +675,5 @@
             </dependencies>
         </artifactDependencyTree>
     </lastProjectDependencyTree>
-    <lastCommitRevisionNumber>563894caaa33998ccf398a60410008ad9f1d4f3d</lastCommitRevisionNumber>
+    <lastCommitRevisionNumber>598d6d29c9ec9fd82e189839dc3e1ee0f0427879</lastCommitRevisionNumber>
 </workSettings>
