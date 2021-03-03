@@ -21,4 +21,4 @@ spec:
         listenerType: GATEWAY
         portNumber: ${EGRESS_OTT_PORT}
   workloadLabels:
-    app: egressgateway-${RENTAL_PROPERTY_MODULE_NAME}
+    app: egressgateway-${NAMESPACE}

@@ -2,11 +2,11 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   labels:
-    app: ingressgateway-${NAMESPACE}
-    istio: ingressgateway-${NAMESPACE}
-  name: ingressgateway-https
+    app: ingress-${NAMESPACE}-tls
+    istio: ingress-${NAMESPACE}-tls
+  name: ingressgateway-tls
 spec:
-  host: ingress-${NAMESPACE}.ingress.apps.${OPENSHIFT_CLUSTER}
+  host: ${INGRESS_HOST_TLS}
   port:
     targetPort: https-${INGRESS_PORT_HTTPS}
   tls:

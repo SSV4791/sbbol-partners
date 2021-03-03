@@ -14,3 +14,4 @@ spec:
   selector:
     app: ingressgateway-${NAMESPACE}
     istio: ingressgateway-${NAMESPACE}
+  type: ClusterIP

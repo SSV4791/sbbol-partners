@@ -4,7 +4,7 @@ metadata:
   name: egress-appjournal-gw
 spec:
   selector:
-    istio: egressgateway-${RENTAL_PROPERTY_MODULE_NAME}
+    istio: egressgateway-${NAMESPACE}
   servers:
     - hosts:
         - ${APPJOURNAL_HOST_1}
@@ -14,6 +14,6 @@ spec:
         - ${APPJOURNAL_HOST_5}
         - ${APPJOURNAL_HOST_6}
       port:
-        name: tcp
-        number: ${APPJOURNAL_PORT}
+        name: tcp-8081
+        number: 8081
         protocol: TCP

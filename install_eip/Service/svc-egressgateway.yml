@@ -3,24 +3,29 @@ apiVersion: v1
 metadata:
   name: egressgateway-svc
   labels:
-    app: egressgateway-${PARTNERS_MODULE_NAME}
-    istio: egressgateway-${PARTNERS_MODULE_NAME}
+    app: egressgateway-${NAMESPACE}
+    istio: egressgateway-${NAMESPACE}
 spec:
   ports:
-    - name: tcp-aj-${APPJOURNAL_PORT}
-      port: ${APPJOURNAL_PORT}
+    - name: tcp-8080
+      port: 8080
       protocol: TCP
-    - name: tcp-db
-      port: ${DB_PORT}
+    - name: tcp-${DB_TCP_PORT}
+      port: ${DB_TCP_PORT}
       protocol: TCP
-    - name: http-fluent-${FLUENT_BIT_HTTP_PORT}
-      port: ${FLUENT_BIT_HTTP_PORT}
+    - name: tcp-${DB_SI_TCP_PORT}
+      port: ${DB_SI_TCP_PORT}
+    - name: http-${EGRESS_HTTPS_PORT}
+      port: ${EGRESS_HTTPS_PORT}
       protocol: TCP
-    - name: https-fluent-${FLUENT_BIT_HTTPS_PORT}
-      port: ${FLUENT_BIT_HTTPS_PORT}
+    - name: http-${EGRESS_OTT_PORT}
+      port: ${EGRESS_OTT_PORT}
+      protocol: TCP
+    - name: tcp-8081
+      port: 8081
       protocol: TCP
   selector:
-    app: egressgateway-${PARTNERS_MODULE_NAME}
-    istio: egressgateway-${PARTNERS_MODULE_NAME}
+    app: egressgateway-${NAMESPACE}
+    istio: egressgateway-${NAMESPACE}
   type: ClusterIP
   sessionAffinity: None

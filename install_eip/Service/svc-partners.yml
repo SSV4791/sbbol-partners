@@ -20,4 +20,4 @@ spec:
     - name: tcp-debug
       port: 8000
       targetPort: 8000
-  type: LoadBalancer
+  type: ClusterIP

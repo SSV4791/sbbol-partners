@@ -74,42 +74,6 @@ spec:
                       - ppc64le
                       - s390x
       containers:
-        - resources:
-            limits:
-              cpu: 400m
-              memory: 500Mi
-            requests:
-              cpu: 300m
-              memory: 300Mi
-          terminationMessagePath: /dev/termination-log
-          name: ott-sidecar
-          ports:
-            - containerPort: 8080
-              protocol: TCP
-            - containerPort: 8443
-              protocol: TCP
-            - containerPort: 8778
-              protocol: TCP
-            - name: http-envoy-prom
-              containerPort: 15090
-              protocol: TCP
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: ott-secret
-              readOnly: true
-              mountPath: /mnt/secrets
-            - name: ott-uds-socket
-              mountPath: /mnt/ott-uds-socket
-            - name: ott-logback
-              readOnly: true
-              mountPath: /tmp/ott-logback.xml
-          terminationMessagePolicy: File
-          envFrom:
-            - secretRef:
-                name: ott-ingress-passwords
-            - configMapRef:
-                name: cm-ingress-ott-settings
-          image: ${OTT_REGISTRY_URL}
         - args:
             - proxy
             - router
@@ -171,14 +135,11 @@ spec:
           imagePullPolicy: IfNotPresent
           name: istio-proxy
           ports:
-            - containerPort: 15020
-              name: status-port
+            - containerPort: ${INGRESS_OTT_PORT}
+              name: https-${INGRESS_OTT_PORT}
               protocol: TCP
-            - containerPort: 8080
-              name: http
-              protocol: TCP
-            - containerPort: 5443
-              name: https
+            - containerPort: ${INGRESS_PORT_HTTPS}
+              name: https-${INGRESS_PORT_HTTPS}
               protocol: TCP
           readinessProbe:
             failureThreshold: 30
@@ -211,6 +172,44 @@ spec:
             - mountPath: /etc/istio/ingressgateway-ca-certs
               name: ingressgateway-ca-certs
               readOnly: true
+            - name: ott-uds-socket
+              mountPath: /mnt/ott-uds-socket
+        - resources:
+            limits:
+              cpu: 400m
+              memory: 500Mi
+            requests:
+              cpu: 300m
+              memory: 300Mi
+          terminationMessagePath: /dev/termination-log
+          name: ott-sidecar
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 8778
+              protocol: TCP
+            - name: http-envoy-prom
+              containerPort: 15090
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: ott-secret
+              readOnly: true
+              mountPath: /mnt/secrets
+            - name: ott-uds-socket
+              mountPath: /mnt/ott-uds-socket
+            - name: ott-logback
+              readOnly: true
+              mountPath: /tmp/ott-logback.xml
+          terminationMessagePolicy: File
+          envFrom:
+            - secretRef:
+                name: ott-ingress-passwords
+            - configMapRef:
+                name: cm-ingress-ott-settings
+          image: ${OTT_REGISTRY_URL}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
