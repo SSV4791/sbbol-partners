@@ -3,13 +3,12 @@
     <parent>
         <artifactId>partners</artifactId>
         <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
-        <version>1.000.00_0007</version>
+        <version>DEV-SNAPSHOT</version>
     </parent>
 
 
     <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
     <artifactId>partners-api</artifactId>
-    <version>1.000.00_0007</version>
     <modelVersion>4.0.0</modelVersion>
 
     <dependencies>
