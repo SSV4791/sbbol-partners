@@ -3,11 +3,12 @@
     <parent>
         <artifactId>partners</artifactId>
         <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
-        <version>DEV-SNAPSHOT</version>
+        <version>1.000.00_0009</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>partners-model-jpa</artifactId>
+    <version>1.000.00_0009</version>
     <dependencies>
         <dependency>
             <groupId>sbp.com.sbt.dataspace</groupId>

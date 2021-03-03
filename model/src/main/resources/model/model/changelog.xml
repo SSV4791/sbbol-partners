@@ -884,4 +884,11 @@
     <changeSet author="partners" id="1.000.00_0007-applied">
         <tagDatabase tag="partners-1.000.00_0007-applied"/>
     </changeSet>
+    <changeSet author="partners" id="1.000.00_0009-before">
+        <tagDatabase tag="partners-1.000.00_0009-before"/>
+    </changeSet>
+
+    <changeSet author="partners" id="1.000.00_0009-applied">
+        <tagDatabase tag="partners-1.000.00_0009-applied"/>
+    </changeSet>
 </databaseChangeLog>
