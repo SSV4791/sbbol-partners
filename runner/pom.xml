@@ -3,11 +3,10 @@
     <parent>
         <artifactId>partners</artifactId>
         <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
-        <version>1.000.00_0009</version>
+        <version>DEV-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>runner</artifactId>
-    <version>1.000.00_0009</version>
     <packaging>jar</packaging>
 
 
@@ -15,7 +14,7 @@
         <dependency>
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-rest</artifactId>
-            <version>1.000.00_0009</version>
+            <version>DEV-SNAPSHOT</version>
         </dependency>
 
         <!--Для интеграции с ТС Журналированием. Json формат логов-->
