@@ -7,8 +7,8 @@ spec:
     istio: ingressgateway-${NAMESPACE}
   servers:
     - hosts:
-        - ingress-${NAMESPACE}.ingress.apps.${OPENSHIFT_CLUSTER}
         - ${INGRESS_HOST_GEO_TLS}
+        - ${INGRESS_HOST_TLS}
       port:
         name: https-${INGRESS_PORT_HTTPS}
         number: ${INGRESS_PORT_HTTPS}
@@ -23,6 +23,7 @@ spec:
           - ${SUBJECT_ALT_NAME_2}
     - hosts:
         - ${INGRESS_HOST_GEO_OTT}
+        - ${INGRESS_HOST_OTT}
       port:
         name: https-${INGRESS_OTT_PORT}
         number: ${INGRESS_OTT_PORT}
@@ -32,9 +33,3 @@ spec:
         mode: MUTUAL
         privateKey: /etc/istio/ingressgateway-certs/tls.key
         serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
-    - hosts:
-        - ingress-${NAMESPACE}.apps.${OPENSHIFT_CLUSTER}
-      port:
-        name: http-${INGRESS_PORT}
-        number: ${INGRESS_PORT}
-        protocol: HTTP

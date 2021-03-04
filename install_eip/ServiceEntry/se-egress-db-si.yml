@@ -9,6 +9,10 @@ spec:
     - ${SI_DB_HOST}
   location: MESH_EXTERNAL
   ports:
-    - name: tcp
+    - name: tcp-${DB_SI_TCP_PORT}
+      number: ${DB_SI_TCP_PORT}
+      protocol: TCP
+    - name: tcp-${DB_PORT}
       number: ${DB_PORT}
       protocol: TCP
+  resolution: DNS

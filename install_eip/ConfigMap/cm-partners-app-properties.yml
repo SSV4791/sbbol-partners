@@ -15,7 +15,7 @@ data:
     management.metrics.tags.application=partners
     management.metrics.export.prometheus.enabled=true
     management.endpoints.enabled-by-default=true
-    management.endpoints.web.exposure.include=*
+    management.endpoints.web.exposure.include=prometheus,health
     management.endpoints.jmx.exposure.include=*
     management.endpoint.metrics.enabled=true
     management.endpoint.prometheus.enabled=true

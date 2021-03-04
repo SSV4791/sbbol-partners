@@ -10,22 +10,21 @@ spec:
     - mesh
   hosts:
     - ${MAIN_DB_HOST}
-  http:
+  tcp:
     - match:
         - gateways:
             - mesh
-          port: ${DB_PORT}
+          port: ${DB_TCP_PORT}
       route:
         - destination:
             host: egressgateway-svc
             port:
-              number: ${DB_PORT}
-            subset: db-main
+              number: ${DB_TCP_PORT}
           weight: 100
     - match:
         - gateways:
             - egress-db-main-gw
-          port: ${DB_PORT}
+          port: ${DB_TCP_PORT}
       route:
         - destination:
             host: ${MAIN_DB_HOST}

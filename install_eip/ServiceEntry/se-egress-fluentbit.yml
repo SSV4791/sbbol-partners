@@ -6,15 +6,11 @@ spec:
   exportTo:
     - .
   hosts:
-    - ${FLUENT_BIT_HTTP_HOST}
     - ${FLUENT_BIT_HTTPS_HOST}
   location: MESH_EXTERNAL
   ports:
     - name: http-fluent-${FLUENT_BIT_SERVICE_PORT}
       number: ${FLUENT_BIT_SERVICE_PORT}
-      protocol: HTTP
-    - name: http-fluent-${FLUENT_BIT_HTTP_PORT}
-      number: ${FLUENT_BIT_HTTP_PORT}
       protocol: HTTP
     - name: https-fluent-${FLUENT_BIT_HTTPS_PORT}
       number: ${FLUENT_BIT_HTTPS_PORT}

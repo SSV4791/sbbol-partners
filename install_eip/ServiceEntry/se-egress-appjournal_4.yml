@@ -1,19 +1,15 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry
 metadata:
-  name: se-egress-appjournal
+  name: se-egress-appjournal-4
 spec:
   exportTo:
     - .
   hosts:
-    - ${APPJOURNAL_HOST_1}
-    - ${APPJOURNAL_HOST_2}
-    - ${APPJOURNAL_HOST_3}
     - ${APPJOURNAL_HOST_4}
-    - ${APPJOURNAL_HOST_5}
-    - ${APPJOURNAL_HOST_6}
   location: MESH_EXTERNAL
   ports:
-    - name: tcp
+    - name: tcp-appjournal-${APPJOURNAL_PORT}
       number: ${APPJOURNAL_PORT}
       protocol: TCP
+  resolution: DNS

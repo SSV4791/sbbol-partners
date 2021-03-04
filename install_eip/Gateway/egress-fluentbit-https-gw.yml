@@ -4,11 +4,11 @@ metadata:
   name: egress-fluentbit-https-gw
 spec:
   selector:
-    istio: egressgateway-${PARTNERS_MODULE_NAME}
+    istio: egressgateway-${NAMESPACE}
   servers:
     - hosts:
         -  ${FLUENT_BIT_HTTPS_HOST}
       port:
-        name: https-fluent-${FLUENT_BIT_HTTPS_PORT}
-        number: ${FLUENT_BIT_HTTPS_PORT}
+        name: http-${EGRESS_OTT_PORT}
+        number: ${EGRESS_OTT_PORT}
         protocol: HTTP

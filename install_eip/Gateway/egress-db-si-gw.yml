@@ -4,11 +4,11 @@ metadata:
   name: egress-db-si-gw
 spec:
   selector:
-    istio: egressgateway-${PARTNERS_MODULE_NAME}
+    istio: egressgateway-${NAMESPACE}
   servers:
     - hosts:
         - ${SI_DB_HOST}
       port:
-        name: tcp
-        number: ${DB_PORT}
+        name: tcp-${DB_SI_TCP_PORT}
+        number: ${DB_SI_TCP_PORT}
         protocol: TCP

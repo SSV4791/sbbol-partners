@@ -28,7 +28,7 @@ data:
         Match *
         # Hostname сервиса приема событий
         # Например: logger-endpoint-demo-http-ci00641491-idevlg-pprbtsloggertest.apps.test-ose.ca.sbrf.ru
-        Host ${FLUENT_BIT_HTTP_HOST}
+        Host ${FLUENT_BIT_HTTPS_HOST}
         # Порт сервиса приема событий 80 для http и 443 для https
         Port ${FLUENT_BIT_SERVICE_PORT}
         # Метод сервиса приема событий

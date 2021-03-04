@@ -21,4 +21,4 @@ spec:
         listenerType: GATEWAY
         portNumber: ${INGRESS_OTT_PORT}
   workloadLabels:
-    app: ingress-${NAMESPACE}
+    app: ingressgateway-${NAMESPACE}
