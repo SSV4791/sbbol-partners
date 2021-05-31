@@ -49,7 +49,7 @@
     >-Dloader.path=./deposit-model-jpa/target
     
     #####Внимание
-    Т.к. скрипт содержит специфичный для Linux синтаксис, то запуск необходимо осуществлять в Bash-среде. Для Windows, к примеру, можно воспользоваться Git Bash-эмулятором.
+    Так как скрипт содержит специфичный для Linux синтаксис, то запуск необходимо осуществлять в Bash-среде. Для Windows, к примеру, можно воспользоваться Git Bash-эмулятором.
     Строка запуска: ./local-run.sh
 
 2. Запустить приложение dataspace-deposit. Для этого необходимо запустить SpringBoot-приложение [Runner](https://sbtatlas.sigma.sbrf.ru/stash/projects/PPRBAC/repos/dataspace-client/browse/dataspace-deposit/dataspace-deposit-service/src/main/java/sbp/sbt/dataspace/deposit/Runner.java)
