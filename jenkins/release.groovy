@@ -12,13 +12,13 @@ pipeline {
         timestamps()
     }
     parameters {
-        string(name: 'version', defaultValue: '1.000.00', description: 'Версия сборки')
+        string(name: 'version', defaultValue: '2.000.00', description: 'Версия сборки')
         booleanParam(name: 'fullBuild', defaultValue: true, description: 'Полная сборка с вызовом CustomerBuilder (обязательно для релизной сборки)')
-        string(name: 'branch', defaultValue: 'release-1.000.00', description: 'Ветка, с которой собирается поставка (если проставлен флаг fullBuild)')
+        string(name: 'branch', defaultValue: 'release-2.000.00', description: 'Ветка, с которой собирается поставка (если проставлен флаг fullBuild)')
         string(name: 'dataspaceDistrib', defaultValue: '', description: 'Ссылка на дистрибутив dataspace (если не проставлен флаг fullBuild)')
         string(name: 'customerDistrib', defaultValue: '', description: 'Ссылка на дистрибутив фабрики (если не проставлен флаг fullBuild)')
-        booleanParam(name: 'dynamicVersion', defaultValue: false, description: 'Добавлять номер сборки к версии (1.000.00_00XX)')
-        booleanParam(name: 'release', defaultValue: false, description: 'Выпуск релизной сборки')
+        booleanParam(name: 'dynamicVersion', defaultValue: true, description: 'Добавлять номер сборки к версии (2.000.00_00XX)')
+        booleanParam(name: 'release', defaultValue: true, description: 'Выпуск релизной сборки')
         booleanParam(name: 'needQG', defaultValue: true, description: 'QG')
     }
     environment {
