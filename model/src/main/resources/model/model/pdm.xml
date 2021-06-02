@@ -1,6 +1,6 @@
 <PdmModel>
-  <model model-name="partners" component-code="НЕ ЗАДАНО" version="1.000.00_0009" versioned-entities="false">
-    <class name="Renter" extends="BaseEntity" label="Арендатор" tableName="T_RENTER" pk-index-name="PK_T_RENTER" description="" affinity="objectId" class-access="UPDATE" lockable="false">
+  <model model-name="partners" component-code="НЕ ЗАДАНО" version="2.000.00_0004" versioned-entities="false">
+    <class name="Renter" extends="BaseEntity" label="Арендатор" tableName="T_RENTER" pk-index-name="PK_T_RENTER" description="" affinity="objectId" class-access="UPDATE" strategy="JOINED" lockable="false">
       <id type="String" category="SNOWFLAKE"/>
       <property name="uuid" type="String" length="36" label="Используется как уникальный идентификатор записи" mandatory="true" unique="true" index="true" column-name="UUID" description="" column-type="VARCHAR(36)"/>
       <property name="digitalId" type="String" length="254" label="Идентификатор договора ДБО" mandatory="true" index="true" column-name="DIGITALID" description="" column-type="VARCHAR(254)"/>
@@ -43,7 +43,7 @@
         <property name="type"/>
       </index>
     </class>
-    <class name="LegalAddress" extends="BaseEntity" label="Адрес регистрации" tableName="T_LEGALADDRESS" pk-index-name="PK_T_LEGALADDRESS" description="" affinity="renter" class-access="UPDATE" lockable="false">
+    <class name="LegalAddress" extends="BaseEntity" label="Адрес регистрации" tableName="T_LEGALADDRESS" pk-index-name="PK_T_LEGALADDRESS" description="" affinity="renter" class-access="UPDATE" strategy="JOINED" lockable="false">
       <id type="String" category="SNOWFLAKE"/>
       <property name="renter" type="Renter" length="254" label="" mandatory="true" unique="true" index="true" column-name="RENTER_ID" description="" column-type="VARCHAR(254)" changeable="CREATE" parent="true" object-link="O2O"/>
       <property name="zipCode" type="String" length="6" label="Индекс" column-name="ZIPCODE" description="" column-type="VARCHAR(6)"/>
@@ -71,7 +71,7 @@
         <property name="type"/>
       </index>
     </class>
-    <class name="PhysicalAddress" extends="BaseEntity" label="Фактический адрес" tableName="T_PHYSICALADDRESS" pk-index-name="PK_T_PHYSICALADDRESS" description="" affinity="renter" class-access="UPDATE" lockable="false">
+    <class name="PhysicalAddress" extends="BaseEntity" label="Фактический адрес" tableName="T_PHYSICALADDRESS" pk-index-name="PK_T_PHYSICALADDRESS" description="" affinity="renter" class-access="UPDATE" strategy="JOINED" lockable="false">
       <id type="String" category="SNOWFLAKE"/>
       <property name="renter" type="Renter" length="254" label="" mandatory="true" unique="true" index="true" column-name="RENTER_ID" description="" column-type="VARCHAR(254)" changeable="CREATE" parent="true" object-link="O2O"/>
       <property name="zipCode" type="String" length="6" label="Индекс" column-name="ZIPCODE" description="" column-type="VARCHAR(6)"/>
@@ -99,7 +99,7 @@
         <property name="type"/>
       </index>
     </class>
-    <class name="RenterApiCall" extends="BaseEntity" label="Результат обработки пакета Unit of Work для Renter" tableName="T_RENTERAPICALL" pk-index-name="PK_T_RENTERAPICALL" description="" affinity="parentObject" class-access="SYSTEM" final-class="true" lockable="false">
+    <class name="RenterApiCall" extends="BaseEntity" label="Результат обработки пакета Unit of Work для Renter" tableName="T_RENTERAPICALL" pk-index-name="PK_T_RENTERAPICALL" description="" affinity="parentObject" class-access="SYSTEM" final-class="true" strategy="JOINED">
       <id type="String" category="SNOWFLAKE"/>
       <property name="apiCallId" type="String" length="254" label="Идентификатор пакета" unique="true" column-name="APICALLID" description="" column-type="VARCHAR(254)" system-field="true" changeable="SYSTEM"/>
       <property name="firstCallDate" type="Date" length="3" label="Дата первого успешного вызова пакета" column-name="FIRSTCALLDATE" description="" column-type="TIMESTAMP(3)" system-field="true" changeable="SYSTEM"/>
@@ -121,7 +121,7 @@
         <property name="aggregateRoot"/>
       </index>
     </class>
-    <class name="BaseEntity" label="Базовый класс модели" description="" is-abstract="true" class-access="SYSTEM" lockable="false">
+    <class name="BaseEntity" label="Базовый класс модели" description="" is-abstract="true" class-access="SYSTEM">
       <id type="String" category="NO_ID"/>
       <property name="lastChangeDate" type="Date" length="3" label="System attribute: date of the last modification" column-name="SYS_LASTCHANGEDATE" description="" column-type="TIMESTAMP(3)" changeable="READ_ONLY"/>
       <property name="isDeleted" type="Boolean" label="System attribute: Deleted flag" mandatory="true" column-name="SYS_ISDELETED" default-value="false" description="" column-type="${type_boolean}" system-field="true" changeable="SYSTEM"/>
@@ -131,7 +131,7 @@
       <property name="chgCnt" type="Long" label="Счетчик изменений (технический)" column-name="CHGCNT" description="" column-type="${type_long}" changeable="READ_ONLY"/>
       <property name="offFlag" type="Byte" label="Признак деактивации записи" column-name="OFFFLAG" description="" column-type="${type_byte}" system-field="true" changeable="SYSTEM"/>
     </class>
-    <class name="CREpkEvent" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENT" pk-index-name="PK_T_REPL_CR_CREPKEVENT" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CREpkEvent" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENT" pk-index-name="PK_T_REPL_CR_CREPKEVENT" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
       <property name="epkId" type="String" length="254" label="Идентификатор EPK" unique="true" index="true" column-name="EPKID" description="" column-type="VARCHAR(254)"/>
@@ -151,7 +151,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CREpkEventBuffer" extends="BaseEntity" label="Буферная таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENTBUFFER" pk-index-name="PK_T_REPL_CR_CREPKEVENTBUFFER" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CREpkEventBuffer" extends="BaseEntity" label="Буферная таблица событий ЕПК" tableName="T_REPL_CR_CREPKEVENTBUFFER" pk-index-name="PK_T_REPL_CR_CREPKEVENTBUFFER" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="status" type="String" length="254" label="Статус обработки события" unique="false" index="true" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
       <property name="epkId" type="String" length="254" label="Идентификатор EPK" unique="true" index="true" column-name="EPKID" description="" column-type="VARCHAR(254)"/>
@@ -174,7 +174,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRRequestEvent" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CRRequestEvent" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
       <property name="fromSpace" type="String" length="254" label="Из какого пространства (SPACE/ZONE)" column-name="FROMSPACE" description="" column-type="VARCHAR(254)"/>
@@ -187,7 +187,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRRequestEventDupByAggregate" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CRRequestEventDupByAggregate" extends="BaseEntity" label="Таблица событий запросов" tableName="T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" pk-index-name="PK_T_REPL_CR_CRREQUESTEVENT_DUP_BY_AGGREGATE" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="status" type="String" length="254" label="Статус обработки события" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
       <property name="fromClient" type="String" length="254" label="Старый клиент" column-name="FROMCLIENT" description="" column-type="VARCHAR(254)"/>
@@ -200,7 +200,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRBatch" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CRBATCH" pk-index-name="PK_T_REPL_CR_CRBATCH" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CRBatch" extends="BaseEntity" label="Таблица событий ЕПК" tableName="T_REPL_CR_CRBATCH" pk-index-name="PK_T_REPL_CR_CRBATCH" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="fieldName" type="String" length="254" label="Наименования поля" column-name="FIELDNAME" description="" column-type="VARCHAR(254)"/>
       <property name="eventId" type="String" length="254" label="Сквозной идентификатор события EventId" column-name="EVENTID" description="" column-type="VARCHAR(254)"/>
@@ -211,7 +211,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRTask" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRTASK" pk-index-name="PK_T_REPL_CR_CRTASK" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CRTask" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRTASK" pk-index-name="PK_T_REPL_CR_CRTASK" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="status" type="String" length="254" label="Статус выполнения задачи" unique="false" index="true" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
       <property name="retryCount" type="Integer" label="Колличество перезапусков задачи" column-name="RETRYCOUNT" description="" column-type="${type_int}"/>
@@ -232,7 +232,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRProcess" extends="BaseEntity" label="Таблица с попыткой запуска задачи" tableName="T_REPL_CR_CRPROCESS" pk-index-name="PK_T_REPL_CR_CRPROCESS" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CRProcess" extends="BaseEntity" label="Таблица с попыткой запуска задачи" tableName="T_REPL_CR_CRPROCESS" pk-index-name="PK_T_REPL_CR_CRPROCESS" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="startTime" type="Date" length="3" label="Время начала обработки" column-name="STARTTIME" description="" column-type="TIMESTAMP(3)"/>
       <property name="status" type="String" length="254" label="Статус выполнения процесса" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
@@ -246,7 +246,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRLock" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRLOCK" pk-index-name="PK_T_REPL_CR_CRLOCK" description="" affinity="objectId" class-access="CREATE" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CRLock" extends="BaseEntity" label="Таблица с задачами" tableName="T_REPL_CR_CRLOCK" pk-index-name="PK_T_REPL_CR_CRLOCK" description="" affinity="objectId" class-access="CREATE" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="token" type="String" length="254" label="TOKEN" column-name="TOKEN" description="" column-type="VARCHAR(254)"/>
       <property name="migrationStatus" type="Long" label="Миграционная блокировка по клиенту" column-name="MIGRATIONSTATUS" description="" column-type="${type_long}"/>
@@ -258,7 +258,7 @@
         <property name="objectId"/>
       </index>
     </class>
-    <class name="CRAggregateTask" extends="BaseEntity" label="Таблица с задачами обработки конкретного агрегата" tableName="T_REPL_CR_CRAGGREGATETASK" pk-index-name="PK_T_REPL_CR_CRAGGREGATETASK" description="" class-access="READ_ONLY" final-class="true" lockable="false" generate-jpa="false">
+    <class name="CRAggregateTask" extends="BaseEntity" label="Таблица с задачами обработки конкретного агрегата" tableName="T_REPL_CR_CRAGGREGATETASK" pk-index-name="PK_T_REPL_CR_CRAGGREGATETASK" description="" class-access="READ_ONLY" final-class="true" strategy="JOINED" generate-jpa="false">
       <id type="String" category="MANUAL"/>
       <property name="status" type="String" length="254" label="Статус выполнения задачи" unique="false" index="true" column-name="STATUS" description="" column-type="VARCHAR(254)"/>
       <property name="aggregateRootId" type="String" length="254" label="ID корня агрегата" unique="false" index="true" column-name="AGGREGATEROOTID" description="" column-type="VARCHAR(254)"/>
@@ -323,7 +323,7 @@
   </model>
   <status/>
   <meta-information>
-    <plugin-version>4.2.0-build.212</plugin-version>
+    <plugin-version>4.2.0-build.239</plugin-version>
   </meta-information>
   <system-locks>
     <system-locks-classes class="Renter" table-name="T_REPL_AGGLOCK_RENTER"/>
