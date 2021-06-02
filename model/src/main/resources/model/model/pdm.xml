@@ -1,5 +1,5 @@
 <PdmModel>
-  <model model-name="partners" component-code="НЕ ЗАДАНО" version="2.000.00_0004" versioned-entities="false">
+  <model model-name="partners" component-code="НЕ ЗАДАНО" version="2.000.00_0005" versioned-entities="false">
     <class name="Renter" extends="BaseEntity" label="Арендатор" tableName="T_RENTER" pk-index-name="PK_T_RENTER" description="" affinity="objectId" class-access="UPDATE" strategy="JOINED" lockable="false">
       <id type="String" category="SNOWFLAKE"/>
       <property name="uuid" type="String" length="36" label="Используется как уникальный идентификатор записи" mandatory="true" unique="true" index="true" column-name="UUID" description="" column-type="VARCHAR(36)"/>

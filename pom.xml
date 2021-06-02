@@ -12,7 +12,7 @@
     <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
     <artifactId>partners</artifactId>
     <name>partners</name>
-    <version>DEV-SNAPSHOT</version>
+    <version>2.000.00_0005</version>
 
     <modules>
         <module>partners-model-jpa</module>
