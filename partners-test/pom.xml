@@ -3,12 +3,11 @@
     <parent>
         <artifactId>partners</artifactId>
         <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
-        <version>2.000.00_0004</version>
+        <version>DEV-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>partners-test</artifactId>
-    <version>2.000.00_0004</version>
 
     <properties>
         <maven.compiler.source>14</maven.compiler.source>
@@ -54,13 +53,13 @@
         <dependency>
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-model-jpa</artifactId>
-            <version>2.000.00_0004</version>
+            <version>DEV-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-model-sdk</artifactId>
-            <version>2.000.00_0004</version>
+            <version>DEV-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -98,7 +97,7 @@
         <dependency>
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-api</artifactId>
-            <version>2.000.00_0004</version>
+            <version>DEV-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
