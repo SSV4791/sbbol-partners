@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dr-egress-audit-ott
+spec:
+  exportTo:
+    - .
+  host: ${AUDIT_OTT_HOST}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+      - port:
+          number: ${AUDIT_OTT_PORT}
+        tls:
+          caCertificates: /etc/istio/egressgateway-ca-certs/chain.pem
+          clientCertificate: /etc/istio/egressgateway-certs/tls.crt
+          mode: MUTUAL
+          privateKey: /etc/istio/egressgateway-certs/tls.key
+          sni: ${AUDIT_OTT_HOST}

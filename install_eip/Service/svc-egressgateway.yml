@@ -7,22 +7,35 @@ metadata:
     istio: egressgateway-${NAMESPACE}
 spec:
   ports:
-    - name: tcp-8080
-      port: 8080
+    - name: tcp-${DB_MAIN_PORT_LESTENER}
+      port: ${DB_MAIN_PORT_LESTENER}
       protocol: TCP
-    - name: tcp-${DB_TCP_PORT}
-      port: ${DB_TCP_PORT}
+    - name: tcp-${DB_SI_PORT_LESTENER}
+      port: ${DB_SI_PORT_LESTENER}
       protocol: TCP
-    - name: tcp-${DB_SI_TCP_PORT}
-      port: ${DB_SI_TCP_PORT}
+    - name: tcp-${APPJOURNAL_PORT_LISTENER_1}
+      port: ${APPJOURNAL_PORT_LISTENER_1}
+      protocol: TCP
+    - name: tcp-${APPJOURNAL_PORT_LISTENER_2}
+      port: ${APPJOURNAL_PORT_LISTENER_2}
+      protocol: TCP
+    - name: tcp-${APPJOURNAL_PORT_LISTENER_3}
+      port: ${APPJOURNAL_PORT_LISTENER_3}
+      protocol: TCP
+    - name: tcp-${APPJOURNAL_PORT_LISTENER_4}
+      port: ${APPJOURNAL_PORT_LISTENER_4}
+      protocol: TCP
+    - name: tcp-${APPJOURNAL_PORT_LISTENER_5}
+      port: ${APPJOURNAL_PORT_LISTENER_5}
+      protocol: TCP
+    - name: tcp-${APPJOURNAL_PORT_LISTENER_6}
+      port: ${APPJOURNAL_PORT_LISTENER_6}
+      protocol: TCP
     - name: http-${EGRESS_HTTPS_PORT}
       port: ${EGRESS_HTTPS_PORT}
       protocol: TCP
     - name: http-${EGRESS_OTT_PORT}
       port: ${EGRESS_OTT_PORT}
-      protocol: TCP
-    - name: tcp-8081
-      port: 8081
       protocol: TCP
   selector:
     app: egressgateway-${NAMESPACE}

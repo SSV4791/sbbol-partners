@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vs-egress-appjournal-1
+spec:
+  exportTo:
+    - .
+  gateways:
+    - egress-appjournal-gw-1
+    - mesh
+  hosts:
+    - ${APPJOURNAL_HOST_1}
+  tcp:
+    - match:
+        - gateways:
+            - mesh
+          port: ${APPJOURNAL_PORT_PROXY_1}
+      route:
+        - destination:
+            host: egressgateway-svc
+            port:
+              number: ${APPJOURNAL_PORT_LISTENER_1}
+          weight: 100
+    - match:
+        - gateways:
+            - egress-appjournal-gw-1
+          port: ${APPJOURNAL_PORT_LISTENER_1}
+      route:
+        - destination:
+            host: ${APPJOURNAL_HOST_1}
+            port:
+              number: ${APPJOURNAL_PORT}
+          weight: 100

@@ -1,14 +1,14 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: egress-db-main-gw
+  name: egress-appjournal-gw-5
 spec:
   selector:
     istio: egressgateway-${NAMESPACE}
   servers:
     - hosts:
-        - ${DB_MAIN_HOST}
+        - ${APPJOURNAL_HOST_5}
       port:
-        name: tcp-${DB_MAIN_PORT_LESTENER}
-        number: ${DB_MAIN_PORT_LESTENER}
+        name: tcp-${APPJOURNAL_PORT_LISTENER_5}
+        number: ${APPJOURNAL_PORT_LISTENER_5}
         protocol: TCP

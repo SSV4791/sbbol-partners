@@ -6,30 +6,59 @@ spec:
   selector:
     istio: ingressgateway-${NAMESPACE}
   servers:
+    #GEO_TLS
     - hosts:
         - ${INGRESS_HOST_GEO_TLS}
-        - ${INGRESS_HOST_TLS}
       port:
-        name: https-${INGRESS_PORT_HTTPS}
-        number: ${INGRESS_PORT_HTTPS}
+        name: https-${INGRESS_GEO_TLS_PORT}
+        number: ${INGRESS_GEO_TLS_PORT}
         protocol: HTTPS
       tls:
-        caCertificates: /etc/istio/ingressgateway-ca-certs/ca-chain.cert.pem
+        caCertificates: /etc/istio/ingressgateway-ca-certs/${CHAIN_PEM_GEO_TLS}
         mode: MUTUAL
-        privateKey: /etc/istio/ingressgateway-certs/tls.key
-        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+        privateKey: /etc/istio/ingressgateway-certs/${CERT_KEY_GEO_TLS}
+        serverCertificate: /etc/istio/ingressgateway-certs/${CERT_GEO_TLS}
         subjectAltNames:
           - ${SUBJECT_ALT_NAME_1}
           - ${SUBJECT_ALT_NAME_2}
+          - ${SUBJECT_ALT_NAME_3}
+    #TLS
+    - hosts:
+        - ${INGRESS_HOST_TLS}
+      port:
+        name: https-${INGRESS_TLS_PORT}
+        number: ${INGRESS_TLS_PORT}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-certs/${CHAIN_PEM_TLS}
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-certs/${CERT_KEY_TLS}
+        serverCertificate: /etc/istio/ingressgateway-certs/${CERT_TLS}
+        subjectAltNames:
+          - ${SUBJECT_ALT_NAME_1}
+          - ${SUBJECT_ALT_NAME_2}
+          - ${SUBJECT_ALT_NAME_3}
+    #GEO_OTT
     - hosts:
         - ${INGRESS_HOST_GEO_OTT}
+      port:
+        name: https-${INGRESS_GEO_OTT_PORT}
+        number: ${INGRESS_GEO_OTT_PORT}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-certs/${CHAIN_PEM_GEO_OTT}
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-certs/${CERT_KEY_GEO_OTT}
+        serverCertificate: /etc/istio/ingressgateway-certs/${CERT_GEO_OTT}
+    #OTT
+    - hosts:
         - ${INGRESS_HOST_OTT}
       port:
         name: https-${INGRESS_OTT_PORT}
         number: ${INGRESS_OTT_PORT}
         protocol: HTTPS
       tls:
-        caCertificates: /etc/istio/ingressgateway-ca-certs/ca-chain.cert.pem
+        caCertificates: /etc/istio/ingressgateway-ca-certs/${CHAIN_PEM_OTT}
         mode: MUTUAL
-        privateKey: /etc/istio/ingressgateway-certs/tls.key
-        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+        privateKey: /etc/istio/ingressgateway-certs/${CERT_KEY_OTT}
+        serverCertificate: /etc/istio/ingressgateway-certs/${CERT_OTT}

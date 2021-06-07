@@ -17,7 +17,7 @@ metadata:
   name: egressgateway-${NAMESPACE}
 spec:
   progressDeadlineSeconds: 1200
-  replicas: 1
+  replicas: ${EGRESS_REPLICAS_COUNT}
   revisionHistoryLimit: 10
   selector:
     matchLabels:

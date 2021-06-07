@@ -1,33 +1,33 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: vs-egress-db-main
+  name: vs-egress-db-si
 spec:
   exportTo:
     - .
   gateways:
-    - egress-db-main-gw
+    - egress-db-si-gw
     - mesh
   hosts:
-    - ${MAIN_DB_HOST}
+    - ${DB_SI_HOST}
   tcp:
     - match:
         - gateways:
             - mesh
-          port: ${DB_TCP_PORT}
+          port: ${DB_SI_PORT_PROXY}
       route:
         - destination:
             host: egressgateway-svc
             port:
-              number: ${DB_TCP_PORT}
+              number: ${DB_SI_PORT_LESTENER}
           weight: 100
     - match:
         - gateways:
-            - egress-db-main-gw
-          port: ${DB_TCP_PORT}
+            - egress-db-si-gw
+          port: ${DB_SI_PORT_LESTENER}
       route:
         - destination:
-            host: ${MAIN_DB_HOST}
+            host: ${DB_SI_HOST}
             port:
-              number: ${DB_PORT}
+              number: ${DB_SI_PORT}
           weight: 100

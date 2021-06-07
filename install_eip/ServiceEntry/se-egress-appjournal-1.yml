@@ -5,11 +5,16 @@ metadata:
 spec:
   exportTo:
     - .
+  addresses:
+    - ${APPJOURNAL_IP_1}
   hosts:
     - ${APPJOURNAL_HOST_1}
   location: MESH_EXTERNAL
   ports:
-    - name: tcp-appjournal-${APPJOURNAL_PORT}
+    - name: tcp-${APPJOURNAL_PORT_PROXY_1}
+      number: ${APPJOURNAL_PORT_PROXY_1}
+      protocol: TCP
+    - name: tcp-${APPJOURNAL_PORT}
       number: ${APPJOURNAL_PORT}
       protocol: TCP
   resolution: DNS

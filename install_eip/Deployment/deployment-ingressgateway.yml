@@ -17,7 +17,7 @@ metadata:
   name: ingressgateway-${NAMESPACE}
 spec:
   progressDeadlineSeconds: 1200
-  replicas: 1
+  replicas: ${INGRESS_REPLICAS_COUNT}
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -135,11 +135,17 @@ spec:
           imagePullPolicy: IfNotPresent
           name: istio-proxy
           ports:
+            - containerPort: ${INGRESS_GEO_TLS_PORT}
+              name: https-${INGRESS_GEO_TLS_PORT}
+              protocol: TCP
+            - containerPort: ${INGRESS_TLS_PORT}
+              name: https-${INGRESS_TLS_PORT}
+              protocol: TCP
+            - containerPort: ${INGRESS_GEO_OTT_PORT}
+              name: https-${INGRESS_GEO_OTT_PORT}
+              protocol: TCP
             - containerPort: ${INGRESS_OTT_PORT}
               name: https-${INGRESS_OTT_PORT}
-              protocol: TCP
-            - containerPort: ${INGRESS_PORT_HTTPS}
-              name: https-${INGRESS_PORT_HTTPS}
               protocol: TCP
           readinessProbe:
             failureThreshold: 30

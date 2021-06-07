@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: ef-ott-egress-auth-filter
+  name: ef-geo-ott-ingress-auth-filter
 spec:
   configPatches:
     - applyTo: HTTP_FILTER
@@ -24,8 +24,8 @@ spec:
           filterChain:
             filter:
               name: envoy.http_connection_manager
-          portNumber: ${EGRESS_OTT_PORT}
+          portNumber: ${INGRESS_GEO_OTT_PORT}
         context: GATEWAY
   workloadSelector:
     labels:
-      app: egressgateway-${NAMESPACE}
+      app: ingressgateway-${NAMESPACE}

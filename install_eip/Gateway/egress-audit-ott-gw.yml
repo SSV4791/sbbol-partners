@@ -1,14 +1,14 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: egress-db-main-gw
+  name: egress-audit-ott-gw
 spec:
   selector:
     istio: egressgateway-${NAMESPACE}
   servers:
     - hosts:
-        - ${DB_MAIN_HOST}
+        -  ${AUDIT_OTT_HOST}
       port:
-        name: tcp-${DB_MAIN_PORT_LESTENER}
-        number: ${DB_MAIN_PORT_LESTENER}
-        protocol: TCP
+        name: http-${EGRESS_OTT_PORT}
+        number: ${EGRESS_OTT_PORT}
+        protocol: HTTP

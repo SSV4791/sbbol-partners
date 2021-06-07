@@ -5,14 +5,17 @@ metadata:
 spec:
   exportTo:
     - .
+  addresses:
+    - ${DB_SI_MASTER_IP}
+    - ${DB_SI_SLAVE_IP}
   hosts:
-    - ${SI_DB_HOST}
+    - ${DB_SI_HOST}
   location: MESH_EXTERNAL
   ports:
-    - name: tcp-${DB_SI_TCP_PORT}
-      number: ${DB_SI_TCP_PORT}
+    - name: tcp-${DB_SI_PORT_PROXY}
+      number: ${DB_SI_PORT_PROXY}
       protocol: TCP
-    - name: tcp-${DB_PORT}
-      number: ${DB_PORT}
+    - name: tcp-${DB_SI_PORT}
+      number: ${DB_SI_PORT}
       protocol: TCP
   resolution: DNS

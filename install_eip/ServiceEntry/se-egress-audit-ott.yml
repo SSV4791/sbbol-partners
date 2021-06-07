@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: se-egress-audit-ott
+spec:
+  exportTo:
+    - .
+  hosts:
+    - ${AUDIT_OTT_HOST}
+  location: MESH_EXTERNAL
+  ports:
+    - name: http-${AUDIT_PORT_PROXY}
+      number: ${AUDIT_PORT_PROXY}
+      protocol: HTTP
+    - name: https-${AUDIT_OTT_PORT}
+      number: ${AUDIT_OTT_PORT}
+      protocol: TLS
+  resolution: DNS
