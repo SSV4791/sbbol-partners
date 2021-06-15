@@ -7,8 +7,12 @@ metadata:
   name: ingressgateway-svc
 spec:
   ports:
-    - name: https-${INGRESS_PORT_HTTPS}
-      port: ${INGRESS_PORT_HTTPS}
+    - name: https-${INGRESS_GEO_TLS_PORT}
+      port: ${INGRESS_GEO_TLS_PORT}
+    - name: https-${INGRESS_TLS_PORT}
+      port: ${INGRESS_TLS_PORT}
+    - name: https-${INGRESS_GEO_OTT_PORT}
+      port: ${INGRESS_GEO_OTT_PORT}
     - name: https-${INGRESS_OTT_PORT}
       port: ${INGRESS_OTT_PORT}
   selector:

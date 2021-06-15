@@ -41,4 +41,12 @@ data:
     spring.sleuth.enabled=false
     dataspace.monitoring.datasource.sleuth.enabled=false
     dataspace.monitoring.datasource.enabled=false
+    audit.enabled=true
+    audit.metamodel.url=${AUDIT_METAMODEL_URL}
+    audit.metamodel.version=1.1
+    audit.metamodel.module.name=${AUDIT_MODULE_ID}
+    audit.node.headerName=X-Forwarded-for
+    audit.node.defaultName=${AUDIT_DEFAULT_NODE}
+    audit.url=${AUDIT_URL}
+    audit.event.url=${AUDIT_EVENT_URL}
   jvm-arguments: |-

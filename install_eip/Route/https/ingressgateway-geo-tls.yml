@@ -9,7 +9,7 @@ metadata:
 spec:
   host: ${INGRESS_HOST_GEO_TLS}
   port:
-    targetPort: https-${INGRESS_PORT_HTTPS}
+    targetPort: https-${INGRESS_GEO_TLS_PORT}
   tls:
     termination: passthrough
   to:

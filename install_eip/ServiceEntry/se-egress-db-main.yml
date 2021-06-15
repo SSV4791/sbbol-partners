@@ -5,14 +5,17 @@ metadata:
 spec:
   exportTo:
     - .
+  addresses:
+    - ${DB_MAIN_MASTER_IP}
+    - ${DB_MAIN_SLAVE_IP}
   hosts:
-    - ${MAIN_DB_HOST}
+    - ${DB_MAIN_HOST}
   location: MESH_EXTERNAL
   ports:
-    - name: tcp-${DB_TCP_PORT}
-      number: ${DB_TCP_PORT}
+    - name: tcp-${DB_MAIN_PORT_PROXY}
+      number: ${DB_MAIN_PORT_PROXY}
       protocol: TCP
-    - name: tcp-${DB_PORT}
-      number: ${DB_PORT}
+    - name: tcp-${DB_MAIN_PORT}
+      number: ${DB_MAIN_PORT}
       protocol: TCP
   resolution: DNS

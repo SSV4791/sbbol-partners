@@ -7,8 +7,8 @@ spec:
     istio: egressgateway-${NAMESPACE}
   servers:
     - hosts:
-        - ${SI_DB_HOST}
+        - ${DB_SI_HOST}
       port:
-        name: tcp-${DB_SI_TCP_PORT}
-        number: ${DB_SI_TCP_PORT}
+        name: tcp-${DB_SI_PORT_LESTENER}
+        number: ${DB_SI_PORT_LESTENER}
         protocol: TCP
