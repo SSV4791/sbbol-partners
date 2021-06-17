@@ -18,7 +18,7 @@ pipeline {
     }
     environment {
         BITBUCKET_CREDENTIALS_ID = 'sbbol-bitbucket'
-        NEXUS_CREDENTIALS_ID = 'SBBOL-build'
+        NEXUS_CREDENTIALS_ID = 'DS_CAB-SA-CI000825'
         GIT_PROJECT = 'CIBPPRB'
         GIT_REPOSITORY = 'sbbol-partners'
         PR_CHECK_LABEL = 'pr_check'

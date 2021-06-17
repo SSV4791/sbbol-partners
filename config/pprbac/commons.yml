@@ -21,4 +21,4 @@ commons:
     url: https://sbt-sonarqube.sigma.sbrf.ru/
     token: 613f5c708cf709538c6ae732f47a922458b4f1db
   maven:
-    pathSettings: ./config/sigma/settings.xml
+    pathSettings: ./config/pprbac/settings.xml

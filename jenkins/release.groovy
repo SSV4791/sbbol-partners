@@ -20,6 +20,7 @@ pipeline {
         booleanParam(name: 'dynamicVersion', defaultValue: true, description: 'Добавлять номер сборки к версии (2.000.00_00XX)')
         booleanParam(name: 'release', defaultValue: true, description: 'Выпуск релизной сборки')
         booleanParam(name: 'needQG', defaultValue: true, description: 'QG')
+        choice(name: 'jenkins', choices: 'SBBOL\nPPRBAC', description: 'В каком jenkins запускать job CustomerBuild')
     }
     environment {
         GIT_PROJECT = 'CIBPPRB'
@@ -29,13 +30,15 @@ pipeline {
         ARTIFACT_ID = 'partners'
         ARTIFACT_NAME_OS = ''
         VERSION = ''
-        DATASPACE_CONFIGS = './config/default.yml,./config/sigma/commons.yml,./config/sigma/devgen.yml'
+        DATASPACE_CONFIGS = ''
         NEXUSSBRF_RELEASE_REPOSITORY = 'https://sbrf-nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
         DEV_REPOSITORY = 'https://nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
         PROJECT_URL = "https://sbtatlas.sigma.sbrf.ru/stashdbo/projects/${GIT_PROJECT}/repos/${GIT_REPOSITORY}/"
-
         CUSTOMER_DISTRIB_URL = ''
         DATASPACE_DISTRIB_URL = ''
+        CUSTOMER_BUILDER_URL = ''
+        NEXUS_CREDENTIALS_ID = 'DS_CAB-SA-CI000825'
+        JENKINS_CREDENTIALS_ID = 'CAB-SA-CI000825-sbt-jenkins-sigma'
     }
 
     stages {
@@ -57,6 +60,21 @@ pipeline {
                         if (params.release) {
                             error("fullBuild should be selected for release distrib (QG checks in CustomerBuilder are required)")
                         }
+                    }
+                    switch (params.jenkins) {
+                        case "PPRBAC":
+                            CUSTOMER_BUILDER_URL = "https://sbt-jenkins.sigma.sbrf.ru/job/PPRBAC/job/Openshift/job/DataSpace/job/CustomerBuilder"
+                            DATASPACE_CONFIGS = './config/default.yml,./config/pprbac/commons.yml'
+                            break;
+                        case "SBBOL":
+                            CUSTOMER_BUILDER_URL = "https://sbt-jenkins.sigma.sbrf.ru/job/SBBOL/job/DataSpace/job/CustomerBuilder"
+                            DATASPACE_CONFIGS = './config/default.yml,./config/sbbol/commons.yml'
+                            if (params.useReserveCredentials) {
+                                NEXUS_CREDENTIALS_ID = 'DS_CAB-SA-CI000827'
+                                JENKINS_CREDENTIALS_ID = 'CAB-SA-CI000827-sbt-jenkins-sigma'
+                                DATASPACE_CONFIGS = './config/default.yml,./config/sbbol/reserve/commons.yml'
+                            }
+                            break;
                     }
                 }
             }
@@ -112,11 +130,11 @@ pipeline {
                     }
                     def triggerBuildResponse = httpRequest(
                             httpMode: 'POST',
-                            authentication: "sbt-jenkins-sigma",
+                            authentication: "${JENKINS_CREDENTIALS_ID}",
                             ignoreSslErrors: true,
                             quiet: true,
                             consoleLogResponseBody: false,
-                            url: "https://sbt-jenkins.sigma.sbrf.ru/job/PPRBAC/job/Openshift/job/DataSpace/job/CustomerBuilder/buildWithParameters?${paramString}"
+                            url: "${CUSTOMER_BUILDER_URL}/buildWithParameters?${paramString}"
                     )
                     def queueLink = triggerBuildResponse.headers["Location"][0]
                     log.info("CustomerBuild submitted. Queue link: ${queueLink}")
@@ -125,7 +143,7 @@ pipeline {
                     String buildLink = null
                     while (!buildLink) {
                         def queueResponse = httpRequest(
-                                authentication: "sbt-jenkins-sigma",
+                                authentication: "${JENKINS_CREDENTIALS_ID}",
                                 ignoreSslErrors: true,
                                 quiet: true,
                                 consoleLogResponseBody: false,
@@ -144,7 +162,7 @@ pipeline {
                     def result = null
                     while (!finished) {
                         def buildResponse = httpRequest(
-                                authentication: "sbt-jenkins-sigma",
+                                authentication: "${JENKINS_CREDENTIALS_ID}",
                                 ignoreSslErrors: true,
                                 quiet: true,
                                 consoleLogResponseBody: false,
@@ -185,13 +203,13 @@ pipeline {
                 script {
                     def customerUrl = params.fullBuild ? CUSTOMER_DISTRIB_URL : params.customerDistrib
                     log.info("Downloading customer distrib ${customerUrl}")
-                    httpRequest authentication: "sbbol-nexus",
+                    httpRequest authentication: "${NEXUS_CREDENTIALS_ID}",
                             outputFile: "customer-distrib.zip",
                             responseHandle: 'NONE',
                             url: "${customerUrl}"
                     def dataSpaceUrl = params.fullBuild ? DATASPACE_DISTRIB_URL : params.dataspaceDistrib
                     log.info("Downloading dataspace distrib ${dataSpaceUrl}")
-                    httpRequest authentication: "sbbol-nexus",
+                    httpRequest authentication: "${NEXUS_CREDENTIALS_ID}",
                             outputFile: "dataspace-distrib.zip",
                             responseHandle: 'NONE',
                             url: "${dataSpaceUrl}"
@@ -248,7 +266,7 @@ pipeline {
                     dir('distrib') {
                         log.info("Publishing artifact to ${DEV_REPOSITORY}")
                         publishDev(
-                                credentialId: "sbbol-nexus",
+                                credentialId: "${NEXUS_CREDENTIALS_ID}",
                                 repository: "corp-releases",
                                 groupId: "ru.sberbank.pprb.sbbol.partners",
                                 artifactId: ARTIFACT_ID,
