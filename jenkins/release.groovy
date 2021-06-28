@@ -69,11 +69,6 @@ pipeline {
                         case "SBBOL":
                             CUSTOMER_BUILDER_URL = "https://sbt-jenkins.sigma.sbrf.ru/job/SBBOL/job/DataSpace/job/CustomerBuilder"
                             DATASPACE_CONFIGS = './config/default.yml,./config/sbbol/commons.yml'
-                            if (params.useReserveCredentials) {
-                                NEXUS_CREDENTIALS_ID = 'DS_CAB-SA-CI000827'
-                                JENKINS_CREDENTIALS_ID = 'CAB-SA-CI000827-sbt-jenkins-sigma'
-                                DATASPACE_CONFIGS = './config/default.yml,./config/sbbol/reserve/commons.yml'
-                            }
                             break;
                     }
                 }
