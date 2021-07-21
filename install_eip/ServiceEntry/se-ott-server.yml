@@ -15,3 +15,4 @@ spec:
     - name: tcp-${OTT_SERVICE_PORT}
       number: ${OTT_SERVICE_PORT}
       protocol: TCP
+  resolution: DNS
