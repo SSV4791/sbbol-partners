@@ -17,7 +17,6 @@ pipeline {
         string(name: 'pullRequestId', description: 'ID пулл-реквеста')
     }
     environment {
-        BITBUCKET_CREDENTIALS_ID = 'sbbol-bitbucket'
         NEXUS_CREDENTIALS_ID = 'DS_CAB-SA-CI000825'
         GIT_PROJECT = 'CIBPPRB'
         GIT_REPOSITORY = 'sbbol-partners'
@@ -28,10 +27,16 @@ pipeline {
         stage('Init') {
             steps {
                 script {
-                    pullRequest = bitbucket.getPullRequest(BITBUCKET_CREDENTIALS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
+                    pullRequest = bitbucket.getPullRequest(NEXUS_CREDENTIALS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
                     bitbucket.setJobPullRequestLink(pullRequest)
-                    bitbucket.setJenkinsLabelInfo(BITBUCKET_CREDENTIALS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
-                    bitbucket.updateBitbucketHistoryBuild(BITBUCKET_CREDENTIALS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")                }
+                    bitbucket.setBuildStatus(NEXUS_CREDENTIALS_ID, 'INPROGRESS', PR_CHECK_LABEL, pullRequest.fromRef.latestCommit)
+                    bitbucket.setJenkinsLabelInfo(
+                            NEXUS_CREDENTIALS_ID,
+                            GIT_PROJECT,
+                            GIT_REPOSITORY,
+                            params.pullRequestId,
+                            PR_CHECK_LABEL)
+                }
             }
         }
 
@@ -69,9 +74,9 @@ pipeline {
     post {
         success {
             script {
-                bitbucket.setBuildStatus(BITBUCKET_CREDENTIALS_ID, 'SUCCESSFUL', PR_CHECK_LABEL, pullRequest.fromRef.latestCommit)
+                bitbucket.setBuildStatus(NEXUS_CREDENTIALS_ID, 'SUCCESSFUL', PR_CHECK_LABEL, pullRequest.fromRef.latestCommit)
                 bitbucket.setJenkinsLabelStatus(
-                        BITBUCKET_CREDENTIALS_ID,
+                        NEXUS_CREDENTIALS_ID,
                         GIT_PROJECT,
                         GIT_REPOSITORY,
                         params.pullRequestId,
@@ -81,7 +86,7 @@ pipeline {
         }
         failure {
             script {
-                bitbucket.setBuildStatus(BITBUCKET_CREDENTIALS_ID, 'FAILED', PR_CHECK_LABEL, pullRequest.fromRef.latestCommit)
+                bitbucket.setBuildStatus(NEXUS_CREDENTIALS_ID, 'FAILED', PR_CHECK_LABEL, pullRequest.fromRef.latestCommit)
             }
         }
         cleanup {
