@@ -18,7 +18,7 @@ pipeline {
     }
     environment {
         BITBUCKET_CREDENTIALS_ID = 'sbbol-bitbucket'
-        NEXUS_CREDENTIALS_ID = 'SBBOL-build'
+        NEXUS_CREDENTIALS_ID = 'DS_CAB-SA-CI000825'
         GIT_PROJECT = 'CIBPPRB'
         GIT_REPOSITORY = 'sbbol-partners'
         PR_CHECK_LABEL = 'pr_check'
@@ -30,14 +30,8 @@ pipeline {
                 script {
                     pullRequest = bitbucket.getPullRequest(BITBUCKET_CREDENTIALS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
                     bitbucket.setJobPullRequestLink(pullRequest)
-                    bitbucket.setBuildStatus(BITBUCKET_CREDENTIALS_ID, 'INPROGRESS', PR_CHECK_LABEL, pullRequest.fromRef.latestCommit)
-                    bitbucket.setJenkinsLabelInfo(
-                            BITBUCKET_CREDENTIALS_ID,
-                            GIT_PROJECT,
-                            GIT_REPOSITORY,
-                            params.pullRequestId,
-                            PR_CHECK_LABEL)
-                }
+                    bitbucket.setJenkinsLabelInfo(BITBUCKET_CREDENTIALS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
+                    bitbucket.updateBitbucketHistoryBuild(BITBUCKET_CREDENTIALS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")                }
             }
         }
 
@@ -66,7 +60,7 @@ pipeline {
                             '-e "MVNW_VERBOSE=true" ' +
                             "-e \"REPO_USER=${USERNAME}\" " +
                             "-e \"REPO_PASSWORD=${PASSWORD}\" " +
-                            'sbtatlas.sigma.sbrf.ru:5000/openjdk:11 ' +
+                            'registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/openjdk:11-with-certs ' +
                             './mvnw clean install -DskipTests -s /build/jenkins/settings.xml'
                 }
             }
