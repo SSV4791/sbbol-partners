@@ -15,6 +15,8 @@ spec:
       port: ${INGRESS_GEO_OTT_PORT}
     - name: https-${INGRESS_OTT_PORT}
       port: ${INGRESS_OTT_PORT}
+    - name: https-${INGRESS_HEALTH_CHECK_PORT}
+      port: ${INGRESS_HEALTH_CHECK_PORT}
   selector:
     app: ingressgateway-${NAMESPACE}
     istio: ingressgateway-${NAMESPACE}
