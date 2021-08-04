@@ -91,18 +91,22 @@ spec:
             limits:
               cpu: ${PARTNERS_LIMIT_CPU}
               memory: ${PARTNERS_LIMIT_MEMORY}
+              ephemeral-storage: ${PARTNERS_LIMIT_EPHEMERAL_STORAGE}
             requests:
               cpu: ${PARTNERS_REQUEST_CPU}
               memory: ${PARTNERS_REQUEST_MEMORY}
+              ephemeral-storage: ${PARTNERS_REQUEST_EPHEMERAL_STORAGE}
         - name: fluentbit
           image: ${FLUENTBIT_IMAGE}
           resources:
             limits:
               cpu: ${fluentBitLimitCPU}
               memory: ${fluentBitLimitMemory}
+              ephemeral-storage: ${fluentBitLimitEphemeralStorage}
             requests:
               cpu: ${fluentBitRequestCPU}
               memory: ${fluentBitRequestMemory}
+              ephemeral-storage: ${fluentBitRequestEphemeralStorage}
           env:
             - name: service
               value: ${PARTNERS_MODULE_NAME}
