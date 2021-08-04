@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: ingress-${NAMESPACE}-health
+    istio: ingress-${NAMESPACE}-health
+    router: geo
+    shard: geo
+  name: ingressgateway-geo-hc
+spec:
+  host: ${INGRESS_HOST_HEALTH_CHECK}
+  port:
+    targetPort: https-${INGRESS_HEALTH_CHECK_PORT}
+  tls:
+    termination: passthrough
+  to:
+    kind: Service
+    name: svc-ingressgateway

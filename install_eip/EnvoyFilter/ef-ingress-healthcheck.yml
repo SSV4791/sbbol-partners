@@ -1,0 +1,31 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ef-ingress-healthcheck
+spec:
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          portNumber: ${INGRESS_HEALTH_CHECK_PORT}
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          config:
+            rules:
+              action: ALLOW
+              policies:
+                health_rbac_any_policy:
+                  permissions:
+                    and_rules:
+                      rules:
+                        - header:
+                            exact_match: /MODULE_ID_REPLACE/actuator/health
+                            name: ':path'
+                  principals:
+                    - any: true
+          name: envoy.filters.http.rbac
+  workloadSelector:
+    labels:
+      app: ingress-${NAMESPACE}

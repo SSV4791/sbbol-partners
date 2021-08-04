@@ -12,6 +12,7 @@ spec:
     - ${INGRESS_HOST_OTT}
     - ${INGRESS_HOST_GEO_TLS}
     - ${INGRESS_HOST_GEO_OTT}
+    - ${INGRESS_HOST_HEALTH_CHECK}
   http:
     - match:
         - uri:
