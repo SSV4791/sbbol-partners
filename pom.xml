@@ -5,7 +5,7 @@
     <parent>
         <groupId>sbp.com.sbt.dataspace</groupId>
         <artifactId>dataspace-bom</artifactId>
-        <version>4.2.112</version>
+        <version>4.3.27</version>
         <relativePath/>
     </parent>
 
