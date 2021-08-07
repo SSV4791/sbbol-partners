@@ -3,7 +3,7 @@
 * DataSpace
 * Мониторинг
 * Журналирование
-* Аудит 
+* Аудит
 * Meta
 * SPAS
 
@@ -31,7 +31,7 @@
 6. [Развертывание в OpenShift](https://sbtatlas.sigma.sbrf.ru/wiki/display/SPD/DataSpace-Core+PipelineV4).
 
 ##Структура проекта
-Проект состоит из следующих артефактов 
+Проект состоит из следующих артефактов
 
 |Имя артефакта|Описание|
 |---|---|
@@ -45,9 +45,9 @@
 ##Локальный запуск и вызов сервисов
 Для локального тестирования приложения вам необходимо:
 1. Запустить локально dataspace-core, который автоматически поднимет встроенную БД, создаст необходимые структуры данных в соответствии с описанием модели, а также инициалицирует данные. После генерации артефактов модели [deposit-model-jpa](https://sbtatlas.sigma.sbrf.ru/stash/projects/PPRBAC/repos/dataspace-client/browse/deposit-model-jpa) это можно осуществить посредством [скрипта](https://sbtatlas.sigma.sbrf.ru/stash/projects/PPRBAC/repos/dataspace-client/browse/documentation/local-run.sh)
-    >Скрипт осуществляет запуск SpringBoot-приложения DataSpace Core, расширяемого classpath'ом артефактов, сгенерированных в артефакте deposit-model-jpa, за счет JVM-параметра: 
+    >Скрипт осуществляет запуск SpringBoot-приложения DataSpace Core, расширяемого classpath'ом артефактов, сгенерированных в артефакте deposit-model-jpa, за счет JVM-параметра:
     >-Dloader.path=./deposit-model-jpa/target
-    
+
     #####Внимание
     Так как скрипт содержит специфичный для Linux синтаксис, то запуск необходимо осуществлять в Bash-среде. Для Windows, к примеру, можно воспользоваться Git Bash-эмулятором.
     Строка запуска: ./local-run.sh
@@ -65,7 +65,7 @@
   2. Капитализация депозита (CapitalizeDepositService.execute)
   3. Получение списка открытых депозитов клиента (SearchDepositService.searchOpenedDeposit)
   4. Получение списка ставок по депозитам (SearchDepositService.searchDepositRates)
-  
+
 Описание данных API [загружено](https://meta.sigma.sbrf.ru/index.html?session_state=3c9ba986-3142-4eaa-9f9e-bd4ce99f55a8&code=d974d178-fb36-4aa1-a7f4-0d02298ba9cb.3c9ba986-3142-4eaa-9f9e-bd4ce99f55a8.2ff942cd-826d-4ee4-a13d-fb5cbe640814#/search/API/?q=dataspace) в META
 
 ####Примеры вызова API
@@ -94,4 +94,5 @@
 * Регистрация метамодели openDeposit в ТС Аудит в сигме
 ```curl -d "@metamodel-open-deposit.json" -H "Content-Type: application/json" -X POST http://demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru```
 
-
+##  Тестирование
+* [Sonar](sonar.md)

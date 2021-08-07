@@ -1,0 +1,21 @@
+# This config helps maintain coding style
+# between different IDEs
+root = true
+
+[*]
+end_of_line = lf
+indent_style = space
+indent_size = 4
+
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[{*.yml, *.yaml}]
+indent_size = 2
+
+[*.yml.j2]
+indent_size = 2
+
+[*.json]
+indent_size = 2

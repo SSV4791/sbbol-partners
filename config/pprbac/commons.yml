@@ -17,8 +17,19 @@ commons:
   git:
     credentials: dataspace-bot-ssh
   sonar:
-    credentials: dataspace-bot-sonar-key
     url: https://sbt-sonarqube.sigma.sbrf.ru/
-    token: 613f5c708cf709538c6ae732f47a922458b4f1db
+    token: 826d76d27597ac41ae13d0811ca95c12ef12d57d
+    projectKey: ru.sberbank.pprb.sbbol.partners:partners
   maven:
     pathSettings: ./config/pprbac/settings.xml
+
+QualityGates:
+  sbrf:
+    url: https://sbrf-nexus.sigma.sbrf.ru/nexus
+    groupId: Nexus_PROD.CI02792425_sbbol-partners
+    credentials: DS_sbbol-nexus
+    repositoryId: corp-releases
+  sast:
+    credentials: DS_SAST_PARTNERS
+    configPath: config/devsecops-config.yml
+  mode: scanAndFlags
