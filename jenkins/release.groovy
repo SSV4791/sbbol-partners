@@ -31,7 +31,7 @@ pipeline {
         DATASPACE_ARCHIVE_NAME = 'dataspace-distrib.zip'
         VERSION_PATTERN = /02\.\d{3}\.\d{2}_\d{4}/
         // Паттерн, по которому выбираются версии для инкремента последней при сборке
-        INITIAL_VERSION = '01.001.00_0038'
+        INITIAL_VERSION = '02.000.00_0001'
         VERSION = ''
         LAST_VERSION = ''
         DATASPACE_CONFIGS = ''
