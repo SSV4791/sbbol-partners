@@ -29,7 +29,7 @@ pipeline {
         ARTIFACT_NAME_OS = ''
         CUSTOMER_ARCHIVE_NAME = 'customer-distrib.zip'
         DATASPACE_ARCHIVE_NAME = 'dataspace-distrib.zip'
-        VERSION_PATTERN = /02\.\d{3}\.\d{2}_\d{4}/
+        VERSION_PATTERN = /\d{2}\.\d{3}\.\d{2}_\d{4}/
         // Паттерн, по которому выбираются версии для инкремента последней при сборке
         INITIAL_VERSION = '02.000.00_0001'
         VERSION = ''
@@ -311,6 +311,9 @@ pipeline {
         }
 
         stage('Push ReleaseNotes') {
+            when {
+                expression { params.release }
+            }
             steps {
                 script {
                     log.info("Last version: ${LAST_VERSION}")
