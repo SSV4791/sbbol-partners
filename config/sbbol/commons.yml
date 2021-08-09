@@ -39,7 +39,7 @@ QualityGates:
   sbrf:
     url: https://sbrf-nexus.sigma.sbrf.ru/nexus
     groupId: Nexus_PROD.CI02792425_sbbol-partners
-    credentials: CAB-SA-CI000826
+    credentials: CAB-SA-CI000825
     repositoryId: corp-releases
   sast:
     credentials: DS_SAST_PARTNERS
