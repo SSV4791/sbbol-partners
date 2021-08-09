@@ -9,11 +9,6 @@
 
     <artifactId>partners-test</artifactId>
 
-    <properties>
-        <maven.compiler.source>14</maven.compiler.source>
-        <maven.compiler.target>14</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>sbp.com.sbt.dataspace</groupId>
@@ -49,17 +44,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
-            <artifactId>partners-model-jpa</artifactId>
-            <version>DEV-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
-            <artifactId>partners-model-sdk</artifactId>
-            <version>DEV-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -98,8 +82,28 @@
             <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
             <artifactId>partners-api</artifactId>
             <version>DEV-SNAPSHOT</version>
-            <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+            <artifactId>partners-model-jpa</artifactId>
+            <version>DEV-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+            <artifactId>partners-model-sdk</artifactId>
+            <version>DEV-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+            <artifactId>partners-rest</artifactId>
+            <version>DEV-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.sberbank.pprb.sbbol.partners</groupId>
+            <artifactId>partners-service</artifactId>
+            <version>DEV-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>

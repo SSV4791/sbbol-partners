@@ -62,12 +62,12 @@ pipeline {
         success {
             script {
                 upstreamResult(
-                        credentialsId: pprbCredential,
-                        projectKey: params.projectKey,
-                        repoSlug: params.repoSlug,
-                        sourcePrId: params.sourcePullRequestId,
-                        upstreamBranchName: upstreamBranchName,
-                        state: 'success'
+                    credentialsId: pprbCredential,
+                    projectKey: params.projectKey,
+                    repoSlug: params.repoSlug,
+                    sourcePrId: params.sourcePullRequestId,
+                    upstreamBranchName: upstreamBranchName,
+                    state: 'success'
                 )
             }
         }
@@ -76,40 +76,40 @@ pipeline {
                 try {
                     def authorPr = pullRequest.author.user.name
                     def fields = [
-                            project          : [
-                                    id: jira.getProject('cab-sa-pyjobs01', bitbucket.getJiraKeyByLogin(pprbCredential, authorPr)).id
-                            ],
-                            summary          : "Задача на перелитие ПРа ${params.sourcePullRequestId}",
-                            description      : "Этот ПР необходимо перелить в ветку ${params.targetBranch} самостоятельно, " +
-                                    "потому что робот по какой то причине не смог его перелить автоматом " +
-                                    "${Const.BITBUCKET_SERVER_INSTANCE_URL}/projects/${params.projectKey}" +
-                                    "/repos/${params.repoSlug}/pull-requests/${params.sourcePullRequestId}/overview",
-                            customfield_10006: params.epicKey,
-                            labels           : [pullRequest.toRef.displayId, params.targetBranch],
-                            issuetype        : [
-                                    "id": 3
-                            ],
-                            assignee         : [
-                                    "name": authorPr
-                            ]
+                        project          : [
+                            id: jira.getProject('cab-sa-pyjobs01', bitbucket.getJiraKeyByLogin(pprbCredential, authorPr)).id
+                        ],
+                        summary          : "Задача на перелитие ПРа ${params.sourcePullRequestId}",
+                        description      : "Этот ПР необходимо перелить в ветку ${params.targetBranch} самостоятельно, " +
+                            "потому что робот по какой то причине не смог его перелить автоматом " +
+                            "${Const.BITBUCKET_SERVER_INSTANCE_URL}/projects/${params.projectKey}" +
+                            "/repos/${params.repoSlug}/pull-requests/${params.sourcePullRequestId}/overview",
+                        customfield_10006: params.epicKey,
+                        labels           : [pullRequest.toRef.displayId, params.targetBranch],
+                        issuetype        : [
+                            "id": 3
+                        ],
+                        assignee         : [
+                            "name": authorPr
+                        ]
                     ]
                     def jiraIssue = jira.createIssue('cab-sa-pyjobs01', fields)
                     upstreamResult(
-                            credentialsId: pprbCredential,
-                            projectKey: params.projectKey,
-                            repoSlug: params.repoSlug,
-                            sourcePrId: params.sourcePullRequestId,
-                            jiraIssueLink: jiraIssue,
-                            state: 'jira-issue'
+                        credentialsId: pprbCredential,
+                        projectKey: params.projectKey,
+                        repoSlug: params.repoSlug,
+                        sourcePrId: params.sourcePullRequestId,
+                        jiraIssueLink: jiraIssue,
+                        state: 'jira-issue'
                     )
                 } catch (e) {
                     println(e)
                     upstreamResult(
-                            credentialsId: pprbCredential,
-                            projectKey: params.projectKey,
-                            repoSlug: params.repoSlug,
-                            sourcePrId: params.sourcePullRequestId,
-                            state: 'failed'
+                        credentialsId: pprbCredential,
+                        projectKey: params.projectKey,
+                        repoSlug: params.repoSlug,
+                        sourcePrId: params.sourcePullRequestId,
+                        state: 'failed'
                     )
                 }
             }

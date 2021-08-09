@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @ExtendWith(SpringExtension.class)
-public class RenterTest extends BaseControllerTest{
+class RenterTest extends BaseControllerTest{
 
     RenterClient renterClient;
 
@@ -25,15 +25,15 @@ public class RenterTest extends BaseControllerTest{
     }
 
     @Test
-    public void version() {
+    void version() {
         Version version = renterClient.version();
         assertThat(version)
-                .isNotNull()
-                .isEqualTo(version.ver("1.0.0"));
+            .isNotNull()
+            .isEqualTo(version.ver("1.0.0"));
     }
 
     @Test
-    public void testCreateValidRenter() {
+    void testCreateValidRenter() {
         Renter renter = getValidRenter();
         Renter result = renterClient.createRenter(renter);
 
@@ -43,7 +43,7 @@ public class RenterTest extends BaseControllerTest{
     }
 
     @Test
-    public void testCreateInvalidRenter() {
+    void testCreateInvalidRenter() {
         Renter renter = getValidRenter();
         renter.setOgrn("1");
         Renter result = renterClient.createRenter(renter);
@@ -54,7 +54,7 @@ public class RenterTest extends BaseControllerTest{
     }
 
     @Test
-    public void testUpdateValidRenter() {
+    void testUpdateValidRenter() {
         Renter renter = getValidRenter();
         Renter createdRenter = renterClient.createRenter(renter);
         String newKpp ="999999999";
@@ -67,7 +67,7 @@ public class RenterTest extends BaseControllerTest{
     }
 
     @Test
-    public void testUpdateInvalidRenter() {
+    void testUpdateInvalidRenter() {
         Renter renter = getValidRenter();
         Renter createdRenter = renterClient.createRenter(renter);
         createdRenter.setOgrn("1");
@@ -79,17 +79,18 @@ public class RenterTest extends BaseControllerTest{
     }
 
     @Test
-    public void testGetRenter() {
+    void testGetRenter() {
         Renter renter = getValidRenter();
         Renter createdRenter = renterClient.createRenter(renter);
         Renter testRenter = renterClient.getRenter(new RenterIdentifier().digitalId("1").uuid(createdRenter.getUuid()));
 
-        assertThat(testRenter).isNotNull();
-        assertThat(testRenter).isEqualTo(createdRenter);
+        assertThat(testRenter)
+            .isNotNull()
+            .isEqualTo(createdRenter);
     }
 
     @Test
-    public void getGetRentersList() {
+    void getGetRentersList() {
         RenterFilter filter = new RenterFilter().digitalId("999");
         RenterListResponse response = renterClient.getRenters(filter);
 
@@ -115,30 +116,30 @@ public class RenterTest extends BaseControllerTest{
 
     private Renter getValidRenter() {
         RenterAddress address = new RenterAddress().zipCode("655511")
-                .regionCode("42")
-                .region("Кемеровская область")
-                .city("Кемерово")
-                .locality("Кемерово")
-                .street("Ленина")
-                .building("162")
-                .buildingBlock("1")
-                .flat("55");
+            .regionCode("42")
+            .region("Кемеровская область")
+            .city("Кемерово")
+            .locality("Кемерово")
+            .street("Ленина")
+            .building("162")
+            .buildingBlock("1")
+            .flat("55");
 
         return new Renter()
-                .digitalId("1")
-                .type(Renter.TypeEnum.LEGAL_ENTITY)
-                .legalName("ОАО Рога и копыта")
-                .inn("132456789132")
-                .kpp("0")
-                .ogrn("123456789012345")
-                .okpo("1234567890")
-                .account("40702810538261023926")
-                .bankBic("044525225")
-                .bankName("ПАО СБЕРБАНК")
-                .bankAccount("30101810400000000225")
-                .phoneNumbers("+79991112233")
-                .emails("roga@mail.ru")
-                .legalAddress(address)
-                .physicalAddress(address);
+            .digitalId("1")
+            .type(Renter.TypeEnum.LEGAL_ENTITY)
+            .legalName("ОАО Рога и копыта")
+            .inn("132456789132")
+            .kpp("0")
+            .ogrn("123456789012345")
+            .okpo("1234567890")
+            .account("40702810538261023926")
+            .bankBic("044525225")
+            .bankName("ПАО СБЕРБАНК")
+            .bankAccount("30101810400000000225")
+            .phoneNumbers("+79991112233")
+            .emails("roga@mail.ru")
+            .legalAddress(address)
+            .physicalAddress(address);
     }
 }

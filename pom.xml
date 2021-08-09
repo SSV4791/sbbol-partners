@@ -32,10 +32,22 @@
         <headless.meta>https://meta.sigma.sbrf.ru</headless.meta>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <model>${project.parent.basedir}/model/src/main/resources/model</model>
         <modelPackage>${project.groupId}</modelPackage>
+        <!--suppress UnresolvedMavenProperty -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${maven.multiModuleProjectDirectory}/partners-test/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <!--Увеличить покрытие кода в фабрике Партнеры -->
+        <sonar.coverage.exclusions>
+            **/model/**/*,
+            **/partners-api/**/*,
+            **/partners-service/**/*,
+            **/partners-test/**/*,
+            **/runner/**/*
+        </sonar.coverage.exclusions>
     </properties>
 
     <distributionManagement>
@@ -119,10 +131,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -135,8 +146,9 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
+                <!--suppress UnresolvedMavenProperty -->
                 <sonar.coverage.jacoco.xmlReportPaths>
-                    ${project.basedir}/target/site/jacoco/jacoco.xml
+                    ${maven.multiModuleProjectDirectory}/rental-property-test/target/site/jacoco-aggregate/jacoco.xml
                 </sonar.coverage.jacoco.xmlReportPaths>
             </properties>
             <build>
@@ -144,29 +156,46 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.5</version>
                         <configuration>
                             <output>file</output>
                             <append>true</append>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>jacoco-initialize</id>
+                                <id>prepare-agent</id>
                                 <goals>
                                     <goal>prepare-agent</goal>
                                 </goals>
-                                <phase>test-compile</phase>
                             </execution>
                             <execution>
-                                <id>jacoco-site</id>
-                                <phase>package</phase>
+                                <id>report-aggregate</id>
+                                <phase>verify</phase>
                                 <goals>
-                                    <goal>report</goal>
+                                    <goal>report-aggregate</goal>
                                 </goals>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <version>3.8.1</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.sonarsource.scanner.maven</groupId>
+                            <artifactId>sonar-maven-plugin</artifactId>
+                            <version>3.7.0.1746</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>jacoco-maven-plugin</artifactId>
+                            <version>0.8.6</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
         <profile>
