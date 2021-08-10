@@ -1,0 +1,158 @@
+==	Параметры конфигурации
+
+=== Стендозависимые параметры деплоя
+
+[options="header",cols="25%,25%,25%,25%"]
+|=======================
+|  Параметр  |  Описание  |  Значение  |
+| registryUrl |  URL на registry с образом приложения  |  registry.sigma.sbrf.ru/pprb
+| registryProject | Название проекта в registry  | ci00908578/ci02792425_sbbol-partners
+| ISTIO_CONTROL_PLANE | Instance istio  | ci01994970-edevgen2-control-panel
+| FLUENTBIT_IMAGE |  Образ контейнера логгера | registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+| PROXY_IMAGE | Образ энвой-прокси  | registry.sigma.sbrf.ru/dev/ci01563053/ocp4_dev/operatorhub/openshift-service-mesh/proxyv2-rhel8:1.1.3-2
+| DB_MAIN_HOST | Хост до сновной БД | tkled-pprb00137.vm.esrt.cloud.sbrf.ru
+| DB_SI_HOST | Хост до БД SI | tkled-pprb00137.vm.esrt.cloud.sbrf.ru
+| DB_MAIN_MASTER_IP | Основной IP до БД | 10.53.223.31
+| DB_MAIN_SLAVE_IP | Дополнительный IP до БД | 1.1.1.1
+| DB_SI_MASTER_IP | Основной IP до БД SI | 10.53.223.31
+| DB_SI_SLAVE_IP | Дополнительный IP до БД SI | 2.2.2.2
+| DB_MAIN_PORT | Порт до основной БД | 5433
+| DB_SI_PORT | Порт до БД SI | 5433
+| DB_MAIN_PORT_PROXY | Прокси порт до основной БД | 3001
+| DB_SI_PORT_PROXY | Прокси порт до БД SI |3003
+| DB_MAIN_PORT_LESTENER | Порт до слушителя основной БД | 4001
+| DB_SI_PORT_LESTENER | Порт до слушителя БД SI | 4003
+| INGRESS_HOST_GEO_TLS | Хост роута балансировщика без ОТТ | ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-geo-tls.ingress.apps.dev-gen2.sigma.sbrf.ru
+| INGRESS_GEO_TLS_PORT | Порт роута балансировщика без ОТТ | 2111
+| INGRESS_HOST_GEO_OTT | Хост роута балансировщика с ОТТ | ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-geo-ott.ingress.apps.dev-gen2.sigma.sbrf.ru
+| INGRESS_GEO_OTT_PORT | Порт роута балансировщика с ОТТ | 2110
+| INGRESS_HOST_TLS | Локальный роут приложения без ОТТ | ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6.ingress.apps.dev-gen2.sigma.sbrf.ru
+| INGRESS_TLS_PORT | Порт ингресса без ОТТ  | 2101
+| INGRESS_HOST_OTT | Локальный роут приложения с ОТТ  | ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-ott.ingress.apps.dev-gen2.sigma.sbrf.ru
+| INGRESS_OTT_PORT | Порт ингресса с ОТТ | 2100
+| INGRESS_HOST_HEALTH_CHECK | Локальный роут хелсчека | ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-geo-tls-hc.apps.dev-gen2.sigma.sbrf.ru
+| INGRESS_HEALTH_CHECK_PORT | Порт хелсчека | 5445
+| INGRESS_LIMIT_CPU | Лимит CPU ингресса | 1200m
+| INGRESS_LIMIT_MEMORY | Лимит памяти ингресса  | 700Mi
+| INGRESS_REQUEST_CPU | Запрос CPU ингресса  | 1000m
+| INGRESS_REQUEST_MEMORY |  Запрос памяти ингресса | 700Mi
+| INGRESS_PROXY_LIMIT_EPHEMERAL_STORAGE | Лимит эфимерного хранилища прокси | 2Gi
+| INGRESS_PROXY_REQUEST_EPHEMERAL_STORAGE | Запрос эфимерного хранилища прокси | 2Gi
+| INGRESS_OTT_LIMIT_EPHEMERAL_STORAGE | Лимит эфимерного хранилища ОТТ | 2Gi
+| INGRESS_OTT_REQUEST_EPHEMERAL_STORAGE | Запрос эфимерного хранилища ОТТ| 2Gi
+| EGRESS_OTT_PORT | Порт эгресса с OTT  | 8443
+| EGRESS_HTTPS_PORT |  Порт эгресса без ОТТ | 5443
+| EGRESS_LIMIT_CPU | Лимит CPU эгресса  | 800m
+| EGRESS_LIMIT_MEMORY | Лимит памяти эгресса  | 700Mi
+| EGRESS_REQUEST_CPU | Запрос CPU эгресса  | 800m
+| EGRESS_REQUEST_MEMORY | Запрс памяти эгресса  | 700Mi
+| EGRESS_PROXY_LIMIT_EPHEMERAL_STORAGE | Лимит эфимерного хранилища прокси | 2Gi
+| EGRESS_PROXY_REQUEST_EPHEMERAL_STORAGE | Запрос эфимерного хранилища прокси | 2Gi
+| EGRESS_OTT_LIMIT_EPHEMERAL_STORAGE | Лимит эфимерного хранилища ОТТ| 2Gi
+| EGRESS_OTT_REQUEST_EPHEMERAL_STORAGE | Запрос эфимерного хранилища ОТТ | 2Gi
+| PARTNERS_MODULE_NAME | Наименование модуля | pprb4-digital-partners
+| PARTNERS_LIMIT_CPU | Лимит CPU приложения | 500m
+| PARTNERS_REQUEST_CPU | Запрос CPU приложения | 500m
+| PARTNERS_LIMIT_MEMORY | Лимит памяти приложения | 500Mi
+| PARTNERS_REQUEST_MEMORY | Запрос памяти приложения | 500Mi
+| PARTNERS_LIMIT_EPHEMERAL_STORAGE | Лимит эфимерного хранилища приложения | 2Gi
+| PARTNERS_REQUEST_EPHEMERAL_STORAGE | Запрос эфимерного хранилища приложения | 2Gi
+| INGRESS_REPLICAS_COUNT | Количество реплик Ingress |  1
+| EGRESS_REPLICAS_COUNT | Количество реплик Egress | 1
+| SUBJECT_ALT_NAME_1 | 1 SAN | http://sbbol-dev-sbbol-rental-property-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+| SUBJECT_ALT_NAME_2 | 2 SAN | http://sbbol-dev-sbbol-mapi-realty-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+| SUBJECT_ALT_NAME_3 | 3 SAN | http://sbbol-dev-sbbol-transport-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+| SUBJECT_ALT_NAME_4 | 4 SAN | http://sbbol-dev-sbbol-transport-mobile-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+| SUBJECT_ALT_NAME_5 | 5 SAN | http://osiris.sbrf.ru
+| DATASPACE_URL | Урл базы к БД | http://svc-dataspace-core-partners:8080
+| standinEnabled | Влючение функционала stand-in  | false
+| mainDataBaseSecretId | Наименование секрета для основной БД |  pgdb-main-secret
+| standinDataBaseSecretId | Наименование секрета для SI БД | pgdb-si-secret
+| appJournalSettings | Название секрета с данными подключения к Прикладному журнала   | secret-appjournalstubsettings
+| kafkaSslSecret |  Название секрета с данными подключения к Kafka  | kafka-ssl-secret
+| fluentBitCert | Название секрета для Мониторинга | fluentBitCert
+| RUN_DEBUG | Запуск в режиме Debug | false
+| fluentBitLimitCPU |  Лимит CPU Fluent Bit | 50m
+| fluentBitLimitMemory | Лимит памяти Fluent Bit  | 32Mi
+| fluentBitRequestCPU | Запрос CPU Fluent Bit  | 10m
+| fluentBitRequestMemory | Запрос памяти Fluent Bit  | 16Mi
+| fluentBitLimitEphemeralStorage | Лимит памяти для эфимерного хранилища | 2Gi
+| fluentBitRequestEphemeralStorage | Запрос памяти для эфимерного хранилища | 2Gi
+| fluentBitEnvStandId |  Идентификатор стенда Fluent Bit | dev
+| fluentBitEnvCluster |  Кластер Fluent Bit | dev-gen2.ca.sbrf.ru
+| fluentBitEnvZoneId | Zone Id Fluent Bit  | default
+| FLUENT_BIT_HTTP_HOST | Http хост Fluent Bit  | logger-endpoint-http-ci00641491-idevgen-logger-ift.apps.dev-gen.ca.sbrf.ru
+| FLUENT_BIT_HTTP_PORT | Http порт Fluent Bit | 8183
+| FLUENT_BIT_HTTPS_HOST | Https хост Fluent Bit | ci00641491-idevgen-logger-ift.ingress.apps.dev-gen.ca.sbrf.ru
+| FLUENT_BIT_HTTPS_PORT | Https порт Fluent Bit | 443
+| FLUENT_BIT_SERVICE_PORT | Сервисный порт Fluent Bit | 80
+| APPJOURNAL_HOST_1 | Хост Kafka прикладного журнала | 1sbtatlas.sigma.sbrf.ru
+| APPJOURNAL_HOST_2 | Хост Kafka прикладного журнала | 2sbtatlas.sigma.sbrf.ru
+| APPJOURNAL_HOST_3 | Хост Kafka прикладного журнала | 3sbtatlas.sigma.sbrf.ru
+| APPJOURNAL_HOST_4 | Хост Kafka прикладного журнала | 4sbtatlas.sigma.sbrf.ru
+| APPJOURNAL_HOST_5 | Хост Kafka прикладного журнала | 5sbtatlas.sigma.sbrf.ru
+| APPJOURNAL_HOST_6 | Хост Kafka прикладного журнала | 6sbtatlas.sigma.sbrf.ru
+| APPJOURNAL_PORT | Порт Kafka прикладного журнала | 9092
+| APPJOURNAL_IP_1 | IP Kafka прикладного журнала | 10.116.72.65
+| APPJOURNAL_IP_2 | IP Kafka прикладного журнала | 10.53.96.31
+| APPJOURNAL_IP_3 | IP Kafka прикладного журнала | 10.53.96.32
+| APPJOURNAL_IP_4 | IP Kafka прикладного журнала | 10.53.96.33
+| APPJOURNAL_IP_5 | IP Kafka прикладного журнала | 10.53.96.34
+| APPJOURNAL_IP_6 | IP Kafka прикладного журнала | 10.53.96.35
+| APPJOURNAL_PORT_PROXY_1 | Порт прокси Kafka прикладного журнала | 3101
+| APPJOURNAL_PORT_PROXY_2 | Порт прокси Kafka прикладного журнала | 3102
+| APPJOURNAL_PORT_PROXY_3 | Порт прокси Kafka прикладного журнала | 3103
+| APPJOURNAL_PORT_PROXY_4 | Порт прокси Kafka прикладного журнала | 3104
+| APPJOURNAL_PORT_PROXY_5 | Порт прокси Kafka прикладного журнала | 3105
+| APPJOURNAL_PORT_PROXY_6 | Порт прокси Kafka прикладного журнала | 3106
+| APPJOURNAL_PORT_LISTENER_1 | Порт Слушателя Kafka прикладного журнала | 4101
+| APPJOURNAL_PORT_LISTENER_2 | Порт Слушателя Kafka прикладного журнала | 4102
+| APPJOURNAL_PORT_LISTENER_3 | Порт Слушателя Kafka прикладного журнала | 4103
+| APPJOURNAL_PORT_LISTENER_4 | Порт Слушателя Kafka прикладного журнала | 4104
+| APPJOURNAL_PORT_LISTENER_5 | Порт Слушателя Kafka прикладного журнала | 4105
+| APPJOURNAL_PORT_LISTENER_6 | Порт Слушателя Kafka прикладного журнала | 4106
+| OTT_REGISTRY_URL | Образ ОТТ Прокси  | registry.sigma.sbrf.ru/pprb/ci00641491/ci01125613_ott/ott-client-api-v2:4.0.4
+| OTT_ENTITY_PROFILE | Module_Id в сервере ОТТ  | pprb4-digital-partners
+| OTT_SERVICE_HOST_1 | Хост ОТТ  | 10.53.99.178
+| OTT_SERVICE_SI_HOST_1 | Хост ОТТ  | 10.53.99.178
+| OTT_SERVICE_HOST_2 | Хост ОТТ  | 10.53.96.30
+| OTT_SERVICE_SI_HOST_2 | Хост ОТТ  | 10.53.96.30
+| OTT_SERVICE_PORT |  Порт ОТТ | 8443
+| OTT_SERVICE_URL | Url сервиса ОТТ  | https://10.53.99.178:8443/ott-service/rest/token
+| OTT_TRUST_STORE_PATH |  Название публичного хранилища ОТТ | sigma_ott_trust
+| AUDIT_MODULE_ID | Наименование модуля аудита | pprb4-digital-partners
+| AUDIT_DEFAULT_NODE | Нода по умолчанию для аудита | localhost
+| AUDIT_METAMODEL_URL | URL аудита для метамоделей | /v1/metamodel
+| AUDIT_EVENT_URL | URL аудита для событий | /v1/event
+| AUDIT_URL | Хост аудита | http://demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru
+| AUDIT_OTT_HOST | Хост аудита с ОТТ | demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru
+| AUDIT_OTT_PORT | Порт аудта с ОТТ | 443
+| AUDIT_PORT_PROXY | Прокси порт для аудта | 80
+| CHAIN_PEM_GEO_TLS | | ca-chain.cert.pem
+| CERT_KEY_GEO_TLS | | tls.key
+| CERT_GEO_TLS | | tls.crt
+| CHAIN_PEM_TLS | | ca-chain.cert.pem
+| CERT_KEY_TLS | | tls.key
+| CERT_TLS | | tls.crt
+| CHAIN_PEM_GEO_OTT | | ca-chain.cert.pem
+| CERT_KEY_GEO_OTT | | tls.key
+| CERT_GEO_OTT | | tls.crt
+| CHAIN_PEM_OTT | | ca-chain.cert.pem
+| CERT_KEY_OTT | | tls.key
+| CERT_OTT | | tls.crt
+
+|=======================
+
+=== Секреты OSE
+
+|=======================
+|pgdb-main-secret | настройки подключения к Main ДБ
+|pgdb-si-secret | настройки подключения к SI ДБ
+|istio-egressgateway-ca-certs | корневые сертификаты, содержат сертификат с именем из параметра CA_CERT_CHAIN_PEM
+|istio-egressgateway-certs | приватные ключи для эгресса, пример для дева: в секрете tls.crt и tls.key
+|ott-secret | сертификаты для интеграции с ОТТ. Публичное хранилище и хранилище с сертификатом модуля
+|ott-ingress-passwords | пароли от хранилищ ОТТ
+|istio-ingressgateway-ca-certs | приватные ключи для ингресса, пример для дева: в секрете tls.crt и tls.key
+|istio-ingressgateway-certs | корневые сертификаты, содержат сертификат с именем из параметра CA_CERT_CHAIN_PEM
+|appjounal-settings-secret | Настойки подключения к Прикладному Журналу
+|=======================

@@ -1,0 +1,16 @@
+:Author:    Осипов Артем Олегович
+:Email:     <DCB_BRAIN_NEW@sberbank.ru>
+
+= ППРБ.Digital.Партнеры (Admin guide)
+:toc-title: Оглавление
+:sectnums:
+:toc: up
+:hide-uri-scheme:
+
+include::01_about.adoc[]
+
+include::02_integration.adoc[]
+
+include::03_configuration.adoc[]
+
+include::04_install.adoc[]
