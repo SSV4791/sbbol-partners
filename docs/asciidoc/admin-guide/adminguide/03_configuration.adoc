@@ -57,6 +57,7 @@
 | PARTNERS_REQUEST_MEMORY | Запрос памяти приложения | 500Mi
 | PARTNERS_LIMIT_EPHEMERAL_STORAGE | Лимит эфимерного хранилища приложения | 2Gi
 | PARTNERS_REQUEST_EPHEMERAL_STORAGE | Запрос эфимерного хранилища приложения | 2Gi
+| PARTNERS_REPLICAS_COUNT | Количество реплик приложения |  2
 | INGRESS_REPLICAS_COUNT | Количество реплик Ingress |  1
 | EGRESS_REPLICAS_COUNT | Количество реплик Egress | 1
 | SUBJECT_ALT_NAME_1 | 1 SAN | http://sbbol-dev-sbbol-rental-property-ci02281165.apps.dev-gen2.sigma.sbrf.ru
@@ -66,6 +67,7 @@
 | SUBJECT_ALT_NAME_5 | 5 SAN | http://osiris.sbrf.ru
 | DATASPACE_URL | Урл базы к БД | http://svc-dataspace-core-partners:8080
 | standinEnabled | Влючение функционала stand-in  | false
+| replicasCount | Количество реплик ДБ  | 1
 | mainDataBaseSecretId | Наименование секрета для основной БД |  pgdb-main-secret
 | standinDataBaseSecretId | Наименование секрета для SI БД | pgdb-si-secret
 | appJournalSettings | Название секрета с данными подключения к Прикладному журнала   | secret-appjournalstubsettings
