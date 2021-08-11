@@ -264,8 +264,8 @@ pipeline {
                             log.info("Successfully published to ${getSbrfNexusLink(CUSTOMER_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))}")
 
                             log.info("Publishing artifact to ${NEXUSSBRF_RELEASE_REPOSITORY}")
-                            nexus.publishZip(GROUP_ID, CUSTOMER_ARTIFACT_ID, "distrib", ARTIFACT_NAME_OS, "${VERSION}-eip")
-                            log.info("Successfully published to ${getSbrfNexusLink(CUSTOMER_ARTIFACT_ID, "${VERSION}-eip", GROUP_ID.replaceAll('\\.', '/'))}")
+                            nexus.publishZip(GROUP_ID, CUSTOMER_ARTIFACT_ID, "distrib", ARTIFACT_NAME_OS, "D-${VERSION}-eip")
+                            log.info("Successfully published to ${getSbrfNexusLink(CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip", GROUP_ID.replaceAll('\\.', '/'))}")
                         }
                         archiveArtifacts artifacts: "*.zip"
                     }
@@ -282,6 +282,7 @@ pipeline {
                     boolean qgPassed = true
                     for (String artifactId in [DATASPACE_ARTIFACT_ID, CUSTOMER_ARTIFACT_ID]) {
                         def response = qgm.getFlagMap(
+                            credId: "${NEXUS_CREDENTIALS_ID}",
                             repositoryId: 'Nexus_PROD',
                             groupId: GROUP_ID.replaceAll('\\.', '/'),
                             artifactId: DATASPACE_ARTIFACT_ID,
@@ -327,11 +328,11 @@ pipeline {
                         def sbrfNexusDataspaceLink = getSbrfNexusLink(DATASPACE_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))
                         releaseNotes = createReleaseNotesWithDescription(projectLog, latestCommitHash, PROJECT_URL, sbrfNexusCustomerLink, sbrfNexusDataspaceLink)
                         try {
-                            nexus.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "${VERSION}-eip")
+                            nexus.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip")
                         } catch (e) {
                             sendEmail('Surov.P.V@sberbank.ru', 'Failed push ReleaseNotes to nexus', e)
                         }
-                        qgm.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "${VERSION}-eip", releaseNotes, NEXUS_CREDENTIALS_ID)
+                        qgm.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip", releaseNotes, NEXUS_CREDENTIALS_ID)
                         archiveArtifacts artifacts: "release-notes"
                     }
                 }
