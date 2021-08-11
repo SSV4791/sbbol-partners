@@ -6,7 +6,7 @@ metadata:
     app: ${PARTNERS_MODULE_NAME}
     app.kubernetes.io/part-of: istio
 spec:
-  replicas: 1
+  replicas: ${PARTNERS_REPLICAS_COUNT}
   strategy:
     type: RollingUpdate
     rollingUpdate:
