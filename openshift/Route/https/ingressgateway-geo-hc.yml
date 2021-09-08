@@ -15,4 +15,4 @@ spec:
     termination: passthrough
   to:
     kind: Service
-    name: svc-ingressgateway
+    name: ingressgateway-svc
