@@ -7,10 +7,14 @@
 :toc: up
 :hide-uri-scheme:
 
-include::01_about.adoc[]
+include::010_about_doc.adoc[]
 
-include::02_integration.adoc[]
+include::011_about_soft.adoc[]
 
-include::03_configuration.adoc[]
+include::012_architecture.adoc[]
 
-include::04_install.adoc[]
+include::020_integration.adoc[]
+
+include::030_configuration.adoc[]
+
+include::040_deploy.adoc[]
