@@ -44,6 +44,7 @@ pipeline {
         NEXUS_CREDENTIALS_ID = 'DS_CAB-SA-CI000825'
         JENKINS_CREDENTIALS_ID = 'CAB-SA-CI000825-sbt-jenkins-sigma'
         BITBUCKET_CREDENTIALS_ID = 'bitbucket-dbo-key'
+        DOCS_PATH = "${GIT_REPOSITORY}/${env.BRANCH_NAME}"
     }
 
     stages {
@@ -269,6 +270,34 @@ pipeline {
                         }
                         archiveArtifacts artifacts: "*.zip"
                     }
+                }
+            }
+        }
+
+        stage('Publish documentation') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(
+                        credentialsId: "${NEXUS_CREDENTIALS_ID}",
+                        usernameVariable: 'USERNAME',
+                        passwordVariable: 'PASSWORD'
+                    )]) {
+                        sh 'docker run --rm ' +
+                            '-v "$(pwd)":/build ' +
+                            '-v "$(pwd)"/../.m2:/root/.m2 ' +
+                            '-w /build ' +
+                            '-e "M2_HOME=/root/.m2" ' +
+                            '-e "MVNW_REPOURL=http://sbtatlas.sigma.sbrf.ru/nexus/content/groups/public/" ' +
+                            '-e "MVNW_VERBOSE=true" ' +
+                            "-e \"REPO_USER=${USERNAME}\" " +
+                            "-e \"REPO_PASSWORD=${PASSWORD}\" " +
+                            'registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/openjdk:11-with-certs ' +
+                            './mvnw -P asciidoc -pl docs clean org.asciidoctor:asciidoctor-maven-plugin:process-asciidoc -X -s /build/jenkins/settings.xml'
+                    }
+
+                    sh 'ls docs/target/generated-docs'
+
+                    docs.publish('documentation-publisher', 'docs/target/generated-docs', DOCS_PATH)
                 }
             }
         }

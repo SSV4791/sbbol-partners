@@ -1,0 +1,367 @@
+==	Параметры конфигурации
+
+=== Стендозависимые параметры деплоя
+
+Описание всех переменных в install_eip.
+
+.os_props.conf
+[%collapsible]
+====
+[source,properties]
+----
+# OPENSHIFT CONFIGS
+
+# ссылка на registry
+registryUrl=registry.sigma.sbrf.ru/pprb
+# ссылка на проект в registry
+registryProject=ci00908578/ci02792425_sbbol-partners
+# имя CP Istio
+ISTIO_CONTROL_PLANE=ci01994970-edevgen2-control-panel
+# ссылка на образ fluentbit
+FLUENTBIT_IMAGE=registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+# ссылка на образ envoy
+PROXY_IMAGE=registry.sigma.sbrf.ru/dev/ci01563053/ocp4_dev/operatorhub/openshift-service-mesh/proxyv2-rhel8:1.1.3-2
+
+#INGRESS
+
+# адрес TLS-роута для геобалансировки
+INGRESS_HOST_GEO_TLS=ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-geo-tls.ingress.apps.dev-gen2.sigma.sbrf.ru
+# порт TLS-роута для геобалансировки
+INGRESS_GEO_TLS_PORT=2111
+# адрес OTT-роута для геобалансировки
+INGRESS_HOST_GEO_OTT=ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-geo-ott.ingress.apps.dev-gen2.sigma.sbrf.ru
+# порт OTT-роута для геобалансировки
+INGRESS_GEO_OTT_PORT=2110
+# адрес роута для HealhCheck через геобалансировщик (не закрыт SAN, доступ только к /actuator/health)
+INGRESS_HOST_HEALTH_CHECK=ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-geo-tls-hc.apps.dev-gen2.sigma.sbrf.ru
+# порт роута для HealhCheck через геобалансировщик (не закрыт SAN, доступ только к /actuator/health)
+INGRESS_HEALTH_CHECK_PORT=5445
+# адрес прямого TLS-роута
+INGRESS_HOST_TLS=ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6.ingress.apps.dev-gen2.sigma.sbrf.ru
+# порт прямого TLS-роута
+INGRESS_TLS_PORT=2101
+# адрес прямого OTT-роута
+INGRESS_HOST_OTT=ingress-ci02281165-edevgen2-efs-kib-sbbol-dev-test6-ott.ingress.apps.dev-gen2.sigma.sbrf.ru
+# хост прямого OTT-роута
+INGRESS_OTT_PORT=2100
+# лимиты ингресса по CPU
+INGRESS_LIMIT_CPU=1200m
+# лимиты ингресса по памяти
+INGRESS_LIMIT_MEMORY=700Mi
+# запросы ингресса по CPU
+INGRESS_REQUEST_CPU=1000m
+# запросы ингресса по памяти
+INGRESS_REQUEST_MEMORY=700Mi
+# количество реплик ingress
+INGRESS_REPLICAS_COUNT=1
+# лимиты ephemeral storage для ингресса
+INGRESS_PROXY_LIMIT_EPHEMERAL_STORAGE=2Gi
+# запросы ephemeral storage для ингресса
+INGRESS_PROXY_REQUEST_EPHEMERAL_STORAGE=2Gi
+# лимиты ephemeral storage для сайдкара OTT на игрессе
+INGRESS_OTT_LIMIT_EPHEMERAL_STORAGE=2Gi
+# запросы ephemeral storage для сайдкара OTT на игрессе
+INGRESS_OTT_REQUEST_EPHEMERAL_STORAGE=2Gi
+
+#EGRESS
+
+# OTT-порт на егрессе (для вызова внешних API, закрытых OTT)
+EGRESS_OTT_PORT=8443
+# HTTPS-порт на егрессе
+EGRESS_HTTPS_PORT=5443
+# лимиты егресса по CPU
+EGRESS_LIMIT_CPU=800m
+# лимиты егресса по памяти
+EGRESS_LIMIT_MEMORY=700Mi
+# запросы егресса по CPU
+EGRESS_REQUEST_CPU=800m
+# запросы егресса по памяти
+EGRESS_REQUEST_MEMORY=700Mi
+# количество реплик egress
+EGRESS_REPLICAS_COUNT=1
+# лимиты ephemeral storage для егресса
+EGRESS_PROXY_LIMIT_EPHEMERAL_STORAGE=2Gi
+# запросы ephemeral storage для егресса
+EGRESS_PROXY_REQUEST_EPHEMERAL_STORAGE=2Gi
+# лимиты ephemeral storage для сайдкара OTT на егрессе
+EGRESS_OTT_LIMIT_EPHEMERAL_STORAGE=2Gi
+# запросы ephemeral storage для сайдкара OTT на егрессе
+EGRESS_OTT_REQUEST_EPHEMERAL_STORAGE=2Gi
+
+#CERTS
+
+# название файла (ключа в секрете) с цепочкой корневых сертификатов
+CHAIN_PEM_TLS=ca-chain.cert.pem
+# название файла (ключа в секрете) с приватным ключом
+CERT_KEY_TLS=tls.key
+# название файла (ключа в секрете) с сертификатом
+CERT_TLS=tls.crt
+# название файла (ключа в секрете) с цепочкой корневых сертификатов для геобалансировщика
+CHAIN_PEM_GEO_TLS=ca-chain.cert.pem
+# название файла (ключа в секрете) с приватным ключом для геобалансировщика
+CERT_KEY_GEO_TLS=tls.key
+# название файла (ключа в секрете) с сертификатом для геобалансировщика
+CERT_GEO_TLS=tls.crt
+# название файла (ключа в секрете) с цепочкой корневых сертификатов для доступа по OTT
+CHAIN_PEM_OTT=ca-chain.cert.pem
+# название файла (ключа в секрете) с приватным ключом для доступа по OTT
+CERT_KEY_OTT=tls.key
+# название файла (ключа в секрете) с сертификатом для доступа по OTT
+CERT_OTT=tls.crt
+# название файла (ключа в секрете) с цепочкой корневых сертификатов для доступа по OTT через геобалансировщик
+CHAIN_PEM_GEO_OTT=ca-chain.cert.pem
+# название файла (ключа в секрете) с приватным ключом для доступа по OTT через геобалансировщик
+CERT_KEY_GEO_OTT=tls.key
+# название файла (ключа в секрете) с сертификатом для доступа по OTT через геобалансировщик
+CERT_GEO_OTT=tls.crt
+
+# DATABASE
+
+# Хост основной БД (MAIN)
+DB_MAIN_HOST=tkled-pprb00137.vm.esrt.cloud.sbrf.ru
+# Хост БД StandIn
+DB_SI_HOST=tkled-pprb00137.vm.esrt.cloud.sbrf.ru
+# Основной IP до БД (MAIN)
+DB_MAIN_MASTER_IP=10.53.223.31
+# Дополнительный IP до БД (MAIN)
+DB_MAIN_SLAVE_IP=1.1.1.1
+# Основной IP до БД StandIn
+DB_SI_MASTER_IP=10.53.223.31
+# Дополнительный IP до БД StandIn
+DB_SI_SLAVE_IP=2.2.2.2
+# Порт до основной БД (MAIN)
+DB_MAIN_PORT=5433
+# Порт до БД StandIn
+DB_SI_PORT=5433
+# Прокси порт до основной БД (MAIN)
+DB_MAIN_PORT_PROXY=3001
+# Прокси порт до БД StandIn
+DB_SI_PORT_PROXY=3003
+# Порт до слушителя основной БД (MAIN)
+DB_MAIN_PORT_LESTENER=4001
+# Порт до слушителя БД StandIn
+DB_SI_PORT_LESTENER=4003
+#  Количество реплик ДБ
+replicasCount=1
+
+
+
+# FLUENTBIT CONFIGS
+
+# Хост FluentBit
+FLUENT_BIT_HTTPS_HOST=ci00641491-idevgen-logger-ift.ingress.apps.dev-gen.ca.sbrf.ru
+# Http порт FluentBit
+FLUENT_BIT_HTTP_PORT=8183
+# Https порт FluentBit
+FLUENT_BIT_HTTPS_PORT=443
+# Сервисный порт FluentBit
+FLUENT_BIT_SERVICE_PORT=80
+# Лимиты FluentBit по CPU
+fluentBitLimitCPU=50m
+# Лимиты FluentBit по памяти
+fluentBitLimitMemory=32Mi
+# Запросы FluentBit по CPU
+fluentBitRequestCPU=10m
+# Запросы FluentBit по памяти
+fluentBitRequestMemory=16Mi
+# Переменная среды FluentBit с названием стенда
+fluentBitEnvStandId=dev
+# Переменная среды FluentBit с названием кластера
+fluentBitEnvCluster=dev-gen2.ca.sbrf.ru
+# Переменная среды FluentBit с названием зоны
+fluentBitEnvZoneId=default
+# лимиты ephemeral storage для fluenbit
+fluentBitLimitEphemeralStorage=2Gi
+# запросы ephemeral storage для fluenbit
+fluentBitRequestEphemeralStorage=2Gi
+# Название секрета для Мониторинга
+fluentBitCert=fluentBitCert
+
+
+# APP JOURNAL CONFIGS
+
+# Хост 1 для kafka прикладного журнала
+APPJOURNAL_HOST_1=1STR-VAT-APP0668.delta.sbrf.ru
+# Хост 2 для kafka прикладного журнала
+APPJOURNAL_HOST_2=2STR-VAT-APP0668.delta.sbrf.ru
+# Хост 3 для kafka прикладного журнала
+APPJOURNAL_HOST_3=3STR-VAT-APP0668.delta.sbrf.ru
+# Хост 4 для kafka прикладного журнала
+APPJOURNAL_HOST_4=4STR-VAT-APP0668.delta.sbrf.ru
+# Хост 5 для kafka прикладного журнала
+APPJOURNAL_HOST_5=5STR-VAT-APP0668.delta.sbrf.ru
+# Хост 6 для kafka прикладного журнала
+APPJOURNAL_HOST_6=6STR-VAT-APP0668.delta.sbrf.ru
+# IP 1 для kafka прикладного журнала
+APPJOURNAL_IP_1=10.116.72.65
+# IP 2 для kafka прикладного журнала
+APPJOURNAL_IP_2=10.53.96.31
+# IP 3 для kafka прикладного журнала
+APPJOURNAL_IP_3=10.53.96.32
+# IP 4 для kafka прикладного журнала
+APPJOURNAL_IP_4=10.53.96.33
+# IP 5 для kafka прикладного журнала
+APPJOURNAL_IP_5=10.53.96.34
+# IP 6 для kafka прикладного журнала
+APPJOURNAL_IP_6=10.53.96.35
+# Порт для kafka прикладного журнала
+APPJOURNAL_PORT=9092
+# Порт 1 для kafka прикладного журнала (порт для выхода через egress)
+APPJOURNAL_PORT_LISTENER_1=4101
+# Порт 2 для kafka прикладного журнала (порт для выхода через egress)
+APPJOURNAL_PORT_LISTENER_2=4102
+# Порт 3 для kafka прикладного журнала (порт для выхода через egress)
+APPJOURNAL_PORT_LISTENER_3=4103
+# Порт 4 для kafka прикладного журнала (порт для выхода через egress)
+APPJOURNAL_PORT_LISTENER_4=4104
+# Порт 5 для kafka прикладного журнала (порт для выхода через egress)
+APPJOURNAL_PORT_LISTENER_5=4105
+# Порт 6 для kafka прикладного журнала (порт для выхода через egress)
+APPJOURNAL_PORT_LISTENER_6=4106
+# Порт 1 для kafka прикладного журнала (внутренняя маршрутизация в istio)
+APPJOURNAL_PORT_PROXY_1=3101
+# Порт 2 для kafka прикладного журнала (внутренняя маршрутизация в istio)
+APPJOURNAL_PORT_PROXY_2=3102
+# Порт 3 для kafka прикладного журнала (внутренняя маршрутизация в istio)
+APPJOURNAL_PORT_PROXY_3=3103
+# Порт 4 для kafka прикладного журнала (внутренняя маршрутизация в istio)
+APPJOURNAL_PORT_PROXY_4=3104
+# Порт 5 для kafka прикладного журнала (внутренняя маршрутизация в istio)
+APPJOURNAL_PORT_PROXY_5=3105
+# Порт 6 для kafka прикладного журнала (внутренняя маршрутизация в istio)
+APPJOURNAL_PORT_PROXY_6=3106
+
+#OTT
+
+# Ссылка на образ с контейнером OTT
+OTT_REGISTRY_URL=registry.sigma.sbrf.ru/pprb/ci00641491/ci01125613_ott/ott-client-api-v2:4.0.4
+# Имя модуля в OTT
+OTT_ENTITY_PROFILE=pprb4-digital-partners
+# основной хост OTT
+OTT_SERVICE_HOST_1=10.53.99.178
+# SI хост OTT
+OTT_SERVICE_SI_HOST_1=10.53.99.178
+# второй основной хост OTT
+OTT_SERVICE_HOST_2=10.53.96.30
+# второй SI хост OTT
+OTT_SERVICE_SI_HOST_2=10.53.96.30
+# порт сервиса OTT
+OTT_SERVICE_PORT=8443
+# ссылка на сервис OTT
+OTT_SERVICE_URL=https://10.53.99.178:8443/ott-service/rest/token
+# имя ключа в секрете ott-secret с доверенными сертификатами
+OTT_TRUST_STORE_PATH=sigma_ott_trust
+
+
+#AUDIT Параметры шифта
+
+# Наименование модуля аудита
+AUDIT_MODULE_ID=pprb4-digital-partners
+# Нода по умолчанию для аудита
+AUDIT_DEFAULT_NODE=localhost
+# URL аудита для метамоделей
+AUDIT_METAMODEL_URL=/v1/metamodel
+# URL аудита для событий
+AUDIT_EVENT_URL=/v1/event
+# Хост аудита
+AUDIT_URL=http://demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru
+# Хост аудита с ОТТ
+AUDIT_OTT_HOST=demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru
+# Порт аудта с ОТТ
+AUDIT_OTT_PORT=443
+# Прокси порт для аудта
+AUDIT_PORT_PROXY=80
+
+# PARTNERS CONFIGS
+
+#Наименование модуля
+PARTNERS_MODULE_NAME=pprb4-digital-partners
+# Количество реплик в deployment
+PARTNERS_REPLICAS_COUNT=1
+# Лимиты пода по cpu
+PARTNERS_LIMIT_CPU=500m
+# Лимиты пода по памяти
+PARTNERS_LIMIT_MEMORY=500Mi
+# Запросы пода по cpu
+PARTNERS_REQUEST_CPU=500m
+# Запросы пода по памяти
+PARTNERS_REQUEST_MEMORY=500Mi
+# Лимит эфимерного хранилища приложения
+PARTNERS_LIMIT_EPHEMERAL_STORAGE=2Gi
+# Запрос эфимерного хранилища приложения
+PARTNERS_REQUEST_EPHEMERAL_STORAGE=2Gi
+# имя секрета с подключением к основной БД
+mainDataBaseSecretId=pgdb-main-secret
+# имя секрета с подключением к БД SI
+standinDataBaseSecretId=pgdb-si-secret
+# имя секрета с параметрами подключения к kafka прикладного журнала
+appJournalSettings=secret-appjournalstubsettings
+# имя секрета с конфигурацией SSL для подключения к kafka прикладного журнала
+kafkaSslSecret=kafka-ssl-secret
+# 1 SAN
+SUBJECT_ALT_NAME_1=http://sbbol-dev-sbbol-rental-property-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+# 2 SAN
+SUBJECT_ALT_NAME_2=http://sbbol-dev-sbbol-mapi-realty-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+# 3 SAN
+SUBJECT_ALT_NAME_3=http://sbbol-dev-sbbol-transport-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+# 4 SAN
+SUBJECT_ALT_NAME_4=http://sbbol-dev-sbbol-transport-mobile-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+# 5 SAN
+SUBJECT_ALT_NAME_5=http://osiris.sbrf.ru
+# Урл базы к БД
+DATASPACE_URL=http://svc-dataspace-core-partners:8080
+# Влючение функционала stand-in
+standinEnabled=false
+# Запуск в режиме Debug
+RUN_DEBUG=false
+----
+====
+
+.os_yaml_dirs.conf
+[%collapsible]
+====
+[source]
+----
+/dataspace/configs
+/configs/ConfigMap
+/configs/Deployment
+/configs/DestinationRule
+/configs/EnvoyFilter
+/configs/Gateway
+/configs/Route/https
+/configs/Service
+/configs/ServiceEntry
+/configs/VirtualService
+----
+====
+
+=== Секреты OSE
+
+Стандартные для фабрик секреты
+
+Сертификаты для Istio:
+
+* istio-egressgateway-ca-certs
+* istio-egressgateway-certs
+* istio-ingressgateway-ca-certs
+* istio-ingressgateway-certs
+
+Секрет для подключения ПЖ
+
+* appjounal-settings-secret
+
+Секреты для OTT
+
+* ott-ingress-passwords
+* ott-secret
+
+Секреты для подключения к БД
+
+* pgdb-main-secret
+* pgdb-si-secret
+
+=== Параметры настройки БД
+
+Настройка БД — типовая.
+
+https://confluence.sberbank.ru/pages/viewpage.action?pageId=3313801156

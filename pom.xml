@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -15,14 +16,15 @@
     <version>DEV-SNAPSHOT</version>
 
     <modules>
+        <module>docs</module>
+        <module>partners-api</module>
         <module>partners-model-jpa</module>
         <module>partners-model-sdk</module>
-        <module>runner</module>
         <module>partners-openapi</module>
         <module>partners-rest</module>
         <module>partners-service</module>
-        <module>partners-api</module>
         <module>partners-test</module>
+        <module>runner</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -214,5 +216,6 @@
                 </plugins>
             </build>
         </profile>
+
     </profiles>
 </project>
