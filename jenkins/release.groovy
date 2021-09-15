@@ -34,7 +34,7 @@ pipeline {
         INITIAL_VERSION = '02.000.00_0001'
         VERSION = ''
         LAST_VERSION = ''
-        DATASPACE_CONFIGS = ''
+        DATASPACE_CONFIGS = './config/default.yml,./config/sbbol/commons.yml'
         NEXUSSBRF_RELEASE_REPOSITORY = 'https://sbrf-nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
         DEV_REPOSITORY = 'https://nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
         PROJECT_URL = "https://sbtatlas.sigma.sbrf.ru/stashdbo/projects/${GIT_PROJECT}/repos/${GIT_REPOSITORY}/"
