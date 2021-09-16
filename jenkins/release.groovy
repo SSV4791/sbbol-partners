@@ -14,6 +14,7 @@ pipeline {
     }
     parameters {
         booleanParam(name: 'needQG', defaultValue: true, description: 'Прохождение QG')
+        booleanParam(name: 'needAdminGuide', defaultValue: false, description: 'Публикация admin-guid')
         choice(name: 'tuz', choices: ['DS_CAB-SA-CI000825'], description: 'ТУЗ, используемая для сборки')
     }
     environment {
@@ -27,7 +28,7 @@ pipeline {
         CUSTOMER_ARCHIVE_NAME = 'customer-distrib.zip'
         DATASPACE_ARCHIVE_NAME = 'dataspace-distrib.zip'
         VERSION = ''
-        LAST_VERSION = ''
+        VERSION_PATTERN = /\d{2}\.\d{3}\.\d{2}_\d{4}/
         DATASPACE_CONFIGS = './config/default.yml,./config/sbbol/commons.yml'
         NEXUSSBRF_RELEASE_REPOSITORY = 'https://sbrf-nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
         DEV_REPOSITORY = 'https://nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
@@ -37,6 +38,7 @@ pipeline {
         DATASPACE_DISTRIB_URL = ''
 
         CREDENTIALS_ID = "${params.tuz}"
+        JENKINS_CREDENTIALS_ID = 'CAB-SA-CI000825-sbt-jenkins-sigma'
     }
 
     stages {
@@ -45,7 +47,7 @@ pipeline {
             steps {
                 script {
                     sh 'mkdir distrib'
-                    def version = (env.JOB_NAME).replaceAll('%2F', '/').split('/').last()
+                    def version = (env.JOB_NAME).replaceAll('%2F', '-').split('-').last()
                     def build = (env.BUILD_NUMBER).toString().padLeft(4, '0')
                     VERSION = "${version}_${build}"
                     log.info('Build version: ' + VERSION)
@@ -236,7 +238,7 @@ pipeline {
         stage('Push ReleaseNotes') {
             steps {
                 script {
-                    def latestCommitHash = checkoutRef('bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, GIT_BRANCH)
+                    def latestCommitHash = git.checkoutRef('bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, GIT_BRANCH)
                     List versionTags = git.tags().findAll { it.matches(VERSION_PATTERN) }.sort()
                     def lastVersion = versionTags.isEmpty() ? '' : versionTags.last()
                     log.info("Last version: ${lastVersion}")
@@ -250,11 +252,14 @@ pipeline {
                         def sbrfNexusDataspaceLink = getSbrfNexusLink(DATASPACE_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))
                         releaseNotes = createReleaseNotesWithDescription(projectLog, latestCommitHash, PROJECT_URL, sbrfNexusCustomerLink, sbrfNexusDataspaceLink)
                         try {
-                            nexus.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip")
+                            nexus.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "${VERSION}-eip")
                         } catch (e) {
-                            sendEmail('Surov.P.V@sberbank.ru', 'Failed push ReleaseNotes to nexus', e)
+                            sendEmail(
+                                to: 'Surov.P.V@sberbank.ru',
+                                subject: 'Failed push ReleaseNotes to nexus',
+                                body: e)
                         }
-                        qgm.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip", releaseNotes)
+                        qgm.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "${VERSION}-eip", releaseNotes)
                         archiveArtifacts artifacts: "release-notes"
                     }
                 }
@@ -270,6 +275,7 @@ pipeline {
                     boolean qgPassed = true
                     for (String artifactId in [DATASPACE_ARTIFACT_ID, CUSTOMER_ARTIFACT_ID]) {
                         def response = qgm.getFlagMap(
+                            credId: "${CREDENTIALS_ID}",
                             repositoryId: 'Nexus_PROD',
                             groupId: GROUP_ID.replaceAll('\\.', '/'),
                             artifactId: DATASPACE_ARTIFACT_ID,
@@ -307,10 +313,13 @@ pipeline {
         }
 
         stage('Publish documentation') {
+            when {
+                expression { params.needAdminGuide }
+            }
             steps {
                 script {
                     withCredentials([usernamePassword(
-                        credentialsId: CREDENTIALS_ID,
+                        credentialsId: "${CREDENTIALS_ID}",
                         usernameVariable: 'USERNAME',
                         passwordVariable: 'PASSWORD'
                     )]) {
@@ -329,7 +338,7 @@ pipeline {
 
                     sh 'ls docs/target/generated-docs'
 
-                    docs.publish('documentation-publisher', 'docs/target/generated-docs', DOCS_PATH)
+                    docs.publish('documentation-publisher', 'docs/target/generated-docs', "${GIT_REPOSITORY}/${env.BRANCH_NAME}")
                 }
             }
         }
