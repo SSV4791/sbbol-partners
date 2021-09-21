@@ -7,7 +7,6 @@ metadata:
   labels:
     app: ${PARTNERS_MODULE_NAME}
     app.kubernetes.io/part-of: istio
-    version: ${imageVersion}
 spec:
   replicas: ${PARTNERS_REPLICAS_COUNT}
   strategy:
