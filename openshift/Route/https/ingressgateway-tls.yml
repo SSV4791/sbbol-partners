@@ -5,6 +5,8 @@ metadata:
     app: ingress-${NAMESPACE}-tls
     istio: ingress-${NAMESPACE}-tls
   name: ingressgateway-tls
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
 spec:
   host: ${INGRESS_HOST_TLS}
   port:
