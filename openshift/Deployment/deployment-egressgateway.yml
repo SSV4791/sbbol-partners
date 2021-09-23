@@ -79,7 +79,7 @@ spec:
             - proxy
             - router
             - --domain
-            - $(POD_NAMESPACE).svc.cluster.local
+            - egressgateway-${NAMESPACE}.svc.cluster.local
             - --proxyLogLevel=warning
             - --proxyComponentLogLevel=misc:error
             - --log_output_level=default:info
@@ -187,12 +187,16 @@ spec:
               name: config-volume
             - mountPath: /etc/istio/pod
               name: podinfo
+            - mountPath: /var/run/secrets/istio
+              name: istiod-ca-cert
             - mountPath: /etc/istio/egressgateway-certs
               name: egressgateway-certs
               readOnly: true
             - mountPath: /etc/istio/egressgateway-ca-certs
-              readOnly: true
               name: egressgateway-ca-certs
+              readOnly: true
+            - mountPath: /mnt/ott-uds-socket
+              name: ott-uds-socket
         - resources:
             limits:
               cpu: 400m
