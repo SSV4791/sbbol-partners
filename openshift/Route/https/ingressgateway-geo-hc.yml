@@ -5,7 +5,6 @@ metadata:
     app: ingress-${NAMESPACE}-health
     istio: ingress-${NAMESPACE}-health
     router: geo
-    shard: geo
   name: ingressgateway-geo-hc
 spec:
   host: ${INGRESS_HOST_HEALTH_CHECK}
