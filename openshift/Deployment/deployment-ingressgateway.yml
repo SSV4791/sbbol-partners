@@ -78,7 +78,7 @@ spec:
             - proxy
             - router
             - --domain
-            - $(POD_NAMESPACE).svc.cluster.local
+            - ingressgateway-${NAMESPACE}.svc.cluster.local
             - --proxyLogLevel=warning
             - --proxyComponentLogLevel=misc:error
             - --log_output_level=default:info
@@ -151,9 +151,6 @@ spec:
             - containerPort: 15021
               name: status-port
               protocol: TCP
-            - containerPort: 8080
-              name: http
-              protocol: TCP
             - containerPort: 15443
               name: tls
               protocol: TCP
@@ -168,7 +165,7 @@ spec:
               name: https-${INGRESS_GEO_TLS_PORT}
               protocol: TCP
             - containerPort: ${INGRESS_TLS_PORT}
-              name: https
+              name: https-${INGRESS_TLS_PORT}
               protocol: TCP
             - containerPort: ${INGRESS_GEO_OTT_PORT}
               name: https-${INGRESS_GEO_OTT_PORT}
@@ -211,8 +208,8 @@ spec:
             - mountPath: /etc/istio/ingressgateway-ca-certs
               name: ingressgateway-ca-certs
               readOnly: true
-            - name: ott-uds-socket
-              mountPath: /mnt/ott-uds-socket
+            - mountPath: /mnt/ott-uds-socket
+              name: ott-uds-socket
         - resources:
             limits:
               cpu: 400m
