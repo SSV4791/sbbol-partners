@@ -21,7 +21,7 @@ spec:
                     and_rules:
                       rules:
                         - header:
-                            exact_match: /${PARTNERS_MODULE_NAME}/actuator/health
+                            exact_match: /actuator/health
                             name: ':path'
                   principals:
                     - any: true
