@@ -92,7 +92,7 @@ spec:
             - name: PILOT_CERT_PROVIDER
               value: istiod
             - name: CA_ADDR
-              value: istiod-basic.${ISTIO_CONTROL_PLANE}.svc:15012
+              value: ${MESH_DISCOVERY_ADDRESS}.${ISTIO_CONTROL_PLANE}.svc:15012
             - name: NODE_NAME
               valueFrom:
                 fieldRef:

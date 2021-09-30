@@ -22,7 +22,7 @@ data:
       concurrency: 2
       configPath: ./etc/istio/proxy
       controlPlaneAuthPolicy: NONE
-      discoveryAddress: istiod-basic.${ISTIO_CONTROL_PLANE}.svc:15012
+      discoveryAddress: ${MESH_DISCOVERY_ADDRESS}.${ISTIO_CONTROL_PLANE}.svc:15012
       drainDuration: 45s
       parentShutdownDuration: 1m0s
       proxyAdminPort: 15000
