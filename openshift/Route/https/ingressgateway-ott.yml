@@ -5,6 +5,8 @@ metadata:
     app: ingress-${NAMESPACE}-ott
     istio: ingress-${NAMESPACE}-ott
   name: ingressgateway-ott
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
 spec:
   host: ${INGRESS_HOST_OTT}
   port:

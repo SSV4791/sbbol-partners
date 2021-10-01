@@ -6,6 +6,8 @@ metadata:
     istio: ingress-${NAMESPACE}-geo-tls
     router: geo
   name: ingressgateway-geo-tls
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
 spec:
   host: ${INGRESS_HOST_GEO_TLS}
   port:
