@@ -6,6 +6,8 @@ metadata:
     istio: ingress-${NAMESPACE}-health
     router: geo
   name: ingressgateway-geo-hc
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
 spec:
   host: ${INGRESS_HOST_HEALTH_CHECK}
   port:
