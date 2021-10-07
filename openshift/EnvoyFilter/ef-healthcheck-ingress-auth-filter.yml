@@ -28,4 +28,4 @@ spec:
           name: envoy.filters.http.rbac
   workloadSelector:
     labels:
-      app: ingress-${NAMESPACE}
+      app: ingressgateway-${NAMESPACE}

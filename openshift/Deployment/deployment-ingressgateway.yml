@@ -135,7 +135,7 @@ spec:
                   apiVersion: v1
                   fieldPath: metadata.labels['service.istio.io/canonical-revision']
             - name: ISTIO_META_WORKLOAD_NAME
-              value: ingress-${NAMESPACE}
+              value: ingressgateway-${NAMESPACE}
             - name: ISTIO_META_OWNER
               value: kubernetes://apis/apps/v1/namespaces/${NAMESPACE}/deployments/ingressgateway-${NAMESPACE}
             - name: ISTIO_META_MESH_ID
