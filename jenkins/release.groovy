@@ -251,15 +251,7 @@ pipeline {
                         def sbrfNexusCustomerLink = getSbrfNexusLink(CUSTOMER_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))
                         def sbrfNexusDataspaceLink = getSbrfNexusLink(DATASPACE_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))
                         releaseNotes = createReleaseNotesWithDescription(projectLog, latestCommitHash, PROJECT_URL, sbrfNexusCustomerLink, sbrfNexusDataspaceLink)
-                        try {
-                            nexus.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "${VERSION}-eip")
-                        } catch (e) {
-                            sendEmail(
-                                to: 'Surov.P.V@sberbank.ru',
-                                subject: 'Failed push ReleaseNotes to nexus',
-                                body: e)
-                        }
-                        qgm.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "${VERSION}-eip", releaseNotes)
+                        qgm.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip", releaseNotes)
                         archiveArtifacts artifacts: "release-notes"
                     }
                 }
