@@ -238,7 +238,7 @@ pipeline {
         stage('Push ReleaseNotes') {
             steps {
                 script {
-                    def latestCommitHash = git.checkoutRef('bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, GIT_BRANCH)
+                    def latestCommitHash = checkoutRef('bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, GIT_BRANCH)
                     List versionTags = git.tags().findAll { it.matches(VERSION_PATTERN) }.sort()
                     def lastVersion = versionTags.isEmpty() ? '' : versionTags.last()
                     log.info("Last version: ${lastVersion}")
@@ -388,6 +388,26 @@ def publishDev(Map params) {
     def arr = code.split(":")
     if (code.trim() == '' || arr.length == 0 || arr[arr.length - 1].trim() != '201') {
         error("Failed publish to Nexus")
+    }
+}
+
+def checkoutRef(String credentialsId, String project, String slug, String ref) {
+    sh 'git init'
+    sh 'git reset --hard --quiet'
+    sh 'git clean -xfd --quiet'
+    withSSH(credentialsId) {
+        sh "git fetch --quiet --tags ${Const.BITBUCKET_SERVER_URL}/${project}/${slug}.git $ref"
+    }
+    sh "git checkout SBP-partners-${VERSION}"
+    sh 'git prune -v'
+    sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+}
+
+def withSSH(String credential, Closure body) {
+    withEnv(["GIT_SSH_COMMAND=ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"]) {
+        sshagent(credentials: [credential]) {
+            body.call()
+        }
     }
 }
 

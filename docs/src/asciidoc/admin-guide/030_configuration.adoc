@@ -17,6 +17,8 @@ registryUrl=registry.sigma.sbrf.ru/pprb
 registryProject=ci00908578/ci02792425_sbbol-partners
 # имя CP Istio
 ISTIO_CONTROL_PLANE=ci01994970-edevgen2-synapse-control-panel
+# префикс Mesh аддреса
+MESH_DISCOVERY_ADDRESS=istiod-basic
 # ссылка на образ fluentbit
 FLUENTBIT_IMAGE=registry.sigma.sbrf.ru/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
 # ссылка на образ envoy
