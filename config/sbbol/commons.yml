@@ -43,5 +43,5 @@ QualityGates:
     repositoryId: corp-releases
   sast:
     credentials: DS_SAST_PARTNERS
-    configPath: config/devsecops-config.yml
+    configPath: ./config/devsecops-config.yml
   mode: scanAndFlags
