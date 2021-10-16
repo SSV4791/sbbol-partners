@@ -1,10 +1,14 @@
 import ru.sbrf.ufs.pipeline.Const
+import ru.sbrf.ufs.pipeline.docker.DockerRunBuilder
 
 /**
- * Пайплайн PR Check
+ * Пайплайн пулл реквест чека
  */
 
 @Library(['ufs-jobs@master']) _
+
+def pullRequest = null
+def ufsCredential = 'DS_CAB-SA-CI000825'
 
 pipeline {
 
@@ -19,32 +23,34 @@ pipeline {
         string(name: 'pullRequestId', description: 'ID пулл-реквеста')
     }
     environment {
-        GIT_PROJECT = 'CIBPPRB'
-        GIT_REPOSITORY = 'sbbol-partners'
+        NEXUS_CREDS = credentials("${ufsCredential}")
+        SONAR_TOKEN = credentials('sonar-token-partners')
         PR_CHECK_LABEL = 'pr_check'
         pullRequest = null
-        NEXUS_CREDS_ID = 'DS_CAB-SA-CI000825'
-        NEXUS_CREDS = credentials("${NEXUS_CREDS_ID}")
-        SONAR_TOKEN = credentials('sonar-token-partners')
-        SONAR_PROJECT = 'ru.sberbank.pprb.sbbol.partners:partners'
-        latestCommitHash = ''
     }
     stages {
-        stage('Init') {
+        /**
+         * Чтение переменных окружения из файла
+         */
+        stage('Read env properties') {
+            steps {
+                load "./jenkins/env.groovy"
+            }
+        }
+        stage('Preparing job') {
             steps {
                 script {
-                    pullRequest = bitbucket.getPullRequest(NEXUS_CREDS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
-                    bitbucket.setJobPullRequestLink(pullRequest)
-                    bitbucket.setJenkinsLabelInfo(NEXUS_CREDS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
-                    bitbucket.updateBitbucketHistoryBuild(NEXUS_CREDS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")
+                    pullRequest = bitbucket.getPullRequest(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
+                    setJobPullRequestLink(pullRequest)
+                    bitbucket.setJenkinsLabelInfo(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
+                    bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")
                 }
             }
         }
-
         stage('Prepare project') {
             steps {
                 script {
-                    latestCommitHash = git.checkoutRef 'bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, "${pullRequest.fromRef.displayId}:${pullRequest.fromRef.displayId} ${pullRequest.toRef.displayId}:${pullRequest.toRef.displayId} "
+                    git.checkoutRef 'bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, "${pullRequest.fromRef.displayId}:${pullRequest.fromRef.displayId} ${pullRequest.toRef.displayId}:${pullRequest.toRef.displayId} "
                     sh "git merge ${pullRequest.toRef.displayId}"
                 }
             }
@@ -52,28 +58,23 @@ pipeline {
         stage('Compile and Check') {
             steps {
                 script {
-                    docker.withRegistry(Const.OPENSHIFT_REGISTRY, NEXUS_CREDS_ID) {
-                        sh 'docker run --rm ' +
-                            '-v "$(pwd)":/build ' +
-                            '-v "$(pwd)"/../.m2:/root/.m2 ' +
-                            '-w /build ' +
-                            '-e "M2_HOME=/root/.m2" ' +
-                            '-e "MVNW_REPOURL=http://sbtatlas.sigma.sbrf.ru/nexus/content/groups/public/" ' +
-                            '-e "MVNW_VERBOSE=true" ' +
-                            "-e \"REPO_USER=${NEXUS_CREDS_USR}\" " +
-                            "-e \"REPO_PASSWORD=${NEXUS_CREDS_PSW}\" " +
-                            'registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/openjdk:11-with-certs ' +
-                            './mvnw clean install sonar:sonar' +
-                            " -P sonar" +
-                            " -e" +
-                            " -Dsonar.host.url=https://sbt-sonarqube.sigma.sbrf.ru/" +
-                            " -Dsonar.login=${SONAR_TOKEN}" +
-                            " -Dsonar.projectKey=${SONAR_PROJECT}" +
-                            " -Dsonar.pullrequest.key=${params.pullRequestId}" +
-                            " -Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}" +
-                            " -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}" +
-                            " -s /build/jenkins/settings.xml"
-                    }
+                    new DockerRunBuilder(this)
+                        .registry(Const.OPENSHIFT_REGISTRY, ufsCredential)
+                        .volume("${WORKSPACE}", "/build")
+                        .extra("-w /build")
+                        .cpu(2)
+                        .memory("2g")
+                        .image(BUILD_JAVA_DOCKER_IMAGE)
+                        .cmd('./gradlew ' +
+                            "-PnexusLogin=${NEXUS_CREDS_USR} " +
+                            "-PnexusPassword=${NEXUS_CREDS_PSW} " +
+                            "-Dsonar.login=${SONAR_TOKEN} " +
+                            "-Dsonar.pullrequest.key=${params.pullRequestId} " +
+                            "-Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId} " +
+                            "-Dsonar.pullrequest.base=${pullRequest.toRef.displayId} " +
+                            "clean build sonarqube --parallel"
+                        )
+                        .run()
                 }
             }
         }
@@ -81,13 +82,13 @@ pipeline {
     post {
         success {
             script {
-                bitbucket.setJenkinsLabelStatus(NEXUS_CREDS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
-                bitbucket.updateBitbucketHistoryBuild(NEXUS_CREDS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
+                bitbucket.setJenkinsLabelStatus(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
+                bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
             }
         }
         failure {
             script {
-                bitbucket.updateBitbucketHistoryBuild(NEXUS_CREDS_ID, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
+                bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
             }
         }
         cleanup {

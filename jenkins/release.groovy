@@ -1,8 +1,10 @@
-import groovy.json.JsonOutput
 import ru.sbrf.ufs.pipeline.Const
+import ru.sbrf.ufs.pipeline.docker.DockerRunBuilder
 
 @Library(['ufs-jobs@master']) _
 
+def latestCommitHash = ''
+def projectLog = ''
 
 pipeline {
     agent {
@@ -13,337 +15,306 @@ pipeline {
         timestamps()
     }
     parameters {
-        booleanParam(name: 'needQG', defaultValue: true, description: 'Прохождение QG')
-        booleanParam(name: 'needAdminGuide', defaultValue: false, description: 'Публикация admin-guid')
-        choice(name: 'tuz', choices: ['DS_CAB-SA-CI000825'], description: 'ТУЗ, используемая для сборки')
+        string(name: 'branch', defaultValue: 'develop', description: 'Ветка для сборки образа')
+        choice(name: 'credentialID', choices: ['DS_CAB-SA-CI000825'], description: 'ТУЗ, используемая для сборки')
+        booleanParam(name: 'checkmarx', defaultValue: false, description: 'Прохождение проверки Checkmarx')
     }
     environment {
-        GIT_PROJECT = 'CIBPPRB'
-        GIT_REPOSITORY = 'sbbol-partners'
-        GIT_LINK = 'ssh://git@10.56.5.65:8878/cibpprb/sbbol-partners.git'
-        GROUP_ID = 'Nexus_PROD.CI02792425_sbbol-partners'
-        CUSTOMER_ARTIFACT_ID = 'partners'
-        DATASPACE_ARTIFACT_ID = 'dataspace-apps-partners'
+        NEXUS_CREDS = credentials("${params.credentialID}")
+        SONAR_TOKEN = credentials('sonar-token-partners')
+        // Паттерн версии для определения последней сборки по тегу. В данном случае будет искаться последняя сборка 01.000.00_хххх
+        VERSION_PATTERN = /01\.000\.00_\d{4}/
+        // Паттерн, по которому определяется начальная версия, если поиск по VERSION_PATTERN ничего не нашел
+        INITIAL_VERSION = '01.002.00_0005'
+        // internal envs
+        IMAGE_NAME = ''
         ARTIFACT_NAME_OS = ''
-        CUSTOMER_ARCHIVE_NAME = 'customer-distrib.zip'
-        DATASPACE_ARCHIVE_NAME = 'dataspace-distrib.zip'
+        ARTIFACT_NAME_DOCS = ''
+        ARTIFACT_NAME_LOCK = ''
         VERSION = ''
-        VERSION_PATTERN = /\d{2}\.\d{3}\.\d{2}_\d{4}/
-        DATASPACE_CONFIGS = './config/default.yml,./config/sbbol/commons.yml'
-        NEXUSSBRF_RELEASE_REPOSITORY = 'https://sbrf-nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
-        DEV_REPOSITORY = 'https://nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content'
-        PROJECT_URL = "https://sbtatlas.sigma.sbrf.ru/stashdbo/projects/${GIT_PROJECT}/repos/${GIT_REPOSITORY}/"
-
-        CUSTOMER_DISTRIB_URL = ''
-        DATASPACE_DISTRIB_URL = ''
-
-        CREDENTIALS_ID = "${params.tuz}"
-        JENKINS_CREDENTIALS_ID = 'CAB-SA-CI000825-sbt-jenkins-sigma'
+        LAST_VERSION = ''
     }
 
     stages {
+        /**
+         * Чтение переменных окружения из файла
+         */
+        stage('Read env properties') {
+            steps {
+                load "./jenkins/env.groovy"
+            }
+        }
 
-        stage('Detect build version') {
+        /**
+         * Вычисляет версию текущей сборки
+         */
+        stage('Evaluate version') {
             steps {
                 script {
-                    sh 'mkdir distrib'
-                    def version = (env.JOB_NAME).replaceAll('%2F', '-').split('-').last()
-                    def build = (env.BUILD_NUMBER).toString().padLeft(4, '0')
-                    VERSION = "${version}_${build}"
-                    log.info('Build version: ' + VERSION)
+                    // Ищем список всех тэгов, удовлетворяющих нашему паттерну версий
+                    List versionTags = git.tags().findAll { it.matches(VERSION_PATTERN) }.sort()
+                    LAST_VERSION = versionTags.isEmpty() ? '' : versionTags.last()
+
+                    // Инкрементируем последнюю версию и устанавливаем ее, как текущую версию сборки
+                    def versions = (LAST_VERSION ?: INITIAL_VERSION).split("_")
+                    def nextBuildNumber = (versions[1].toInteger() + 1).toString().padLeft(4, '0')
+                    VERSION = "${versions[0]}_${nextBuildNumber}"
                 }
             }
         }
 
-        stage('Trigger CustomerBuilder') {
+        /**
+         * Push'им git tag с версией
+         */
+        stage('Set version') {
             steps {
                 script {
-                    def deployerParams = ""
-                    deployerParams += "-Dversion.forceVersion=${VERSION} -Dgit.commitComment=\"deployer release\""
-                    def parameters = [
-                        "isRelease"              : true,
-                        "jobMode"                : "Deployer",
-                        "gitModel"               : GIT_LINK,
-                        "branch"                 : GIT_BRANCH,
-                        "pathToConfigFile"       : DATASPACE_CONFIGS,
-                        "isIncludeCoreWithSearch": true,
-                        "isIncludeOnlyCore"      : false,
-                        "isIncludeOnlySearch"    : false,
-                        "isIncludeGigabas"       : true,
-                        "isIncludeStateMachine"  : false,
-                        "isIncludeDuplication"   : false,
-                        "buildClient"            : true,
-                        "needInstallToOS"        : false,
-                        "needQG"                 : params.needQG,
-                        "clientDeployerOptions"  : deployerParams
-                    ]
-                    def paramString = new StringBuilder()
-                    for (param in parameters) {
-                        if (paramString.length() != 0) {
-                            paramString.append('&')
-                        }
-                        paramString.append(param.key)
-                            .append('=')
-                            .append(URLEncoder.encode(param.value as String, "UTF-8"))
-                    }
-                    def triggerBuildResponse = httpRequest(
-                        httpMode: 'POST',
-                        authentication: "${JENKINS_CREDENTIALS_ID}",
-                        ignoreSslErrors: true,
-                        quiet: true,
-                        consoleLogResponseBody: false,
-                        //url: "https://sbt-jenkins.sigma.sbrf.ru/job/PPRBAC/job/Openshift/job/DataSpace/job/CustomerBuilder/buildWithParameters?${paramString}"
-                        url: "https://sbt-jenkins.sigma.sbrf.ru/job/SBBOL/job/DataSpace/job/CustomerBuilder/buildWithParameters?${paramString}"
-                    )
-                    def queueLink = triggerBuildResponse.headers["Location"][0]
-                    log.info("CustomerBuild submitted. Queue link: ${queueLink}")
+                    // Ставим git tag с версией сборки на текущий commit
+                    git.tag('bitbucket-dbo-key', VERSION)
+                }
+            }
+        }
 
-                    def timeoutSeconds = 1
-                    String buildLink = null
-                    while (!buildLink) {
-                        def queueResponse = httpRequest(
-                            authentication: "${JENKINS_CREDENTIALS_ID}",
-                            ignoreSslErrors: true,
-                            quiet: true,
-                            consoleLogResponseBody: false,
-                            url: "${queueLink}api/json")
-                        def queue = readJSON(text: queueResponse.content)
-                        buildLink = queue?.executable?.url
-                        if (!buildLink) {
-                            log.info("Waiting for build to start...")
-                            sleep(timeoutSeconds)
-                            timeoutSeconds++
-                        }
-                    }
-                    log.info("CustomerBuilder started: ${buildLink}")
+        /**
+         * Собираем проект
+         */
+        stage('Build') {
+            steps {
+                script {
+                    new DockerRunBuilder(this)
+                        .registry(Const.OPENSHIFT_REGISTRY, params.credentialID)
+                        .volume("${WORKSPACE}", "/build")
+                        .extra("-w /build")
+                        .cpu(2)
+                        .memory("2g")
+                        .image(BUILD_JAVA_DOCKER_IMAGE)
+                        .cmd('./gradlew ' +
+                            "-PnexusLogin=${NEXUS_CREDS_USR} " +
+                            "-PnexusPassword=${NEXUS_CREDS_PSW} " +
+                            "-Pversion=${VERSION} " +
+                            "-Dsonar.login=${SONAR_TOKEN} " +
+                            "-Dsonar.branch.name=${params.branch} " +
+                            'build sonarqube --parallel'
+                        )
+                        .run()
+                }
+            }
+        }
 
-                    def finished = false
-                    def result = null
-                    while (!finished) {
-                        def buildResponse = httpRequest(
-                            authentication: "${JENKINS_CREDENTIALS_ID}",
-                            ignoreSslErrors: true,
-                            quiet: true,
-                            consoleLogResponseBody: false,
-                            url: "${buildLink}api/json")
-                        def buildInfo = readJSON(text: buildResponse.content)
-                        finished = !buildInfo?.building
-                        if (!finished) {
-                            log.info("Waiting for build to complete...")
-                            log.info("Build link: ${buildLink}")
-                            sleep(60)
-                        } else {
-                            result = buildInfo
-                        }
-                    }
-                    log.info("CustomerBuilder finished. Result ${result?.result}")
+        /**
+         * Устанавливает в описание jenkins job собираемую версию
+         */
+        stage('Set display') {
+            steps {
+                script {
+                    currentBuild.displayName += " $VERSION"
+                    rtp stableText: "<h1>Build number: $VERSION</h1>"
+                }
+            }
+        }
 
-                    if ("SUCCESS" == result.result) {
-                        def description = result.description
-
-                        def regex = /.*<br> jobResult = ([^\r^\n]*).*/
-                        def jobResultText = (description =~ regex)[0][1]
-                        log.info("Job result: ${jobResultText}")
-                        def jobResult = readJSON(text: jobResultText)
-
-                        log.info("DataSpace distrib link: ${jobResult.rootKey.dataSpaceDistribution}")
-                        log.info("Customer distrib link: ${jobResult.rootKey.customerDistribution}")
-                        CUSTOMER_DISTRIB_URL = jobResult.rootKey.customerDistribution
-                        DATASPACE_DISTRIB_URL = jobResult.rootKey.dataSpaceDistribution
-                    } else {
-                        error("Unsuccessfull build. Check logs of CustomerBuilder ${buildLink}")
+        /**
+         * Собирает и публикует docker образ в registry
+         */
+        stage('Build and Push docker image') {
+            steps {
+                script {
+                    IMAGE_NAME = "${DOCKER_REGISTRY}/${BASE_IMAGE_NAME}/${ARTIFACT_ID}:${VERSION}"
+                    docker.withRegistry(Const.OPENSHIFT_REGISTRY, params.credentialID) {
+                        docker.build(IMAGE_NAME, "--force-rm .").push()
                     }
                 }
             }
         }
 
-        stage('Download distribs') {
+        /**
+         * Собирает артефакт с шаблонами OpenShift
+         */
+        stage('Prepare Openshift manifest') {
             steps {
                 script {
-                    log.info("Downloading customer distrib ${CUSTOMER_DISTRIB_URL}")
-                    httpRequest authentication: "${CREDENTIALS_ID}",
-                        outputFile: CUSTOMER_ARCHIVE_NAME,
-                        responseHandle: 'NONE',
-                        url: "${CUSTOMER_DISTRIB_URL}"
-                    log.info("Downloading dataspace distrib ${DATASPACE_DISTRIB_URL}")
-                    httpRequest authentication: "${CREDENTIALS_ID}",
-                        outputFile: DATASPACE_ARCHIVE_NAME,
-                        responseHandle: 'NONE',
-                        url: "${DATASPACE_DISTRIB_URL}"
-                }
-            }
-        }
-
-        stage('Prepare install_eip archive') {
-            steps {
-                script {
-                    dir('distrib') {
-                        sh "unzip ../${CUSTOMER_ARCHIVE_NAME}"
-                        sh "unzip ../${DATASPACE_ARCHIVE_NAME} -d ./dataspace"
-
-                        // extract version
-                        def dataspaceVersion = sh(
-                            script: "cat dataspace/configs/dataspace-core-template.yaml" +
-                                " | sed -n 's/^.*version: \\(.*\\).*\$/\\1/p'" +
-                                " | head -1",
-                            returnStdout: true).trim()
-                        sh "echo \"Dataspace version: ${dataspaceVersion}\""
-
-                        // remove version from resources names
-                        sh "sed -i 's/\${MODULE_NAME}-${dataspaceVersion}/\${MODULE_NAME}/' dataspace/configs/dataspace-core-template.yaml"
-                        sh "sed -i 's/\${MODULE_NAME}-${dataspaceVersion}/\${MODULE_NAME}/' dataspace/configs/dataspace-gigabas-template.yaml"
-
-                        // package archive
-                        ARTIFACT_NAME_OS = "partners-${VERSION}.zip"
+                    dir('openshift') {
+                        def repoDigest = sh(script: "docker inspect ${IMAGE_NAME} --format='{{index .RepoDigests 0}}'", returnStdout: true).trim()
+                        def imageHash = repoDigest.split('@').last()
+                        log.info('Docker image hash: ' + imageHash)
+                        sh "sed -i 's/\${imageNameWithDigest}/${ARTIFACT_ID}@${imageHash}/' configs/Deployment/deployment-partners.yml"
+                        sh "sed -i 's/\${imageVersion}/${VERSION}/' configs/Deployment/deployment-partners.yml"
+                        ARTIFACT_NAME_OS = "${ARTIFACT_ID}_os-${VERSION}.zip"
+                        // copy liquibase
+                        sh "cp -r ../runner/src/main/resources/db/changelog db"
+                        sh "mkdir ${WORKSPACE}/distrib"
                         sh "zip -rq ${WORKSPACE}/distrib/${ARTIFACT_NAME_OS} *"
                     }
                 }
             }
         }
 
+        /**
+         * Собирает артефакт с документацией
+         */
+        stage('Prepare docs') {
+            steps {
+                script {
+                    ARTIFACT_NAME_DOCS = "${ARTIFACT_ID}_docs-${VERSION}.zip"
+                    dir('docs/build') {
+                        sh "zip -rq ${WORKSPACE}/distrib/$ARTIFACT_NAME_DOCS docs"
+                    }
+                }
+            }
+        }
+
+        /**
+         * Собирает артефакт с lock файлами
+         */
+        stage('Prepare locks') {
+            steps {
+                script {
+                    ARTIFACT_NAME_LOCK = "${ARTIFACT_ID}_locks-${VERSION}.zip"
+                    dir('gradle') {
+                        sh "zip -rq ${WORKSPACE}/distrib/$ARTIFACT_NAME_LOCK dependency-locks"
+                        dir('wrapper') {
+                            sh "zip -rq ${WORKSPACE}/distrib/$ARTIFACT_NAME_LOCK gradle-wrapper.properties"
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Собирает release notes
+         */
+        stage('Create release notes') {
+            steps {
+                script {
+                    projectLog = sh(
+                        returnStdout: true,
+                        script: "git log --oneline --no-merges --pretty=tformat:'%s' " +
+                            "${LAST_VERSION ? LAST_VERSION + '..HEAD' : ''}"
+                    )
+                    dir('distrib') {
+                        def projectUrl = "https://sbtatlas.sigma.sbrf.ru/stashdbo/projects/${GIT_PROJECT}/repos/${GIT_REPOSITORY}/" as String
+                        releaseNotes = createReleaseNotes(projectLog, latestCommitHash, projectUrl)
+                        sh "zip -q release_notes-${VERSION}.zip release-notes"
+                    }
+                }
+            }
+        }
+
+        /**
+         * Публикует собранные выше артефакты в nexus
+         */
         stage('Publish') {
             steps {
                 script {
                     dir('distrib') {
-                        log.info("Publishing artifact to ${DEV_REPOSITORY}")
                         publishDev(
-                            credentialId: "${CREDENTIALS_ID}",
+                            credentialId: params.credentialID,
                             repository: "corp-releases",
                             groupId: "ru.sberbank.pprb.sbbol.partners",
-                            artifactId: CUSTOMER_ARTIFACT_ID,
+                            artifactId: ARTIFACT_ID,
                             version: "D-${VERSION}",
                             extension: 'zip',
                             packaging: 'zip',
                             classifier: "distrib",
                             file: ARTIFACT_NAME_OS
                         )
-                        log.info("Successfully published to https://nexus.sigma.sbrf.ru/nexus/content/repositories/corp-releases/ru/sberbank/pprb/sbbol/partners/partners/D-${VERSION}/")
                         log.info("Distrib url: http://nexus.sigma.sbrf.ru:8099/nexus/service/local/repositories/corp-releases/content/ru/sberbank/pprb/sbbol/partners/partners/D-${VERSION}/partners-D-${VERSION}-distrib.zip")
-                        log.info("Uploading CustomerBuilder distribs to sbrf-nexus")
-
-                        nexus.publishZip(GROUP_ID, DATASPACE_ARTIFACT_ID, "distrib", "../${DATASPACE_ARCHIVE_NAME}", VERSION)
-                        log.info("Successfully published to ${getSbrfNexusLink(DATASPACE_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))}")
-                        nexus.publishZip(GROUP_ID, CUSTOMER_ARTIFACT_ID, "distrib", "../${CUSTOMER_ARCHIVE_NAME}", VERSION)
-                        log.info("Successfully published to ${getSbrfNexusLink(CUSTOMER_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))}")
-
-                        log.info("Publishing artifact to ${NEXUSSBRF_RELEASE_REPOSITORY}")
-                        nexus.publishZip(GROUP_ID, CUSTOMER_ARTIFACT_ID, "distrib", ARTIFACT_NAME_OS, "${VERSION}-eip")
-                        log.info("Successfully published to ${getSbrfNexusLink(CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip", GROUP_ID.replaceAll('\\.', '/'))}")
+                        qgm.publishReleaseNotes(GROUP_ID, ARTIFACT_ID, VERSION, releaseNotes, params.credentialID)
+                        nexus.publishZip(GROUP_ID, ARTIFACT_ID, "distrib.openshift", ARTIFACT_NAME_OS, VERSION, params.credentialID)
+                        nexus.publishZip(GROUP_ID, ARTIFACT_ID, "distrib.docs", ARTIFACT_NAME_DOCS, VERSION, params.credentialID)
+                        nexus.publishZip(GROUP_ID, ARTIFACT_ID, "distrib.lock", ARTIFACT_NAME_LOCK, VERSION, params.credentialID)
                         archiveArtifacts artifacts: "*.zip"
+                        log.info("Prod url: https://sbrf-nexus.ca.sbrf.ru/nexus/content/repositories/Nexus_PROD/content/Nexus_PROD/CI02792425_sbbol-partners/partners/D-${VERSION}/partners-D-${VERSION}-distrib.openshift.zip")
                     }
                 }
             }
         }
 
-        stage('Push ReleaseNotes') {
-            steps {
-                script {
-                    def latestCommitHash = checkoutRef('bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, GIT_BRANCH)
-                    List versionTags = git.tags().findAll { it.matches(VERSION_PATTERN) }.sort()
-                    def lastVersion = versionTags.isEmpty() ? '' : versionTags.last()
-                    log.info("Last version: ${lastVersion}")
-                    def projectLog = sh(
-                        returnStdout: true,
-                        script: "git log --oneline --no-merges --pretty=tformat:'%s' " +
-                            "${lastVersion ? lastVersion + '..HEAD' : ''}"
-                    )
-                    dir('distrib') {
-                        def sbrfNexusCustomerLink = getSbrfNexusLink(CUSTOMER_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))
-                        def sbrfNexusDataspaceLink = getSbrfNexusLink(DATASPACE_ARTIFACT_ID, VERSION, GROUP_ID.replaceAll('\\.', '/'))
-                        releaseNotes = createReleaseNotesWithDescription(projectLog, latestCommitHash, PROJECT_URL, sbrfNexusCustomerLink, sbrfNexusDataspaceLink)
-                        qgm.publishReleaseNotes(GROUP_ID, CUSTOMER_ARTIFACT_ID, "D-${VERSION}-eip", releaseNotes)
-                        archiveArtifacts artifacts: "release-notes"
-                    }
-                }
-            }
-        }
-
-        stage('Push technical flags') {
-            when {
-                expression { params.needQG }
-            }
-            steps {
-                script {
-                    boolean qgPassed = true
-                    for (String artifactId in [DATASPACE_ARTIFACT_ID, CUSTOMER_ARTIFACT_ID]) {
-                        def response = qgm.getFlagMap(
-                            credId: "${CREDENTIALS_ID}",
-                            repositoryId: 'Nexus_PROD',
-                            groupId: GROUP_ID.replaceAll('\\.', '/'),
-                            artifactId: DATASPACE_ARTIFACT_ID,
-                            version: VERSION
-                        )
-                        log.info("QGM result for ${artifactId}: ${response}")
-                        def success = true
-                        def flags = ["ci", "sast", "oss", "meta"]
-                        for (def flag : flags) {
-                            if (response[flag] != "ok") {
-                                success = false
-                                break
-                            }
-                        }
-                        if (!success) {
-                            qgPassed = false
-                            log.warn("QG unsuccessful for artifact ${artifactId}. Flags won't be published for current artifact")
-                            break
-                        }
-                    }
-                    log.info("QG result: ${qgPassed}")
-                    if (qgPassed) {
-                        dpm.publishFlags("${VERSION}-eip", CUSTOMER_ARTIFACT_ID, GROUP_ID, ["ci", "sast", "oss", "meta"])
-                    }
-                }
-            }
-        }
-
-        stage('Tag current version') {
-            steps {
-                script {
-                    git.tag('bitbucket-dbo-key', VERSION)
-                }
-            }
-        }
-
+        /**
+         * Публикует документацию на сервер с документацией
+         */
         stage('Publish documentation') {
-            when {
-                expression { params.needAdminGuide }
-            }
             steps {
                 script {
-                    withCredentials([usernamePassword(
-                        credentialsId: "${CREDENTIALS_ID}",
-                        usernameVariable: 'USERNAME',
-                        passwordVariable: 'PASSWORD'
-                    )]) {
-                        sh 'docker run --rm ' +
-                            '-v "$(pwd)":/build ' +
-                            '-v "$(pwd)"/../.m2:/root/.m2 ' +
-                            '-w /build ' +
-                            '-e "M2_HOME=/root/.m2" ' +
-                            '-e "MVNW_REPOURL=http://sbtatlas.sigma.sbrf.ru/nexus/content/groups/public/" ' +
-                            '-e "MVNW_VERBOSE=true" ' +
-                            "-e \"REPO_USER=${USERNAME}\" " +
-                            "-e \"REPO_PASSWORD=${PASSWORD}\" " +
-                            'registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/openjdk:11-with-certs ' +
-                            './mvnw -P asciidoc -pl docs clean org.asciidoctor:asciidoctor-maven-plugin:process-asciidoc -X -s /build/jenkins/settings.xml'
+                    def docsPath = "${ARTIFACT_ID}/${env.BRANCH_NAME}" as String // путь для публикации документации
+                    docs.publish('documentation-publisher', 'docs/build/docs/', docsPath)
+                }
+            }
+        }
+
+        /**
+         * Анализ кода checkmarx
+         */
+        stage('Checkmarx code analyze') {
+            when { expression { params.checkmarx } }
+            steps {
+                script {
+                    def devsecopsConfig = readYaml(file: 'jenkins/resourse/devsecops-config.yml')
+                    String repoUrl = "${Const.BITBUCKET_SERVER_INSTANCE_URL}/scm/${GIT_PROJECT.toLowerCase()}/${GIT_REPOSITORY}.git"
+                    library('ru.sbrf.devsecops@master')
+                    runOSS(devsecopsConfig, repoUrl, "${params.branch}/${GIT_REPOSITORY}", latestCommitHash)
+                    runSastCx(devsecopsConfig, repoUrl, "${params.branch}/${GIT_REPOSITORY}", latestCommitHash)
+
+                    /**
+                     * В функции checkStatus четвертым параметром можно выставить максимальное время ожидания ответа (в секундах)
+                     * Если не дождаться ответа, то будет добавлен флаг о непрохождении этой проверки
+                     * Этот параметр индивидуален и зависит от размера вашего приложения(кода)
+                     * По умолчанию стоит 5 минут
+                     * В примере ниже выставляем ожидание 2 минуты
+                     *   checkmarx.checkStatus(Const.SAST_QG_URL, latestCommitHash, VERSION, 120)
+                     */
+                    checkmarx.checkStatus(Const.SAST_QG_URL, latestCommitHash, VERSION, 600)
+                    def QGstatus = getOSSQGFlag(latestCommitHash)
+                    log.info("OSS_RUN:${QGstatus.OSS_RUN} OSS_PASS:${QGstatus.OSS_PASS} OSS_HIGH_PASS:${QGstatus.OSS_HIGH_PASS} OSS_MEDIUM_PASS:${QGstatus.OSS_MEDIUM_PASS}")
+                }
+            }
+        }
+
+        /**
+         * Публикует технические флаги о сборке
+         */
+        stage('Push technical flags') {
+            steps {
+                script {
+                    dpm.publishFlags(VERSION, ARTIFACT_ID, GROUP_ID, ["bvt", "ci", "smart_regress_ift", "smart_regress_st", "smoke_ift", "smoke_st"], params.credentialID)
+                }
+            }
+        }
+
+        /**
+         * Проставляет в таски jira fix build
+         */
+        stage('Set fix build') {
+            steps {
+                script {
+                    def jiraIssues = [] as Set
+                    projectLog.trim().split('\n').each { issue ->
+                        def jiraIssue = (issue =~ /[A-Za-z0-9]+-+[0-9]+/)
+                        if (jiraIssue.find()) {
+                            jiraIssues << jiraIssue.group(0)
+                        }
                     }
 
-                    sh 'ls docs/target/generated-docs'
-
-                    docs.publish('documentation-publisher', 'docs/target/generated-docs', "${GIT_REPOSITORY}/${env.BRANCH_NAME}")
+                    jiraIssues.each { jiraIssue ->
+                        try {
+                            jira.setFixBuild(jiraIssue, VERSION, params.credentialID)
+                        } catch (e) {
+                            log.error("Failed to update fixBuild for ${jiraIssue}: ${e}")
+                        }
+                    }
                 }
             }
         }
     }
     post {
+        /**
+         * Обязательно подчищаем за собой
+         */
         cleanup {
             cleanWs()
+            sh "docker rmi -f ${IMAGE_NAME} || true"
         }
     }
-}
-
-static String getSbrfNexusLink(String artifactId, String version, String groupId) {
-    return "https://sbrf-nexus.sigma.sbrf.ru/nexus/content/repositories/Nexus_PROD/${groupId}/${artifactId}/${version}/${artifactId}-${version}-distrib.zip"
 }
 
 /**
@@ -376,7 +347,7 @@ def publishDev(Map params) {
             " -F e=${params.extension}" +
             " -F file=@${params.file}" +
             " -F hasPom=false" +
-            " ${DEV_REPOSITORY}"
+            " https://nexus.sigma.sbrf.ru/nexus/service/local/artifact/maven/content"
 
         response = sh(returnStdout: true, script: request)
         log.info("Response: ${response}")
@@ -389,71 +360,4 @@ def publishDev(Map params) {
     if (code.trim() == '' || arr.length == 0 || arr[arr.length - 1].trim() != '201') {
         error("Failed publish to Nexus")
     }
-}
-
-def checkoutRef(String credentialsId, String project, String slug, String ref) {
-    sh 'git init'
-    sh 'git reset --hard --quiet'
-    sh 'git clean -xfd --quiet'
-    withSSH(credentialsId) {
-        sh "git fetch --quiet --tags ${Const.BITBUCKET_SERVER_URL}/${project}/${slug}.git $ref"
-    }
-    sh "git checkout SBP-partners-${VERSION}"
-    sh 'git prune -v'
-    sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-}
-
-def withSSH(String credential, Closure body) {
-    withEnv(["GIT_SSH_COMMAND=ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"]) {
-        sshagent(credentials: [credential]) {
-            body.call()
-        }
-    }
-}
-
-/**
- * Функция по формированию ReleaseNotes. Видоизмененная копия
- * https://sbtatlas.sigma.sbrf.ru/stashdbo/projects/CIBUFS/repos/ufs-jobs/browse/vars/createReleaseNotes.groovy
- * </br>
- * Отличается дополнительным блоком <pre>desc</pre> в ReleaseNotes с ссылками на артефакты,
- * полученные через CustomerBuilder.
- *
- * @param releaseNotes изменения, которые необходимо добавить в release-notes
- * @param latestCommit хеш последнего коммита
- * @param projectUrl ссылка на проект в BitBucket
- * @param customerDistribUrl ссылка на артефакт фабрики в sbrf-nexus (из CustomerBuilder)
- * @param dataspaceDistribUrl ссылка на артефакт dataspace в sbrf-nexus (из CustomerBuilder)
- */
-def createReleaseNotesWithDescription(String releaseNotes, String latestCommit, String projectUrl,
-                                      String customerDistribUrl, String dataspaceDistribUrl) {
-    def data = [
-        releaseNotes: [
-
-        ],
-        codeNotes   : [[
-                           'commit'    : latestCommit,
-                           'repository': projectUrl
-                       ]],
-        desc        : [
-            'customerDistribUrl' : customerDistribUrl,
-            'dataspaceDistribUrl': dataspaceDistribUrl
-        ]
-    ]
-
-    def jiraIssues = [] as Set
-    releaseNotes.trim().split('\n').each { releaseNote ->
-        def jiraIssue = (releaseNote =~ /[A-Za-z0-9]+-+[0-9]+/)
-        if (jiraIssue.find()) {
-            jiraIssues << jiraIssue.group(0)
-        }
-    }
-
-    jiraIssues.each { issue ->
-        data.releaseNotes << [issue: issue]
-    }
-
-    def json = JsonOutput.toJson(data)
-    log.info("ReleaseNotes: ${json}")
-    writeFile file: 'release-notes', text: json
-    return data
 }

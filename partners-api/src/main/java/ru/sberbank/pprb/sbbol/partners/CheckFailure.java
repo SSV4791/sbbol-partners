@@ -1,16 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-
 /**
  * Неуспешное прохождение проверки
  */
-@Getter
-@Setter
-@AllArgsConstructor
 public class CheckFailure {
 
     /**
@@ -23,4 +15,24 @@ public class CheckFailure {
      */
     private String field;
 
+    public CheckFailure(String msg, String field) {
+        this.msg = msg;
+        this.field = field;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
+    }
 }

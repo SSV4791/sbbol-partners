@@ -1,42 +1,45 @@
 package ru.sberbank.pprb.sbbol.partners.mapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import ru.sberbank.pprb.sbbol.partners.graph.get.LegalAddressGet;
-import ru.sberbank.pprb.sbbol.partners.graph.get.PhysicalAddressGet;
-import ru.sberbank.pprb.sbbol.partners.graph.get.RenterGet;
-import ru.sberbank.pprb.sbbol.partners.packet.CreateLegalAddressParam;
-import ru.sberbank.pprb.sbbol.partners.packet.CreatePhysicalAddressParam;
-import ru.sberbank.pprb.sbbol.partners.packet.CreateRenterParam;
-import ru.sberbank.pprb.sbbol.partners.packet.UpdateLegalAddressParam;
-import ru.sberbank.pprb.sbbol.partners.packet.UpdatePhysicalAddressParam;
-import ru.sberbank.pprb.sbbol.partners.packet.UpdateRenterParam;
+import org.mapstruct.Named;
+import org.mapstruct.NullValueMappingStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import ru.sberbank.pprb.sbbol.partners.entity.LegalAddress;
+import ru.sberbank.pprb.sbbol.partners.entity.PhysicalAddress;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterAddress;
 
-@Mapper(componentModel = "spring")
+import javax.persistence.CascadeType;
+import javax.persistence.OneToOne;
+
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RenterMapper {
 
-    /**
-     * Преобразовывает модель данных Renter DataSpace в модель данных Renter ППРБ
-     */
+    @Mapping(target = "renterType", source = "type")
+    ru.sberbank.pprb.sbbol.partners.entity.Renter toRenter(Renter renter);
+
+    RenterAddress toRentalAddress(LegalAddress address);
+
+    RenterAddress toRentalAddress(PhysicalAddress address);
+
+    @Mapping(target = "legalAddress", source = "legalAddress", qualifiedByName = "updateLegalAddress")
+    @Mapping(target = "physicalAddress", source = "physicalAddress", qualifiedByName = "updatePhysicalAddress")
+    void updateRenter(Renter dtoRenter, @MappingTarget() ru.sberbank.pprb.sbbol.partners.entity.Renter entityRenter);
+
+    @Named("updateLegalAddress")
+    void updateRentalAddress(RenterAddress dtoAddress, @MappingTarget() LegalAddress entityAddress);
+
+    @Named("updatePhysicalAddress")
+    void updateRentalAddress(RenterAddress dtoAddress, @MappingTarget() PhysicalAddress entityAddress);
+
     @Mapping(target = "type", source = "renterType")
-    Renter renterToFront(RenterGet contract);
+    Renter toRenter(ru.sberbank.pprb.sbbol.partners.entity.Renter contract);
 
-    @Mapping(target = "renterType", source = "type")
-    void createRenterParam(Renter contract, @MappingTarget CreateRenterParam createRenterParam);
+    LegalAddress toLegalAddress(RenterAddress address);
 
-    @Mapping(target = "renterType", source = "type")
-    void updateRenterParam(Renter contract, @MappingTarget UpdateRenterParam updateRenterParam);
-
-    void createAddressParam(RenterAddress address, @MappingTarget CreateLegalAddressParam createAddressParam);
-    void createAddressParam(RenterAddress address, @MappingTarget CreatePhysicalAddressParam createAddressParam);
-
-    void updateAddressParam(RenterAddress address, @MappingTarget UpdateLegalAddressParam updateAddressParam);
-    void updateAddressParam(RenterAddress address, @MappingTarget UpdatePhysicalAddressParam updateAddressParam);
-
-    RenterAddress addressToFront(LegalAddressGet address);
-    RenterAddress addressToFront(PhysicalAddressGet address);
+    PhysicalAddress toPhysicalAddress(RenterAddress address);
 
 }

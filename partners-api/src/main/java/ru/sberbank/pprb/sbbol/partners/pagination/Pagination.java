@@ -23,9 +23,9 @@ public final class Pagination {
     public final Boolean hasNextPage;
 
     public Pagination(
-            Integer offset,
-            Integer count,
-            Boolean hasNextPage
+        Integer offset,
+        Integer count,
+        Boolean hasNextPage
     ) {
 
         this.offset = offset;
@@ -39,25 +39,25 @@ public final class Pagination {
         if (o == null || getClass() != o.getClass()) return false;
         Pagination other = (Pagination) o;
         return Objects.equals(offset, other.offset) &&
-                Objects.equals(count, other.count) &&
-                Objects.equals(hasNextPage, other.hasNextPage);
+            Objects.equals(count, other.count) &&
+            Objects.equals(hasNextPage, other.hasNextPage);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                offset,
-                count,
-                hasNextPage
+            offset,
+            count,
+            hasNextPage
         );
     }
 
     @Override
     public String toString() {
         return "Pagination{" +
-                "offset='" + offset + '\'' +
-                ", count='" + count + '\'' +
-                ", hasNextPage='" + hasNextPage + '\'' +
-                '}';
+            "offset='" + offset + '\'' +
+            ", count='" + count + '\'' +
+            ", hasNextPage='" + hasNextPage + '\'' +
+            '}';
     }
 }

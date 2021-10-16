@@ -1,1 +1,0 @@
-java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -cp "$(printf ./partners-model-jpa/target/standalone/*jar)" -Dloader.path=./partners-model-jpa/target org.springframework.boot.loader.PropertiesLauncher --spring.profiles.active=local-h2-profile --dataspace-core.model.packagesToScan=ru.sberbank.pprb.sbbol.partners
