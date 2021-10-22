@@ -1,0 +1,111 @@
+### Получение версии приложения
+GET http://127.0.0.1:8080/renter/version
+
+### Получение Арендатора по
+POST http://127.0.0.1:8080/renter/get
+Content-Type: application/json
+
+{
+    "digitalId": "123456789",
+    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f"
+}
+
+### Поиск Арендатора по digitalID
+POST http://127.0.0.1:8080/renter/view
+Content-Type: application/json
+
+{
+    "digitalId": "123456789",
+    "pagination": {
+        "offset": "1",
+        "count": "6",
+        "hasNextPage": "false"
+    }
+}
+
+### Создание Арендатора
+POST http://127.0.0.1:8080/renter/create
+Content-Type: application/json
+
+{
+    "uuid": null,
+    "digitalId": "123456789",
+    "type": "PHYSICAL_PERSON",
+    "legalName": null,
+    "inn": null,
+    "kpp": null,
+    "ogrn": null,
+    "okpo": null,
+    "lastName": "Кавил",
+    "firstName": "Генри",
+    "middleName": null,
+    "dulType": null,
+    "dulName": null,
+    "dulSerie": null,
+    "dulNumber": null,
+    "dulDivisionIssue": null,
+    "dulDateIssue": null,
+    "dulDivisionCode": null,
+    "account": null,
+    "bankBic": null,
+    "bankName": null,
+    "bankAccount": null,
+    "phoneNumbers": null,
+    "emails": null,
+    "legalAddress": {
+        "zipCode": null,
+        "regionCode": null,
+        "region": null,
+        "city": "г.Москва",
+        "locality": null,
+        "street": null,
+        "building": null,
+        "buildingBlock": null,
+        "flat": null
+    },
+
+    "physicalAddress": null
+}
+
+### Создание Арендатора
+POST http://127.0.0.1:8080/renter/update
+Content-Type: application/json
+
+{
+    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
+    "digitalId": "123456789",
+    "type": "PHYSICAL_PERSON",
+    "legalName": null,
+    "inn": null,
+    "kpp": null,
+    "ogrn": null,
+    "okpo": null,
+    "lastName": "Кавил",
+    "firstName": "Генри",
+    "middleName": "Михайлович",
+    "dulType": null,
+    "dulName": "Наименование DUL",
+    "dulSerie": "1234",
+    "dulNumber": "123456",
+    "dulDivisionIssue": null,
+    "dulDateIssue": null,
+    "dulDivisionCode": null,
+    "account": null,
+    "bankBic": null,
+    "bankName": "Зелёный БАНК",
+    "bankAccount": null,
+    "phoneNumbers": null,
+    "emails": null,
+    "legalAddress": {
+        "zipCode": null,
+        "regionCode": null,
+        "region": null,
+        "city": "г. Краснодар",
+        "locality": null,
+        "street": null,
+        "building": null,
+        "buildingBlock": null,
+        "flat": null
+    },
+    "physicalAddress": null
+}

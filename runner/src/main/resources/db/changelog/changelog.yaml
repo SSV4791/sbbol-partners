@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - include:
+      file: sql/01.001.00/changelog.xml
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1634287346343_create_hibernate_se_structure_t_crtj_clientlock.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1634626743677_create_hibernate_se_structure_t_crtj_clientlockevent.sql
+      relativeToChangelogFile: true

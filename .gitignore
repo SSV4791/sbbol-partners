@@ -1,34 +1,16 @@
-# .iml files
-*.iml
+.*
+!.editorconfig
 
-## File-based project format:
-*.ipr
-*.iws
-*.ids
+.idea
+.gradle
 
-#all files in .idea directory
-.idea/
-.mvn/timing.properties
+# Build
+**/generated/
+**/build
+**/logs
 
-# IntelliJ
-/out/
-
-### target directories
+# локальные настройки
+/local/
+/custom/
+/logs/
 **/target/
-**/logs/
-**/log/
-
-*.log
-test*.txt
-
-*.rds
-*.rds.dump.report
-*.rds.import.report
-
-*pom.xml.versionsBackup
-#.*
-
-# temp directory for generated test configs
-**/temp/
-
-/deployer2-*

@@ -20,7 +20,7 @@ import static ru.sberbank.pprb.sbbol.partners.renter.model.Renter.TypeEnum.PHYSI
 public class ValidationServiceImpl implements ValidationService {
     @Override
     public List<CheckResult> check(Renter renter) {
-        List<CheckResult> results = Arrays.stream(Check.values())
+        return Arrays.stream(Check.values())
                 .map(check -> check.validate(renter))
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(CheckFailure::getField,
@@ -28,7 +28,6 @@ public class ValidationServiceImpl implements ValidationService {
                 .entrySet().stream()
                 .map(entry -> new CheckResult().field(entry.getKey()).message(entry.getValue()))
                 .collect(Collectors.toList());
-        return results;
     }
 
 

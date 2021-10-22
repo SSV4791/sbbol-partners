@@ -1,0 +1,197 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"eg-${NAMESPACE}"}]'
+  name: partners
+  labels:
+    app: ${PARTNERS_MODULE_NAME}
+    app.kubernetes.io/part-of: istio
+    version: ${imageVersion}
+spec:
+  replicas: ${PARTNERS_REPLICAS_COUNT}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: ${PARTNERS_MODULE_NAME}
+      version: ${imageVersion}
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+        sidecar.istio.io/proxyLimitsCPU: 200m
+        sidecar.istio.io/proxyLimitsMemory: 256Mi
+        sidecar.istio.io/proxyRequestsCPU: 200m
+        sidecar.istio.io/proxyRequestsMemory: 256Mi
+        sidecar.istio.io/proxyCPULimit: 500m
+        sidecar.istio.io/proxyMemoryLimit: 1Gi
+      labels:
+        app: ${PARTNERS_MODULE_NAME}
+        version: ${imageVersion}
+    spec:
+      containers:
+        - name: ${PARTNERS_MODULE_NAME}
+          image: ${registryUrl}/${registryProject}/${imageNameWithDigest}
+          env:
+            - name: NODE_NAME       #добавление имени ноды в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAMESPACE    #добавление имени неймспейса в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME        #добавление имени пода в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODEID
+              value: ${PARTNERS_MODULE_NAME}
+            - name: RUN_DEBUG
+              value: 'false'
+            - name: JVM_OPTION
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-partners-app-properties
+                  key: jvm-arguments
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 8000
+              name: tcp-debug
+          envFrom:
+            - configMapRef:
+                name: cm-partners-app-properties
+          volumeMounts:
+            - name: app-config
+              mountPath: /deployments/config
+              readOnly: true
+            - name: logback-config
+              mountPath: /deployments/config/logback
+              readOnly: true
+            - name: logsshare
+              mountPath: /app/logs
+            - name: main-db-secret
+              mountPath: /deployments/credentials/main_db
+              readOnly: true
+            - name: standin-db-secret
+              mountPath: /deployments/credentials/si_db
+              readOnly: true
+            - name: appjournal-config
+              mountPath: /deployments/config/app_journal
+              readOnly: true
+            - name: kafka-ssl-secret
+              mountPath: /opt/keystore/kafka
+              readOnly: true
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+            initialDelaySeconds: 80
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+            initialDelaySeconds: 80
+          resources:
+            limits:
+              cpu: ${PARTNERS_LIMIT_CPU}
+              memory: ${PARTNERS_LIMIT_MEMORY}
+              ephemeral-storage: ${PARTNERS_LIMIT_EPHEMERAL_STORAGE}
+            requests:
+              cpu: ${PARTNERS_REQUEST_CPU}
+              memory: ${PARTNERS_REQUEST_MEMORY}
+              ephemeral-storage: ${PARTNERS_REQUEST_EPHEMERAL_STORAGE}
+        - name: fluentbit
+          image: ${FLUENTBIT_IMAGE}
+          resources:
+            limits:
+              cpu: ${fluentBitLimitCPU}
+              memory: ${fluentBitLimitMemory}
+              ephemeral-storage: ${fluentBitLimitEphemeralStorage}
+            requests:
+              cpu: ${fluentBitRequestCPU}
+              memory: ${fluentBitRequestMemory}
+              ephemeral-storage: ${fluentBitRequestEphemeralStorage}
+          env:
+            - name: service
+              value: ${PARTNERS_MODULE_NAME}
+            - name: cluster
+              value: ${fluentBitEnvCluster}
+            - name: moduleId
+              value: ${PARTNERS_MODULE_NAME}
+            - name: moduleVersion
+              value: ${VERSION}
+            - name: nodeId
+              value: ${PARTNERS_MODULE_NAME}
+            - name: standId
+              value: ${fluentBitEnvStandId}
+            - name: zoneId
+              value: ${fluentBitEnvZoneId}
+            - name: pod
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: namespace
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: logsshare
+              mountPath: /app/logs
+            - mountPath: /fluent-bit/etc
+              name: cm-ds-fluentbit
+              readOnly: true
+      volumes:
+        - name: app-config
+          configMap:
+            name: cm-partners-app-properties
+            items:
+              - key: application.properties
+                path: application.properties
+        - name: logback-config
+          configMap:
+            name: cm-partners-logback
+            items:
+              - key: logback.xml
+                path: logback.xml
+        - name: cm-ds-fluentbit
+          configMap:
+            defaultMode: 420
+            name: cm-ds-fluentbit
+        - name: logsshare
+          emptyDir: {}
+        - name: main-db-secret
+          secret:
+            secretName: ${mainDataBaseSecretId}
+            defaultMode: 400
+        - name: standin-db-secret
+          secret:
+            secretName: ${standinDataBaseSecretId}
+            defaultMode: 400
+            optional: true
+        - name: appjournal-config
+          secret:
+            secretName: ${appJournalSettings}
+            defaultMode: 400
+            optional: true
+        - name: kafka-ssl-secret
+          secret:
+            secretName: ${kafkaSslSecret}
+            defaultMode: 400
+            optional: true
