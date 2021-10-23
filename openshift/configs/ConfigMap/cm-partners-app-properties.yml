@@ -37,11 +37,6 @@ data:
     management.endpoint.health.group.liveness.show-details=always
     management.health.db.enabled=false
 
-    standin.cloud.client.stub=true
-    standin.cloud.client.zone-id=test
-    standin.cloud.client.kafka.bootstrapServers=localhost
-    standin.cloud.client.mmtProxyUrl=localhost
-
     #StandIn plugin
     standin.plugin.configuration.journalHashKeyResolver=INTERFACE
     standin.plugin.configuration.replicationStrategy=STANDIN_LOCKS
