@@ -197,6 +197,8 @@ spec:
               readOnly: true
             - mountPath: /mnt/ott-uds-socket
               name: ott-uds-socket
+          securityContext:
+            readOnlyRootFilesystem: true
         - resources:
             limits:
               cpu: 400m
@@ -228,6 +230,8 @@ spec:
             - name: ott-logback
               readOnly: true
               mountPath: /tmp/ott-logback.xml
+            - name: ott-tmp
+              mountPath: /tmp
           terminationMessagePolicy: File
           envFrom:
             - secretRef:
@@ -235,6 +239,8 @@ spec:
             - configMapRef:
                 name: cm-egress-ott-settings
           image: ${OTT_REGISTRY_URL}
+          securityContext:
+            readOnlyRootFilesystem: true
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -285,3 +291,5 @@ spec:
           configMap:
             name: cm-egress-ott-logback
             defaultMode: 400
+        - name: ott-tmp
+          emptyDir: { }
