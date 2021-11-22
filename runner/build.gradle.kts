@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     id("dependency-locking-conventions")
     id("java-conventions")
@@ -19,7 +21,9 @@ tasks {
         useJUnitPlatform()
         testLogging {
             events("passed", "skipped", "failed")
+            exceptionFormat = TestExceptionFormat.FULL
         }
+        systemProperty("file.encoding", "UTF-8")
     }
     clean {
         delete("target")

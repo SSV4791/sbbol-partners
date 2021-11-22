@@ -1,0 +1,107 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: gw-ingress-{{ openshift.env }}-{{ os_project.name }}
+spec:
+  selector:
+    istio: ingressgateway-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_istio_label }}
+  servers:
+
+{% if (os_project.istio.ingress.mtls_geo.route is defined) %}
+    - hosts:
+        - '*'
+      port:
+        name: https-{{ os_project.istio.ingress.mtls_geo.route.port }}
+        number: {{ os_project.istio.ingress.mtls_geo.route.port }}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-geo-certs/chain.pem
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-geo-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-geo-certs/tls.crt
+{% if os_project.istio.ingress.mtls_geo.subjectAltNames is defined %}
+        subjectAltNames:
+{% for subjectAltName in (os_project.istio.ingress.mtls_geo.subjectAltNames | flatten) %}
+          - {{ subjectAltName }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if (os_project.istio.ingress.mtls.route is defined) %}
+    - hosts:
+{% if (os_project.istio.ingress.mtls_geo.route is defined) %}
+        - {{ os_project.istio.ingress.mtls.route.host }}
+{% else %}
+        - '*'
+{% endif %}
+      port:
+        name: https-{{ os_project.istio.ingress.mtls.route.port }}
+        number: {{ os_project.istio.ingress.mtls.route.port }}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-certs/chain.pem
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+{% if os_project.istio.ingress.mtls.subjectAltNames is defined %}
+        subjectAltNames:
+{% for subjectAltName in (os_project.istio.ingress.mtls.subjectAltNames | flatten) %}
+          - {{ subjectAltName }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if (os_project.istio.ingress.ott is defined) %}
+    - hosts:
+        - {{ os_project.istio.ingress.ott.route.host }}
+      port:
+        name: https-{{ os_project.istio.ingress.ott.route.port }}
+        number: {{ os_project.istio.ingress.ott.route.port }}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-certs/chain.pem
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+{% if os_project.istio.ingress.ott.subjectAltNames is defined %}
+        subjectAltNames:
+{% for subjectAltName in (os_project.istio.ingress.ott.subjectAltNames | flatten) %}
+          - {{ subjectAltName }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if (os_project.istio.ingress.healthcheck is defined) %}
+    - hosts:
+        - {{ os_project.istio.ingress.healthcheck.route.host }}
+      port:
+        name: https-{{ os_project.istio.ingress.healthcheck.route.port }}
+        number: {{ os_project.istio.ingress.healthcheck.route.port }}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-hc-certs/chain.pem
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-hc-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-hc-certs/tls.crt
+{% endif %}
+
+{% if (os_project.istio.ingress.ott_geo is defined) %}
+    - hosts:
+        - {{ os_project.istio.ingress.ott_geo.route.host }}
+      port:
+        name: https-{{ os_project.istio.ingress.ott_geo.route.port }}
+        number: {{ os_project.istio.ingress.ott_geo.route.port }}
+        protocol: HTTPS
+      tls:
+        caCertificates: /etc/istio/ingressgateway-ca-ott-geo-certs/chain.pem
+        mode: MUTUAL
+        privateKey: /etc/istio/ingressgateway-ott-geo-certs/tls.key
+        serverCertificate: /etc/istio/ingressgateway-ott-geo-certs/tls.crt
+{% if os_project.istio.ingress.ott_geo.subjectAltNames is defined %}
+        subjectAltNames:
+{% for subjectAltName in (os_project.istio.ingress.ott_geo.subjectAltNames | flatten) %}
+          - {{ subjectAltName }}
+{% endfor %}
+{% endif %}
+{% endif %}

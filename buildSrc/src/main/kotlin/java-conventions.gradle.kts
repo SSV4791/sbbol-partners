@@ -6,7 +6,6 @@ plugins {
 }
 
 group = "ru.sberbank.pprb.sbbol.partners"
-version = "DEV-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_15

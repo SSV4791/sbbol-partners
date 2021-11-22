@@ -3,6 +3,8 @@
 
 .idea
 .gradle
+**/.project
+**/.settings
 
 # Build
 **/generated/

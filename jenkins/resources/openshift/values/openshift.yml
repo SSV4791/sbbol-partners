@@ -1,0 +1,68 @@
+---
+openshift:
+  env: dev
+  os_host: "dev-gen2.sigma.sbrf.ru"
+  io_control_panel: ci01994970-edevgen2-synapse-control-panel
+  mesh_discovery_address: istiod-basic.ci01994970-edevgen2-synapse-control-panel.svc
+
+os_project:
+  ports:
+    - port: 8080
+  health_check: false
+  host: "https://api.dev-gen2.sigma.sbrf.ru:6443"
+  project: ci02281165-edevgen2-efs-kib-sbbol-dev-test6
+  name: sbbol-partners
+  istio:
+    ingress:
+      mtls:
+        route:
+          host: ingress-ci02281165-partners-tls.apps.dev-gen2.sigma.sbrf.ru
+          port: 5443
+      mtls_geo:
+        route:
+          host: ingress-ci02281165-partners-geo-tls.apps.dev-gen2.sigma.sbrf.ru
+          port: 5441
+      ott:
+        route:
+          host: ingress-ci02281165-partners-ott.apps.dev-gen2.sigma.sbrf.ru
+          port: 5444
+        key_store: partners_pprb.p12
+        trust_store: sigma_ott_trust.p12
+        OTT_MODULE_ID: partners_pprb
+      ott_geo:
+        route:
+          host: ingress-ci02281165-partners-geo-ott.apps.dev-gen2.sigma.sbrf.ru
+          port: 5442
+      healthcheck:
+        route:
+          host: ingress-ci02281165-partners-tls-hc.apps.dev-gen2.sigma.sbrf.ru
+          port: 5445
+    egress:
+      ott:
+        port: 5443
+        key_store: partners_pprb.p12
+        trust_store: sigma_ott_trust.p12
+        OTT_MODULE_ID: partners_pprb
+      mtls:
+        port: 5443
+
+registry_area: registry.sigma.sbrf.ru
+nexus_area: Nexus_PROD/CI02792425_sbbol-partners
+versionMask: "D-\\d{2}\\.\\d{3}\\.\\d{2}_\\d{4}"
+
+project_suffix: "{{ (os_project.project | hash('md5'))[:6] }}"
+suffix_istio_label: "{{ project_suffix }}"
+suffix_app_label: "{{ project_suffix }}"
+
+registry_ott: registry.sigma.sbrf.ru/pprb/ci00641491/ci01125613_ott
+registry_istio_proxy: registry.sigma.sbrf.ru/registry_redhat_io/openshift-service-mesh
+
+canary_suffix: main
+
+context_prefix: /sbbol-partners/
+
+fluentbit:
+  module_id: pprb4-digital-partners
+
+sbbol:
+  url: sbbol-dev-rest-in-ci02281165.apps.dev-gen2.sigma.sbrf.ru

@@ -1,0 +1,29 @@
+---
+{% if os_project.istio.ingress.ott_geo is defined %}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sbbol-{{ openshift.env }}-{{ os_project.name }}-ott-geo
+  labels:
+{% if os_project.istio.ingress.ott_geo.route.for_openshift_geo is sameas true %}
+    router: geo
+{% endif %}
+    app: istio-ingressgateway-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+    chart: gateways
+    heritage: Tiller
+    istio: ingressgateway-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_istio_label }}
+    release: istio
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
+spec:
+  host: {{ os_project.istio.ingress.ott_geo.route.host }}
+  port:
+    targetPort: https-{{ os_project.istio.ingress.ott_geo.route.port }}
+  tls:
+    termination: passthrough
+  to:
+    kind: Service
+    name: istio-ingressgateway-{{ openshift.env }}-{{ os_project.name }}
+    weight: 100
+  wildcardPolicy: None
+{% endif %}

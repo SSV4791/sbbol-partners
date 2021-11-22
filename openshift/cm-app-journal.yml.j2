@@ -1,0 +1,11 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: app-journal
+data:
+  appJournal.properties: |-
+    standin.cloud.client.stub=true
+    standin.cloud.client.zoneId=test
+    standin.cloud.client.kafka.bootstrapServers=localhost
+    standin.cloud.client.mmtProxyUrl=localhost
