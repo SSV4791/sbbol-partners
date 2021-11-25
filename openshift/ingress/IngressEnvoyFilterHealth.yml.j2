@@ -1,0 +1,39 @@
+---
+{% if os_project.istio.ingress.healthcheck is defined %}
+# Фильтр для разделения доступа к контекстам
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: envoyfilter-{{ openshift.env }}-{{ os_project.name }}
+spec:
+  configPatches:
+    - applyTo: HTTP_FILTER
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.rbac
+          config:
+            rules:
+              action: ALLOW
+              policies:
+                health_rbac_any_policy:
+                  permissions:
+                    and_rules:
+                      rules:
+                        - header:
+                            name: ':path'
+{# укажите ваш корректный location #}
+                            exact_match: {{ context_prefix }}actuator/health
+                  principals:
+                    - any: true
+      match:
+        listener:
+          # Порт, который указан в gateway-inrgess
+          portNumber: {{ os_project.istio.ingress.healthcheck.route.port }}
+        context: GATEWAY
+  workloadSelector:
+    labels:
+      # должно совпадать с label.app deployment ingress
+      app: ingressgateway-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+      istio: ingressgateway-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_istio_label }}
+{% endif %}

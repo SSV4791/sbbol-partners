@@ -1,0 +1,135 @@
+---
+int:
+  sbbol:
+    rest_in:
+      latest:
+        name: sbbol-rest-in
+        host: sbbol-dev-rest-in-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+        port: '443'
+        ott: false
+        mtls: true
+        protocol: TLS
+
+  pprb:
+    db_main:
+      v1_0:
+        - name: db-main
+          host: tkled-pprb00137.vm.esrt.cloud.sbrf.ru
+          ip: 10.53.223.31
+          port: '5433'
+          egress_port: '1526'
+          #fail if comment ott or mtls. TODO: fix with set default
+          ott: false
+          mtls: false
+          protocol: TCP
+    #         resolution: STATIC
+
+    db_si:
+      v1_0:
+        - name: db-si
+          host: tkled-pprb00137-fake.vm.esrt.cloud.sbrf.ru
+          ip: 10.53.223.31
+          port: '5433'
+          egress_port: '1527'
+          ott: false
+          mtls: false
+          protocol: TCP
+          resolution: STATIC
+
+    audit_ott:
+      v1_0:
+        - name: audit-ott
+          host: audit-ott.ru
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: true
+
+    fluentbit:
+      v1_0:
+        - name: fluent-bit-ott
+          host: sbtatlas.sigma.sbrf.ru
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: true
+
+    sbbol_ott:
+      v1_0:
+        - name: sbbol-ott
+          host: sbbol-dev-rest-in-ci02281165-ott.apps.dev-gen.sigma.sbrf.ru
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: true
+
+    sbbol_https:
+      v1_0:
+        - name: sbbol-https
+          host: sbbol-dev-rest-in-ci02281165.apps.dev-gen.sigma.sbrf.ru
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: false
+
+    prometheus_https:
+      v1_0:
+        - name: prometheus-https
+          host: appmon-service.apps.dev-gen.sigma.sbrf.ru
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: false
+
+    #kafka?
+    appjournal:
+      v1_0:
+        - name: appjournal1
+          #test comment
+          host: 1sbtatlas.sigma.sbrf.ru
+          ip: 10.128.11.11
+          port: '9092'
+          egress_port: '9991'
+          ott: false
+          mtls: false
+          protocol: TCP
+          url: dummy
+          resolution: STATIC
+
+        - name: appjournal6
+          host: 6sbtatlas.sigma.sbrf.ru
+          ip: 10.128.11.11
+          port: '9092'
+          egress_port: '9996'
+          ott: false
+          mtls: false
+          protocol: TCP
+          url: dummy
+          resolution: STATIC
+  ott:
+    hosts:
+      - 10.53.99.178
+      - 10.53.96.30
+    port: 8443
+    protocol: https
+    v1_0:
+      - host: 10.53.99.178
+        port: 8443
+      - host: 10.53.96.30
+        port: 8443
+  dynatrace:
+    latest:
+      servers:
+        - host: tkles-mvp000199.vm.esrt.cloud.sbrf.ru
+          ip: 10.53.90.60
+          port: 9999
+          egress_port: 9999
+        - host: tkles-mvp000228.vm.esrt.cloud.sbrf.ru
+          ip: 10.53.90.149
+          port: 9999
+          egress_port: 9999

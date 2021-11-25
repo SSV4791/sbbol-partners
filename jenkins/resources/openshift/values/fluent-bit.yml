@@ -1,0 +1,20 @@
+fluentbit:
+  tag: "{{ os_project.fpi_name | default(os_project.name) }}"
+  stand_id: dev
+  cluster: dev-gen.ca.sbrf.ru
+  zone_id: default
+  module_version: latest
+  kafka:
+    ssl:
+      enabled: no
+      secret:
+        name: fluent-bit-kafka-certs
+    topics: fluentbit_logs
+    required_acks: 1
+    brokers:
+      - host: 10.53.223.18
+        port: 9092
+      - host: 10.53.223.55
+        port: 9092
+      - host: 10.53.223.46
+        port: 9092

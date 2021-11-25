@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    networking.istio.io/exportTo: "."
+    description: "Service for app"
+    # Аннотация для включения сбора метрик
+    prometheus.io.scrape: "true"
+    # Аннотация для указания HTTP endpoint с метриками приложения
+    prometheus.io.path: "/actuator/prometheus"
+    # Аннотация для указания порта подключения к HTTP endpoint с метриками
+{# TODO: нужно ли итерироваться здесь? пока хардкод 8080 #}
+    prometheus.io.port: "8080"
+  name: svc-app-{{ openshift.env }}-{{ os_project.name }}
+  labels:
+    app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+spec:
+  ports:
+{% for port in os_project.ports %}
+    - name: {{ port.name | default('http-' + ( port.port | string ) ) }}
+      protocol: {{ port.protocol | default('TCP') }}
+      port: {{ port.port }}
+      targetPort: {{ port.targetPort | default(port.port) }}
+{% endfor %}
+  selector:
+    app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+  type: ClusterIP
+  sessionAffinity: None

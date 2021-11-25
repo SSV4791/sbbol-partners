@@ -1,0 +1,221 @@
+---
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  annotations:
+    app.openshift.io/connects-to: istio-system,{{ openshift.io_control_panel }},egressgateway-{{ openshift.env }}-{{ os_project.name }}
+  name: app-{{ openshift.env }}-{{ os_project.name }}-{{ canary_suffix }}
+  labels:
+    app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+    version: {{ version | default('v1') }}
+    app.kubernetes.io/part-of: istio
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: {{ os_project.rollingParams.updatePeriodSeconds | default('1') }}
+      intervalSeconds: {{ os_project.rollingParams.intervalSeconds | default('1') }}
+      timeoutSeconds: {{ os_project.rollingParams.timeoutSeconds | default('600') }}
+      maxUnavailable: {{ os_project.rollingParams.maxUnavailable | default('25%') }}
+      maxSurge: {{ os_project.rollingParams.maxSurge | default('25%') }}
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ConfigChange
+  replicas: {{ os_project.pods | default('1') }}
+  revisionHistoryLimit: 2
+  selector:
+      app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+      version: {{ version | default('v1') }}
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+        sidecar.istio.io/proxyCPULimit: {{ os_project.istio.sidecar.limits.cpu | default("200m") }}
+        sidecar.istio.io/proxyMemoryLimit: {{ os_project.istio.sidecar.limits.memory | default("300Mi") }}
+        sidecar.istio.io/proxyCPU: {{ os_project.istio.sidecar.requests.cpu | default("50m") }}
+        sidecar.istio.io/proxyMemory: {{ os_project.istio.sidecar.requests.memory | default("150Mi") }}
+      labels:
+        app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+        version: {{ version | default('v1') }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - topologyKey: kubernetes.io/hostname
+            labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - sbbol-ufs-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+              - key: version
+                operator: In
+                values:
+                - {{ version | default('v1') }}
+      containers:
+        - name: {{ os_project.name }}
+# app_docker_image проставляется при сборке архива с конфигами
+          image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/{app_docker_image}
+          securityContext:
+            readOnlyRootFilesystem: true
+          env:
+            - name: NODE_NAME       #добавление имени ноды в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAMESPACE    #добавление имени неймспейса в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME        #добавление имени пода в переменные среды пода
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NODEID
+              value: ${MODULE_NAME}
+            - name: RUN_DEBUG
+              value: 'false'
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 8000
+              name: tcp-debug
+          volumeMounts:
+            - name: app-config
+              mountPath: /deployments/config
+              readOnly: true
+            - name: logback-config
+              mountPath: /deployments/config/logback
+              readOnly: true
+            - name: logsshare
+              mountPath: /app/logs
+            - name: main-db-secret
+              mountPath: /deployments/credentials/main_db
+              readOnly: true
+            - name: standin-db-secret
+              mountPath: /deployments/credentials/si_db
+              readOnly: true
+            - name: app-journal-config
+              mountPath: /deployments/config/app_journal
+              readOnly: true
+            - name: kafka-ssl-secret
+              mountPath: /opt/keystore/kafka
+              readOnly: true
+            - name: java-tmp-dir
+              mountPath: /tmp
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+            initialDelaySeconds: 80
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+            initialDelaySeconds: 80
+          resources:
+            limits:
+              cpu: {{ os_project.limits.cpu | default("500m") }}
+              memory: {{ os_project.limits.memory | default("500Mi") }}
+              ephemeral-storage: {{ os_project.limits.ephemeral_storage | default("768Mi") }}
+            requests:
+              cpu: {{ os_project.requests.cpu | default("500m") }}
+              memory: {{ os_project.requests.memory | default("500Mi") }}
+              ephemeral-storage: {{ os_project.requests.ephemeral_storage | default("512Mi") }}
+        - name: fluentbit
+          image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+          securityContext:
+            readOnlyRootFilesystem: true
+          resources:
+            limits:
+              ## TODO: hardcode now, ${fluentBitEnvCluster} and ${MODULE_NAME} and others
+              cpu: 50m
+              memory: 32Mi
+              ephemeral-storage: 2Gi
+            requests:
+              cpu: 10m
+              memory: 16Mi
+              ephemeral-storage: 2Gi
+          env:
+            - name: service
+              value: {{ fluentbit.module_id }}
+            - name: cluster
+              value: {{ fluentbit.cluster }}
+            - name: moduleId
+              value: {{ fluentbit.module_id }}
+            - name: moduleVersion
+              value: {{ fluentbit.module_version }}
+            - name: nodeId
+              value: {{ fluentbit.module_id }}
+            - name: standId
+              value: {{ fluentbit.stand_id }}
+            - name: zoneId
+              value: {{ fluentbit.zone_id }}
+            - name: pod
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: namespace
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: logsshare
+              mountPath: /app/logs
+            - mountPath: /fluent-bit/etc
+              name: ds-fluentbit
+              readOnly: true
+      volumes:
+        - name: app-config
+          configMap:
+            name: cm-app-properties
+            items:
+              - key: application.properties
+                path: application.properties
+        - name: logback-config
+          configMap:
+            name: cm-logback
+            items:
+              - key: logback.xml
+                path: logback.xml
+        - name: ds-fluentbit
+          configMap:
+            defaultMode: 420
+            name: cm-ds-fluentbit
+        - name: logsshare
+          emptyDir: {}
+        - name: main-db-secret
+          secret:
+            secretName: pgdb-main-secret
+            defaultMode: 400
+        - name: standin-db-secret
+          secret:
+            secretName: pgdb-si-secret
+            defaultMode: 400
+            optional: true
+        - name: app-journal-config
+          configMap:
+            name: app-journal
+            items:
+              - key: appJournal.properties
+                path: appJournal.properties
+        - name: kafka-ssl-secret
+          secret:
+            secretName: kafka-ssl-secret
+            defaultMode: 400
+            optional: true
+        - name: java-tmp-dir
+          emptyDir: {}

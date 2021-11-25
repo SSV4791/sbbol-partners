@@ -1,0 +1,58 @@
+---
+{% set flatten_entries = integration_entries | flatten %}
+{% for integration_entry in flatten_entries | rejectattr('protocol', 'equalto', 'TCP')  %}
+---
+# DestinationRule для взаимодействия "Под приложения" - "Egress"
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dr-{{ openshift.env }}-{{ os_project.name }}-{{ integration_entry.name }}-egress
+spec:
+  exportTo:
+  - .
+  host: istio-egressgateway-{{ openshift.env }}-{{ os_project.name }}
+  subsets:
+  - name: {{ integration_entry.name }}
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+      portLevelSettings:
+      - port:
+{% if integration_entry.ott is sameas true %}
+          number: {{ os_project.istio.egress.ott.port }}
+{% elif integration_entry.mtls is sameas true %}
+          number: {{ os_project.istio.egress.mtls.port }}
+{% else %}
+          number: {{ os_project.istio.egress.http.port }}
+{% endif %}
+        tls:
+          mode: {{ os_project.istio.istio_mtls | default ('ISTIO_MUTUAL') }}
+          sni: {{ integration_entry.host }}
+{% endfor %}
+{% for entry_host in (flatten_entries | selectattr('mtls', 'equalto', true) | map(attribute='host') | list | unique) %}
+{% set entry_first = flatten_entries | selectattr('host', 'equalto', entry_host) | first %}
+# DestinationRule включает mTLS на взаимодействии "Egress" -> "Точка интеграции"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: dr-{{ openshift.env }}-{{ os_project.name }}-{{ entry_first.name }}
+spec:
+  exportTo:
+  - .
+  host: {{ entry_first.host }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+    portLevelSettings:
+{% for entry_port in (flatten_entries | selectattr('host', 'equalto', entry_host) | selectattr('mtls', 'equalto', true) | map(attribute='port') | list | unique) %}
+    - port:
+        number: {{ entry_port }}
+      tls:
+        caCertificates: /etc/istio/egressgateway-ca-certs/chain.pem
+        clientCertificate: {{ entry_first.clientCertificate | default('/etc/istio/egressgateway-certs/tls.crt') }}
+        mode: MUTUAL
+        privateKey: {{ entry_first.privateKey | default('/etc/istio/egressgateway-certs/tls.key') }}
+        sni: {{ entry_first.host }}
+{% endfor %}
+{% endfor %}
