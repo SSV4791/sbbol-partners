@@ -8,6 +8,7 @@ import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
 import ru.sberbank.pprb.sbbol.partners.renter.model.Version;
+import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
 
 import javax.validation.Valid;
 

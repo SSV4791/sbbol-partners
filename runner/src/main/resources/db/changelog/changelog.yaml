@@ -8,3 +8,27 @@ databaseChangeLog:
   - include:
       file: sql/01.002.00/1634626743677_create_hibernate_se_structure_t_crtj_clientlockevent.sql
       relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1636538466662_create_partners_structure_partner.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1636544855074_create_partners_structure_address.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1636544933034_create_partners_structure_account.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1636545490596_create_partners_structure_bank.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1636545764303_create_partners_structure_document.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1637157928895_create_partners_structure_contact.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1637235453910_create_partners_structure_merge_history.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/01.002.00/1637342055243_create_partners_structure_bank_account.sql
+      relativeToChangelogFile: true

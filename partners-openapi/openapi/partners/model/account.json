@@ -8,8 +8,13 @@
       "type": "string",
       "title": "Идентификатор счёта"
     },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
     "version": {
       "type": "integer",
+      "format": "int64",
       "title": "Версия"
     },
     "name": {

@@ -1,0 +1,197 @@
+@startuml
+package default {
+    enum "RenterType" {
+        LEGAL_ENTITY
+        ENTREPRENEUR
+        PHYSICAL_PERSON
+    }
+    enum "DulType" {
+        PASSPORTOFRUSSIA
+        SEAMANPASSPORT
+        SERVICEMANIDENTITYCARDOFRUSSIA
+        FOREIGNPASSPORT
+        SERVICEPASSPORTOFRUSSIA
+        RFCITIZENDIPLOMATICPASSPORT
+        PASSPORTOFRUSSIAWITHCHIP
+    }
+}
+package default {
+    entity "Renter" {
+        * uuid : String
+        * digitalId : String
+        * renterType : RenterType
+        legalName : String
+        inn : String
+        kpp : String
+        ogrn : String
+        okpo : String
+        lastName : String
+        firstName : String
+        middleName : String
+        dulType : DulType
+        dulSerie : String
+        dulNumber : String
+        dulDivisionIssue : String
+        dulDateIssue : LocalDate
+        dulDivisionCode : String
+        account : String
+        bankBic : String
+        bankName : String
+        bankAccount : String
+        phoneNumbers : String
+        emails : String
+        legalAddress : LegalAddress
+        physicalAddress : PhysicalAddress
+    }
+    entity "LegalAddress" {
+        renter : Renter
+        zipCode : String
+        regionCode : String
+        region : String
+        city : String
+        locality : String
+        street : String
+        building : String
+        buildingBlock : String
+        flat : String
+    }
+    entity "PhysicalAddress" {
+        renter : Renter
+        zipCode : String
+        regionCode : String
+        region : String
+        city : String
+        locality : String
+        street : String
+        building : String
+        buildingBlock : String
+        flat : String
+    }
+}
+RenterType --|{ Renter
+DulType --|{ Renter
+Renter --|{ LegalAddress
+Renter --|{ PhysicalAddress
+
+package Partners {
+    enum "PartnerType" {
+        RENTER
+        PARTNERS
+        BENEFICIAR
+    }
+    enum "LegalForm" {
+        LEGAL_ENTITY
+        ENTREPRENEUR
+        PHYSICAL_PERSON
+    }
+    enum "AddressType" {
+        LEGAL
+        PHYSICAL
+    }
+    enum "AccountState" {
+        SIGN
+        NOT_SIGN
+    }
+    enum "DocumentType" {
+        PASSPORT_OF_RUSSIA
+        SEAMAN_PASSPORT
+        SERVICEMAN_IDENTITY_CARD_OF_RUSSIA
+        FOREIGN_PASSPORT
+        SERVICE_PASSPORT_OF_RUSSIA
+        RF_CITIZEN_DIPLOMATIC_PASSPORT
+        PASSPORT_OF_RUSSIA_WITH_CHIP
+    }
+}
+package Partners {
+    entity "CollapseHistory" {
+        * uuid: uuid
+        * main_uuid: uuid
+    }
+    entity "Partners" {
+        * uuid: uuid
+        * digital_id: String
+        version: int64
+        type: PartnerType
+        legal_type: LegalForm
+        org_name: String
+        first_name: String
+        second_name: String
+        middle_name: String
+        inn : String
+        kpp : String
+        ogrn : String
+        okpo : String
+        phone: String
+        email: String
+        comments: String
+        deleted: boolean
+    }
+    entity "Address" {
+        * uuid: uuid
+        * digital_id: String
+        * partner_uuid: uuid
+        version: int64
+        type: AddressType
+        zip_code: String
+        region: String
+        city : String
+        location : String
+        street : String
+        building : String
+        building_block : String
+        flat : String
+    }
+    entity "Accounts" {
+        * uuid: uuid
+        * partner_uuid: uuid
+        version: int64
+        name: String
+        account: String
+        state: AccountState
+    }
+    entity "Bank" {
+        * uuid: uuid
+        * account_uuid: uuid
+        version: int64
+        bic: String
+        name: String
+    }
+    entity "BankAccount" {
+        * uuid: uuid
+        * bank_uuid: uuid
+        account: String
+    }
+    entity "Documents" {
+        * uuid: uuid
+        * partner_uuid: uuid
+        version: int64
+        type: DocumentType
+        series: String
+        number: String
+        date_issue: LocalDate
+        division_issue: String
+        division_code: String
+    }
+    entity "Contacts" {
+        * uuid: uuid
+        * partner_uuid: uuid
+        version: int64
+        name: String
+        position: String
+        phone: String
+        email: String
+    }
+}
+"CollapseHistory" --|| "Partners"
+"Partners" --|| "PartnerType"
+"Partners" --|| "LegalForm"
+"Partners" --o{ "Address"
+"Partners" --o{ "Accounts"
+"Partners" --o{ "Documents"
+"Partners" --o{ "Contacts"
+"Address" --|| "AddressType"
+"Accounts" --|| "Bank"
+"Bank" --o{ "BankAccount"
+"Accounts" --|| "AccountState"
+"Documents" --|| "DocumentType"
+@enduml

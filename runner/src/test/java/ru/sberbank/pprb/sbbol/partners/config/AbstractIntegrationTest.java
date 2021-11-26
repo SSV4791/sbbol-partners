@@ -1,11 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -24,13 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import static io.restassured.RestAssured.config;
-import static io.restassured.config.ObjectMapperConfig.objectMapperConfig;
-
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = {Runner.class}
@@ -38,7 +25,7 @@ import static io.restassured.config.ObjectMapperConfig.objectMapperConfig;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
 @ActiveProfiles("test")
-@Import(TestReplicationConfiguration.class)
+@Import({TestReplicationConfiguration.class})
 @ExtendWith(SpringExtension.class)
 public abstract class AbstractIntegrationTest {
 
@@ -54,7 +41,6 @@ public abstract class AbstractIntegrationTest {
     protected ResponseSpecification badRequestResponseSpec;
 
     protected ResponseSpecification internalServerErrorResponseSpec;
-
 
     @BeforeAll
     public final void setup() {

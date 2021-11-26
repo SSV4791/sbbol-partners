@@ -6,13 +6,13 @@ def ufsCredential = 'DS_CAB-SA-CI000825'
 
 def labels = [
     build    : [
-        entries: ['src/', 'build.gradle.kts', 'gradle.properties', 'settings.gradle.kts', 'jenkins/build.groovy']
+        entries: ['partners-adapter/', 'partners-api/', 'partners-openapi/', 'partners-rest/', 'partners-service/', 'runner/', 'buildSrc/', 'docs/', 'build.gradle.kts', 'gradle.properties', 'settings.gradle.kts', 'jenkins/build.groovy']
     ],
     openshift: [
         entries: ['openshift/', 'jenkins/resources/openshift/', 'jenkins/openshift.groovy']
     ],
     liquibase: [
-        entries: ['src/main/resources', 'jenkins/liquibase.groovy']
+        entries: ['runner/src/main/resources/db', 'jenkins/liquibase.groovy']
     ]
 ]
 

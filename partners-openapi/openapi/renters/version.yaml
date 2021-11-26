@@ -1,4 +1,5 @@
 get:
+  deprecated: true
   operationId: version
   summary: Получение версии проекта
   responses:

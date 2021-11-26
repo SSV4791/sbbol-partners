@@ -9,6 +9,10 @@ import java.util.regex.Pattern;
 
 public class CheckUtils {
 
+    private CheckUtils() {
+        throw new IllegalStateException("Утилитарный класс");
+    }
+
     public static final String DIGIT_CHAR = "1234567890";
     public static final String LEGAL_NAME_PATTERN = "^[A-Za-zА-Яа-я0-9Ёё!\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+$";
     private static final String WHITESPACE = " ";
@@ -54,7 +58,7 @@ public class CheckUtils {
     }
 
     public static Set<Character> filterValidCharacters(String target, String validCharacters) {
-        Set<Character> invalid = new TreeSet<Character>();
+        Set<Character> invalid = new TreeSet<>();
         if (!StringUtils.isEmpty(target)) {
             char[] chars = target.toCharArray();
             for (char ch : chars) {

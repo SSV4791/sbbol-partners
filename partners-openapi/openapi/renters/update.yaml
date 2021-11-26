@@ -1,4 +1,5 @@
 post:
+  deprecated: true
   operationId: updateRenter
   summary: Обновление арендатора
   requestBody:
