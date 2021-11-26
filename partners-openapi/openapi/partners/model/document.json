@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Document",
+  "type": "object",
+  "title": "Документ удостоверяющий личность",
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "title": "Идентификатор"
+    },
+    "version": {
+      "type": "integer",
+      "title": "Версия"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "PASSPORT_OF_RUSSIA",
+        "SEAMAN_PASSPORT",
+        "SERVICEMAN_IDENTITY_CARD_OF_RUSSIA",
+        "FOREIGN_PASSPORT",
+        "SERVICE_PASSPORT_OF_RUSSIA",
+        "RF_CITIZEN_DIPLOMATIC_PASSPORT",
+        "PASSPORT_OF_RUSSIA_WITH_CHIP"
+      ],
+      "title": "Тип документа"
+    },
+    "series": {
+      "type": "string",
+      "title": "Серия документа"
+    },
+    "number": {
+      "type": "string",
+      "title": "Номер документа"
+    },
+    "dateIssue": {
+      "type": "string",
+      "format": "date",
+      "title": "Дата выдачи документа"
+    },
+    "divisionIssue": {
+      "type": "string",
+      "title": "Место выдачи документа"
+    },
+    "divisionCode": {
+      "type": "string",
+      "title": "Код"
+    }
+  },
+  "required": [
+    "uuid",
+    "type"
+  ]
+}

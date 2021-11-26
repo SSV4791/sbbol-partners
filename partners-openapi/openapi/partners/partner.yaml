@@ -1,0 +1,144 @@
+openapi: "3.0.0"
+info:
+  title: Request for partners
+  version: 1.0.0
+  description: OpenAPI Specification for partners
+
+servers:
+  - url: /
+
+paths:
+  /partners/{id}/{digitalId}:
+    get:
+      tags:
+        - Partners
+      description: Получение Партнера по его идентификатору
+      operationId: get-by-id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор документа
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикаор личного кабинета
+      responses:
+        200:
+          description: Успешинй ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/partner_response.json'
+    delete:
+      tags:
+        - Partners
+      description: Удаление Партнера
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор документа
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикаор личного кабинета
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/partner_response.json'
+  /partners:
+    post:
+      tags:
+        - Partners
+      description: Сохранение Партнера
+      operationId: save
+      requestBody:
+        description: Партнер
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/partner.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/partner_response.json'
+    put:
+      tags:
+        - Partners
+      description: Обновление Партнера
+      operationId: update
+      requestBody:
+        description: Партнер
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/partner.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/partner_response.json'
+
+  /partners/view:
+    post:
+      tags:
+        - Partners
+      description: Получение Партнеров
+      operationId: list
+      requestBody:
+        description: Фильтр для запроса Партнеров
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/partners_filter.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/partners_response.json'
+
+
+  #
+  #  /sign:
+  #    post:
+  #      description: Сохранение подписи контрагента
+  #      operationId: sign-save
+  #
+  #  /sign/check:
+  #    post:
+  #      description: Проверка подписи контрагента
+  #      operationId: sign-check
+  #
+  #  /sign/delete:
+  #    post:
+  #      description: Снятие подписи контрагента
+  #      operationId: sign-delete
+
+
+
+
+
+
