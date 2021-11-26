@@ -7,6 +7,10 @@ data:
   application.properties: |-
     server.port=8080
     server.shutdown=graceful
+    server.servlet.encoding.charset=UTF-8
+    server.servlet.encoding.force=true
+    server.servlet.encoding.enabled=true
+    server.tomcat.uri-encoding=UTF-8
 
     spring.jpa.properties.hibernate.jdbc.time_zone=UTC
     spring.jpa.properties.hibernate.cache.use_second_level_cache=true
@@ -17,11 +21,6 @@ data:
     spring.application.name={{ os_project.name }}
     spring.liquibase.enabled=false
     spring.profiles.active=default
-
-    server.servlet.encoding.charset=UTF-8
-    server.servlet.encoding.force=true
-    server.servlet.encoding.enabled=true
-    server.tomcat.uri-encoding=UTF-8
 
     management.metrics.tags.application={{ os_project.name }}
     management.metrics.export.prometheus.enabled=true
@@ -39,6 +38,11 @@ data:
     management.endpoint.health.group.liveness.include=ping
     management.endpoint.health.group.liveness.show-details=always
     management.health.db.enabled=false
+
+    # StandIn plugin
+    standin.plugin.configuration.journalHashKeyResolver=INTERFACE
+    standin.plugin.configuration.replicationStrategy=STANDIN_LOCKS
+    standin.plugin.configuration.serializerType=BINARY_KRYO
 
     # Application Journal
     appjournal.moduleId=pprb4-digital-{{ os_project.name }}
