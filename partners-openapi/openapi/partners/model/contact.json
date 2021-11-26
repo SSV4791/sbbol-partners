@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Contact",
+  "type": "object",
+  "title": "Контакт",
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "title": "Идентификатор"
+    },
+    "version": {
+      "type": "integer",
+      "title": "Версия"
+    },
+    "name": {
+      "type": "string",
+      "title": "Наименование"
+    },
+    "position": {
+      "type": "string",
+      "title": "Должность"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Телефон"
+    },
+    "email": {
+      "type": "string",
+      "title": "Электронный адрес"
+    }
+  }
+}

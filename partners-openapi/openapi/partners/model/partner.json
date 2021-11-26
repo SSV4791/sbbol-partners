@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Partner",
+  "type": "object",
+  "title": "Партнер",
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "title": "Уникальный идентификатор партнера"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "version": {
+      "type": "integer",
+      "title": "Версия"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "LEGAL_ENTITY",
+        "ENTREPRENEUR",
+        "PHYSICAL_PERSON"
+      ],
+      "title": "Тип партнера"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации партнера"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя партнера"
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия партнера"
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество партнера"
+    },
+    "inn": {
+      "type": "string",
+      "title": "ИНН"
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП"
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН"
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Телефон партнера"
+    },
+    "email": {
+      "type": "string",
+      "title": "Адрес электронной почты партнера"
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий пользователя"
+    },
+    "addresses": {
+      "type": "array",
+      "title": "Адреса Партнера",
+      "items": {
+        "$ref": "address.json"
+      }
+    },
+    "accounts": {
+      "type": "array",
+      "title": "Счёта партнера",
+      "items": {
+        "$ref": "account.json"
+      }
+    },
+    "documents": {
+      "type": "array",
+      "title": "Документы партнера",
+      "items": {
+        "$ref": "document.json"
+      }
+    },
+    "contacts": {
+      "type": "array",
+      "title": "Контакты партнера",
+      "items": {
+        "$ref": "contact.json"
+      }
+    }
+  },
+  "required": [
+    "digitalId",
+    "type"
+  ]
+}

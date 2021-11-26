@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PartnerResponse",
+  "type": "object",
+  "title": "Ответ на запрос Партнера",
+  "properties": {
+    "partners": {
+      "type": "object",
+      "$ref": "partner.json",
+      "title": "Партнер"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}

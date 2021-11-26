@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Address",
+  "type": "object",
+  "title": "Адрес партнера",
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "title": "Идентификатор адреса"
+    },
+    "version": {
+      "type": "integer",
+      "title": "Версия"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "LEGAL_ADDRESS",
+        "PHYSICAL_ADDRESS"
+      ],
+      "title": "Тип адреса"
+    },
+    "zipCode": {
+      "type": "string",
+      "title": "Индекс"
+    },
+    "region": {
+      "type": "string",
+      "title": "Регион"
+    },
+    "city" : {
+      "type": "string",
+      "title": "Город"
+    },
+    "location" : {
+      "type": "string",
+      "title": "Населённый пункт"
+    },
+    "street" : {
+      "type": "string",
+      "title": "Улица"
+    },
+    "building" : {
+      "type": "string",
+      "title": "Дом"
+    },
+    "buildingBlock" : {
+      "type": "string",
+      "title": "Строение"
+    },
+    "flat" : {
+      "type": "string",
+      "title": "Квартира"
+    }
+  },
+  "required": [
+    "uuid",
+    "type"
+  ]
+}
+
