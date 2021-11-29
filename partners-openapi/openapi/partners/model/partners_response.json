@@ -4,7 +4,7 @@
   "type": "object",
   "title": "Ответ на запрос Партнеров по Фильтру",
   "properties": {
-    "partner": {
+    "partners": {
       "type": "array",
       "items": {
         "$ref": "partner.json"
