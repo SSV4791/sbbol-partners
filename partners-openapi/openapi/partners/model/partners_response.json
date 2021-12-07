@@ -18,7 +18,7 @@
     "errors": {
       "type": "array",
       "items": {
-        "$ref": "error.json"
+        "$ref": "common/error.json"
       },
       "title": "Ошибки"
     }

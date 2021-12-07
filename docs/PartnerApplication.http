@@ -1,0 +1,38 @@
+### Получение Партнера
+GET http://127.0.0.1:8080/partners/11111/1633bdab-fb11-40c2-8363-9075ca8b139e
+Content-Type: application/json
+
+
+### Создание Партнера
+POST http://127.0.0.1:8080/partners
+Content-Type: application/json
+
+{
+    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
+    "digitalId": "11111",
+    "version": 0,
+    "type": "LEGAL_ENTITY"
+}
+
+
+### Обновление Партнера
+PUT http://127.0.0.1:8080/partners
+Content-Type: application/json
+
+{
+    "uuid": "ccc854a0-ed10-4773-8063-ed6ddd389851",
+    "digitalId": "11111",
+    "version": 0,
+    "type": "LEGAL_ENTITY",
+    "contacts": [
+        {
+            "name": "Рик и Морти"
+        }
+    ]
+}
+
+
+### Удаление Партнера
+DELETE http://127.0.0.1:8080/partners/11111/ccc854a0-ed10-4773-8063-ed6ddd389851
+Content-Type: application/json
+

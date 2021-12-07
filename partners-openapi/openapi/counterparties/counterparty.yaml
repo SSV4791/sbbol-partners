@@ -1,0 +1,82 @@
+openapi: "3.0.0"
+info:
+  title: Request for partners
+  version: 1.0.0
+  description: OpenAPI Specification for partners
+
+servers:
+  - url: /
+
+paths:
+  /counterparty/check-requisites:
+    post:
+      tags:
+        - Counterparties
+      deprecated: true
+      summary: Проверка реквизитов получателя платежа по справочнику контрагентов
+      operationId: check
+      requestBody:
+        description: 'Реквизиты контрагента'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CounterpartySearchRequest'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckPayeeRequisitesResult'
+
+        500:
+          description: Internal server error
+
+components:
+  schemas:
+    CounterpartySearchRequest:
+      type: object
+      properties:
+        digitalId:
+          type: string
+          example: 34534523
+          description: Идентификатор личного кабинета клиента
+        name:
+          type: string
+          example: ООО 'Ромашка'
+          description: Имя контрагента
+        kpp:
+          type: string
+          example: 123456789
+          description: КПП
+        accountNumber:
+          type: string
+          example: 40802810100007800000
+          description: Номер счета
+        taxNumber:
+          type: string
+          example: 8608052141
+          description: ИНН
+        bankBic:
+          type: string
+          example: 368574256
+          description: БИК банка
+        bankAccount:
+          type: string
+          example: 40802810100007800000
+          description: Корр. счет
+    CheckPayeeRequisitesResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - SIGNED
+            - NOTSIGNED
+            - NOTFOUND
+          example: SIGNED
+          description: Статус выполнения проверки
+        pprbGuid:
+          type: string
+          description: Guid контрагента в ППРБ (null - если контрагент не найден)

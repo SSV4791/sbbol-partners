@@ -1,4 +1,4 @@
-openapi: "3.0.0"
+openapi: "3.0.3"
 info:
   title: Request for partners
   version: 1.0.0
@@ -26,7 +26,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикаор личного кабинета
+          description: Идентефикатор личного кабинета
       responses:
         200:
           description: Успешинй ответ
@@ -51,7 +51,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикаор личного кабинета
+          description: Идентефикатор личного кабинета
       responses:
         200:
           description: Успешный ответ
@@ -119,26 +119,3 @@ paths:
             application/json:
               schema:
                 $ref: 'model/partners_response.json'
-
-
-  #
-  #  /sign:
-  #    post:
-  #      description: Сохранение подписи контрагента
-  #      operationId: sign-save
-  #
-  #  /sign/check:
-  #    post:
-  #      description: Проверка подписи контрагента
-  #      operationId: sign-check
-  #
-  #  /sign/delete:
-  #    post:
-  #      description: Снятие подписи контрагента
-  #      operationId: sign-delete
-
-
-
-
-
-

@@ -1,4 +1,5 @@
 post:
+  deprecated: true
   operationId: getRenter
   summary: Получение арендатора
   requestBody:

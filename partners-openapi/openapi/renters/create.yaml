@@ -1,4 +1,5 @@
 post:
+  deprecated: true
   operationId: createRenter
   summary: Создание арендатора
   requestBody:
