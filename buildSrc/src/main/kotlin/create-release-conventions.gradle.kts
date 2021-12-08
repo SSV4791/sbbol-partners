@@ -13,7 +13,7 @@ tasks.register<Zip>("fullDistrib") {
     from("$rootDir/docs") {
         into("docs")
     }
-    from("${project(":partners-openapi").projectDir}/src/main/resources/db/changelog/") {
+    from("${project(":runner").projectDir}/src/main/resources/db/changelog/") {
         into("liquibase")
     }
 }
