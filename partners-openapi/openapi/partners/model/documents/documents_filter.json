@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter",
+  "type": "object",
+  "title": "Фильтр для поиска документов",
+  "properties": {
+    "unifiedIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Идентификаторы партнера/контакта"
+    },
+    "documentType": {
+      "type": "string",
+      "title": "Тип документа"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета"
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса Документов"
+    }
+  },
+  "required": [
+    "unifiedIds",
+    "digitalId"
+  ]
+}

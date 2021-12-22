@@ -1,15 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PartnerAccountsResponse",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse",
   "type": "object",
-  "title": "Счётa Партнера",
+  "title": "Ответ на запрос списка документов партнера",
   "properties": {
-    "accounts": {
+    "documents": {
       "type": "array",
       "items": {
-        "$ref": "partner_account.json"
+        "$ref": "document.json"
       },
-      "title": "Счёт"
+      "title": "Документы партнера"
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",

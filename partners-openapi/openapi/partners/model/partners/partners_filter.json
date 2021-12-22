@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PartnerAccountsFilter",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PartnersFilter",
   "type": "object",
-  "title": "Счёт партнера",
+  "title": "Запрос Партнеров по фильтру",
   "properties": {
     "digitalId": {
       "type": "string",

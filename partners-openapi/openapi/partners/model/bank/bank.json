@@ -4,9 +4,13 @@
   "type": "object",
   "title": "Банк",
   "properties": {
-    "uuid": {
+    "id": {
       "type": "string",
       "title": "Идентификатор"
+    },
+    "partnerAccountId": {
+      "type": "string",
+      "title": "Идентификатор счёта партнера"
     },
     "version": {
       "type": "integer",
@@ -21,15 +25,16 @@
       "type": "string",
       "title": "Наименование"
     },
-    "accounts": {
+    "mediary": {
+      "type": "boolean",
+      "title": "Является транзитным банком"
+    },
+    "bankAccounts": {
       "type": "array",
-      "title": "Корреспондентский счёт",
+      "title": "Корреспондентские счета",
       "items": {
         "$ref": "bank_account.json"
       }
     }
-  },
-  "required": [
-    "uuid"
-  ]
+  }
 }

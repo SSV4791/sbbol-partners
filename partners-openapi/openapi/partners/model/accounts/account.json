@@ -4,11 +4,11 @@
   "type": "object",
   "title": "Счёт партнера",
   "properties": {
-    "uuid": {
+    "id": {
       "type": "string",
       "title": "Идентификатор счёта"
     },
-    "partnerUuid": {
+    "partnerId": {
       "type": "string",
       "title": "Идентификатор партнера"
     },
@@ -29,21 +29,21 @@
       "type": "string",
       "title": "Счёт"
     },
-    "bank": {
-      "type": "object",
-      "title": "Банк",
-      "$ref": "../bank.json"
+    "banks": {
+      "type": "array",
+      "items": {
+        "$ref": "../../model/bank/bank.json"
+      },
+      "title": "Банки"
     },
     "state": {
       "type": "string",
+      "title": "Признак 'Подписан'",
       "enum": [
         "SIGNED",
         "NOT_SIGNED"
-      ],
-      "title": "Признак 'Подписан'"
+      ]
     }
-  },
-  "required": [
-    "uuid"
-  ]
+  }
 }
+

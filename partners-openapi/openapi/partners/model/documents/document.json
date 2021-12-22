@@ -2,28 +2,27 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "ru.sberbank.pprb.sbbol.partners.model.Document",
   "type": "object",
-  "title": "Документ удостоверяющий личность",
+  "title": "Документ",
   "properties": {
-    "uuid": {
+    "id": {
       "type": "string",
       "title": "Идентификатор"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета"
+    },
+    "unifiedId": {
+      "type": "string",
+      "title": "Идентификатор партнера или контакта"
     },
     "version": {
       "type": "integer",
       "format": "int64",
       "title": "Версия"
     },
-    "type": {
-      "type": "string",
-      "enum": [
-        "PASSPORT_OF_RUSSIA",
-        "SEAMAN_PASSPORT",
-        "SERVICEMAN_IDENTITY_CARD_OF_RUSSIA",
-        "FOREIGN_PASSPORT",
-        "SERVICE_PASSPORT_OF_RUSSIA",
-        "RF_CITIZEN_DIPLOMATIC_PASSPORT",
-        "PASSPORT_OF_RUSSIA_WITH_CHIP"
-      ],
+    "documentType": {
+      "$ref": "document_type.json",
       "title": "Тип документа"
     },
     "series": {
@@ -45,11 +44,24 @@
     },
     "divisionCode": {
       "type": "string",
-      "title": "Код"
+      "title": "Код документа"
+    },
+    "certifierName": {
+      "type": "string",
+      "title": "Имя удостоверяющего сотрудника"
+    },
+    "positionCertifier": {
+      "type": "string",
+      "title": "Должность удостоверяющего сотрудника"
+    },
+    "certifierType": {
+      "type": "string",
+      "title": "Тип удостоверяющего сотрудника",
+      "enum": [
+        "NOTARY",
+        "UNKNOWN"
+      ]
     }
-  },
-  "required": [
-    "uuid",
-    "type"
-  ]
+  }
 }
+

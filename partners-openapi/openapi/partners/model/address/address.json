@@ -4,7 +4,7 @@
   "type": "object",
   "title": "Адрес партнера",
   "properties": {
-    "uuid": {
+    "id": {
       "type": "string",
       "title": "Идентификатор адреса"
     },
@@ -21,42 +21,49 @@
       ],
       "title": "Тип адреса"
     },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "unifiedId": {
+      "type": "string",
+      "title": "Идентификатор партнера/контакта"
+    },
     "zipCode": {
       "type": "string",
       "title": "Индекс"
     },
     "region": {
       "type": "string",
-      "title": "Регион"
+      "title": "Район"
     },
-    "city" : {
+    "regionCode": {
+      "type": "string",
+      "title": "Код района"
+    },
+    "city": {
       "type": "string",
       "title": "Город"
     },
-    "location" : {
+    "location": {
       "type": "string",
       "title": "Населённый пункт"
     },
-    "street" : {
+    "street": {
       "type": "string",
       "title": "Улица"
     },
-    "building" : {
+    "building": {
       "type": "string",
       "title": "Дом"
     },
-    "buildingBlock" : {
+    "buildingBlock": {
       "type": "string",
       "title": "Строение"
     },
-    "flat" : {
+    "flat": {
       "type": "string",
       "title": "Квартира"
     }
-  },
-  "required": [
-    "uuid",
-    "type"
-  ]
+  }
 }
-

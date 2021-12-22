@@ -4,9 +4,18 @@
   "type": "object",
   "title": "Корреспондентский счёт банка",
   "properties": {
-    "uuid": {
+    "id": {
       "type": "string",
       "title": "Идентификатор"
+    },
+    "bankId": {
+      "type": "string",
+      "title": "Идентификатор банка"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
     },
     "account": {
       "type": "string",

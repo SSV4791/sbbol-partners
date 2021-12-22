@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.DocumentType",
+  "type": "object",
+  "title": "Вид документа",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор"
+    },
+    "documentType": {
+      "type": "string",
+      "title": "Тип удостоверяющего документа (физ. лицо)"
+    },
+    "description":{
+      "type": "string",
+      "title": "Описание Типа удостоверяющего документа"
+    },
+    "deleted": {
+      "type": "boolean",
+      "title": "Признак 'удалён' если в 'true'"
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PartnersMerge",
+  "type": "object",
+  "title": "Объединение партнеров",
+  "properties": {
+    "childPartnersIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Идентификаторы дочерних партнеров"
+    },
+    "mainPartnerId": {
+      "type": "string",
+      "title": "Идентификатор основного партнера"
+    },
+    "accountIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Идентификаторы счетов Партнера"
+    },
+    "contactIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Идентификаторы контактов Партнера"
+    }
+  },
+  "required": [
+    "childPartnersIds",
+    "mainPartnerId"
+  ]
+}

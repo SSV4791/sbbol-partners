@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsResponse",
+  "type": "object",
+  "title": "Счетa Партнера",
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "items": {
+        "$ref": "account.json"
+      },
+      "title": "Счетa Партнера"
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры ответа Партнеров"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}
