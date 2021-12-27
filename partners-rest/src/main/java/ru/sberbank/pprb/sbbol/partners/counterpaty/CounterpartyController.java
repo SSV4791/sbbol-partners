@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners;
+package ru.sberbank.pprb.sbbol.partners.counterpaty;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;

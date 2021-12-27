@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners;
+package ru.sberbank.pprb.sbbol.partners.renter;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
@@ -51,5 +52,5 @@ public interface PartnerService {
      * @param id        Идентификатор Партнера
      * @return Партнер
      */
-    PartnerResponse deletePartner(String digitalId, String id);
+    Error deletePartner(String digitalId, String id);
 }

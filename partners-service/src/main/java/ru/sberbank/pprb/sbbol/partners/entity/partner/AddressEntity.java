@@ -13,18 +13,29 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serial;
+import java.util.UUID;
 
-@Table(name = "address", indexes = {
-    @Index(name = "i_address_partner_uuid", columnList = "partner_uuid")
-})
+@Table(name = "address"
+//    , indexes = {
+//    @Index(name = "i_address_digital_id", columnList = "digital_id"),
+//    @Index(name = "i_address_unified_uuid", columnList = "unified_uuid")
+//}
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity
 public class AddressEntity extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partner_uuid", nullable = false)
-    private PartnerEntity partner;
+    @Serial
+    private static final long serialVersionUID = 1;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "unified_uuid", nullable = false)
+    private UUID unifiedUuid;
+
+    @Column(name = "digital_id", nullable = false, length = 40)
+    private String digitalId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", length = 254)
@@ -32,6 +43,9 @@ public class AddressEntity extends BaseEntity {
 
     @Column(name = "zip_code", length = 6)
     private String zipCode;
+
+    @Column(name = "region_code", length = 10)
+    private String regionCode;
 
     @Column(name = "region", length = 50)
     private String region;
@@ -53,6 +67,30 @@ public class AddressEntity extends BaseEntity {
 
     @Column(name = "flat", length = 20)
     private String flat;
+
+    public String getRegionCode() {
+        return regionCode;
+    }
+
+    public void setRegionCode(String regionCode) {
+        this.regionCode = regionCode;
+    }
+
+    public String getDigitalId() {
+        return digitalId;
+    }
+
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
+    }
+
+    public UUID getUnifiedUuid() {
+        return unifiedUuid;
+    }
+
+    public void setUnifiedUuid(UUID unifiedUuid) {
+        this.unifiedUuid = unifiedUuid;
+    }
 
     public String getFlat() {
         return flat;
@@ -126,16 +164,8 @@ public class AddressEntity extends BaseEntity {
         this.type = type;
     }
 
-    public PartnerEntity getPartner() {
-        return partner;
-    }
-
-    public void setPartner(PartnerEntity partner) {
-        this.partner = partner;
-    }
-
     @Override
     public String getHashKey() {
-        return partner.getId().toString();
+        return null;
     }
 }

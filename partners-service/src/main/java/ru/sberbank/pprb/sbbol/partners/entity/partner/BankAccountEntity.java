@@ -12,6 +12,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -20,6 +21,9 @@ import java.util.UUID;
 })
 @Entity
 public class BankAccountEntity implements Serializable, HashKeyProvider {
+
+    @Serial
+    private static final long serialVersionUID = 1;
 
     @Column(name = "uuid", nullable = false)
     @Id
@@ -60,6 +64,6 @@ public class BankAccountEntity implements Serializable, HashKeyProvider {
 
     @Override
     public String getHashKey() {
-        return bank.getAccount().getPartner().getId().toString();
+        return bank.getHashKey();
     }
 }

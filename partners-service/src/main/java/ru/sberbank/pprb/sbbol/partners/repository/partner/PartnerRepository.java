@@ -18,7 +18,7 @@ public interface PartnerRepository extends PagingAndSortingRepository<PartnerEnt
      * @param id Идентификатор документа
      * @return Партнер
      */
-    PartnerEntity getByIdAndDeletedIsFalse(UUID id);
+    PartnerEntity getById(UUID id);
 
     /**
      * Получение Партнера
@@ -27,7 +27,7 @@ public interface PartnerRepository extends PagingAndSortingRepository<PartnerEnt
      * @param id        Идентификатор документа
      * @return Партнер
      */
-    PartnerEntity getByDigitalIdAndIdAndDeletedIsFalse(String digitalId, UUID id);
+    PartnerEntity getByDigitalIdAndId(String digitalId, UUID id);
 
     /**
      * Получение списка Партнеров c сортировкой

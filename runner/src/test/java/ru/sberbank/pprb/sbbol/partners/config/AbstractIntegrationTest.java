@@ -17,10 +17,16 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
+import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Error;
+
+import java.lang.reflect.ParameterizedType;
+
+import static io.restassured.RestAssured.given;
 
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {Runner.class}
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    classes = {Runner.class}
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
@@ -34,9 +40,9 @@ public abstract class AbstractIntegrationTest {
     @LocalServerPort
     protected int port;
 
-    protected RequestSpecification requestSpec;
+    protected static RequestSpecification requestSpec;
 
-    protected ResponseSpecification responseSpec;
+    protected static ResponseSpecification responseSpec;
 
     protected ResponseSpecification badRequestResponseSpec;
 
@@ -71,5 +77,51 @@ public abstract class AbstractIntegrationTest {
      * Метод, позволяющий выполнить дополнительные действия по инициализации теста
      */
     protected void initTest() {
+    }
+
+    protected static <T> T get(String url, Class<T> response, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .get(url, params)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T, BODY> T post(String url, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T, BODY> T put(String url, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .put(url)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T> T delete(String url, Class<T> response, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .delete(url, params)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
     }
 }

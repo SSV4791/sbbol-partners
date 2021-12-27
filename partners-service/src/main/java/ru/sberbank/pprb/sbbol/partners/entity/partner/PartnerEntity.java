@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,9 @@ import java.util.List;
 @DynamicInsert
 @Entity
 public class PartnerEntity extends BaseEntity {
+
+    @Serial
+    private static final long serialVersionUID = 1;
 
     @Column(name = "digital_id")
     private String digitalId;
@@ -59,119 +64,25 @@ public class PartnerEntity extends BaseEntity {
     @Column(name = "okpo", length = 30)
     private String okpo;
 
-    @Column(name = "phone", length = 100)
-    private String phone;
-
-    @Column(name = "email", length = 320)
-    private String email;
-
     @Column(name = "comment")
     private String comment;
 
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "citizenship", length = 10)
+    private PartnerCitizenshipType citizenship;
 
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MergeHistoryEntity> mergeHistory;
+    private List<PartnerPhoneEntity> phones;
 
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AccountEntity> accounts;
+    private List<PartnerEmailEntity> emails;
 
-    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DocumentEntity> documents;
-
-    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AddressEntity> addresses;
-
-    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ContactEntity> contacts;
-
-    public String getComment() {
-        return comment;
+    public String getDigitalId() {
+        return digitalId;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getOkpo() {
-        return okpo;
-    }
-
-    public void setOkpo(String okpo) {
-        this.okpo = okpo;
-    }
-
-    public String getOgrn() {
-        return ogrn;
-    }
-
-    public void setOgrn(String ogrn) {
-        this.ogrn = ogrn;
-    }
-
-    public String getKpp() {
-        return kpp;
-    }
-
-    public void setKpp(String kpp) {
-        this.kpp = kpp;
-    }
-
-    public String getInn() {
-        return inn;
-    }
-
-    public void setInn(String inn) {
-        this.inn = inn;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getOrgName() {
-        return orgName;
-    }
-
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
     }
 
     public PartnerType getType() {
@@ -190,75 +101,106 @@ public class PartnerEntity extends BaseEntity {
         this.legalType = legalType;
     }
 
-    public String getDigitalId() {
-        return digitalId;
+    public String getOrgName() {
+        return orgName;
     }
 
-    public void setDigitalId(String digitalId) {
-        this.digitalId = digitalId;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
-    public boolean isDeleted() {
-        return deleted;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public List<MergeHistoryEntity> getMergeHistory() {
-        if (mergeHistory == null) {
-            mergeHistory = new ArrayList<>();
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
+    }
+
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    public String getInn() {
+        return inn;
+    }
+
+    public void setInn(String inn) {
+        this.inn = inn;
+    }
+
+    public String getKpp() {
+        return kpp;
+    }
+
+    public void setKpp(String kpp) {
+        this.kpp = kpp;
+    }
+
+    public String getOgrn() {
+        return ogrn;
+    }
+
+    public void setOgrn(String ogrn) {
+        this.ogrn = ogrn;
+    }
+
+    public String getOkpo() {
+        return okpo;
+    }
+
+    public void setOkpo(String okpo) {
+        this.okpo = okpo;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public PartnerCitizenshipType getCitizenship() {
+        return citizenship;
+    }
+
+    public void setCitizenship(PartnerCitizenshipType citizenship) {
+        this.citizenship = citizenship;
+    }
+
+    public List<PartnerPhoneEntity> getPhones() {
+        if (phones == null) {
+            phones = new ArrayList<>();
         }
-        return mergeHistory;
+        return phones;
     }
 
-    public void setMergeHistory(List<MergeHistoryEntity> mergeHistory) {
-        this.mergeHistory = mergeHistory;
+    public void setPhones(List<PartnerPhoneEntity> phones) {
+        this.phones = phones;
     }
 
-    public List<AccountEntity> getAccounts() {
-        if (accounts == null) {
-            accounts = new ArrayList<>();
+    public List<PartnerEmailEntity> getEmails() {
+        if (emails == null) {
+            emails = new ArrayList<>();
         }
-        return accounts;
+        return emails;
     }
 
-    public void setAccounts(List<AccountEntity> accounts) {
-        this.accounts = accounts;
-    }
-
-    public List<DocumentEntity> getDocuments() {
-        if (documents == null) {
-            documents = new ArrayList<>();
-        }
-        return documents;
-    }
-
-    public void setDocuments(List<DocumentEntity> documents) {
-        this.documents = documents;
-    }
-
-    public List<AddressEntity> getAddresses() {
-        if (addresses == null) {
-            addresses = new ArrayList<>();
-        }
-        return addresses;
-    }
-
-    public void setAddresses(List<AddressEntity> addresses) {
-        this.addresses = addresses;
-    }
-
-    public List<ContactEntity> getContacts() {
-        if (contacts == null) {
-            contacts = new ArrayList<>();
-        }
-        return contacts;
-    }
-
-    public void setContacts(List<ContactEntity> contacts) {
-        this.contacts = contacts;
+    public void setEmails(List<PartnerEmailEntity> emails) {
+        this.emails = emails;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners.rest;
+package ru.sberbank.pprb.sbbol.partners.rest.counterparty;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;

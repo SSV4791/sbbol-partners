@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners.rest;
+package ru.sberbank.pprb.sbbol.partners.rest.renter;
 
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;

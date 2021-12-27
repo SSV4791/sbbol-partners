@@ -1,7 +1,9 @@
-package ru.sberbank.pprb.sbbol.partners;
+package ru.sberbank.pprb.sbbol.partners.partners;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import ru.sberbank.pprb.sbbol.partners.PartnersApi;
+import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
@@ -18,7 +20,7 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> delete(String digitalId, String id) {
+    public ResponseEntity<Error> delete(String digitalId, String id) {
         return ResponseEntity.ok(partnerService.deletePartner(digitalId, id));
     }
 
@@ -33,7 +35,7 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> save(Partner partner) {
+    public ResponseEntity<PartnerResponse> create(Partner partner) {
         return ResponseEntity.ok(partnerService.savePartner(partner));
     }
 

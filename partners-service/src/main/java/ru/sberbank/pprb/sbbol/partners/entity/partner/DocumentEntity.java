@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,23 +12,29 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.time.LocalDate;
+import java.util.UUID;
 
-@Table(name = "document", indexes = {
-    @Index(name = "i_document_partner_uuid", columnList = "partner_uuid")
-})
+@Table(name = "document"
+//    , indexes = {
+//    @Index(name = "i_document_partner_uuid", columnList = "partner_uuid")
+//}
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity
 public class DocumentEntity extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partner_uuid", nullable = false)
-    private PartnerEntity partner;
+    @Serial
+    private static final long serialVersionUID = 1;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 254)
-    private DocumentType type;
+//    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "unified_uuid", nullable = false)
+    private UUID unifiedUuid;
+
+    @Column(name = "type_uuid", nullable = false)
+    private UUID typeUuid;
 
     @Column(name = "series", length = 50)
     private String series;
@@ -45,6 +50,44 @@ public class DocumentEntity extends BaseEntity {
 
     @Column(name = "division_code", length = 50)
     private String divisionCode;
+
+    @Column(name = "certifier_name", length = 100)
+    private String certifierName;
+
+    @Column(name = "position_certifier", length = 100)
+    private String positionCertifier;
+
+    public String getPositionCertifier() {
+        return positionCertifier;
+    }
+
+    public void setPositionCertifier(String positionCertifier) {
+        this.positionCertifier = positionCertifier;
+    }
+
+    public String getCertifierName() {
+        return certifierName;
+    }
+
+    public void setCertifierName(String certifierName) {
+        this.certifierName = certifierName;
+    }
+
+    public UUID getTypeUuid() {
+        return typeUuid;
+    }
+
+    public void setTypeUuid(UUID typeUuid) {
+        this.typeUuid = typeUuid;
+    }
+
+    public UUID getUnifiedUuid() {
+        return unifiedUuid;
+    }
+
+    public void setUnifiedUuid(UUID unifiedUuid) {
+        this.unifiedUuid = unifiedUuid;
+    }
 
     public String getDivisionCode() {
         return divisionCode;
@@ -86,24 +129,8 @@ public class DocumentEntity extends BaseEntity {
         this.series = series;
     }
 
-    public DocumentType getType() {
-        return type;
-    }
-
-    public void setType(DocumentType type) {
-        this.type = type;
-    }
-
-    public PartnerEntity getPartner() {
-        return partner;
-    }
-
-    public void setPartner(PartnerEntity partner) {
-        this.partner = partner;
-    }
-
     @Override
     public String getHashKey() {
-        return partner.getId().toString();
+        return null;
     }
 }

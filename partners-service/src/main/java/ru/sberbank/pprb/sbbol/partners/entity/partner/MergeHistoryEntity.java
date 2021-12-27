@@ -3,14 +3,14 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -20,13 +20,31 @@ import java.util.UUID;
 @Entity
 public class MergeHistoryEntity implements Serializable, HashKeyProvider {
 
-    @Id
+    @Serial
+    private static final long serialVersionUID = 1;
+
     @Column(name = "uuid", nullable = false)
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "main_uuid", nullable = false)
-    private PartnerEntity partner;
+    @Column(name = "partner_uuid", nullable = false)
+    private UUID partnerUuid;
+
+    @Column(name = "main_uuid", nullable = false)
+    private UUID mainUuid;
+
+    @Column(name = "sbbol_uuid", length = 36)
+    private String sbbolUuid;
+
+    public UUID getMainUuid() {
+        return mainUuid;
+    }
+
+    public void setMainUuid(UUID mainUuid) {
+        this.mainUuid = mainUuid;
+    }
 
     public UUID getId() {
         return id;
@@ -36,16 +54,24 @@ public class MergeHistoryEntity implements Serializable, HashKeyProvider {
         this.id = id;
     }
 
-    public PartnerEntity getPartner() {
-        return partner;
+    public UUID getPartnerUuid() {
+        return partnerUuid;
     }
 
-    public void setPartner(PartnerEntity partner) {
-        this.partner = partner;
+    public void setPartnerUuid(UUID partnerUuid) {
+        this.partnerUuid = partnerUuid;
+    }
+
+    public String getSbbolUuid() {
+        return sbbolUuid;
+    }
+
+    public void setSbbolUuid(String sbbolUuid) {
+        this.sbbolUuid = sbbolUuid;
     }
 
     @Override
     public String getHashKey() {
-        return partner.getId().toString();
+        return getPartnerUuid().toString();
     }
 }
