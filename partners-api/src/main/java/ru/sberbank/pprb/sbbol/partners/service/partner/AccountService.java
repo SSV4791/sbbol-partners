@@ -1,14 +1,16 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import ru.sberbank.pprb.sbbol.partners.model.PartnerAccount;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerAccountResponse;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerAccountsFilter;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerAccountsResponse;
+
+import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
+import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
+import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 /**
  * Сервис по работе с счётами Партнера
  */
-public interface PartnerAccountService {
+public interface AccountService {
 
     /**
      * Получение счёта Партнера
@@ -17,7 +19,7 @@ public interface PartnerAccountService {
      * @param id        Идентификатор счёта
      * @return Счёт
      */
-    PartnerAccountResponse getAccount(String digitalId, String id);
+    AccountResponse getAccount(String digitalId, String id);
 
     /**
      * Получение списка счётов партнеров по заданному фильтру
@@ -25,7 +27,7 @@ public interface PartnerAccountService {
      * @param accountsFilter фильтр для поиска счётов Партнера
      * @return список счётов партнера, удовлетворяющих заданному фильтру
      */
-    PartnerAccountsResponse getAccounts(PartnerAccountsFilter accountsFilter);
+    AccountsResponse getAccounts(AccountsFilter accountsFilter);
 
     /**
      * Создание нового счёта Партнера
@@ -33,7 +35,7 @@ public interface PartnerAccountService {
      * @param account данные счёта Партнера
      * @return Счёт
      */
-    PartnerAccountResponse saveAccount(PartnerAccount account);
+    AccountResponse saveAccount(Account account);
 
     /**
      * Обновление счёта Партнера
@@ -41,14 +43,13 @@ public interface PartnerAccountService {
      * @param account новые данные счёта Партнера
      * @return Счёт
      */
-    PartnerAccountResponse updateAccount(PartnerAccount account);
+    AccountResponse updateAccount(Account account);
 
     /**
      * Удаление счёта Партнера
      *
      * @param digitalId Идентификатор личного кабинета клиента
      * @param id        Идентификатор счёта Партнера
-     * @return Счёт
      */
-    PartnerAccountResponse deleteAccount(String digitalId, String id);
+    Error deleteAccount(String digitalId, String id);
 }

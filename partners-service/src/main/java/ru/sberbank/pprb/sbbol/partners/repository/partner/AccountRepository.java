@@ -6,11 +6,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountViewRepository;
 
 import java.util.UUID;
 
 @Repository
-public interface PartnerAdapterRepository extends PagingAndSortingRepository<AccountEntity, UUID> {
+public interface AccountRepository extends PagingAndSortingRepository<AccountEntity, UUID>, AccountViewRepository {
 
     /**
      * Получение счёта Партнера
