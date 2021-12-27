@@ -7,7 +7,8 @@ CREATE TABLE BANK
     account_uuid UUID             NOT NULL,
     version      BIGINT default 0 NOT NULL,
     name         VARCHAR(50),
-    bic          VARCHAR(9)
+    bic          VARCHAR(9),
+    intermediary BOOLEAN
 );
 
 COMMENT ON TABLE BANK IS 'Банки';
@@ -16,5 +17,6 @@ COMMENT ON COLUMN BANK.ACCOUNT_UUID IS 'Уникальный идентифик�
 COMMENT ON COLUMN BANK.VERSION IS 'Версия (служебное поле Hibernate)';
 COMMENT ON COLUMN BANK.NAME IS 'Наименование банка';
 COMMENT ON COLUMN BANK.BIC IS 'БИК банка';
+COMMENT ON COLUMN BANK.INTERMEDIARY IS 'Признак /"Банк посредник/"';
 
 CREATE INDEX I_BANK_ACCOUNT_UUID ON BANK (ACCOUNT_UUID);

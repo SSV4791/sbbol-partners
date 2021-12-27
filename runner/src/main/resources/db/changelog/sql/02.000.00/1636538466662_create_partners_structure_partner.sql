@@ -4,11 +4,11 @@
 CREATE TABLE PARTNER
 (
     uuid        UUID PRIMARY KEY,
-    digital_id  VARCHAR(255)          NOT NULL,
-    version     BIGINT  default 0     NOT NULL,
-    type        VARCHAR(254)          NOT NULL,
-    legal_type  VARCHAR(254)          NOT NULL,
-    org_name    VARCHAR(50),
+    digital_id  VARCHAR(40)      NOT NULL,
+    version     BIGINT default 0 NOT NULL,
+    type        VARCHAR(254)     NOT NULL,
+    legal_type  VARCHAR(254)     NOT NULL,
+    org_name    VARCHAR(350),
     first_name  VARCHAR(50),
     second_name VARCHAR(50),
     middle_name VARCHAR(50),
@@ -16,18 +16,26 @@ CREATE TABLE PARTNER
     kpp         VARCHAR(9),
     ogrn        VARCHAR(15),
     okpo        VARCHAR(30),
-    phone       VARCHAR(100),
-    email       VARCHAR(320),
+    citizenship VARCHAR(20),
     comment     VARCHAR(255),
-    deleted     BOOLEAN default false not null,
+    CONSTRAINT CK_PARTNER_CITIZENSHIP CHECK
+        (
+                CITIZENSHIP = 'UNKNOWN' OR
+                CITIZENSHIP = 'RUSSIA' OR
+                CITIZENSHIP = 'ANOTHER_COUNTRY'
+        ),
     CONSTRAINT CK_PARTNER_TYPE CHECK
-        (TYPE = 'PARTNER' OR
-         TYPE = 'BENEFICIARY' OR
-         TYPE = 'RENTER'),
-    CONSTRAINT CK_PARTNER_LEGAL_TYPE CHECK (
+        (
+                TYPE = 'PARTNER' OR
+                TYPE = 'BENEFICIARY' OR
+                TYPE = 'RENTER'
+        ),
+    CONSTRAINT CK_PARTNER_LEGAL_TYPE CHECK
+        (
                 LEGAL_TYPE = 'LEGAL_ENTITY' OR
                 LEGAL_TYPE = 'ENTREPRENEUR' OR
-                LEGAL_TYPE = 'PHYSICAL_PERSON')
+                LEGAL_TYPE = 'PHYSICAL_PERSON'
+        )
 );
 
 COMMENT ON TABLE PARTNER IS 'Партнеры';
@@ -44,9 +52,7 @@ COMMENT ON COLUMN PARTNER.INN IS 'ИНН';
 COMMENT ON COLUMN PARTNER.KPP IS 'КПП';
 COMMENT ON COLUMN PARTNER.OGRN IS 'ОГРН';
 COMMENT ON COLUMN PARTNER.OKPO IS 'ОКПО';
-COMMENT ON COLUMN PARTNER.PHONE IS 'Телефон партнера';
-COMMENT ON COLUMN PARTNER.EMAIL IS 'Адрес электронной почты партнера';
 COMMENT ON COLUMN PARTNER.COMMENT IS 'Комментарий пользователя';
-COMMENT ON COLUMN PARTNER.DELETED IS 'Признак "Удалён"';
+COMMENT ON COLUMN PARTNER.CITIZENSHIP IS 'Признак /"Гражданин РФ/", заполняется для физ. лиц';
 
 CREATE INDEX I_PARTNER_DIGITAL_ID ON PARTNER (DIGITAL_ID);
