@@ -1,9 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.service.renter;
 
-import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterIdentifier;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
+import ru.sberbank.pprb.sbbol.renter.model.Renter;
+import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
+import ru.sberbank.pprb.sbbol.renter.model.RenterIdentifier;
+import ru.sberbank.pprb.sbbol.renter.model.RenterListResponse;
 
 public interface RenterService {
 

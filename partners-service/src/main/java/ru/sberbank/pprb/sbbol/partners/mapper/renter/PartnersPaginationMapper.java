@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.renter;
 
 import org.mapstruct.Mapper;
-import ru.sberbank.pprb.sbbol.partners.renter.model.Pagination;
+import ru.sberbank.pprb.sbbol.renter.model.Pagination;
 
 @Mapper(componentModel = "spring")
 public interface PartnersPaginationMapper {

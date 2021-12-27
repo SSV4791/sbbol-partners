@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.renter;
 
-import ru.sberbank.pprb.sbbol.partners.renter.model.CheckResult;
-import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
+import ru.sberbank.pprb.sbbol.renter.model.CheckResult;
+import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import java.util.List;
 

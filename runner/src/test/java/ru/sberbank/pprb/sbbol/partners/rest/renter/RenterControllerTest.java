@@ -2,12 +2,12 @@ package ru.sberbank.pprb.sbbol.partners.rest.renter;
 
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterAddress;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterFilter;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterIdentifier;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterListResponse;
-import ru.sberbank.pprb.sbbol.partners.renter.model.Version;
+import ru.sberbank.pprb.sbbol.renter.model.Renter;
+import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
+import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
+import ru.sberbank.pprb.sbbol.renter.model.RenterIdentifier;
+import ru.sberbank.pprb.sbbol.renter.model.RenterListResponse;
+import ru.sberbank.pprb.sbbol.renter.model.Version;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -13,22 +13,9 @@ the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().a
 }
 
 val rentersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/renters/renter.yaml"
-val partnersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners/partner.yaml"
-val partnersAccountsApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners/partner_account.yaml"
+val partnersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners"
 val counterpartiesApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/counterparties/counterparty.yaml"
 val generateObjectOutputDir = "$buildDir/generated/sources"
-openApiValidate {
-    inputSpec.set(rentersApiSchemaPath)
-}
-openApiValidate {
-    inputSpec.set(partnersApiSchemaPath)
-}
-openApiValidate {
-    inputSpec.set(partnersAccountsApiSchemaPath)
-}
-openApiValidate {
-    inputSpec.set(counterpartiesApiSchemaPath)
-}
 
 tasks {
     register("openApiGenerateRenters", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
@@ -39,8 +26,7 @@ tasks {
         generateApiTests.set(false)
         generateApiDocumentation.set(false)
         generateModelTests.set(false)
-        modelPackage.set("ru.sberbank.pprb.sbbol.partners.renter.model")
-        apiPackage.set("ru.sberbank.pprb.sbbol.partners.renter")
+        modelPackage.set("ru.sberbank.pprb.sbbol.renter.model")
         globalProperties.putAll(
             mapOf(
                 "models" to "",
@@ -54,56 +40,6 @@ tasks {
             )
         )
     }
-    register("openApiGeneratePartners", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-        inputSpec.set(partnersApiSchemaPath)
-        outputDir.set(generateObjectOutputDir)
-        generatorName.set("spring")
-        generateAliasAsModel.set(false)
-        generateApiTests.set(false)
-        generateApiDocumentation.set(false)
-        generateModelTests.set(false)
-        modelPackage.set("ru.sberbank.pprb.sbbol.partners.model")
-        apiPackage.set("ru.sberbank.pprb.sbbol.partners")
-        globalProperties.putAll(
-            mapOf(
-                "models" to "",
-            )
-        )
-        configOptions.putAll(
-            mapOf(
-                "dateLibrary" to "java8",
-                "interfaceOnly" to "true",
-                "serializableModel" to "true",
-                "skipDefaultInterface" to "true",
-                "useTags" to "true"
-            )
-        )
-    }
-    register("openApiGeneratePartnersAccounts", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-        inputSpec.set(partnersAccountsApiSchemaPath)
-        outputDir.set(generateObjectOutputDir)
-        generatorName.set("spring")
-        generateAliasAsModel.set(false)
-        generateApiTests.set(false)
-        generateApiDocumentation.set(false)
-        generateModelTests.set(false)
-        modelPackage.set("ru.sberbank.pprb.sbbol.partners.model")
-        apiPackage.set("ru.sberbank.pprb.sbbol.partners")
-        globalProperties.putAll(
-            mapOf(
-                "models" to "",
-            )
-        )
-        configOptions.putAll(
-            mapOf(
-                "dateLibrary" to "java8",
-                "interfaceOnly" to "true",
-                "serializableModel" to "true",
-                "skipDefaultInterface" to "true",
-                "useTags" to "true"
-            )
-        )
-    }
     register("openApiGenerateCounterparties", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
         inputSpec.set(counterpartiesApiSchemaPath)
         outputDir.set(generateObjectOutputDir)
@@ -113,7 +49,6 @@ tasks {
         generateApiDocumentation.set(false)
         generateModelTests.set(false)
         modelPackage.set("ru.sberbank.pprb.sbbol.counterparties.model")
-        apiPackage.set("ru.sberbank.pprb.sbbol.counterparties")
         globalProperties.putAll(
             mapOf(
                 "models" to "",
@@ -129,17 +64,44 @@ tasks {
             )
         )
     }
-}
+    val openApiGeneratePartners =
+        file(partnersApiSchemaPath).listFiles()
+            ?.filter { it.extension in listOf("yml", "yaml") }
+            ?.mapIndexed { idx, file ->
+                register("openApiGenerate$idx", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+                    inputSpec.set(file.absolutePath)
+                    outputDir.set(generateObjectOutputDir)
+                    generatorName.set("spring")
+                    generateAliasAsModel.set(false)
+                    generateApiTests.set(false)
+                    generateApiDocumentation.set(false)
+                    generateModelTests.set(false)
+                    modelPackage.set("ru.sberbank.pprb.sbbol.partners.model")
+                    globalProperties.putAll(
+                        mapOf(
+                            "models" to "",
+                        )
+                    )
+                    configOptions.putAll(
+                        mapOf(
+                            "dateLibrary" to "java8",
+                            "interfaceOnly" to "true",
+                            "serializableModel" to "true",
+                            "skipDefaultInterface" to "true",
+                            "useTags" to "true"
+                        )
+                    )
+                }
+            }
 
-tasks {
     compileJava {
+        if (!openApiGeneratePartners.isNullOrEmpty())
+            dependsOn(openApiGeneratePartners)
         dependsOn(
-            openApiValidate,
             "openApiGenerateRenters",
-            "openApiGeneratePartners",
-            "openApiGeneratePartnersAccounts",
-            "openApiGenerateCounterparties"
-        )
+            "openApiGenerateCounterparties",
+
+            )
     }
     clean {
         delete("target")
