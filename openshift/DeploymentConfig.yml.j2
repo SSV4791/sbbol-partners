@@ -193,18 +193,18 @@ spec:
                 path: logback.xml
         - name: ds-fluentbit
           configMap:
-            defaultMode: 420
+            defaultMode: 0400
             name: cm-ds-fluentbit
         - name: logsshare
           emptyDir: {}
         - name: main-db-secret
           secret:
             secretName: pgdb-main-secret
-            defaultMode: 400
+            defaultMode: 0400
         - name: standin-db-secret
           secret:
             secretName: pgdb-si-secret
-            defaultMode: 400
+            defaultMode: 0400
             optional: true
         - name: app-journal-config
           configMap:
@@ -215,7 +215,7 @@ spec:
         - name: kafka-ssl-secret
           secret:
             secretName: kafka-ssl-secret
-            defaultMode: 400
+            defaultMode: 0400
             optional: true
         - name: java-tmp-dir
           emptyDir: {}
