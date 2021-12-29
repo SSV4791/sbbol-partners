@@ -8,19 +8,16 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.util.UUID;
 
-@Table(name = "address"
-//    , indexes = {
-//    @Index(name = "i_address_digital_id", columnList = "digital_id"),
-//    @Index(name = "i_address_unified_uuid", columnList = "unified_uuid")
-//}
+@Table(name = "address",
+    indexes = {
+        @Index(name = "i_address_digital_id", columnList = "digital_id"),
+        @Index(name = "i_address_unified_uuid", columnList = "unified_uuid")
+    }
 )
 @DynamicUpdate
 @DynamicInsert
@@ -30,7 +27,6 @@ public class AddressEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
     @Column(name = "unified_uuid", nullable = false)
     private UUID unifiedUuid;
 
@@ -68,12 +64,12 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "flat", length = 20)
     private String flat;
 
-    public String getRegionCode() {
-        return regionCode;
+    public UUID getUnifiedUuid() {
+        return unifiedUuid;
     }
 
-    public void setRegionCode(String regionCode) {
-        this.regionCode = regionCode;
+    public void setUnifiedUuid(UUID unifiedUuid) {
+        this.unifiedUuid = unifiedUuid;
     }
 
     public String getDigitalId() {
@@ -84,68 +80,12 @@ public class AddressEntity extends BaseEntity {
         this.digitalId = digitalId;
     }
 
-    public UUID getUnifiedUuid() {
-        return unifiedUuid;
+    public AddressType getType() {
+        return type;
     }
 
-    public void setUnifiedUuid(UUID unifiedUuid) {
-        this.unifiedUuid = unifiedUuid;
-    }
-
-    public String getFlat() {
-        return flat;
-    }
-
-    public void setFlat(String flat) {
-        this.flat = flat;
-    }
-
-    public String getBuildingBlock() {
-        return buildingBlock;
-    }
-
-    public void setBuildingBlock(String buildingBlock) {
-        this.buildingBlock = buildingBlock;
-    }
-
-    public String getBuilding() {
-        return building;
-    }
-
-    public void setBuilding(String building) {
-        this.building = building;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public void setRegion(String region) {
-        this.region = region;
+    public void setType(AddressType type) {
+        this.type = type;
     }
 
     public String getZipCode() {
@@ -156,16 +96,72 @@ public class AddressEntity extends BaseEntity {
         this.zipCode = zipCode;
     }
 
-    public AddressType getType() {
-        return type;
+    public String getRegionCode() {
+        return regionCode;
     }
 
-    public void setType(AddressType type) {
-        this.type = type;
+    public void setRegionCode(String regionCode) {
+        this.regionCode = regionCode;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
+    }
+
+    public String getBuildingBlock() {
+        return buildingBlock;
+    }
+
+    public void setBuildingBlock(String buildingBlock) {
+        this.buildingBlock = buildingBlock;
+    }
+
+    public String getFlat() {
+        return flat;
+    }
+
+    public void setFlat(String flat) {
+        this.flat = flat;
     }
 
     @Override
     public String getHashKey() {
-        return null;
+        return getUnifiedUuid().toString();
     }
 }

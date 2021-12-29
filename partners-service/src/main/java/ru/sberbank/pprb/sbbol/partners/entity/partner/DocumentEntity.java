@@ -5,21 +5,17 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Table(name = "document"
-//    , indexes = {
-//    @Index(name = "i_document_partner_uuid", columnList = "partner_uuid")
-//}
+@Table(name = "document",
+    indexes = {
+        @Index(name = "i_document_unified_uuid", columnList = "unified_uuid"),
+        @Index(name = "i_document_digital_id", columnList = "digital_id")
+    }
 )
 @DynamicUpdate
 @DynamicInsert
@@ -29,9 +25,11 @@ public class DocumentEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
     @Column(name = "unified_uuid", nullable = false)
     private UUID unifiedUuid;
+
+    @Column(name = "digital_id", nullable = false)
+    private String digitalId;
 
     @Column(name = "type_uuid", nullable = false)
     private UUID typeUuid;
@@ -57,20 +55,20 @@ public class DocumentEntity extends BaseEntity {
     @Column(name = "position_certifier", length = 100)
     private String positionCertifier;
 
-    public String getPositionCertifier() {
-        return positionCertifier;
+    public UUID getUnifiedUuid() {
+        return unifiedUuid;
     }
 
-    public void setPositionCertifier(String positionCertifier) {
-        this.positionCertifier = positionCertifier;
+    public void setUnifiedUuid(UUID unifiedUuid) {
+        this.unifiedUuid = unifiedUuid;
     }
 
-    public String getCertifierName() {
-        return certifierName;
+    public String getDigitalId() {
+        return digitalId;
     }
 
-    public void setCertifierName(String certifierName) {
-        this.certifierName = certifierName;
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
     }
 
     public UUID getTypeUuid() {
@@ -81,36 +79,12 @@ public class DocumentEntity extends BaseEntity {
         this.typeUuid = typeUuid;
     }
 
-    public UUID getUnifiedUuid() {
-        return unifiedUuid;
+    public String getSeries() {
+        return series;
     }
 
-    public void setUnifiedUuid(UUID unifiedUuid) {
-        this.unifiedUuid = unifiedUuid;
-    }
-
-    public String getDivisionCode() {
-        return divisionCode;
-    }
-
-    public void setDivisionCode(String divisionCode) {
-        this.divisionCode = divisionCode;
-    }
-
-    public String getDivisionIssue() {
-        return divisionIssue;
-    }
-
-    public void setDivisionIssue(String divisionIssue) {
-        this.divisionIssue = divisionIssue;
-    }
-
-    public LocalDate getDateIssue() {
-        return dateIssue;
-    }
-
-    public void setDateIssue(LocalDate dateIssue) {
-        this.dateIssue = dateIssue;
+    public void setSeries(String series) {
+        this.series = series;
     }
 
     public String getNumber() {
@@ -121,16 +95,48 @@ public class DocumentEntity extends BaseEntity {
         this.number = number;
     }
 
-    public String getSeries() {
-        return series;
+    public LocalDate getDateIssue() {
+        return dateIssue;
     }
 
-    public void setSeries(String series) {
-        this.series = series;
+    public void setDateIssue(LocalDate dateIssue) {
+        this.dateIssue = dateIssue;
+    }
+
+    public String getDivisionIssue() {
+        return divisionIssue;
+    }
+
+    public void setDivisionIssue(String divisionIssue) {
+        this.divisionIssue = divisionIssue;
+    }
+
+    public String getDivisionCode() {
+        return divisionCode;
+    }
+
+    public void setDivisionCode(String divisionCode) {
+        this.divisionCode = divisionCode;
+    }
+
+    public String getCertifierName() {
+        return certifierName;
+    }
+
+    public void setCertifierName(String certifierName) {
+        this.certifierName = certifierName;
+    }
+
+    public String getPositionCertifier() {
+        return positionCertifier;
+    }
+
+    public void setPositionCertifier(String positionCertifier) {
+        this.positionCertifier = positionCertifier;
     }
 
     @Override
     public String getHashKey() {
-        return null;
+        return getUnifiedUuid().toString();
     }
 }
