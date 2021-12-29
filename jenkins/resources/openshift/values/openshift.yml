@@ -66,3 +66,6 @@ fluentbit:
 
 sbbol:
   url: sbbol-dev-rest-in-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+
+app_journal:
+  secret: secret-appjournalstubsettings

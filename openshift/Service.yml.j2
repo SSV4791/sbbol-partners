@@ -12,9 +12,9 @@ metadata:
     # Аннотация для указания порта подключения к HTTP endpoint с метриками
 {# TODO: нужно ли итерироваться здесь? пока хардкод 8080 #}
     prometheus.io.port: "8080"
-  name: svc-app-{{ openshift.env }}-{{ os_project.name }}
+  name: {{ os_project.name }}
   labels:
-    app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+    app: {{ os_project.name }}-{{ suffix_app_label }}
 spec:
   ports:
 {% for port in os_project.ports %}
@@ -24,6 +24,6 @@ spec:
       targetPort: {{ port.targetPort | default(port.port) }}
 {% endfor %}
   selector:
-    app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+    app: {{ os_project.name }}-{{ suffix_app_label }}
   type: ClusterIP
   sessionAffinity: None
