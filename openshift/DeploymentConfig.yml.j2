@@ -3,10 +3,10 @@ kind: DeploymentConfig
 apiVersion: apps.openshift.io/v1
 metadata:
   annotations:
-    app.openshift.io/connects-to: istio-system,{{ openshift.io_control_panel }},egressgateway-{{ openshift.env }}-{{ os_project.name }}
-  name: app-{{ openshift.env }}-{{ os_project.name }}-{{ canary_suffix }}
+    app.openshift.io/connects-to: istio-system,{{ openshift.io_control_panel }}
+  name: {{ os_project.name }}-{{ canary_suffix }}
   labels:
-    app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+    app: {{ os_project.name }}-{{ suffix_app_label }}
     version: {{ version | default('v1') }}
     app.kubernetes.io/part-of: istio
 spec:
@@ -25,7 +25,7 @@ spec:
   replicas: {{ os_project.pods | default('1') }}
   revisionHistoryLimit: 2
   selector:
-      app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+      app: {{ os_project.name }}-{{ suffix_app_label }}
       version: {{ version | default('v1') }}
   template:
     metadata:
@@ -36,7 +36,7 @@ spec:
         sidecar.istio.io/proxyCPU: {{ os_project.istio.sidecar.requests.cpu | default("50m") }}
         sidecar.istio.io/proxyMemory: {{ os_project.istio.sidecar.requests.memory | default("150Mi") }}
       labels:
-        app: app-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+        app: {{ os_project.name }}-{{ suffix_app_label }}
         version: {{ version | default('v1') }}
     spec:
       affinity:
@@ -48,15 +48,16 @@ spec:
               - key: app
                 operator: In
                 values:
-                - sbbol-ufs-{{ openshift.env }}-{{ os_project.name }}-{{ suffix_app_label }}
+                - {{ os_project.name }}-{{ suffix_app_label }}
               - key: version
                 operator: In
                 values:
                 - {{ version | default('v1') }}
       containers:
-        - name: {{ os_project.name }}
+        - name: app
 # app_docker_image проставляется при сборке архива с конфигами
           image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/{app_docker_image}
+          imagePullPolicy: Always
           securityContext:
             readOnlyRootFilesystem: true
           env:
@@ -135,18 +136,19 @@ spec:
               ephemeral-storage: {{ os_project.requests.ephemeral_storage | default("512Mi") }}
         - name: fluentbit
           image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+          imagePullPolicy: Always
           securityContext:
             readOnlyRootFilesystem: true
           resources:
             limits:
               ## TODO: hardcode now, ${fluentBitEnvCluster} and ${MODULE_NAME} and others
-              cpu: 50m
-              memory: 32Mi
-              ephemeral-storage: 2Gi
+              cpu: {{ fluentbit.limits.cpu | default("50m") }}
+              memory: {{ fluentbit.limits.memory | default("32Mi") }}
+              ephemeral-storage: {{ fluentbit.limits.ephemeral_storage | default("2Gi") }}
             requests:
-              cpu: 10m
-              memory: 16Mi
-              ephemeral-storage: 2Gi
+              cpu: {{ fluentbit.requests.cpu | default("50m") }}
+              memory: {{ fluentbit.requests.memory | default("32Mi") }}
+              ephemeral-storage: {{ fluentbit.requests.ephemeral_storage | default("2Gi") }}
           env:
             - name: service
               value: {{ fluentbit.module_id }}
@@ -181,20 +183,20 @@ spec:
       volumes:
         - name: app-config
           configMap:
-            name: cm-app-properties
+            name: cm-app-properties-{{ canary_suffix }}
             items:
               - key: application.properties
                 path: application.properties
         - name: logback-config
           configMap:
-            name: cm-logback
+            name: cm-logback-{{ canary_suffix }}
             items:
               - key: logback.xml
                 path: logback.xml
         - name: ds-fluentbit
           configMap:
             defaultMode: 0400
-            name: cm-ds-fluentbit
+            name: cm-ds-fluentbit-{{ canary_suffix }}
         - name: logsshare
           emptyDir: {}
         - name: main-db-secret
@@ -207,11 +209,10 @@ spec:
             defaultMode: 0400
             optional: true
         - name: app-journal-config
-          configMap:
-            name: app-journal
-            items:
-              - key: appJournal.properties
-                path: appJournal.properties
+          secret:
+            secretName: {{ app_journal.secret }}
+            defaultMode: 0400
+            optional: true
         - name: kafka-ssl-secret
           secret:
             secretName: kafka-ssl-secret

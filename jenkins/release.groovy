@@ -20,6 +20,7 @@ pipeline {
     parameters {
         string(name: 'branch', defaultValue: 'develop', description: 'Ветка для сборки образа')
         choice(name: 'credentialID', choices: ['DS_CAB-SA-CI000825'], description: 'ТУЗ, используемая для сборки')
+        string(name: 'istio_tag', defaultValue: '01.000.03', description: 'Тег для шаблонов istio')
         string(name: 'commitOrTag', description: 'Хэш коммита или тэг от которого формируется release-notes')
         booleanParam(name: 'checkmarx', defaultValue: false, description: 'Прохождение проверки Checkmarx')
         booleanParam(name: 'reverseAndPublish', defaultValue: false)
@@ -149,6 +150,7 @@ pipeline {
             steps {
                 script {
                     dir('openshift') {
+                        istio.getOSTemplates('bitbucket-dbo-key', 'istio', 'openshift', params.istio_tag, './istio')
                         git.raw(params.credentialID, 'cibufs', 'sbbol-params', 'master', "${ARTIFACT_ID}/${params.branch}/params.yml")
                         def repoDigest = sh(script: "docker inspect ${DOCKER_IMAGE_NAME} --format='{{index .RepoDigests 0}}'", returnStdout: true).trim()
                         DOCKER_IMAGE_HASH = repoDigest.split('@').last()
