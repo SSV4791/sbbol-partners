@@ -2,10 +2,15 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentCertifierType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.LocalDate;
@@ -31,6 +36,10 @@ public class DocumentEntity extends BaseEntity {
     @Column(name = "digital_id", nullable = false)
     private String digitalId;
 
+    @OneToOne
+    @JoinColumn(name = "type_uuid", nullable = false, insertable = false, updatable = false)
+    private DocumentTypeEntity type;
+
     @Column(name = "type_uuid", nullable = false)
     private UUID typeUuid;
 
@@ -55,6 +64,10 @@ public class DocumentEntity extends BaseEntity {
     @Column(name = "position_certifier", length = 100)
     private String positionCertifier;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "certifier_type", nullable = false, length = 10)
+    private DocumentCertifierType certifierType;
+
     public UUID getUnifiedUuid() {
         return unifiedUuid;
     }
@@ -69,6 +82,14 @@ public class DocumentEntity extends BaseEntity {
 
     public void setDigitalId(String digitalId) {
         this.digitalId = digitalId;
+    }
+
+    public DocumentTypeEntity getType() {
+        return type;
+    }
+
+    public void setType(DocumentTypeEntity type) {
+        this.type = type;
     }
 
     public UUID getTypeUuid() {
@@ -133,6 +154,14 @@ public class DocumentEntity extends BaseEntity {
 
     public void setPositionCertifier(String positionCertifier) {
         this.positionCertifier = positionCertifier;
+    }
+
+    public DocumentCertifierType getCertifierType() {
+        return certifierType;
+    }
+
+    public void setCertifierType(DocumentCertifierType certifierType) {
+        this.certifierType = certifierType;
     }
 
     @Override
