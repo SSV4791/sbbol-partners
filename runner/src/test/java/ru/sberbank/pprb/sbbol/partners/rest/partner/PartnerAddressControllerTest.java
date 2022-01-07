@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
@@ -8,7 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import java.util.List;
 
@@ -135,17 +135,17 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var searchAddress =
-            get(
+            getNotFound(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
-                AddressResponse.class,
+                Error.class,
                 address.getDigitalId(), address.getUuid()
             );
 
         assertThat(searchAddress)
             .isNotNull();
 
-        assertThat(searchAddress.getAddress())
-            .isNull();
+        assertThat(searchAddress.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     private static Address createValidAddress(String partnerUuid, String digitalId) {

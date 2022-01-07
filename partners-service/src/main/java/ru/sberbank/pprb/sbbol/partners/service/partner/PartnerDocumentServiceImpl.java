@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
@@ -35,6 +36,9 @@ public class PartnerDocumentServiceImpl implements PartnerDocumentService {
     @Transactional(readOnly = true)
     public DocumentResponse getDocument(String digitalId, String id) {
         var document = documentRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
+        if (document == null) {
+            throw new EntryNotFoundException("partner_document", digitalId, id);
+        }
         var response = documentMapper.toDocument(document);
         return new DocumentResponse().document(response);
     }
@@ -60,7 +64,7 @@ public class PartnerDocumentServiceImpl implements PartnerDocumentService {
     public DocumentResponse saveDocument(Document document) {
         var partner = partnerRepository.getByDigitalIdAndId(document.getDigitalId(), UUID.fromString(document.getUnifiedUuid()));
         if (partner == null) {
-            return null;
+            throw new EntryNotFoundException("partner", document.getDigitalId(), document.getUuid());
         }
         var requestDocument = documentMapper.toDocument(document);
         var saveDocument = documentRepository.save(requestDocument);
@@ -73,7 +77,7 @@ public class PartnerDocumentServiceImpl implements PartnerDocumentService {
     public DocumentResponse updateDocument(Document document) {
         var searchDocument = documentRepository.getByDigitalIdAndId(document.getDigitalId(), UUID.fromString(document.getUuid()));
         if (searchDocument == null) {
-            return null;
+            throw new EntryNotFoundException("partner_document", document.getDigitalId(), document.getUuid());
         }
         documentMapper.updateDocument(document, searchDocument);
         var saveContact = documentRepository.save(searchDocument);
@@ -86,7 +90,7 @@ public class PartnerDocumentServiceImpl implements PartnerDocumentService {
     public Error deleteDocument(String digitalId, String id) {
         var searchDocument = documentRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
         if (searchDocument == null) {
-            return new Error();
+            throw new EntryNotFoundException("partner_document", digitalId, id);
         }
         documentRepository.delete(searchDocument);
         return new Error();

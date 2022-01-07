@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
@@ -166,16 +167,16 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var searchContact =
-            get(
+            getNotFound(
                 baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
-                ContactResponse.class,
+                Error.class,
                 contact.getDigitalId(), contact.getUuid()
             );
         assertThat(searchContact)
             .isNotNull();
 
-        assertThat(searchContact.getContact())
-            .isNull();
+        assertThat(searchContact.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     public static Contact getValidContact(String partnerUuid) {

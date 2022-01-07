@@ -9,7 +9,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,7 +33,7 @@ public class DocumentViewRepositoryImpl implements DocumentViewRepository, BaseR
             Join<DocumentEntity, DocumentTypeEntity> type = root.join("type");
             predicates.add(builder.equal(type.get("systemName"), (filter.getDocumentType())));
         }
-        criteria.orderBy(builder.desc(root.get("digitalId")));
+        defaultOrder(builder, root);
         criteria.select(root).where(builder.and(predicates.toArray(new Predicate[0])));
         var query = entityManager.createQuery(criteria);
         var pagination = filter.getPagination();
@@ -42,6 +41,6 @@ public class DocumentViewRepositoryImpl implements DocumentViewRepository, BaseR
             query.setFirstResult(pagination.getOffset());
             query.setMaxResults(pagination.getCount());
         }
-        return Collections.emptyList();
+        return query.getResultList();
     }
 }

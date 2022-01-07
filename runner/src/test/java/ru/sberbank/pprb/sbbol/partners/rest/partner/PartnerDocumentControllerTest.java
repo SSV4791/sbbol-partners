@@ -1,11 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.model.Address;
-import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
-import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
-import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
@@ -13,7 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,9 +23,9 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testGetPartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
-        DocumentResponse actualDocument =
+        var partner = createValidPartner();
+        var document = createValidPartnerDocument(partner.getUuid());
+        var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
@@ -42,51 +38,51 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isEqualTo(document);
     }
 
-//    @Test
-//    void testViewPartnerDocument() {
-//        var partner = createValidPartner("7777");
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
-//
-//        var filter1 = new DocumentsFilter()
-//            .digitalId(partner.getDigitalId())
-//            .unifiedUuid(List.of(partner.getUuid()))
-//            .pagination(new Pagination()
-//                .count(4)
-//                .offset(0));
-//        var response1 = post(
-//            baseRoutePath + "/documents/view",
-//            filter1,
-//            DocumentsResponse.class
-//        );
-//        assertThat(response1)
-//            .isNotNull();
-//        assertThat(response1.getDocuments().size())
-//            .isEqualTo(4);
-//        var filter2 = new DocumentsFilter()
-//            .digitalId(partner.getDigitalId())
-//            .unifiedUuid(List.of(partner.getUuid()))
-//            .documentType("LEGAL_ADDRESS")
-//            .pagination(new Pagination()
-//                .count(4)
-//                .offset(0));
-//        var response2 = post(
-//            baseRoutePath + "/documents/view",
-//            filter2,
-//            DocumentsResponse.class
-//        );
-//        assertThat(response2)
-//            .isNotNull();
-//        assertThat(response2.getDocuments().size())
-//            .isEqualTo(4);
-//    }
+    @Test
+    void testViewPartnerDocument() {
+        var partner = createValidPartner("7777");
+        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
+
+        var filter1 = new DocumentsFilter()
+            .digitalId(partner.getDigitalId())
+            .unifiedUuid(List.of(partner.getUuid()))
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response1 = post(
+            baseRoutePath + "/documents/view",
+            filter1,
+            DocumentsResponse.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getDocuments().size())
+            .isEqualTo(4);
+        var filter2 = new DocumentsFilter()
+            .digitalId(partner.getDigitalId())
+            .unifiedUuid(List.of(partner.getUuid()))
+            .documentType("SEAMAN_PASSPORT")
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/documents/view",
+            filter2,
+            DocumentsResponse.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getDocuments().size())
+            .isEqualTo(4);
+    }
 
     @Test
     void testCreatePartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
+        var partner = createValidPartner();
+        var document = createValidPartnerDocument(partner.getUuid());
         assertThat(document)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -97,10 +93,10 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testUpdatePartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
+        var partner = createValidPartner();
+        var document = createValidPartnerDocument(partner.getUuid());
         String newName = "Новое номер";
-        Document updateDocument = new Document();
+        var updateDocument = new Document();
         updateDocument.uuid(document.getUuid());
         updateDocument.digitalId(document.getDigitalId());
         updateDocument.unifiedUuid(document.getUnifiedUuid());
@@ -117,9 +113,9 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testDeletePartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
-        DocumentResponse actualDocument =
+        var partner = createValidPartner();
+        var document = createValidPartnerDocument(partner.getUuid());
+        var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
@@ -132,7 +128,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isNotNull()
             .isEqualTo(document);
 
-        Error deleteDocument =
+        var deleteDocument =
             delete(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 Error.class,
@@ -141,18 +137,18 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(deleteDocument)
             .isNotNull();
 
-        DocumentResponse searchDocument =
-            get(
+        var searchDocument =
+            getNotFound(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
-                DocumentResponse.class,
+                Error.class,
                 document.getDigitalId(), document.getUuid()
             );
 
         assertThat(searchDocument)
             .isNotNull();
 
-        assertThat(searchDocument.getDocument())
-            .isNull();
+        assertThat(searchDocument.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     private static Document createValidPartnerDocument(String partnerUuid, String digitalId) {
@@ -187,6 +183,13 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .dateIssue(LocalDate.now())
             .divisionCode("1111")
             .number("23")
+            .documentType(
+                new DocumentType()
+                    .uuid("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2")
+                    .description("Паспорт моряка (удостоверение личности моряка)")
+                    .status(false)
+                    .documentType("SEAMAN_PASSPORT")
+            )
             ;
     }
 }

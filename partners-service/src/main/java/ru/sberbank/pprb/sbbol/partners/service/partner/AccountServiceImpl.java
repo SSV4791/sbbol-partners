@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
@@ -41,6 +42,9 @@ public class AccountServiceImpl implements AccountService {
     public AccountResponse getAccount(String digitalId, String id) {
         if (legacySbbolAdapter.checkMigration(digitalId)) {
             var account = accountRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
+            if (account == null) {
+                throw new EntryNotFoundException("account", digitalId, id);
+            }
             var response = accountMapper.toAccount(account);
             return new AccountResponse().account(response);
         } else {
@@ -76,8 +80,7 @@ public class AccountServiceImpl implements AccountService {
         if (legacySbbolAdapter.checkMigration(account.getDigitalId())) {
             var partner = partnerRepository.getByDigitalIdAndId(account.getDigitalId(), UUID.fromString(account.getPartnerUuid()));
             if (partner == null) {
-                //TODO добавить обработку ошибок
-                return null;
+                throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerUuid());
             }
             var requestAccount = accountMapper.toAccount(account);
             if (!CollectionUtils.isEmpty(requestAccount.getBanks())) {
@@ -103,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
         if (legacySbbolAdapter.checkMigration(account.getDigitalId())) {
             var searchAccount = accountRepository.getByDigitalIdAndId(account.getDigitalId(), UUID.fromString(account.getUuid()));
             if (searchAccount == null) {
-                return null;
+                throw new EntryNotFoundException("account", account.getDigitalId(), account.getUuid());
             }
             accountMapper.updateAccount(account, searchAccount);
             var saveAccount = accountRepository.save(searchAccount);
@@ -121,7 +124,7 @@ public class AccountServiceImpl implements AccountService {
         if (legacySbbolAdapter.checkMigration(digitalId)) {
             var searchAccount = accountRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
             if (searchAccount == null) {
-                return new Error();
+                throw new EntryNotFoundException("account", digitalId, id);
             }
             accountRepository.delete(searchAccount);
         } else {

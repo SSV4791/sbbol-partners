@@ -17,10 +17,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
-import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
-
-import java.lang.reflect.ParameterizedType;
 
 import static io.restassured.RestAssured.given;
 
@@ -44,9 +40,7 @@ public abstract class AbstractIntegrationTest {
 
     protected static ResponseSpecification responseSpec;
 
-    protected ResponseSpecification badRequestResponseSpec;
-
-    protected ResponseSpecification internalServerErrorResponseSpec;
+    protected static ResponseSpecification notFoundResponseSpec;
 
     @BeforeAll
     public final void setup() {
@@ -64,12 +58,8 @@ public abstract class AbstractIntegrationTest {
             .expectStatusCode(HttpStatus.OK.value())
             .build();
 
-        internalServerErrorResponseSpec = new ResponseSpecBuilder()
-            .expectStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .build();
-
-        badRequestResponseSpec = new ResponseSpecBuilder()
-            .expectStatusCode(HttpStatus.BAD_REQUEST.value())
+        notFoundResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.NOT_FOUND.value())
             .build();
     }
 
@@ -86,6 +76,17 @@ public abstract class AbstractIntegrationTest {
             .get(url, params)
             .then()
             .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T> T getNotFound(String url, Class<T> response, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .get(url, params)
+            .then()
+            .spec(notFoundResponseSpec)
             .extract()
             .as(response);
     }

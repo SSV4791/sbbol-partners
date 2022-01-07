@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.MergeHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -49,12 +50,11 @@ public class PartnerServiceImpl implements PartnerService {
             UUID uuid = UUID.fromString(id);
             var history = mergeHistoryRepository.getByPartnerUuid(uuid);
             if (history == null) {
-                //TODO обработка ошибок
-                return new PartnerResponse();
+                throw new EntryNotFoundException("partner", digitalId, id);
             }
             PartnerEntity partner = partnerRepository.getByDigitalIdAndId(digitalId, history.getMainUuid());
             if (partner == null) {
-                return new PartnerResponse();
+                throw new EntryNotFoundException("partner", digitalId, id);
             }
             var response = partnerMapper.toPartner(partner);
             var partnerResponse = new PartnerResponse();
@@ -127,11 +127,11 @@ public class PartnerServiceImpl implements PartnerService {
         if (legacySbbolAdapter.checkMigration(partner.getDigitalId())) {
             MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(partner.getUuid()));
             if (history == null) {
-                return null;
+                throw new EntryNotFoundException("partner", partner.getDigitalId(), partner.getUuid());
             }
             PartnerEntity searchPartner = partnerRepository.getByDigitalIdAndId(partner.getDigitalId(), history.getMainUuid());
             if (searchPartner == null) {
-                return new PartnerResponse();
+                throw new EntryNotFoundException("partner", partner.getDigitalId(), partner.getUuid());
             }
             partnerMapper.updatePartner(partner, searchPartner);
             PartnerEntity savePartner = partnerRepository.save(searchPartner);
@@ -151,11 +151,11 @@ public class PartnerServiceImpl implements PartnerService {
         if (legacySbbolAdapter.checkMigration(digitalId)) {
             MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(id));
             if (history == null) {
-                return new Error();
+                throw new EntryNotFoundException("partner", digitalId, id);
             }
             PartnerEntity searchPartner = partnerRepository.getByDigitalIdAndId(digitalId, history.getMainUuid());
-            if (searchPartner ==null) {
-                return new Error();
+            if (searchPartner == null) {
+                throw new EntryNotFoundException("partner", digitalId, id);
             }
             partnerRepository.deleteById(searchPartner.getId());
             mergeHistoryRepository.deleteByMainUuid(searchPartner.getId());

@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
@@ -41,12 +42,9 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Override
     @Transactional
     public DocumentTypeResponse updateDocument(DocumentType document) {
-        if (document.getUuid() == null) {
-            return null;
-        }
         DocumentTypeEntity searchDocument = dictionaryRepository.getById(UUID.fromString(document.getUuid()));
         if (searchDocument == null) {
-            return null;
+            throw new EntryNotFoundException("contact", document.getUuid());
         }
         documentTypeMapper.updateDocument(document, searchDocument);
         dictionaryRepository.save(searchDocument);

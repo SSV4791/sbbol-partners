@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerAddressMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
@@ -35,6 +36,9 @@ public class PartnerAddressServiceImpl implements PartnerAddressService {
     @Transactional(readOnly = true)
     public AddressResponse getAddress(String digitalId, String id) {
         var address = addressRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
+        if (address == null) {
+            throw new EntryNotFoundException("address", digitalId, id);
+        }
         var response = partnerAddressMapper.toAddress(address);
         return new AddressResponse().address(response);
     }
@@ -60,7 +64,7 @@ public class PartnerAddressServiceImpl implements PartnerAddressService {
     public AddressResponse saveAddress(Address address) {
         var partner = partnerRepository.getByDigitalIdAndId(address.getDigitalId(), UUID.fromString(address.getUnifiedUuid()));
         if (partner == null) {
-            return null;
+            throw new EntryNotFoundException("partenr", address.getDigitalId(), address.getUuid());
         }
         var requestAddress = partnerAddressMapper.toAddress(address);
         var saveAddress = addressRepository.save(requestAddress);
@@ -73,7 +77,7 @@ public class PartnerAddressServiceImpl implements PartnerAddressService {
     public AddressResponse updateAddress(Address address) {
         var searchAddress = addressRepository.getByDigitalIdAndId(address.getDigitalId(), UUID.fromString(address.getUuid()));
         if (searchAddress == null) {
-            return null;
+            throw new EntryNotFoundException("address", address.getDigitalId(), address.getUuid());
         }
         partnerAddressMapper.updateAddress(address, searchAddress);
         var saveContact = addressRepository.save(searchAddress);
@@ -86,7 +90,7 @@ public class PartnerAddressServiceImpl implements PartnerAddressService {
     public Error deleteAddress(String digitalId, String id) {
         var searchAddress = addressRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
         if (searchAddress == null) {
-            return new Error();
+            throw new EntryNotFoundException("address", digitalId, id);
         }
         addressRepository.delete(searchAddress);
         return new Error();

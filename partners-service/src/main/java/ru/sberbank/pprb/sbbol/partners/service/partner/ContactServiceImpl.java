@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
@@ -42,6 +43,9 @@ public class ContactServiceImpl implements ContactService {
     @Transactional(readOnly = true)
     public ContactResponse getContact(String digitalId, String id) {
         var contact = contactRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
+        if (contact == null) {
+            throw new EntryNotFoundException("contact", digitalId, id);
+        }
         var response = contactMapper.toContact(contact);
         return new ContactResponse().contact(response);
     }
@@ -67,7 +71,7 @@ public class ContactServiceImpl implements ContactService {
     public ContactResponse saveContact(Contact contact) {
         var partner = partnerRepository.getByDigitalIdAndId(contact.getDigitalId(), UUID.fromString(contact.getPartnerUuid()));
         if (partner == null) {
-            return null;
+            throw new EntryNotFoundException("partner", contact.getDigitalId(), contact.getUuid());
         }
         var requestContact = contactMapper.toContact(contact);
         for (ContactEmailEntity email : requestContact.getEmails()) {
@@ -86,7 +90,7 @@ public class ContactServiceImpl implements ContactService {
     public ContactResponse updateContact(Contact contact) {
         var searchContact = contactRepository.getByDigitalIdAndId(contact.getDigitalId(), UUID.fromString(contact.getUuid()));
         if (searchContact == null) {
-            return null;
+            throw new EntryNotFoundException("contact", contact.getDigitalId(), contact.getUuid());
         }
         contactMapper.updateContact(contact, searchContact);
         var saveContact = contactRepository.save(searchContact);
@@ -99,7 +103,7 @@ public class ContactServiceImpl implements ContactService {
     public Error deleteContact(String digitalId, String id) {
         var searchContact = contactRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
         if (searchContact == null) {
-            return new Error();
+            throw new EntryNotFoundException("contact", digitalId, id);
         }
         contactRepository.delete(searchContact);
         return new Error();

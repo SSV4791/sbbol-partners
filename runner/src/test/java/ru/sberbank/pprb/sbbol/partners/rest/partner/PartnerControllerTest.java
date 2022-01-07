@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -149,16 +150,16 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var searchPartner =
-            get(
+            getNotFound(
                 baseRoutePath + "/{digitalId}" + "/{id}",
-                PartnerResponse.class,
+                Error.class,
                 createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getUuid()
             );
         assertThat(searchPartner)
             .isNotNull();
 
-        assertThat(searchPartner.getPartner())
-            .isNull();
+        assertThat(searchPartner.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     public static Partner getValidPartner() {

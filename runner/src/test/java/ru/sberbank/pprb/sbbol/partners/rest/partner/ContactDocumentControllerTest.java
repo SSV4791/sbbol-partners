@@ -1,12 +1,20 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
@@ -34,52 +42,52 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .isEqualTo(document);
     }
 
-//    @Test
-//    void testViewContactDocument() {
-//        Partner partner = createValidPartner("6666");
-//        Contact contact = createValidContact(partner.getUuid(), partner.getDigitalId());
-//        var document1 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
-//        var document2 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
-//        var document3 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
-//        var document4 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
-//
-//        DocumentsFilter filter1 = new DocumentsFilter()
-//            .digitalId(contact.getDigitalId())
-//            .unifiedUuid(
-//                List.of(
-//                    contact.getUuid()
-//                )
-//            )
-//            .pagination(new Pagination()
-//                .count(4)
-//                .offset(0));
-//        var response1 = post(
-//            baseRoutePath + "/documents/view",
-//            filter1,
-//            DocumentsResponse.class
-//        );
-//        assertThat(response1)
-//            .isNotNull();
-//        assertThat(response1.getDocuments().size())
-//            .isEqualTo(4);
-//
-//        DocumentsFilter filter2 = new DocumentsFilter()
-//            .digitalId(contact.getDigitalId())
-//            .unifiedUuid(List.of(document1.getUuid()))
-//            .documentType("PASSPORT_OF_RUSSIA")
-//            .pagination(new Pagination()
-//                .count(4)
-//                .offset(0));
-//        var response2 = post(
-//            baseRoutePath + "/documents/view",
-//            filter2,
-//            ContactsResponse.class
-//        );
-//        assertThat(response2)
-//            .isNotNull();
-//        assertThat(response2.getContacts().size())
-//            .isEqualTo(1);
-//    }
+    @Test
+    void testViewContactDocument() {
+        Partner partner = createValidPartner("6666");
+        Contact contact = createValidContact(partner.getUuid(), partner.getDigitalId());
+        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+
+        DocumentsFilter filter1 = new DocumentsFilter()
+            .digitalId(contact.getDigitalId())
+            .unifiedUuid(
+                List.of(
+                    contact.getUuid()
+                )
+            )
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response1 = post(
+            baseRoutePath + "/documents/view",
+            filter1,
+            DocumentsResponse.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getDocuments().size())
+            .isEqualTo(4);
+
+        DocumentsFilter filter2 = new DocumentsFilter()
+            .digitalId(contact.getDigitalId())
+            .unifiedUuid(List.of(contact.getUuid()))
+            .documentType("PASSPORT_OF_RUSSIA")
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/documents/view",
+            filter2,
+            DocumentsResponse.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getDocuments().size())
+            .isEqualTo(4);
+    }
 
 
     @Test
@@ -144,17 +152,17 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var searchDocument =
-            get(
+            getNotFound(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
-                DocumentResponse.class,
+                Error.class,
                 document.getDigitalId(), document.getUuid()
             );
 
         assertThat(searchDocument)
             .isNotNull();
 
-        assertThat(searchDocument.getDocument())
-            .isNull();
+        assertThat(searchDocument.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     public static Document getValidContactDocument(String partnerUuid) {
@@ -171,6 +179,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .dateIssue(LocalDate.now())
             .divisionCode("1111")
             .number("23")
+            .documentType(
+                new DocumentType()
+                    .uuid("3422aec8-7f44-4089-9a43-f8e3c5b00722")
+                    .description("Паспорт РФ")
+                    .status(false)
+                    .documentType("PASSPORT_OF_RUSSIA")
+            )
             ;
     }
 
