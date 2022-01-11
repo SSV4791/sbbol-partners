@@ -281,13 +281,13 @@ PARTNERS_MODULE_NAME=pprb4-digital-partners
 # Количество реплик в deployment
 PARTNERS_REPLICAS_COUNT=1
 # Лимиты пода по cpu
-PARTNERS_LIMIT_CPU=500m
+PARTNERS_LIMIT_CPU=1
 # Лимиты пода по памяти
-PARTNERS_LIMIT_MEMORY=500Mi
+PARTNERS_LIMIT_MEMORY=1000Mi
 # Запросы пода по cpu
-PARTNERS_REQUEST_CPU=500m
+PARTNERS_REQUEST_CPU=1
 # Запросы пода по памяти
-PARTNERS_REQUEST_MEMORY=500Mi
+PARTNERS_REQUEST_MEMORY=1000Mi
 # Лимит эфимерного хранилища приложения
 PARTNERS_LIMIT_EPHEMERAL_STORAGE=2Gi
 # Запрос эфимерного хранилища приложения
