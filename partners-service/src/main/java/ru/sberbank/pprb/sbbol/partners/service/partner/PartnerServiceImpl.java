@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.MergeHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
@@ -24,6 +25,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import java.util.UUID;
 
 @Service
+@Logged(printRequestResponse = true)
 public class PartnerServiceImpl implements PartnerService {
 
     private final PartnerRepository partnerRepository;

@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Logged(printRequestResponse = true)
 public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     private final DocumentDictionaryRepository dictionaryRepository;

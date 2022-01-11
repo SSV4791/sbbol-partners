@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
@@ -18,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import java.util.UUID;
 
 @Service
+@Logged(printRequestResponse = true)
 public class AccountServiceImpl implements AccountService {
 
     private final PartnerRepository partnerRepository;
