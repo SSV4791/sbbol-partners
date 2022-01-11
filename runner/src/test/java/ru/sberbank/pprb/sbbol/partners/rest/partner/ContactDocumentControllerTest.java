@@ -2,34 +2,26 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.model.Address;
-import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
-import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
-import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
-public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
+public class ContactDocumentControllerTest extends AbstractIntegrationTest {
 
-    public static final String baseRoutePath = "/partner";
+    public static final String baseRoutePath = "/partner/contact";
 
     @Test
-    void testGetPartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
-        DocumentResponse actualDocument =
+    void testGetContactDocument() {
+        var partner = createValidPartner();
+        var contact = createValidContact(partner.getUuid());
+        var document = createValidContactDocument(contact.getUuid());
+        var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
@@ -43,16 +35,21 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
 //    @Test
-//    void testViewPartnerDocument() {
-//        var partner = createValidPartner("7777");
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
-//        createValidPartnerDocument(partner.getUuid(), partner.getDigitalId());
+//    void testViewContactDocument() {
+//        Partner partner = createValidPartner("6666");
+//        Contact contact = createValidContact(partner.getUuid(), partner.getDigitalId());
+//        var document1 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+//        var document2 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+//        var document3 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+//        var document4 = createValidContactDocument(contact.getUuid(), contact.getDigitalId());
 //
-//        var filter1 = new DocumentsFilter()
-//            .digitalId(partner.getDigitalId())
-//            .unifiedUuid(List.of(partner.getUuid()))
+//        DocumentsFilter filter1 = new DocumentsFilter()
+//            .digitalId(contact.getDigitalId())
+//            .unifiedUuid(
+//                List.of(
+//                    contact.getUuid()
+//                )
+//            )
 //            .pagination(new Pagination()
 //                .count(4)
 //                .offset(0));
@@ -65,28 +62,31 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 //            .isNotNull();
 //        assertThat(response1.getDocuments().size())
 //            .isEqualTo(4);
-//        var filter2 = new DocumentsFilter()
-//            .digitalId(partner.getDigitalId())
-//            .unifiedUuid(List.of(partner.getUuid()))
-//            .documentType("LEGAL_ADDRESS")
+//
+//        DocumentsFilter filter2 = new DocumentsFilter()
+//            .digitalId(contact.getDigitalId())
+//            .unifiedUuid(List.of(document1.getUuid()))
+//            .documentType("PASSPORT_OF_RUSSIA")
 //            .pagination(new Pagination()
 //                .count(4)
 //                .offset(0));
 //        var response2 = post(
 //            baseRoutePath + "/documents/view",
 //            filter2,
-//            DocumentsResponse.class
+//            ContactsResponse.class
 //        );
 //        assertThat(response2)
 //            .isNotNull();
-//        assertThat(response2.getDocuments().size())
-//            .isEqualTo(4);
+//        assertThat(response2.getContacts().size())
+//            .isEqualTo(1);
 //    }
 
+
     @Test
-    void testCreatePartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
+    void testCreateContactDocument() {
+        var partner = createValidPartner();
+        var contact = createValidContact(partner.getUuid());
+        var document = createValidContactDocument(contact.getUuid());
         assertThat(document)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -96,16 +96,17 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testUpdatePartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
+    void testUpdateContactDocument() {
+        var partner = createValidPartner();
+        var contact = createValidContact(partner.getUuid());
+        var document = createValidContactDocument(contact.getUuid());
         String newName = "Новое номер";
-        Document updateDocument = new Document();
+        var updateDocument = new Document();
         updateDocument.uuid(document.getUuid());
         updateDocument.digitalId(document.getDigitalId());
         updateDocument.unifiedUuid(document.getUnifiedUuid());
         updateDocument.number(newName);
-        DocumentResponse newUpdateDocument = put(baseRoutePath + "/document", updateDocument, DocumentResponse.class);
+        var newUpdateDocument = put(baseRoutePath + "/document", updateDocument, DocumentResponse.class);
 
         assertThat(newUpdateDocument)
             .isNotNull();
@@ -116,14 +117,15 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testDeletePartnerDocument() {
-        Partner partner = createValidPartner();
-        Document document = createValidPartnerDocument(partner.getUuid());
-        DocumentResponse actualDocument =
+    void testDeleteContactDocument() {
+        var partner = createValidPartner();
+        var contact = createValidContact(partner.getUuid());
+        var document = createValidContactDocument(contact.getUuid());
+        var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
-                document.getDigitalId(),document.getUuid()
+                document.getDigitalId(), document.getUuid()
             );
         assertThat(actualDocument)
             .isNotNull();
@@ -132,7 +134,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isNotNull()
             .isEqualTo(document);
 
-        Error deleteDocument =
+        var deleteDocument =
             delete(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 Error.class,
@@ -141,7 +143,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(deleteDocument)
             .isNotNull();
 
-        DocumentResponse searchDocument =
+        var searchDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
@@ -155,29 +157,11 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isNull();
     }
 
-    private static Document createValidPartnerDocument(String partnerUuid, String digitalId) {
-        var response = post(baseRoutePath + "/document", getValidPartnerDocument(partnerUuid, digitalId), DocumentResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getDocument();
+    public static Document getValidContactDocument(String partnerUuid) {
+        return getValidContactDocument(partnerUuid, "111111");
     }
 
-    private static Document createValidPartnerDocument(String partnerUuid) {
-        var response = post(baseRoutePath + "/document", getValidPartnerDocument(partnerUuid), DocumentResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getDocument();
-    }
-
-    private static Document getValidPartnerDocument(String partnerUuid) {
-        return getValidPartnerDocument(partnerUuid, "111111");
-    }
-
-    private static Document getValidPartnerDocument(String partnerUuid, String digitalId) {
+    public static Document getValidContactDocument(String partnerUuid, String digitalId) {
         return new Document()
             .version(0L)
             .unifiedUuid(partnerUuid)
@@ -188,5 +172,23 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .divisionCode("1111")
             .number("23")
             ;
+    }
+
+    private static Document createValidContactDocument(String partnerUuid, String digitalId) {
+        var documentResponse = post(baseRoutePath + "/document", getValidContactDocument(partnerUuid, digitalId), DocumentResponse.class);
+        assertThat(documentResponse)
+            .isNotNull();
+        assertThat(documentResponse.getErrors())
+            .isNull();
+        return documentResponse.getDocument();
+    }
+
+    private static Document createValidContactDocument(String partnerUuid) {
+        var documentResponse = post(baseRoutePath + "/document", getValidContactDocument(partnerUuid), DocumentResponse.class);
+        assertThat(documentResponse)
+            .isNotNull();
+        assertThat(documentResponse.getErrors())
+            .isNull();
+        return documentResponse.getDocument();
     }
 }

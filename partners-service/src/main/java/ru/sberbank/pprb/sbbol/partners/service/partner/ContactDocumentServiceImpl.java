@@ -9,24 +9,24 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.UUID;
 
 @Service
-public class PartnerDocumentServiceImpl implements PartnerDocumentService {
+public class ContactDocumentServiceImpl implements ContactDocumentService {
 
-    private final PartnerRepository partnerRepository;
+    private final ContactRepository contactRepository;
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
 
-    public PartnerDocumentServiceImpl(
-        PartnerRepository partnerRepository,
+    public ContactDocumentServiceImpl(
+        ContactRepository contactRepository,
         DocumentRepository documentRepository,
         DocumentMapper documentMapper
     ) {
-        this.partnerRepository = partnerRepository;
+        this.contactRepository = contactRepository;
         this.documentRepository = documentRepository;
         this.documentMapper = documentMapper;
     }
@@ -58,8 +58,8 @@ public class PartnerDocumentServiceImpl implements PartnerDocumentService {
     @Override
     @Transactional
     public DocumentResponse saveDocument(Document document) {
-        var partner = partnerRepository.getByDigitalIdAndId(document.getDigitalId(), UUID.fromString(document.getUnifiedUuid()));
-        if (partner == null) {
+        var contact = contactRepository.getByDigitalIdAndId(document.getDigitalId(), UUID.fromString(document.getUnifiedUuid()));
+        if (contact == null) {
             return null;
         }
         var requestDocument = documentMapper.toDocument(document);
