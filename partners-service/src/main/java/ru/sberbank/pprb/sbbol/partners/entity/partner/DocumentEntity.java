@@ -14,6 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "document",
@@ -162,6 +163,26 @@ public class DocumentEntity extends BaseEntity {
 
     public void setCertifierType(DocumentCertifierType certifierType) {
         this.certifierType = certifierType;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DocumentEntity that = (DocumentEntity) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

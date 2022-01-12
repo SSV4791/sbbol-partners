@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Table(name = "bank", indexes = {
     @Index(name = "i_bank_account_uuid", columnList = "account_uuid")
@@ -84,6 +85,26 @@ public class BankEntity extends BaseEntity {
 
     public void setBankAccounts(List<BankAccountEntity> bankAccounts) {
         this.bankAccounts = bankAccounts;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        BankEntity that = (BankEntity) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

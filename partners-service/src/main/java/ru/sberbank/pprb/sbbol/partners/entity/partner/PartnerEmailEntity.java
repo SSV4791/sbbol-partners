@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.util.Objects;
 
 @Entity
 @DynamicUpdate
@@ -28,6 +29,26 @@ public class PartnerEmailEntity extends EmailBaseEntity {
 
     public void setPartner(PartnerEntity partner) {
         this.partner = partner;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        PartnerEmailEntity that = (PartnerEmailEntity) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

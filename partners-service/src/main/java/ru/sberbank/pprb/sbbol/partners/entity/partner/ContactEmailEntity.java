@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @DynamicUpdate
@@ -24,6 +25,26 @@ public class ContactEmailEntity extends EmailBaseEntity {
 
     public void setContact(ContactEntity contact) {
         this.contact = contact;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ContactEmailEntity that = (ContactEmailEntity) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

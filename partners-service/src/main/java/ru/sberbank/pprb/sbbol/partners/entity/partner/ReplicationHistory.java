@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -134,6 +135,26 @@ public class ReplicationHistory implements Serializable, HashKeyProvider {
 
     public void setPartnerUuid(UUID partnerUuid) {
         this.partnerUuid = partnerUuid;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ReplicationHistory that = (ReplicationHistory) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

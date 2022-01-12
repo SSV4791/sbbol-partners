@@ -11,6 +11,7 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "document_type_dictionary",
@@ -69,6 +70,26 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
 
     public void setSystemName(String systemName) {
         this.systemName = systemName;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DocumentTypeEntity that = (DocumentTypeEntity) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

@@ -11,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "address",
@@ -158,6 +159,26 @@ public class AddressEntity extends BaseEntity {
 
     public void setFlat(String flat) {
         this.flat = flat;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        AddressEntity that = (AddressEntity) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

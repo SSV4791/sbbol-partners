@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Table(name = "partner", indexes = {
     @Index(name = "i_partner_uuid", columnList = "digital_id")
@@ -201,6 +202,26 @@ public class PartnerEntity extends BaseEntity {
 
     public void setEmails(List<PartnerEmailEntity> emails) {
         this.emails = emails;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? super.hashCode() : Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        PartnerEntity that = (PartnerEntity) obj;
+        if (getId() == null || that.getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override
