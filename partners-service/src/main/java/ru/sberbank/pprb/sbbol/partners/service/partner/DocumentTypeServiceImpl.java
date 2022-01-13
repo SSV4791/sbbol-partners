@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
@@ -14,7 +13,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepo
 import java.util.List;
 import java.util.UUID;
 
-@Service
 @Logged(printRequestResponse = true)
 public class DocumentTypeServiceImpl implements DocumentTypeService {
 
@@ -28,8 +26,8 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     @Override
     @Transactional(readOnly = true)
-    public DocumentsTypeResponse getDocuments(Boolean status) {
-        List<DocumentTypeEntity> response = dictionaryRepository.findAllByDeleted(status);
+    public DocumentsTypeResponse getDocuments(Boolean deleted) {
+        List<DocumentTypeEntity> response = dictionaryRepository.findAllByDeleted(deleted);
         return new DocumentsTypeResponse().documentType(documentTypeMapper.toDocumentType(response));
     }
 
@@ -44,12 +42,12 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Override
     @Transactional
     public DocumentTypeResponse updateDocument(DocumentType document) {
-        DocumentTypeEntity searchDocument = dictionaryRepository.getById(UUID.fromString(document.getUuid()));
-        if (searchDocument == null) {
-            throw new EntryNotFoundException("contact", document.getUuid());
+        DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(document.getId()));
+        if (foundDocument == null) {
+            throw new EntryNotFoundException("document_type", document.getId());
         }
-        documentTypeMapper.updateDocument(document, searchDocument);
-        dictionaryRepository.save(searchDocument);
-        return new DocumentTypeResponse().documentType(documentTypeMapper.toDocumentType(searchDocument));
+        documentTypeMapper.updateDocument(document, foundDocument);
+        dictionaryRepository.save(foundDocument);
+        return new DocumentTypeResponse().documentType(documentTypeMapper.toDocumentType(foundDocument));
     }
 }

@@ -23,8 +23,8 @@ public class AccountViewRepositoryImpl implements AccountViewRepository, BaseRep
         List<Predicate> predicates = new ArrayList<>();
         var root = criteria.from(AccountEntity.class);
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        if (filter.getPartnerUuid() != null) {
-            predicates.add(root.get("partnerUuid").in(filter.getPartnerUuid().stream().map(UUID::fromString).collect(Collectors.toList())));
+        if (filter.getPartnerIds() != null) {
+            predicates.add(root.get("partnerUuid").in(filter.getPartnerIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
         criteria.orderBy(defaultOrder(builder, root));
         criteria.select(root).where(builder.and(predicates.toArray(new Predicate[0])));

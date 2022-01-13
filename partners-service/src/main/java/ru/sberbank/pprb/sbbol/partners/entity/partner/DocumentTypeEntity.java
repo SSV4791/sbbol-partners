@@ -29,7 +29,7 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
 
     @Column(name = "uuid", nullable = false)
     @Id
-    private UUID id;
+    private UUID uuid;
 
     @Column(name = "system_name", nullable = false, length = 50)
     private String systemName;
@@ -40,12 +40,12 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
     @Column(name = "deleted")
     private Boolean deleted;
 
-    public UUID getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public Boolean getDeleted() {
@@ -74,7 +74,7 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
 
     @Override
     public int hashCode() {
-        return getId() == null ? super.hashCode() : Objects.hash(getId());
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
     }
 
     @Override
@@ -86,14 +86,14 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
             return false;
         }
         DocumentTypeEntity that = (DocumentTypeEntity) obj;
-        if (getId() == null || that.getId() == null) {
+        if (getUuid() == null || that.getUuid() == null) {
             return false;
         }
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getUuid(), that.getUuid());
     }
 
     @Override
     public String getHashKey() {
-        return getId().toString();
+        return getUuid().toString();
     }
 }

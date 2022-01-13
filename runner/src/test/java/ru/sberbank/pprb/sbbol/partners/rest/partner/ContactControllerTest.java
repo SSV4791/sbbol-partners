@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 
@@ -24,12 +25,12 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     @Test
     void testGetContact() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
+        var contact = createValidContact(partner.getId());
         var actualContact =
             get(
                 baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
                 ContactResponse.class,
-                contact.getDigitalId(), contact.getUuid()
+                contact.getDigitalId(), contact.getId()
             );
         assertThat(actualContact)
             .isNotNull();
@@ -41,14 +42,14 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     @Test
     void testViewContact() {
         var partner = createValidPartner("2222");
-        var contact1 = createValidContact(partner.getUuid(), partner.getDigitalId());
-        var contact2 = createValidContact(partner.getUuid(), partner.getDigitalId());
-        var contact3 = createValidContact(partner.getUuid(), partner.getDigitalId());
-        var contact4 = createValidContact(partner.getUuid(), partner.getDigitalId());
+        var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact4 = createValidContact(partner.getId(), partner.getDigitalId());
 
         var filter1 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
-            .partnerUuid(partner.getUuid())
+            .partnerId(partner.getId())
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -64,8 +65,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
 
         var filter2 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
-            .partnerUuid(partner.getUuid())
-            .uuid(List.of(contact4.getUuid()))
+            .partnerId(partner.getId())
+            .ids(List.of(contact4.getId()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -81,13 +82,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
 
         var filter3 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
-            .partnerUuid(partner.getUuid())
-            .uuid(
+            .partnerId(partner.getId())
+            .ids(
                 List.of(
-                    contact1.getUuid(),
-                    contact2.getUuid(),
-                    contact3.getUuid(),
-                    contact4.getUuid()
+                    contact1.getId(),
+                    contact2.getId(),
+                    contact3.getId(),
+                    contact4.getId()
                 )
             )
             .pagination(new Pagination()
@@ -107,7 +108,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     @Test
     void testCreateContact() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
+        var contact = createValidContact(partner.getId());
         assertThat(contact)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -123,12 +124,12 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     @Test
     void testUpdateContact() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
+        var contact = createValidContact(partner.getId());
         String newName = "Новое наименование";
         var updateContact = new Contact();
-        updateContact.uuid(contact.getUuid());
+        updateContact.id(contact.getId());
         updateContact.digitalId(contact.getDigitalId());
-        updateContact.partnerUuid(contact.getPartnerUuid());
+        updateContact.partnerId(contact.getPartnerId());
         updateContact.orgName(newName);
         var newUpdateContact = put(baseRoutePath + "/contact", updateContact, ContactResponse.class);
 
@@ -143,12 +144,12 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     @Test
     void testDeleteContact() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
+        var contact = createValidContact(partner.getId());
         var actualContact =
             get(
                 baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
                 ContactResponse.class,
-                contact.getDigitalId(), contact.getUuid()
+                contact.getDigitalId(), contact.getId()
             );
         assertThat(actualContact)
             .isNotNull();
@@ -159,8 +160,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         var deleteContact =
             delete(
                 baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
-                Error.class,
-                actualContact.getContact().getDigitalId(), actualContact.getContact().getUuid()
+                actualContact.getContact().getDigitalId(), actualContact.getContact().getId()
             );
 
         assertThat(deleteContact)
@@ -170,7 +170,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             getNotFound(
                 baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
                 Error.class,
-                contact.getDigitalId(), contact.getUuid()
+                contact.getDigitalId(), contact.getId()
             );
         assertThat(searchContact)
             .isNotNull();
@@ -186,9 +186,9 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     public static Contact getValidContact(String partnerUuid, String digitalId) {
         return new Contact()
             .version(0L)
-            .partnerUuid(partnerUuid)
+            .partnerId(partnerUuid)
             .digitalId(digitalId)
-            .legalForm(Contact.LegalFormEnum.LEGAL_ENTITY)
+            .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName("Наименование компании")
             .firstName("Имя клиента")
             .secondName("Фамилия клиента")
@@ -207,7 +207,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Contact createValidContact(String partnerUuid, String digitalId) {
-        var createContact = post(baseRoutePath + "/contact", getValidContact(partnerUuid, digitalId), ContactResponse.class);
+        var createContact = createPost(baseRoutePath + "/contact", getValidContact(partnerUuid, digitalId), ContactResponse.class);
         assertThat(createContact)
             .isNotNull();
         assertThat(createContact.getErrors())
@@ -216,7 +216,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Contact createValidContact(String partnerUuid) {
-        var createContact = post(baseRoutePath + "/contact", getValidContact(partnerUuid), ContactResponse.class);
+        var createContact = createPost(baseRoutePath + "/contact", getValidContact(partnerUuid), ContactResponse.class);
         assertThat(createContact)
             .isNotNull();
         assertThat(createContact.getErrors())

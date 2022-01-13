@@ -7,5 +7,11 @@ import java.util.List;
 
 public interface ContactViewRepository {
 
+    /**
+     * Получение контактов
+     *
+     * @param filter Фильтр для запроса контактов
+     * @return Контакты
+     */
     List<ContactEntity> findByFilter(ContactsFilter filter);
 }

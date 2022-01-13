@@ -20,21 +20,21 @@ public class AccountMapperTest extends BaseConfiguration {
 
     @Test
     void testToAccount() {
-        Account expected = factory.manufacturePojo(Account.class);
-        for (Bank bank : expected.getBanks()) {
-            bank.setAccountUuid(expected.getUuid());
-            for (BankAccount bankAccount : bank.getBankAccounts()) {
-                bankAccount.setBankUuid(bank.getUuid());
+        var expected = factory.manufacturePojo(Account.class);
+        for (var bank : expected.getBanks()) {
+            bank.setPartnerAccountId(expected.getId());
+            for (var bankAccount : bank.getBankAccounts()) {
+                bankAccount.setBankId(bank.getId());
             }
         }
-        AccountEntity account = mapper.toAccount(expected);
-        for (BankEntity bank : account.getBanks()) {
+        var account = mapper.toAccount(expected);
+        for (var bank : account.getBanks()) {
             bank.setAccount(account);
-            for (BankAccountEntity bankAccount : bank.getBankAccounts()) {
+            for (var bankAccount : bank.getBankAccounts()) {
                 bankAccount.setBank(bank);
             }
         }
-        Account actual = mapper.toAccount(account);
+        var actual = mapper.toAccount(account);
         assertThat(expected)
             .usingRecursiveComparison()
             .isEqualTo(actual);
@@ -43,21 +43,26 @@ public class AccountMapperTest extends BaseConfiguration {
 
     @Test
     void testToBank() {
-        Bank expected = factory.manufacturePojo(Bank.class);
-        BankEntity actual = mapper.toBank(expected);
-        actual.setAccount(factory.manufacturePojo(AccountEntity.class));
+        var expected = factory.manufacturePojo(Bank.class);
+        var actual = mapper.toBank(expected);
+        var account = new AccountEntity();
+        account.setUuid(UUID.fromString(expected.getPartnerAccountId()));
+        actual.setAccount(account);
+        for (var bankAccount : actual.getBankAccounts()) {
+            bankAccount.setBank(actual);
+        }
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
-                "accountUuid",
-                "bankAccounts.bankUuid")
+                "partnerAccountId",
+                "bankAccounts.bankId")
             .isEqualTo(mapper.toBank(actual));
     }
 
     @Test
     void testToBankReverse() {
-        BankEntity expected = factory.manufacturePojo(BankEntity.class);
-        Bank actual = mapper.toBank(expected);
+        var expected = factory.manufacturePojo(BankEntity.class);
+        var actual = mapper.toBank(expected);
         expected.setAccount(factory.manufacturePojo(AccountEntity.class));
         assertThat(expected)
             .usingRecursiveComparison()
@@ -70,9 +75,12 @@ public class AccountMapperTest extends BaseConfiguration {
 
     @Test
     void testToBankAccount() {
-        BankAccount expected = factory.manufacturePojo(BankAccount.class)
-            .uuid(UUID.randomUUID().toString());
-        BankAccountEntity actual = mapper.toBankAccount(expected);
+        var expected = factory.manufacturePojo(BankAccount.class)
+            .id(UUID.randomUUID().toString());
+        var actual = mapper.toBankAccount(expected);
+        var bank = new BankEntity();
+        bank.setUuid(UUID.fromString(expected.getBankId()));
+        actual.setBank(bank);
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields("bankUuid")
@@ -81,8 +89,8 @@ public class AccountMapperTest extends BaseConfiguration {
 
     @Test
     void testToBankAccountReverse() {
-        BankAccountEntity expected = factory.manufacturePojo(BankAccountEntity.class);
-        BankAccount actual = mapper.toBankAccount(expected);
+        var expected = factory.manufacturePojo(BankAccountEntity.class);
+        var actual = mapper.toBankAccount(expected);
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields("bank")

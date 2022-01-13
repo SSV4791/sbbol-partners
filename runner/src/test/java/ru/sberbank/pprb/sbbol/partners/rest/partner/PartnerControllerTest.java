@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
@@ -23,14 +24,14 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void testGetPartner() {
         var partner = getValidPartner();
-        var createdPartner = post(baseRoutePath, partner, PartnerResponse.class);
+        var createdPartner = createPost(baseRoutePath, partner, PartnerResponse.class);
         assertThat(createdPartner)
             .isNotNull();
 
         var actualPartner = get(
             baseRoutePath + "/{digitalId}" + "/{id}",
             PartnerResponse.class,
-            createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getUuid()
+            createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getId()
         );
         assertThat(actualPartner)
             .isNotNull();
@@ -41,11 +42,11 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testGetOnePartners() {
-        var createdPartner1 = post(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -66,11 +67,11 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testGetAllPartners() {
-        var createdPartner1 = post(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -107,10 +108,10 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void testUpdatePartner() {
         var partner = getValidPartner();
-        var createdPartner = post(baseRoutePath, partner, PartnerResponse.class);
+        var createdPartner = createPost(baseRoutePath, partner, PartnerResponse.class);
         String newKpp = "999999999";
         var updatePartner = new Partner();
-        updatePartner.uuid(createdPartner.getPartner().getUuid());
+        updatePartner.id(createdPartner.getPartner().getId());
         updatePartner.digitalId(createdPartner.getPartner().getDigitalId());
         updatePartner.legalForm(createdPartner.getPartner().getLegalForm());
         updatePartner.kpp(newKpp);
@@ -126,14 +127,14 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testDeletePartner() {
-        var createdPartner = post(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var createdPartner = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner =
             get(
                 baseRoutePath + "/{digitalId}" + "/{id}",
                 PartnerResponse.class,
-                createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getUuid()
+                createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getId()
             );
         assertThat(actualPartner)
             .isNotNull();
@@ -141,19 +142,16 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull()
             .isEqualTo(createdPartner.getPartner());
 
-        var deletePartner = delete(
+        delete(
             baseRoutePath + "/{digitalId}" + "/{id}",
-            Error.class,
-            actualPartner.getPartner().getDigitalId(), actualPartner.getPartner().getUuid()
+            actualPartner.getPartner().getDigitalId(), actualPartner.getPartner().getId()
         );
-        assertThat(deletePartner)
-            .isNotNull();
 
         var searchPartner =
             getNotFound(
                 baseRoutePath + "/{digitalId}" + "/{id}",
                 Error.class,
-                createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getUuid()
+                createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getId()
             );
         assertThat(searchPartner)
             .isNotNull();
@@ -165,12 +163,13 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     public static Partner getValidPartner() {
         return getValidPartner("111111");
     }
+
     public static Partner getValidPartner(String digitalId) {
         return new Partner()
             .version(0L)
             .digitalId(digitalId)
             .partnerType(Partner.PartnerTypeEnum.PARTNER)
-            .legalForm(Partner.LegalFormEnum.LEGAL_ENTITY)
+            .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName("Наименование компании")
             .firstName("Имя клиента")
             .secondName("Фамилия клиента")
@@ -193,14 +192,14 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Partner createValidPartner() {
-        var createPartner = post("/partners", getValidPartner(), PartnerResponse.class);
+        var createPartner = createPost("/partners", getValidPartner(), PartnerResponse.class);
         assertThat(createPartner)
             .isNotNull();
         return createPartner.getPartner();
     }
 
     protected static Partner createValidPartner(String digitalId) {
-        var createPartner = post("/partners", getValidPartner(digitalId), PartnerResponse.class);
+        var createPartner = createPost("/partners", getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createPartner)
             .isNotNull();
         return createPartner.getPartner();

@@ -4,6 +4,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,6 +41,10 @@ public abstract class AbstractIntegrationTest {
 
     protected static ResponseSpecification responseSpec;
 
+    protected static ResponseSpecification createResponseSpec;
+
+    protected static ResponseSpecification notContentResponseSpec;
+
     protected static ResponseSpecification notFoundResponseSpec;
 
     @BeforeAll
@@ -56,6 +61,14 @@ public abstract class AbstractIntegrationTest {
 
         responseSpec = new ResponseSpecBuilder()
             .expectStatusCode(HttpStatus.OK.value())
+            .build();
+
+        createResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.CREATED.value())
+            .build();
+
+        notContentResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.NO_CONTENT.value())
             .build();
 
         notFoundResponseSpec = new ResponseSpecBuilder()
@@ -91,6 +104,18 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
+    protected static <T, BODY> T createPost(String url, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(createResponseSpec)
+            .extract()
+            .as(response);
+    }
+
     protected static <T, BODY> T post(String url, BODY body, Class<T> response) {
         return given()
             .spec(requestSpec)
@@ -115,14 +140,14 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
-    protected static <T> T delete(String url, Class<T> response, Object... params) {
+    protected static ResponseBody<?> delete(String url, Object... params) {
         return given()
             .spec(requestSpec)
             .when()
             .delete(url, params)
             .then()
-            .spec(responseSpec)
+            .spec(notContentResponseSpec)
             .extract()
-            .as(response);
+            .response().getBody();
     }
 }

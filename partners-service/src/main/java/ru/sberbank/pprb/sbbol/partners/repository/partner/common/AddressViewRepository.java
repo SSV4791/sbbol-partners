@@ -7,5 +7,11 @@ import java.util.List;
 
 public interface AddressViewRepository {
 
+    /**
+     * Получение адресов
+     *
+     * @param filter Фильтр для запроса адресов
+     * @return Адреса
+     */
     List<AddressEntity> findByFilter(AddressesFilter filter);
 }

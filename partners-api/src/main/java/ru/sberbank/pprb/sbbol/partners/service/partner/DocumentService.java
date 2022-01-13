@@ -7,15 +7,15 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 /**
- * Сервис по работе с документами Партнера
+ * Сервис по работе с документами
  */
-public interface PartnerDocumentService {
+public interface DocumentService {
 
     /**
-     * Получение документа Партнера
+     * Получение документа
      *
      * @param digitalId Идентификатор личного кабинета клиента
-     * @param id        Идентификатор счёта
+     * @param id        Идентификатор документа
      * @return Документ
      */
     DocumentResponse getDocument(String digitalId, String id);
@@ -23,32 +23,32 @@ public interface PartnerDocumentService {
     /**
      * Получение списка документов партнеров по заданному фильтру
      *
-     * @param documentsFilter фильтр для поиска документов Партнера
-     * @return список документов партнера, удовлетворяющих заданному фильтру
+     * @param documentsFilter фильтр для поиска документов
+     * @return список документов, удовлетворяющих заданному фильтру
      */
     DocumentsResponse getDocuments(DocumentsFilter documentsFilter);
 
     /**
-     * Создание нового документа Партнера
+     * Создание нового документа
      *
-     * @param document данные документа Партнера
+     * @param document данные документа
      * @return Документ
      */
     DocumentResponse saveDocument(Document document);
 
     /**
-     * Обновление документа Партнера
+     * Обновление документа
      *
-     * @param document новые данные документа Партнера
+     * @param document новые данные документа
      * @return Документ
      */
     DocumentResponse updateDocument(Document document);
 
     /**
-     * Удаление документа Партнера
+     * Удаление документа
      *
      * @param digitalId Идентификатор личного кабинета клиента
-     * @param id        Идентификатор документа Партнера
+     * @param id        Идентификатор документа
      */
-    Error deleteDocument(String digitalId, String id);
+    void deleteDocument(String digitalId, String id);
 }

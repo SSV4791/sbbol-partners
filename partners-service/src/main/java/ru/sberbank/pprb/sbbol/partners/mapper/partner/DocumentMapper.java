@@ -15,14 +15,14 @@ import ru.sberbank.pprb.sbbol.partners.model.Document;
     componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
-    DocumentTypeMapper.class
-},
+        DocumentTypeMapper.class
+    },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 public interface DocumentMapper extends BaseMapper {
 
-    @Mapping(target = "uuid", expression = "java(document.getId() != null ? document.getId().toString() : null)")
-    @Mapping(target = "unifiedUuid", expression = "java(document.getUnifiedUuid() != null ? document.getUnifiedUuid().toString() : null)")
+    @Mapping(target = "id", expression = "java(document.getUuid().toString())")
+    @Mapping(target = "unifiedId", expression = "java(document.getUnifiedUuid().toString())")
     @Mapping(target = "documentType", source = "type")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     Document toDocument(DocumentEntity document);
@@ -32,11 +32,11 @@ public interface DocumentMapper extends BaseMapper {
         return certifierType != null ? Document.CertifierTypeEnum.valueOf(certifierType.name()) : null;
     }
 
-    @Mapping(target = "id", expression = "java(mapUuid(document.getUuid()))")
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(document.getId()))")
+    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "type", source = "documentType")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
-    @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentType().getUuid()))")
+    @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentType().getId()))")
     DocumentEntity toDocument(Document document);
 
     @Named("toCertifierType")
@@ -45,8 +45,8 @@ public interface DocumentMapper extends BaseMapper {
     }
 
     @Named("updateDocument")
-    @Mapping(target = "id", expression = "java(mapUuid(document.getUuid()))")
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(document.getId()))")
+    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "type", source = "documentType")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void updateDocument(Document document, @MappingTarget() DocumentEntity documentEntity);

@@ -12,7 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Error;
 public interface ContactService {
 
     /**
-     * Получение контакты Партнера
+     * Получение контакта Партнера
      *
      * @param digitalId Идентификатор личного кабинета клиента
      * @param id        Идентификатор контакта
@@ -50,5 +50,5 @@ public interface ContactService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param id        Идентификатор контакта Партнера
      */
-    Error deleteContact(String digitalId, String id);
+    void deleteContact(String digitalId, String id);
 }

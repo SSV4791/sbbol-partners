@@ -16,34 +16,34 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AccountMapper extends BaseMapper {
 
-    @Mapping(target = "uuid", expression = "java(account.getId() != null ? account.getId().toString() : null)")
-    @Mapping(target = "partnerUuid", expression = "java(account.getPartnerUuid() != null ? account.getPartnerUuid().toString() : null)")
+    @Mapping(target = "id", expression = "java(account.getUuid().toString())")
+    @Mapping(target = "partnerId", expression = "java(account.getPartnerUuid().toString())")
     Account toAccount(AccountEntity account);
 
-    @Mapping(target = "uuid", expression = "java(bank.getId() != null ? bank.getId().toString() : null)")
-    @Mapping(target = "accountUuid", expression = "java(bank.getHashKey() != null ? bank.getHashKey() : null)")
+    @Mapping(target = "id", expression = "java(bank.getUuid().toString())")
+    @Mapping(target = "partnerAccountId", expression = "java(bank.getAccount().getUuid().toString())")
     @Mapping(target = "mediary", source = "intermediary")
     Bank toBank(BankEntity bank);
 
-    @Mapping(target = "uuid", expression = "java(bankAccount.getId() != null ? bankAccount.getId().toString() : null)")
-    @Mapping(target = "bankUuid", expression = "java(bankAccount.getBank() != null ? bankAccount.getBank().getId().toString() : null)")
+    @Mapping(target = "id", expression = "java(bankAccount.getUuid().toString())")
+    @Mapping(target = "bankId", expression = "java(bankAccount.getBank().getUuid().toString())")
     BankAccount toBankAccount(BankAccountEntity bankAccount);
 
-    @Mapping(target = "id", expression = "java(mapUuid(account.getUuid()))")
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(account.getId()))")
+    @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
     AccountEntity toAccount(Account account);
 
-    @Mapping(target = "id", expression = "java(mapUuid(bank.getUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
     @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "account", ignore = true)
     BankEntity toBank(Bank bank);
 
-    @Mapping(target = "id", expression = "java(mapUuid(bankAccount.getUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(bankAccount.getId()))")
     @Mapping(target = "bank", ignore = true)
     BankAccountEntity toBankAccount(BankAccount bankAccount);
 
     @Named("updateAccount")
-    @Mapping(target = "id", expression = "java(mapUuid(account.getUuid()))")
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(account.getId()))")
+    @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
     void updateAccount(Account account, @MappingTarget() AccountEntity accountEntity);
 }

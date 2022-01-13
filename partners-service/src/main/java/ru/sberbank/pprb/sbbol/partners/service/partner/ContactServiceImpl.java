@@ -1,13 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
@@ -15,17 +10,16 @@ import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
-import java.util.List;
 import java.util.UUID;
 
-@Service
 @Logged(printRequestResponse = true)
 public class ContactServiceImpl implements ContactService {
+
+    public static final String DOCUMENT_NAME = "contact";
 
     private final PartnerRepository partnerRepository;
     private final ContactRepository contactRepository;
@@ -44,9 +38,9 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional(readOnly = true)
     public ContactResponse getContact(String digitalId, String id) {
-        var contact = contactRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
+        var contact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (contact == null) {
-            throw new EntryNotFoundException("contact", digitalId, id);
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
         }
         var response = contactMapper.toContact(contact);
         return new ContactResponse().contact(response);
@@ -71,9 +65,9 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public ContactResponse saveContact(Contact contact) {
-        var partner = partnerRepository.getByDigitalIdAndId(contact.getDigitalId(), UUID.fromString(contact.getPartnerUuid()));
+        var partner = partnerRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getPartnerId()));
         if (partner == null) {
-            throw new EntryNotFoundException("partner", contact.getDigitalId(), contact.getUuid());
+            throw new EntryNotFoundException("partner", contact.getDigitalId(), contact.getId());
         }
         var requestContact = contactMapper.toContact(contact);
         for (ContactEmailEntity email : requestContact.getEmails()) {
@@ -90,24 +84,23 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public ContactResponse updateContact(Contact contact) {
-        var searchContact = contactRepository.getByDigitalIdAndId(contact.getDigitalId(), UUID.fromString(contact.getUuid()));
-        if (searchContact == null) {
-            throw new EntryNotFoundException("contact", contact.getDigitalId(), contact.getUuid());
+        var foundContact = contactRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getId()));
+        if (foundContact == null) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, contact.getDigitalId(), contact.getId());
         }
-        contactMapper.updateContact(contact, searchContact);
-        var saveContact = contactRepository.save(searchContact);
+        contactMapper.updateContact(contact, foundContact);
+        var saveContact = contactRepository.save(foundContact);
         var response = contactMapper.toContact(saveContact);
         return new ContactResponse().contact(response);
     }
 
     @Override
     @Transactional
-    public Error deleteContact(String digitalId, String id) {
-        var searchContact = contactRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
-        if (searchContact == null) {
-            throw new EntryNotFoundException("contact", digitalId, id);
+    public void  deleteContact(String digitalId, String id) {
+        var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+        if (foundContact == null) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
         }
-        contactRepository.delete(searchContact);
-        return new Error();
+        contactRepository.delete(foundContact);
     }
 }

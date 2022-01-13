@@ -25,11 +25,11 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     @Test
     void testCreateDocuments() {
         var documentType = new DocumentType()
-            .uuid(UUID.randomUUID().toString())
-            .status(false)
+            .id(UUID.randomUUID().toString())
+            .deleted(false)
             .documentType("NEW_CREATE_TYPE")
             .description("Описание для создания");
-        var saveDocument = post(baseRoutePath, documentType, DocumentTypeResponse.class);
+        var saveDocument = createPost(baseRoutePath, documentType, DocumentTypeResponse.class);
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getDocumentType())
@@ -43,11 +43,11 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     @Test
     void testUpdateDocuments() {
         var documentType = new DocumentType()
-            .uuid(UUID.randomUUID().toString())
-            .status(false)
+            .id(UUID.randomUUID().toString())
+            .deleted(false)
             .documentType("NEW_UPDATE_TYPE")
             .description("Описание для обновления");
-        var saveDocument = post(baseRoutePath, documentType, DocumentTypeResponse.class);
+        var saveDocument = createPost(baseRoutePath, documentType, DocumentTypeResponse.class);
         assertThat(saveDocument)
             .isNotNull();
 

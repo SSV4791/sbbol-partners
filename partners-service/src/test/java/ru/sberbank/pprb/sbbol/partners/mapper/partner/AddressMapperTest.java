@@ -9,9 +9,9 @@ import ru.sberbank.pprb.sbbol.partners.model.Address;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PartnerAddressMapperTest extends BaseConfiguration {
+class AddressMapperTest extends BaseConfiguration {
 
-    private static final PartnerAddressMapper mapper = Mappers.getMapper(PartnerAddressMapper.class);
+    private static final AddressMapper mapper = Mappers.getMapper(AddressMapper.class);
 
     @Test
     void testToAddress() {
@@ -25,8 +25,8 @@ class PartnerAddressMapperTest extends BaseConfiguration {
     @Test
     void testToAddressType() {
         Address.TypeEnum typeEnum = factory.manufacturePojo(Address.TypeEnum.class);
-        AddressType addressType = PartnerAddressMapper.toAddressType(typeEnum);
+        AddressType addressType = AddressMapper.toAddressType(typeEnum);
         assertThat(typeEnum)
-            .isEqualTo(PartnerAddressMapper.toAddressType(addressType));
+            .isEqualTo(AddressMapper.toAddressType(addressType));
     }
 }

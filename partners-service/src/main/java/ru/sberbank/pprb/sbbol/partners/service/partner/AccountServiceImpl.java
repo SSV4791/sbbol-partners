@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
@@ -11,16 +10,16 @@ import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.UUID;
 
-@Service
 @Logged(printRequestResponse = true)
 public class AccountServiceImpl implements AccountService {
+
+    public static final String DOCUMENT_NAME = "account";
 
     private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
@@ -43,14 +42,14 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(readOnly = true)
     public AccountResponse getAccount(String digitalId, String id) {
         if (legacySbbolAdapter.checkMigration(digitalId)) {
-            var account = accountRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
+            var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
             if (account == null) {
-                throw new EntryNotFoundException("account", digitalId, id);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
             var response = accountMapper.toAccount(account);
             return new AccountResponse().account(response);
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
@@ -71,7 +70,7 @@ public class AccountServiceImpl implements AccountService {
             );
             return accountsResponse;
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
@@ -80,9 +79,9 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public AccountResponse saveAccount(Account account) {
         if (legacySbbolAdapter.checkMigration(account.getDigitalId())) {
-            var partner = partnerRepository.getByDigitalIdAndId(account.getDigitalId(), UUID.fromString(account.getPartnerUuid()));
+            var partner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
             if (partner == null) {
-                throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerUuid());
+                throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
             }
             var requestAccount = accountMapper.toAccount(account);
             if (!CollectionUtils.isEmpty(requestAccount.getBanks())) {
@@ -97,7 +96,7 @@ public class AccountServiceImpl implements AccountService {
             var response = accountMapper.toAccount(saveAccount);
             return new AccountResponse().account(response);
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
@@ -106,32 +105,31 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public AccountResponse updateAccount(Account account) {
         if (legacySbbolAdapter.checkMigration(account.getDigitalId())) {
-            var searchAccount = accountRepository.getByDigitalIdAndId(account.getDigitalId(), UUID.fromString(account.getUuid()));
-            if (searchAccount == null) {
-                throw new EntryNotFoundException("account", account.getDigitalId(), account.getUuid());
+            var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()));
+            if (foundAccount == null) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId());
             }
-            accountMapper.updateAccount(account, searchAccount);
-            var saveAccount = accountRepository.save(searchAccount);
+            accountMapper.updateAccount(account, foundAccount);
+            var saveAccount = accountRepository.save(foundAccount);
             var response = accountMapper.toAccount(saveAccount);
             return new AccountResponse().account(response);
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
 
     @Override
     @Transactional
-    public Error deleteAccount(String digitalId, String id) {
+    public void deleteAccount(String digitalId, String id) {
         if (legacySbbolAdapter.checkMigration(digitalId)) {
-            var searchAccount = accountRepository.getByDigitalIdAndId(digitalId, UUID.fromString(id));
-            if (searchAccount == null) {
-                throw new EntryNotFoundException("account", digitalId, id);
+            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            if (foundAccount == null) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            accountRepository.delete(searchAccount);
+            accountRepository.delete(foundAccount);
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
-        return new Error();
     }
 }

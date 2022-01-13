@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.partners;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.DocumentTypeDictionaryApi;
@@ -18,8 +19,8 @@ public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
     }
 
     @Override
-    public ResponseEntity<DocumentTypeResponse> change(DocumentType documentType) {
-        return ResponseEntity.ok(documentTypeService.saveDocument(documentType));
+    public ResponseEntity<DocumentTypeResponse> create(DocumentType documentType) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentTypeService.saveDocument(documentType));
     }
 
     @Override

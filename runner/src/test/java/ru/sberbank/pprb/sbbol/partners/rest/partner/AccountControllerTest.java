@@ -25,12 +25,12 @@ class AccountControllerTest extends AbstractIntegrationTest {
     @Test
     void testGetAccount() {
         var partner = createValidPartner();
-        var account = createValidAccount(partner.getUuid());
+        var account = createValidAccount(partner.getId());
         var actualAccount =
             get(
                 baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
                 AccountResponse.class,
-                account.getDigitalId(), account.getUuid()
+                account.getDigitalId(), account.getId()
             );
 
         assertThat(actualAccount)
@@ -43,14 +43,14 @@ class AccountControllerTest extends AbstractIntegrationTest {
     @Test
     void testViewAccount() {
         var partner = createValidPartner("4444");
-        createValidAccount(partner.getUuid(), partner.getDigitalId());
-        createValidAccount(partner.getUuid(), partner.getDigitalId());
-        createValidAccount(partner.getUuid(), partner.getDigitalId());
-        createValidAccount(partner.getUuid(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
 
         var filter1 = new AccountsFilter()
             .digitalId(partner.getDigitalId())
-            .partnerUuid(List.of(partner.getUuid()))
+            .partnerIds(List.of(partner.getId()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -68,7 +68,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
     @Test
     void testCreateAccount() {
         var partner = createValidPartner();
-        var account = createValidAccount(partner.getUuid());
+        var account = createValidAccount(partner.getId());
         assertThat(account)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -84,12 +84,12 @@ class AccountControllerTest extends AbstractIntegrationTest {
     @Test
     void testUpdateAccount() {
         var partner = createValidPartner();
-        var account = createValidAccount(partner.getUuid());
+        var account = createValidAccount(partner.getId());
         String newName = "Новое наименование";
         var updateAccount = new Account();
-        updateAccount.uuid(account.getUuid());
+        updateAccount.id(account.getId());
         updateAccount.digitalId(account.getDigitalId());
-        updateAccount.partnerUuid(account.getPartnerUuid());
+        updateAccount.partnerId(account.getPartnerId());
         updateAccount.name(newName);
         var newUpdateAccount = put(baseRoutePath + "/account", updateAccount, AccountResponse.class);
         assertThat(newUpdateAccount)
@@ -103,12 +103,12 @@ class AccountControllerTest extends AbstractIntegrationTest {
     @Test
     void testDeleteAccount() {
         var partner = createValidPartner();
-        var account = createValidAccount(partner.getUuid());
+        var account = createValidAccount(partner.getId());
         var actualAccount =
             get(
                 baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
                 AccountResponse.class,
-                account.getDigitalId(), account.getUuid()
+                account.getDigitalId(), account.getId()
             );
         assertThat(actualAccount)
             .isNotNull();
@@ -119,8 +119,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var deleteAccount =
             delete(
                 baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
-                Error.class,
-                actualAccount.getAccount().getDigitalId(), actualAccount.getAccount().getUuid()
+                actualAccount.getAccount().getDigitalId(), actualAccount.getAccount().getId()
             );
         assertThat(deleteAccount)
             .isNotNull();
@@ -129,7 +128,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             getNotFound(
                 baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
                 Error.class,
-                account.getDigitalId(), account.getUuid()
+                account.getDigitalId(), account.getId()
             );
         assertThat(searchAccount)
             .isNotNull();
@@ -143,9 +142,9 @@ class AccountControllerTest extends AbstractIntegrationTest {
 
     private static Account getValidAccount(String partnerUuid, String digitalId) {
         return new Account()
-            .uuid(UUID.randomUUID().toString())
+            .id(UUID.randomUUID().toString())
             .version(0L)
-            .partnerUuid(partnerUuid)
+            .partnerId(partnerUuid)
             .digitalId(digitalId)
             .name("111111")
             .account("222222")
@@ -156,7 +155,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
                         .name("222222")
                         .addBankAccountsItem(
                             new BankAccount()
-                                .uuid(UUID.randomUUID().toString())
+                                .id(UUID.randomUUID().toString())
                                 .account("111111111111111"))
                 )
             )
@@ -164,7 +163,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
     }
 
     private static Account createValidAccount(String partnerUuid, String digitalId) {
-        var createAccount = post(baseRoutePath + "/account", getValidAccount(partnerUuid, digitalId), AccountResponse.class);
+        var createAccount = createPost(baseRoutePath + "/account", getValidAccount(partnerUuid, digitalId), AccountResponse.class);
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())
@@ -173,7 +172,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
     }
 
     private static Account createValidAccount(String partnerUuid) {
-        var createAccount = post(baseRoutePath + "/account", getValidAccount(partnerUuid), AccountResponse.class);
+        var createAccount = createPost(baseRoutePath + "/account", getValidAccount(partnerUuid), AccountResponse.class);
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())

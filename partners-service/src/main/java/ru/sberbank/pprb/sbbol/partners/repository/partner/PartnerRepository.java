@@ -15,19 +15,19 @@ public interface PartnerRepository extends PagingAndSortingRepository<PartnerEnt
     /**
      * Получение Партнера по идентификатору
      *
-     * @param id Идентификатор документа
+     * @param uuid Идентификатор документа
      * @return Партнер
      */
-    PartnerEntity getById(UUID id);
+    PartnerEntity getByUuid(UUID uuid);
 
     /**
      * Получение Партнера
      *
      * @param digitalId Идентификатор личного кабинета
-     * @param id        Идентификатор документа
+     * @param uuid      Идентификатор документа
      * @return Партнер
      */
-    PartnerEntity getByDigitalIdAndId(String digitalId, UUID id);
+    PartnerEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
 
     /**
      * Получение списка Партнеров c сортировкой

@@ -28,7 +28,7 @@ public class ReplicationHistory implements Serializable, HashKeyProvider {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private UUID id;
+    private UUID uuid;
 
     @Column(name = "partner_uuid", nullable = false)
     private UUID partnerUuid;
@@ -57,12 +57,12 @@ public class ReplicationHistory implements Serializable, HashKeyProvider {
     @Column(name = "sbbol_guid", length = 36)
     private String sbbolGuid;
 
-    public UUID getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getSbbolGuid() {
@@ -139,7 +139,7 @@ public class ReplicationHistory implements Serializable, HashKeyProvider {
 
     @Override
     public int hashCode() {
-        return getId() == null ? super.hashCode() : Objects.hash(getId());
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
     }
 
     @Override
@@ -151,10 +151,10 @@ public class ReplicationHistory implements Serializable, HashKeyProvider {
             return false;
         }
         ReplicationHistory that = (ReplicationHistory) obj;
-        if (getId() == null || that.getId() == null) {
+        if (getUuid() == null || that.getUuid() == null) {
             return false;
         }
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getUuid(), that.getUuid());
     }
 
     @Override

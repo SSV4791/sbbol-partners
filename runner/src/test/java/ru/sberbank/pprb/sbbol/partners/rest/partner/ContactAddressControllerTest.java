@@ -13,16 +13,18 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
-public class PartnerAddressControllerTest extends AbstractIntegrationTest {
+public class ContactAddressControllerTest extends AbstractIntegrationTest {
 
-    public static final String baseRoutePath = "/partner";
+    public static final String baseRoutePath = "/partner/contact";
 
     @Test
-    void testGetPartnerAddress() {
+    void testGetContactAddress() {
         var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var contact = createValidContact(partner.getId());
+        var address = createValidAddress(contact.getId());
         var actualAddress = get(
             baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
             AddressResponse.class,
@@ -36,16 +38,17 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testViewPartnerAddress() {
+    void testViewContactAddress() {
         var partner = createValidPartner("3333");
-        createValidAddress(partner.getId(), partner.getDigitalId());
-        createValidAddress(partner.getId(), partner.getDigitalId());
-        createValidAddress(partner.getId(), partner.getDigitalId());
-        createValidAddress(partner.getId(), partner.getDigitalId());
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        createValidAddress(contact.getId(), contact.getDigitalId());
+        createValidAddress(contact.getId(), contact.getDigitalId());
+        createValidAddress(contact.getId(), contact.getDigitalId());
+        createValidAddress(contact.getId(), contact.getDigitalId());
 
         var filter1 = new AddressesFilter()
-            .digitalId(partner.getDigitalId())
-            .unifiedIds(List.of(partner.getId()))
+            .digitalId(contact.getDigitalId())
+            .unifiedIds(List.of(contact.getId()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -59,8 +62,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
         assertThat(response1.getAddresses().size())
             .isEqualTo(4);
         var filter2 = new AddressesFilter()
-            .digitalId(partner.getDigitalId())
-            .unifiedIds(List.of(partner.getId()))
+            .digitalId(contact.getDigitalId())
+            .unifiedIds(List.of(contact.getId()))
             .type("LEGAL_ADDRESS")
             .pagination(new Pagination()
                 .count(4)
@@ -77,9 +80,10 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testCreatePartnerAddress() {
+    void testCreateContactAddress() {
         var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var contact = createValidContact(partner.getId());
+        var address = createValidAddress(contact.getId());
         assertThat(address)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -89,9 +93,10 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testUpdatePartnerAddress() {
+    void testUpdateContactAddress() {
         var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var contact = createValidContact(partner.getId());
+        var address = createValidAddress(contact.getId());
         String newName = "Новое наименование";
         var updateAddress = new Address();
         updateAddress.id(address.getId());
@@ -109,9 +114,10 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testDeletePartnerAddress() {
+    void testDeleteContactAddress() {
         var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var contact = createValidContact(partner.getId());
+        var address = createValidAddress(contact.getId());
         var actualAddress =
             get(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",

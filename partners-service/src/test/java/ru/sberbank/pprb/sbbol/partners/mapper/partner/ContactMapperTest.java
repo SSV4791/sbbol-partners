@@ -3,11 +3,9 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
@@ -35,10 +33,10 @@ class ContactMapperTest extends BaseConfiguration {
     void testToContact() {
         Contact expected = factory.manufacturePojo(Contact.class);
         for (Email email : expected.getEmails()) {
-            email.setUnifiedUuid(expected.getUuid());
+            email.setUnifiedId(expected.getId());
         }
         for (Phone phone : expected.getPhones()) {
-            phone.setUnifiedUuid(expected.getUuid());
+            phone.setUnifiedId(expected.getId());
         }
         ContactEntity actual = mapper.toContact(expected);
         assertThat(expected)

@@ -23,9 +23,9 @@ public class ContactViewRepositoryImpl implements ContactViewRepository, BaseRep
         List<Predicate> predicates = new ArrayList<>();
         var root = criteria.from(ContactEntity.class);
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        predicates.add(builder.equal(root.get("partnerUuid"), UUID.fromString(filter.getPartnerUuid())));
-        if (filter.getUuid() != null) {
-            predicates.add(root.get("id").in(filter.getUuid().stream().map(UUID::fromString).collect(Collectors.toList())));
+        predicates.add(builder.equal(root.get("partnerUuid"), UUID.fromString(filter.getPartnerId())));
+        if (filter.getIds() != null) {
+            predicates.add(root.get("uuid").in(filter.getIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
         criteria.orderBy(defaultOrder(builder, root));
         criteria.select(root).where(builder.and(predicates.toArray(new Predicate[0])));

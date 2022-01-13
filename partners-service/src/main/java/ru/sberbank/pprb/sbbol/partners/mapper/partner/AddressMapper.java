@@ -11,10 +11,10 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface PartnerAddressMapper extends BaseMapper {
+public interface AddressMapper extends BaseMapper {
 
-    @Mapping(target = "uuid", expression = "java(address.getId() != null ? address.getId().toString() : null)")
-    @Mapping(target = "unifiedUuid", expression = "java(address.getUnifiedUuid() != null ? address.getUnifiedUuid().toString() : null)")
+    @Mapping(target = "id", expression = "java(address.getUuid().toString())")
+    @Mapping(target = "unifiedId", expression = "java(address.getUnifiedUuid().toString())")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     Address toAddress(AddressEntity address);
 
@@ -23,8 +23,8 @@ public interface PartnerAddressMapper extends BaseMapper {
         return addressType != null ? Address.TypeEnum.valueOf(addressType.name()) : null;
     }
 
-    @Mapping(target = "id", expression = "java(mapUuid(address.getUuid()))")
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
+    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     AddressEntity toAddress(Address address);
 
@@ -34,7 +34,7 @@ public interface PartnerAddressMapper extends BaseMapper {
     }
 
     @Named("updateAddress")
-    @Mapping(target = "id", expression = "java(mapUuid(address.getUuid()))")
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
+    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
     void updateAddress(Address address, @MappingTarget() AddressEntity addressEntity);
 }

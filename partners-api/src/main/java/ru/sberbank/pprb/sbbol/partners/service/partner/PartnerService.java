@@ -50,7 +50,6 @@ public interface PartnerService {
      *
      * @param digitalId Идентификатор личного кабинета клиента
      * @param id        Идентификатор Партнера
-     * @return Партнер
      */
-    Error deletePartner(String digitalId, String id);
+    void deletePartner(String digitalId, String id);
 }

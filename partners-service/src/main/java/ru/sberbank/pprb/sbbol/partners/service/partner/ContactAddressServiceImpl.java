@@ -9,22 +9,22 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 
 import java.util.UUID;
 
 @Logged(printRequestResponse = true)
-public class PartnerAddressServiceImpl extends AddressServiceImpl {
+public class ContactAddressServiceImpl extends AddressServiceImpl {
 
-    private final PartnerRepository partnerRepository;
+    private final ContactRepository contactRepository;
 
-    public PartnerAddressServiceImpl(
-        PartnerRepository partnerRepository,
+    public ContactAddressServiceImpl(
+        ContactRepository contactRepository,
         AddressRepository addressRepository,
         AddressMapper addressMapper
     ) {
         super(addressRepository, addressMapper);
-        this.partnerRepository = partnerRepository;
+        this.contactRepository = contactRepository;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class PartnerAddressServiceImpl extends AddressServiceImpl {
     @Override
     @Transactional
     public AddressResponse saveAddress(Address address) {
-        var partner = partnerRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getUnifiedId()));
+        var partner = contactRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getUnifiedId()));
         if (partner == null) {
             throw new EntryNotFoundException("partner", address.getDigitalId(), address.getId());
         }

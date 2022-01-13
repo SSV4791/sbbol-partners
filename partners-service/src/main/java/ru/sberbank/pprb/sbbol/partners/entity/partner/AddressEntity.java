@@ -163,7 +163,7 @@ public class AddressEntity extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return getId() == null ? super.hashCode() : Objects.hash(getId());
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
     }
 
     @Override
@@ -175,10 +175,10 @@ public class AddressEntity extends BaseEntity {
             return false;
         }
         AddressEntity that = (AddressEntity) obj;
-        if (getId() == null || that.getId() == null) {
+        if (getUuid() == null || that.getUuid() == null) {
             return false;
         }
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getUuid(), that.getUuid());
     }
 
     @Override

@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +55,7 @@ class PartnerMapperTest extends BaseConfiguration {
 
     @Test
     void toLegalType() {
-        Partner.LegalFormEnum typeEnum = factory.manufacturePojo(Partner.LegalFormEnum.class);
+        LegalForm typeEnum = factory.manufacturePojo(LegalForm.class);
         LegalType legalType = PartnerMapper.toLegalType(typeEnum);
         assertThat(typeEnum)
             .isEqualTo(PartnerMapper.toLegalType(legalType));

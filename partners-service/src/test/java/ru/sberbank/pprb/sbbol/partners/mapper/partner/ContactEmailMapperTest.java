@@ -14,13 +14,14 @@ public class ContactEmailMapperTest extends BaseConfiguration {
     private static final ContactEmailMapper mapper = Mappers.getMapper(ContactEmailMapper.class);
 
     @Test
-    void testToEmail() {
+    void
+    testToEmail() {
         Email expected = factory.manufacturePojo(Email.class);
         ContactEmailEntity actual = mapper.toEmail(expected);
         actual.setContact(factory.manufacturePojo(ContactEntity.class));
         assertThat(expected)
             .usingRecursiveComparison()
-            .ignoringFields("unifiedUuid")
+            .ignoringFields("unifiedId")
             .isEqualTo(mapper.toEmail(actual));
     }
 

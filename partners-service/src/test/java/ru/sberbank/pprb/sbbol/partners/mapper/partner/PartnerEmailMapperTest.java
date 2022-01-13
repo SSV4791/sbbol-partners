@@ -20,7 +20,7 @@ class PartnerEmailMapperTest extends BaseConfiguration {
         actual.setPartner(factory.manufacturePojo(PartnerEntity.class));
         assertThat(expected)
             .usingRecursiveComparison()
-            .ignoringFields("unifiedUuid")
+            .ignoringFields("unifiedId")
             .isEqualTo(mapper.toEmail(actual));
     }
 

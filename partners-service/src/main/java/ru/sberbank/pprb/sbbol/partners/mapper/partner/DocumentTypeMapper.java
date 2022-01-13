@@ -17,21 +17,18 @@ import java.util.List;
 )
 public interface DocumentTypeMapper extends BaseMapper {
 
-    @Mapping(target = "uuid", expression = "java(documentType.getId() != null ? documentType.getId().toString() : null)")
+    @Mapping(target = "id", expression = "java(documentType.getUuid().toString())")
     @Mapping(target = "documentType", source = "systemName")
-    @Mapping(target = "status", source = "deleted")
     DocumentType toDocumentType(DocumentTypeEntity documentType);
 
     List<DocumentType> toDocumentType(List<DocumentTypeEntity> documentType);
 
-    @Mapping(target = "id", expression = "java(mapUuid(documentType.getUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(documentType.getId()))")
     @Mapping(target = "systemName", source = "documentType")
-    @Mapping(target = "deleted", source = "status")
     DocumentTypeEntity toDocumentType(DocumentType documentType);
 
     @Named("updateDocument")
-    @Mapping(target = "id", expression = "java(mapUuid(document.getUuid()))")
+    @Mapping(target = "uuid", expression = "java(mapUuid(document.getId()))")
     @Mapping(target = "systemName", source = "documentType")
-    @Mapping(target = "deleted", source = "status")
     void updateDocument(DocumentType document, @MappingTarget() DocumentTypeEntity documentEntity);
 }

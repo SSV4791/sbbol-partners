@@ -33,7 +33,7 @@ public class PartnerPhoneEntity extends PhoneBaseEntity {
 
     @Override
     public int hashCode() {
-        return getId() == null ? super.hashCode() : Objects.hash(getId());
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
     }
 
     @Override
@@ -45,10 +45,10 @@ public class PartnerPhoneEntity extends PhoneBaseEntity {
             return false;
         }
         PartnerPhoneEntity that = (PartnerPhoneEntity) obj;
-        if (getId() == null || that.getId() == null) {
+        if (getUuid() == null || that.getUuid() == null) {
             return false;
         }
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getUuid(), that.getUuid());
     }
 
     @Override

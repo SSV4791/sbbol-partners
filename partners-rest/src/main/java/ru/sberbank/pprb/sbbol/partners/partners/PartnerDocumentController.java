@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.partners;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerDocumentApi;
@@ -7,26 +8,26 @@ import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerDocumentService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
 
 @RestController
 public class PartnerDocumentController implements PartnerDocumentApi {
 
-    private final PartnerDocumentService partnerDocumentService;
+    private final DocumentService partnerDocumentService;
 
-    public PartnerDocumentController(PartnerDocumentService partnerDocumentService) {
+    public PartnerDocumentController(DocumentService partnerDocumentService) {
         this.partnerDocumentService = partnerDocumentService;
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> change(Document document) {
-        return ResponseEntity.ok(partnerDocumentService.saveDocument(document));
+    public ResponseEntity<DocumentResponse> create(Document document) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(partnerDocumentService.saveDocument(document));
     }
 
     @Override
-    public ResponseEntity<Error> delete(String digitalId, String id) {
-        return ResponseEntity.ok(partnerDocumentService.deleteDocument(digitalId, id));
+    public ResponseEntity<Void> delete(String digitalId, String id) {
+        partnerDocumentService.deleteDocument(digitalId, id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override

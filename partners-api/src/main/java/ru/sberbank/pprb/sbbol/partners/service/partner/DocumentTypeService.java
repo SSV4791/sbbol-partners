@@ -12,21 +12,21 @@ public interface DocumentTypeService {
     /**
      * Получение списка документов по заданному фильтру
      *
-     * @param status фильтр для поиска типов документов
-     * @return список документов, удовлетворяющих заданному фильтру
+     * @param deleted признак типа документа Удален/Не удален
+     * @return список типов документов, удовлетворяющих заданному фильтру
      */
-    DocumentsTypeResponse getDocuments(Boolean status);
+    DocumentsTypeResponse getDocuments(Boolean deleted);
 
     /**
      * Создание нового типа документа
      *
-     * @param document данные документа Контакта
+     * @param document типы документа Контакта
      * @return Документ
      */
     DocumentTypeResponse saveDocument(DocumentType document);
 
     /**
-     * Обновление документа Контакта
+     * Обновление типа документа Контакта
      *
      * @param document новые данные документа Контакта
      * @return Документ

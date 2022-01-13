@@ -27,13 +27,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @Test
     void testGetContactDocument() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
-        var document = createValidContactDocument(contact.getUuid());
+        var contact = createValidContact(partner.getId());
+        var document = createValidContactDocument(contact.getId());
         var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
-                document.getDigitalId(), document.getUuid()
+                document.getDigitalId(), document.getId()
             );
         assertThat(actualDocument)
             .isNotNull();
@@ -45,17 +45,17 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @Test
     void testViewContactDocument() {
         Partner partner = createValidPartner("6666");
-        Contact contact = createValidContact(partner.getUuid(), partner.getDigitalId());
-        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
-        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
-        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
-        createValidContactDocument(contact.getUuid(), contact.getDigitalId());
+        Contact contact = createValidContact(partner.getId(), partner.getDigitalId());
+        createValidContactDocument(contact.getId(), contact.getDigitalId());
+        createValidContactDocument(contact.getId(), contact.getDigitalId());
+        createValidContactDocument(contact.getId(), contact.getDigitalId());
+        createValidContactDocument(contact.getId(), contact.getDigitalId());
 
         DocumentsFilter filter1 = new DocumentsFilter()
             .digitalId(contact.getDigitalId())
-            .unifiedUuid(
+            .unifiedIds(
                 List.of(
-                    contact.getUuid()
+                    contact.getId()
                 )
             )
             .pagination(new Pagination()
@@ -73,7 +73,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
 
         DocumentsFilter filter2 = new DocumentsFilter()
             .digitalId(contact.getDigitalId())
-            .unifiedUuid(List.of(contact.getUuid()))
+            .unifiedIds(List.of(contact.getId()))
             .documentType("PASSPORT_OF_RUSSIA")
             .pagination(new Pagination()
                 .count(4)
@@ -93,8 +93,8 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @Test
     void testCreateContactDocument() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
-        var document = createValidContactDocument(contact.getUuid());
+        var contact = createValidContact(partner.getId());
+        var document = createValidContactDocument(contact.getId());
         assertThat(document)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -106,13 +106,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @Test
     void testUpdateContactDocument() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
-        var document = createValidContactDocument(contact.getUuid());
+        var contact = createValidContact(partner.getId());
+        var document = createValidContactDocument(contact.getId());
         String newName = "Новое номер";
         var updateDocument = new Document();
-        updateDocument.uuid(document.getUuid());
+        updateDocument.id(document.getId());
         updateDocument.digitalId(document.getDigitalId());
-        updateDocument.unifiedUuid(document.getUnifiedUuid());
+        updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
         var newUpdateDocument = put(baseRoutePath + "/document", updateDocument, DocumentResponse.class);
 
@@ -127,13 +127,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @Test
     void testDeleteContactDocument() {
         var partner = createValidPartner();
-        var contact = createValidContact(partner.getUuid());
-        var document = createValidContactDocument(contact.getUuid());
+        var contact = createValidContact(partner.getId());
+        var document = createValidContactDocument(contact.getId());
         var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
-                document.getDigitalId(), document.getUuid()
+                document.getDigitalId(), document.getId()
             );
         assertThat(actualDocument)
             .isNotNull();
@@ -145,8 +145,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         var deleteDocument =
             delete(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
-                Error.class,
-                actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getUuid()
+                actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getId()
             );
         assertThat(deleteDocument)
             .isNotNull();
@@ -155,7 +154,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             getNotFound(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 Error.class,
-                document.getDigitalId(), document.getUuid()
+                document.getDigitalId(), document.getId()
             );
 
         assertThat(searchDocument)
@@ -172,7 +171,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     public static Document getValidContactDocument(String partnerUuid, String digitalId) {
         return new Document()
             .version(0L)
-            .unifiedUuid(partnerUuid)
+            .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .certifierName("Имя")
             .certifierType(Document.CertifierTypeEnum.NOTARY)
@@ -181,16 +180,16 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .number("23")
             .documentType(
                 new DocumentType()
-                    .uuid("3422aec8-7f44-4089-9a43-f8e3c5b00722")
+                    .id("3422aec8-7f44-4089-9a43-f8e3c5b00722")
                     .description("Паспорт РФ")
-                    .status(false)
+                    .deleted(false)
                     .documentType("PASSPORT_OF_RUSSIA")
             )
             ;
     }
 
     private static Document createValidContactDocument(String partnerUuid, String digitalId) {
-        var documentResponse = post(baseRoutePath + "/document", getValidContactDocument(partnerUuid, digitalId), DocumentResponse.class);
+        var documentResponse = createPost(baseRoutePath + "/document", getValidContactDocument(partnerUuid, digitalId), DocumentResponse.class);
         assertThat(documentResponse)
             .isNotNull();
         assertThat(documentResponse.getErrors())
@@ -199,7 +198,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     private static Document createValidContactDocument(String partnerUuid) {
-        var documentResponse = post(baseRoutePath + "/document", getValidContactDocument(partnerUuid), DocumentResponse.class);
+        var documentResponse = createPost(baseRoutePath + "/document", getValidContactDocument(partnerUuid), DocumentResponse.class);
         assertThat(documentResponse)
             .isNotNull();
         assertThat(documentResponse.getErrors())

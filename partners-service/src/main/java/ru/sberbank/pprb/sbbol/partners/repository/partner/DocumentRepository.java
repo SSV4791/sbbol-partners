@@ -14,8 +14,8 @@ public interface DocumentRepository extends CrudRepository<DocumentEntity, UUID>
      * Получение документа Партнера
      *
      * @param digitalId Идентификатор личного кабинета
-     * @param id        Идентификатор документа
-     * @return документ Партнер
+     * @param uuid      Идентификатор документа
+     * @return документ Партнера
      */
-    DocumentEntity getByDigitalIdAndId(String digitalId, UUID id);
+    DocumentEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
 }

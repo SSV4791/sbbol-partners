@@ -7,5 +7,11 @@ import java.util.List;
 
 public interface DocumentViewRepository {
 
+    /**
+     * Получение документов
+     *
+     * @param filter Фильтр для запроса документов
+     * @return Документы
+     */
     List<DocumentEntity> findByFilter(DocumentsFilter filter);
 }

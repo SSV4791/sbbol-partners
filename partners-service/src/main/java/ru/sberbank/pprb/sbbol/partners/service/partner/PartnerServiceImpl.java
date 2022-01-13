@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
@@ -13,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
@@ -24,9 +22,10 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.UUID;
 
-@Service
 @Logged(printRequestResponse = true)
 public class PartnerServiceImpl implements PartnerService {
+
+    public static final String DOCUMENT_NAME = "partner";
 
     private final PartnerRepository partnerRepository;
     private final MergeHistoryRepository mergeHistoryRepository;
@@ -52,18 +51,18 @@ public class PartnerServiceImpl implements PartnerService {
             UUID uuid = UUID.fromString(id);
             var history = mergeHistoryRepository.getByPartnerUuid(uuid);
             if (history == null) {
-                throw new EntryNotFoundException("partner", digitalId, id);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            PartnerEntity partner = partnerRepository.getByDigitalIdAndId(digitalId, history.getMainUuid());
+            PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, history.getMainUuid());
             if (partner == null) {
-                throw new EntryNotFoundException("partner", digitalId, id);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
             var response = partnerMapper.toPartner(partner);
             var partnerResponse = new PartnerResponse();
             partnerResponse.partner(response);
             return partnerResponse;
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
@@ -92,7 +91,7 @@ public class PartnerServiceImpl implements PartnerService {
             );
             return partnersResponse;
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
@@ -110,15 +109,15 @@ public class PartnerServiceImpl implements PartnerService {
             }
             var savePartner = partnerRepository.save(partnerEntity);
             MergeHistoryEntity history = new MergeHistoryEntity();
-            history.setPartnerUuid(savePartner.getId());
-            history.setMainUuid(savePartner.getId());
+            history.setPartnerUuid(savePartner.getUuid());
+            history.setMainUuid(savePartner.getUuid());
             mergeHistoryRepository.save(history);
             var response = partnerMapper.toPartner(savePartner);
             var partnerResponse = new PartnerResponse();
             partnerResponse.partner(response);
             return partnerResponse;
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
@@ -127,44 +126,42 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     public PartnerResponse updatePartner(Partner partner) {
         if (legacySbbolAdapter.checkMigration(partner.getDigitalId())) {
-            MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(partner.getUuid()));
+            MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(partner.getId()));
             if (history == null) {
-                throw new EntryNotFoundException("partner", partner.getDigitalId(), partner.getUuid());
+                throw new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId());
             }
-            PartnerEntity searchPartner = partnerRepository.getByDigitalIdAndId(partner.getDigitalId(), history.getMainUuid());
-            if (searchPartner == null) {
-                throw new EntryNotFoundException("partner", partner.getDigitalId(), partner.getUuid());
+            PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), history.getMainUuid());
+            if (foundPartner == null) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId());
             }
-            partnerMapper.updatePartner(partner, searchPartner);
-            PartnerEntity savePartner = partnerRepository.save(searchPartner);
+            partnerMapper.updatePartner(partner, foundPartner);
+            PartnerEntity savePartner = partnerRepository.save(foundPartner);
             var response = partnerMapper.toPartner(savePartner);
             var partnerResponse = new PartnerResponse();
             partnerResponse.partner(response);
             return partnerResponse;
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
         return null;
     }
 
     @Override
     @Transactional
-    public Error deletePartner(String digitalId, String id) {
+    public void deletePartner(String digitalId, String id) {
         if (legacySbbolAdapter.checkMigration(digitalId)) {
             MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(id));
             if (history == null) {
-                throw new EntryNotFoundException("partner", digitalId, id);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            PartnerEntity searchPartner = partnerRepository.getByDigitalIdAndId(digitalId, history.getMainUuid());
-            if (searchPartner == null) {
-                throw new EntryNotFoundException("partner", digitalId, id);
+            PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, history.getMainUuid());
+            if (foundPartner == null) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            partnerRepository.deleteById(searchPartner.getId());
-            mergeHistoryRepository.deleteByMainUuid(searchPartner.getId());
-            return new Error();
+            partnerRepository.deleteById(foundPartner.getUuid());
+            mergeHistoryRepository.deleteByMainUuid(foundPartner.getUuid());
         } else {
-            //TODO реализация работы с legacy
+            //TODO DCBBRAIN-1642 реализация работы с legacy
         }
-        return null;
     }
 }

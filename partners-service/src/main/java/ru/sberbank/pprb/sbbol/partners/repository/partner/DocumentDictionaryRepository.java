@@ -11,18 +11,18 @@ import java.util.UUID;
 public interface DocumentDictionaryRepository extends CrudRepository<DocumentTypeEntity, UUID> {
 
     /**
-     * Получение типа документа по идунтефикатору
+     * Получение типа документа по идентификатору
      *
-     * @param id Идентефикатор документа
-     * @return Документ
+     * @param uuid идентификатор документа
+     * @return Тип документа
      */
-    DocumentTypeEntity getById(UUID id);
+    DocumentTypeEntity getByUuid(UUID uuid);
 
     /**
      * Получение типов документов по фильтру
      *
      * @param deleted тип получаемых документов
-     * @return Документы
+     * @return Типы документов
      */
     List<DocumentTypeEntity> findAllByDeleted(Boolean deleted);
 }

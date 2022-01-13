@@ -24,8 +24,8 @@ public class AddressViewRepositoryImpl implements AddressViewRepository, BaseRep
         List<Predicate> predicates = new ArrayList<>();
         var root = criteria.from(AddressEntity.class);
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        if (filter.getUnifiedUuid() != null) {
-            predicates.add(root.get("unifiedUuid").in(filter.getUnifiedUuid().stream().map(UUID::fromString).collect(Collectors.toList())));
+        if (filter.getUnifiedIds() != null) {
+            predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
         if (filter.getType() != null) {
             predicates.add(builder.equal(root.get("type"), AddressType.valueOf(filter.getType())));

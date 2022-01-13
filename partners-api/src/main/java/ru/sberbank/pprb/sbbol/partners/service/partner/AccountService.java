@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
@@ -51,5 +50,5 @@ public interface AccountService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param id        Идентификатор счёта Партнера
      */
-    Error deleteAccount(String digitalId, String id);
+    void deleteAccount(String digitalId, String id);
 }

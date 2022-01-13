@@ -20,7 +20,7 @@ public class ContactPhoneMapperTest extends BaseConfiguration {
         actual.setContact(factory.manufacturePojo(ContactEntity.class));
         assertThat(expected)
             .usingRecursiveComparison()
-            .ignoringFields("unifiedUuid")
+            .ignoringFields("unifiedId")
             .isEqualTo(mapper.toPhone(actual));
     }
 
