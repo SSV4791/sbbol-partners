@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse",
+  "type": "object",
+  "title": "Ответ на запрос вида документа",
+  "properties": {
+    "documentType": {
+      "type": "object",
+      "title": "Вид документа",
+      "$ref": "document_type.json"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}
+

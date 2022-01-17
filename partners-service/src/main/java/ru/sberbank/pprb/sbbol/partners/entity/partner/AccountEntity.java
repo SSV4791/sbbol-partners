@@ -9,24 +9,31 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
-@Table(name = "account", indexes = {
-    @Index(name = "i_account_partner_uuid", columnList = "partner_uuid")
-})
+@Table(name = "account",
+    indexes = {
+        @Index(name = "i_account_digital_id", columnList = "digital_id"),
+        @Index(name = "i_account_partner_uuid", columnList = "partner_uuid")
+    }
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity
 public class AccountEntity extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partner_uuid", nullable = false)
-    private PartnerEntity partner;
+    @Serial
+    private static final long serialVersionUID = 1;
+
+    @Column(name = "partner_uuid", nullable = false)
+    private UUID partnerUuid;
 
     @Column(name = "digital_id", nullable = false)
     private String digitalId;
@@ -41,8 +48,19 @@ public class AccountEntity extends BaseEntity {
     @Column(name = "state", length = 10, columnDefinition = "varchar(10) default 'NOT_SIGN'")
     private AccountStateType state;
 
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-    private BankEntity bank;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BankEntity> banks;
+
+    @Column(name = "sign_collection_id", length = 36)
+    private String signCollectionId;
+
+    public String getSignCollectionId() {
+        return signCollectionId;
+    }
+
+    public void setSignCollectionId(String signCollectionId) {
+        this.signCollectionId = signCollectionId;
+    }
 
     public String getDigitalId() {
         return digitalId;
@@ -76,24 +94,47 @@ public class AccountEntity extends BaseEntity {
         this.name = name;
     }
 
-    public PartnerEntity getPartner() {
-        return partner;
+    public UUID getPartnerUuid() {
+        return partnerUuid;
     }
 
-    public void setPartner(PartnerEntity partner) {
-        this.partner = partner;
+    public void setPartnerUuid(UUID partnerUuid) {
+        this.partnerUuid = partnerUuid;
     }
 
-    public BankEntity getBank() {
-        return bank;
+    public List<BankEntity> getBanks() {
+        if (banks == null) {
+            banks = new ArrayList<>();
+        }
+        return banks;
     }
 
-    public void setBank(BankEntity bank) {
-        this.bank = bank;
+    public void setBanks(List<BankEntity> banks) {
+        this.banks = banks;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        AddressEntity that = (AddressEntity) obj;
+        if (getUuid() == null || that.getUuid() == null) {
+            return false;
+        }
+        return Objects.equals(getUuid(), that.getUuid());
     }
 
     @Override
     public String getHashKey() {
-        return partner.getId().toString();
+        return getUuid().toString();
     }
 }

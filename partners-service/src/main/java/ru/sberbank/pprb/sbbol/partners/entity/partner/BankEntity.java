@@ -9,11 +9,13 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Table(name = "bank", indexes = {
     @Index(name = "i_bank_account_uuid", columnList = "account_uuid")
@@ -23,7 +25,10 @@ import java.util.List;
 @Entity
 public class BankEntity extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @Serial
+    private static final long serialVersionUID = 1;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_uuid", nullable = false)
     private AccountEntity account;
 
@@ -35,6 +40,17 @@ public class BankEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "bank", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BankAccountEntity> bankAccounts;
+
+    @Column(name = "intermediary")
+    private Boolean intermediary;
+
+    public Boolean getIntermediary() {
+        return intermediary;
+    }
+
+    public void setIntermediary(Boolean intermediary) {
+        this.intermediary = intermediary;
+    }
 
     public String getBic() {
         return bic;
@@ -72,7 +88,27 @@ public class BankEntity extends BaseEntity {
     }
 
     @Override
+    public int hashCode() {
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        BankEntity that = (BankEntity) obj;
+        if (getUuid() == null || that.getUuid() == null) {
+            return false;
+        }
+        return Objects.equals(getUuid(), that.getUuid());
+    }
+
+    @Override
     public String getHashKey() {
-        return account.getPartner().getId().toString();
+        return account.getHashKey();
     }
 }

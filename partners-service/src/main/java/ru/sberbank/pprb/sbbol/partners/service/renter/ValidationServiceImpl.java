@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.sberbank.pprb.sbbol.partners.CheckFailure;
 import ru.sberbank.pprb.sbbol.partners.CheckUtils;
-import ru.sberbank.pprb.sbbol.partners.renter.model.CheckResult;
-import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
+import ru.sberbank.pprb.sbbol.renter.model.CheckResult;
+import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -14,9 +14,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static ru.sberbank.pprb.sbbol.partners.renter.model.Renter.TypeEnum.ENTREPRENEUR;
-import static ru.sberbank.pprb.sbbol.partners.renter.model.Renter.TypeEnum.LEGAL_ENTITY;
-import static ru.sberbank.pprb.sbbol.partners.renter.model.Renter.TypeEnum.PHYSICAL_PERSON;
+import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.ENTREPRENEUR;
+import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.LEGAL_ENTITY;
+import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.PHYSICAL_PERSON;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {

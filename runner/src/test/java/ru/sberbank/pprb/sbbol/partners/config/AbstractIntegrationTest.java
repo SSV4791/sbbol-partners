@@ -4,6 +4,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,9 +19,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
 
+import static io.restassured.RestAssured.given;
+
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = {Runner.class}
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    classes = {Runner.class}
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
@@ -34,13 +37,15 @@ public abstract class AbstractIntegrationTest {
     @LocalServerPort
     protected int port;
 
-    protected RequestSpecification requestSpec;
+    protected static RequestSpecification requestSpec;
 
-    protected ResponseSpecification responseSpec;
+    protected static ResponseSpecification responseSpec;
 
-    protected ResponseSpecification badRequestResponseSpec;
+    protected static ResponseSpecification createResponseSpec;
 
-    protected ResponseSpecification internalServerErrorResponseSpec;
+    protected static ResponseSpecification notContentResponseSpec;
+
+    protected static ResponseSpecification notFoundResponseSpec;
 
     @BeforeAll
     public final void setup() {
@@ -58,12 +63,16 @@ public abstract class AbstractIntegrationTest {
             .expectStatusCode(HttpStatus.OK.value())
             .build();
 
-        internalServerErrorResponseSpec = new ResponseSpecBuilder()
-            .expectStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        createResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.CREATED.value())
             .build();
 
-        badRequestResponseSpec = new ResponseSpecBuilder()
-            .expectStatusCode(HttpStatus.BAD_REQUEST.value())
+        notContentResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.NO_CONTENT.value())
+            .build();
+
+        notFoundResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.NOT_FOUND.value())
             .build();
     }
 
@@ -71,5 +80,74 @@ public abstract class AbstractIntegrationTest {
      * Метод, позволяющий выполнить дополнительные действия по инициализации теста
      */
     protected void initTest() {
+    }
+
+    protected static <T> T get(String url, Class<T> response, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .get(url, params)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T> T getNotFound(String url, Class<T> response, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .get(url, params)
+            .then()
+            .spec(notFoundResponseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T, BODY> T createPost(String url, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(createResponseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T, BODY> T post(String url, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T, BODY> T put(String url, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .put(url)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static ResponseBody<?> delete(String url, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .delete(url, params)
+            .then()
+            .spec(notContentResponseSpec)
+            .extract()
+            .response().getBody();
     }
 }

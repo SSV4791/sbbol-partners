@@ -2,34 +2,47 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentCertifierType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.UUID;
 
-@Table(name = "document", indexes = {
-    @Index(name = "i_document_partner_uuid", columnList = "partner_uuid")
-})
+@Table(name = "document",
+    indexes = {
+        @Index(name = "i_document_unified_uuid", columnList = "unified_uuid"),
+        @Index(name = "i_document_digital_id", columnList = "digital_id")
+    }
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity
 public class DocumentEntity extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partner_uuid", nullable = false)
-    private PartnerEntity partner;
+    @Serial
+    private static final long serialVersionUID = 1;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 254)
-    private DocumentType type;
+    @Column(name = "unified_uuid", nullable = false)
+    private UUID unifiedUuid;
+
+    @Column(name = "digital_id", nullable = false)
+    private String digitalId;
+
+    @OneToOne
+    @JoinColumn(name = "type_uuid", nullable = false, insertable = false, updatable = false)
+    private DocumentTypeEntity type;
+
+    @Column(name = "type_uuid", nullable = false)
+    private UUID typeUuid;
 
     @Column(name = "series", length = 50)
     private String series;
@@ -46,36 +59,46 @@ public class DocumentEntity extends BaseEntity {
     @Column(name = "division_code", length = 50)
     private String divisionCode;
 
-    public String getDivisionCode() {
-        return divisionCode;
+    @Column(name = "certifier_name", length = 100)
+    private String certifierName;
+
+    @Column(name = "position_certifier", length = 100)
+    private String positionCertifier;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "certifier_type", nullable = false, length = 10)
+    private DocumentCertifierType certifierType;
+
+    public UUID getUnifiedUuid() {
+        return unifiedUuid;
     }
 
-    public void setDivisionCode(String divisionCode) {
-        this.divisionCode = divisionCode;
+    public void setUnifiedUuid(UUID unifiedUuid) {
+        this.unifiedUuid = unifiedUuid;
     }
 
-    public String getDivisionIssue() {
-        return divisionIssue;
+    public String getDigitalId() {
+        return digitalId;
     }
 
-    public void setDivisionIssue(String divisionIssue) {
-        this.divisionIssue = divisionIssue;
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
     }
 
-    public LocalDate getDateIssue() {
-        return dateIssue;
+    public DocumentTypeEntity getType() {
+        return type;
     }
 
-    public void setDateIssue(LocalDate dateIssue) {
-        this.dateIssue = dateIssue;
+    public void setType(DocumentTypeEntity type) {
+        this.type = type;
     }
 
-    public String getNumber() {
-        return number;
+    public UUID getTypeUuid() {
+        return typeUuid;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setTypeUuid(UUID typeUuid) {
+        this.typeUuid = typeUuid;
     }
 
     public String getSeries() {
@@ -86,24 +109,84 @@ public class DocumentEntity extends BaseEntity {
         this.series = series;
     }
 
-    public DocumentType getType() {
-        return type;
+    public String getNumber() {
+        return number;
     }
 
-    public void setType(DocumentType type) {
-        this.type = type;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
-    public PartnerEntity getPartner() {
-        return partner;
+    public LocalDate getDateIssue() {
+        return dateIssue;
     }
 
-    public void setPartner(PartnerEntity partner) {
-        this.partner = partner;
+    public void setDateIssue(LocalDate dateIssue) {
+        this.dateIssue = dateIssue;
+    }
+
+    public String getDivisionIssue() {
+        return divisionIssue;
+    }
+
+    public void setDivisionIssue(String divisionIssue) {
+        this.divisionIssue = divisionIssue;
+    }
+
+    public String getDivisionCode() {
+        return divisionCode;
+    }
+
+    public void setDivisionCode(String divisionCode) {
+        this.divisionCode = divisionCode;
+    }
+
+    public String getCertifierName() {
+        return certifierName;
+    }
+
+    public void setCertifierName(String certifierName) {
+        this.certifierName = certifierName;
+    }
+
+    public String getPositionCertifier() {
+        return positionCertifier;
+    }
+
+    public void setPositionCertifier(String positionCertifier) {
+        this.positionCertifier = positionCertifier;
+    }
+
+    public DocumentCertifierType getCertifierType() {
+        return certifierType;
+    }
+
+    public void setCertifierType(DocumentCertifierType certifierType) {
+        this.certifierType = certifierType;
+    }
+
+    @Override
+    public int hashCode() {
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DocumentEntity that = (DocumentEntity) obj;
+        if (getUuid() == null || that.getUuid() == null) {
+            return false;
+        }
+        return Objects.equals(getUuid(), that.getUuid());
     }
 
     @Override
     public String getHashKey() {
-        return partner.getId().toString();
+        return getUnifiedUuid().toString();
     }
 }

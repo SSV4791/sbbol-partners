@@ -11,7 +11,8 @@ Content-Type: application/json
     "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
     "digitalId": "11111",
     "version": 0,
-    "type": "LEGAL_ENTITY"
+    "partnerType": "PARTNER",
+    "legalForm": "LEGAL_ENTITY"
 }
 
 
@@ -36,3 +37,40 @@ Content-Type: application/json
 DELETE http://127.0.0.1:8080/partners/11111/ccc854a0-ed10-4773-8063-ed6ddd389851
 Content-Type: application/json
 
+### Создание Контакта
+POST http://127.0.0.1:8080/partner/contact
+Content-Type: application/json
+
+{
+    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
+    "digitalId": "11111",
+    "partnerUuid": "6dd8eddc-69ed-405f-8cd9-c6660540ef75",
+    "version": 0,
+    "legalForm": "LEGAL_ENTITY"
+}
+
+### Создание документа Контакта
+POST http://127.0.0.1:8080/partner/contact/document
+Content-Type: application/json
+
+{
+    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
+    "digitalId": "11111",
+    "unifiedUuid": "1fe6fa21-14c4-4b30-baac-b1c218e09d62",
+    "version": 0
+}
+
+### Создание списка документа Контакта
+POST http://127.0.0.1:8080/partner/contact/documents/view
+Content-Type: application/json
+
+{
+    "unifiedUuid": [
+        "1fe6fa21-14c4-4b30-baac-b1c218e09d62"
+    ],
+    "digitalId": "11111",
+    "pagination": {
+        "offset": 0,
+        "count": 1
+    }
+}

@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Partner",
+  "type": "object",
+  "title": "Партнер",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Уникальный идентификатор партнера"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "partnerType": {
+      "type": "string",
+      "title": "Тип партнера",
+      "enum": [
+        "RENTER",
+        "PARTNER",
+        "BENEFICIARY"
+      ],
+      "description": "Добавлено на случай если миграция будет проводится через данный РЕСТ"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации партнера"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя партнера"
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия партнера"
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество партнера"
+    },
+    "inn": {
+      "type": "string",
+      "title": "ИНН"
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП"
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН"
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО"
+    },
+    "phones": {
+      "type": "array",
+      "title": "Номера телефонов партнера",
+      "items": {
+        "$ref": "../phone/phone.json"
+      }
+    },
+    "emails": {
+      "type": "array",
+      "title": "Адреса электронной почты партнера",
+      "items": {
+        "$ref": "../email/email.json"
+      }
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий пользователя"
+    },
+    "citizenship": {
+      "type": "string",
+      "title": "Гражданство партнера",
+      "enum": [
+        "UNKNOWN",
+        "RUSSIA",
+        "ANOTHER_COUNTRY"
+      ]
+    }
+  }
+}

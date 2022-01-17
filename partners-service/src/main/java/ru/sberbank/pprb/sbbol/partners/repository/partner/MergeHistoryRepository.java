@@ -12,9 +12,15 @@ public interface MergeHistoryRepository extends CrudRepository<MergeHistoryEntit
     /**
      * Получение главного Id из истории слияния
      *
-     * @param id        Идентификатор сущности
-     * @param digitalId Идентификатор личного кабинета клиента
+     * @param id Идентификатор сущности
      * @return История слияния.
      */
-    MergeHistoryEntity getByIdAndPartnerDigitalIdAndPartnerDeletedIsFalse(UUID id, String digitalId);
+    MergeHistoryEntity getByPartnerUuid(UUID id);
+
+    /**
+     * Удаление записи из истории
+     *
+     * @param id Идентификатор базовой сущности
+     */
+    void deleteByMainUuid(UUID id);
 }

@@ -8,77 +8,97 @@ servers:
   - url: /
 
 paths:
-  /partners/{id}/{digitalId}:
+  /partners/{digitalId}/{id}:
     get:
       tags:
         - Partners
       description: Получение Партнера по его идентификатору
       operationId: get-by-id
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Идентефикатор документа
         - name: digitalId
           in: path
           required: true
           schema:
             type: string
           description: Идентефикатор личного кабинета
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор партнера
       responses:
         200:
           description: Успешинй ответ
           content:
             application/json:
               schema:
-                $ref: 'model/partner_response.json'
+                $ref: 'model/partners/partner_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
     delete:
       tags:
         - Partners
       description: Удаление Партнера
       operationId: delete
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Идентефикатор документа
         - name: digitalId
           in: path
           required: true
           schema:
             type: string
           description: Идентефикатор личного кабинета
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор партнера
       responses:
-        200:
+        204:
           description: Успешный ответ
-          content:
-            application/json:
-              schema:
-                $ref: 'model/partner_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
   /partners:
     post:
       tags:
         - Partners
-      description: Сохранение Партнера
-      operationId: save
+      description: Создание партнера
+      operationId: create
       requestBody:
         description: Партнер
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/partner.json'
+              $ref: 'model/partners/partner.json'
       responses:
-        200:
+        201:
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: 'model/partner_response.json'
+                $ref: 'model/partners/partner_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
     put:
       tags:
         - Partners
@@ -90,14 +110,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: 'model/partner.json'
+              $ref: 'model/partners/partner.json'
       responses:
         200:
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: 'model/partner_response.json'
+                $ref: 'model/partners/partner_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
 
   /partners/view:
     post:
@@ -111,11 +139,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: 'model/partners_filter.json'
+              $ref: 'model/partners/partners_filter.json'
       responses:
         200:
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: 'model/partners_response.json'
+                $ref: 'model/partners/partners_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partners/merge:
+    post:
+      tags:
+        - Partners merge
+      description: Слияние партнеров
+      operationId: merge-by-partners
+      requestBody:
+        description: Слияние партнеров
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/merge/parnters_merge.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/merge/partners_merge_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden

@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sbrf.ufs.sbbol.estate.common.model.Pagination",
   "type": "object",
   "title": "Нумерация",
   "properties": {

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.BankAccount",
+  "type": "object",
+  "title": "Корреспондентский счёт банка",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор"
+    },
+    "bankId": {
+      "type": "string",
+      "title": "Идентификатор банка"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "account": {
+      "type": "string",
+      "title": "Корреспондентский счёт"
+    }
+  }
+}

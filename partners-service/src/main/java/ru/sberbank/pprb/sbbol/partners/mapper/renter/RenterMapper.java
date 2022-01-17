@@ -7,8 +7,8 @@ import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.entity.renter.LegalAddress;
 import ru.sberbank.pprb.sbbol.partners.entity.renter.PhysicalAddress;
-import ru.sberbank.pprb.sbbol.partners.renter.model.Renter;
-import ru.sberbank.pprb.sbbol.partners.renter.model.RenterAddress;
+import ru.sberbank.pprb.sbbol.renter.model.Renter;
+import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RenterMapper {

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AddressFilter",
+  "type": "object",
+  "title": "Фильтр для запроса адресов партнера/контакта",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "unifiedIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Идентификаторы партнеров/контактов"
+    },
+    "type": {
+      "type": "string",
+      "title": "Тип адреса"
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса Адресов"
+    }
+  },
+  "required": [
+    "unifiedIds",
+    "digitalId"
+  ]
+}

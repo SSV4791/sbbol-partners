@@ -18,18 +18,18 @@ public abstract class BaseEntity implements Serializable, HashKeyProvider {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private UUID id;
+    private UUID uuid;
 
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
 
-    public UUID getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public Long getVersion() {

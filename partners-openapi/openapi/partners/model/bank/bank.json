@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Bank",
+  "type": "object",
+  "title": "Банк",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор"
+    },
+    "partnerAccountId": {
+      "type": "string",
+      "title": "Идентификатор счёта партнера"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "bic": {
+      "type": "string",
+      "title": "БИК"
+    },
+    "name": {
+      "type": "string",
+      "title": "Наименование"
+    },
+    "mediary": {
+      "type": "boolean",
+      "title": "Является транзитным банком"
+    },
+    "bankAccounts": {
+      "type": "array",
+      "title": "Корреспондентские счета",
+      "items": {
+        "$ref": "bank_account.json"
+      }
+    }
+  }
+}
