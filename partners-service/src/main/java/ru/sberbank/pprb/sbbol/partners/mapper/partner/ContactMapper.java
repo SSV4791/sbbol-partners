@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -47,4 +48,24 @@ public interface ContactMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
     void updateContact(Contact contact, @MappingTarget() ContactEntity contactEntity);
+
+    @AfterMapping
+    default void mapBidirectional(@MappingTarget ContactEntity contact) {
+        var phones = contact.getPhones();
+        if (phones != null) {
+            for (var phone : phones) {
+                if (phone != null) {
+                    phone.setContact(contact);
+                }
+            }
+        }
+        var emails = contact.getEmails();
+        if (emails != null) {
+            for (var email : emails) {
+                if (email != null) {
+                    email.setContact(contact);
+                }
+            }
+        }
+    }
 }

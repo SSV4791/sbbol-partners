@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
@@ -106,14 +107,20 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testCreateNotValidPartner() {
+        var error = createNotValidPartner();
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    @Test
     void testUpdatePartner() {
         var partner = getValidPartner();
         var createdPartner = createPost(baseRoutePath, partner, PartnerResponse.class);
         String newKpp = "999999999";
-        var updatePartner = new Partner();
-        updatePartner.id(createdPartner.getPartner().getId());
-        updatePartner.digitalId(createdPartner.getPartner().getDigitalId());
-        updatePartner.legalForm(createdPartner.getPartner().getLegalForm());
+        var updatePartner = createdPartner.getPartner();
         updatePartner.kpp(newKpp);
         PartnerResponse newUpdatePartner = put(baseRoutePath, updatePartner, PartnerResponse.class);
 
@@ -174,9 +181,9 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .firstName("Имя клиента")
             .secondName("Фамилия клиента")
             .middleName("Отчество клиента")
-            .inn("111111")
-            .kpp("222222")
-            .ogrn("333333")
+            .inn("4139314257")
+            .kpp("123456789")
+            .ogrn("1035006110083")
             .okpo("444444")
             .phones(
                 List.of(
@@ -203,5 +210,12 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createPartner)
             .isNotNull();
         return createPartner.getPartner();
+    }
+
+    private static Error createNotValidPartner() {
+        var partner = getValidPartner();
+        partner.setInn("222222");
+
+        return createBadRequestPost("/partners", partner, Error.class);
     }
 }

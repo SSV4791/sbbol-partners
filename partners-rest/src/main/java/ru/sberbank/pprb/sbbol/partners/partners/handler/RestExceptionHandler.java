@@ -14,6 +14,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 import javax.persistence.EntityNotFoundException;
@@ -21,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -40,6 +43,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleObjectNotFoundException(Exception ex, HttpServletRequest httpRequest) {
         LOG.error("Объект не найден", ex);
         return buildResponseEntity(HttpStatus.NOT_FOUND, ex.getLocalizedMessage(), httpRequest.getRequestURL());
+    }
+
+    @ExceptionHandler({ModelValidationException.class})
+    protected ResponseEntity<Object> handleObjectModelValidationException(ModelValidationException ex, HttpServletRequest httpRequest) {
+        LOG.error("Ошибка заполнения объекта", ex);
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrors(), httpRequest.getRequestURL());
     }
 
     @ExceptionHandler(Exception.class)
@@ -66,7 +75,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponseEntity(HttpStatus status, String errorDesc, StringBuffer requestUrl) {
-        var errorData = new Error().code(status.name()).text(errorDesc);
+        return buildResponseEntity(status, Collections.singletonList(errorDesc), requestUrl);
+    }
+
+    private ResponseEntity<Object> buildResponseEntity(HttpStatus status, List<String> errorsDesc, StringBuffer requestUrl) {
+        var errorData = new Error().code(status.name()).text(errorsDesc);
         String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
         LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
         return new ResponseEntity<>(errorData, status);

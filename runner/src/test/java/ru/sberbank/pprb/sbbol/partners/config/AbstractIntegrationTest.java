@@ -43,6 +43,8 @@ public abstract class AbstractIntegrationTest {
 
     protected static ResponseSpecification createResponseSpec;
 
+    protected static ResponseSpecification createBadRequestResponseSpec;
+
     protected static ResponseSpecification notContentResponseSpec;
 
     protected static ResponseSpecification notFoundResponseSpec;
@@ -65,6 +67,10 @@ public abstract class AbstractIntegrationTest {
 
         createResponseSpec = new ResponseSpecBuilder()
             .expectStatusCode(HttpStatus.CREATED.value())
+            .build();
+
+        createBadRequestResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.BAD_REQUEST.value())
             .build();
 
         notContentResponseSpec = new ResponseSpecBuilder()
@@ -112,6 +118,18 @@ public abstract class AbstractIntegrationTest {
             .post(url)
             .then()
             .spec(createResponseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <T, BODY> T createBadRequestPost(String url, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(createBadRequestResponseSpec)
             .extract()
             .as(response);
     }

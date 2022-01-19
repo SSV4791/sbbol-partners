@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.MergeHistoryEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -101,12 +99,6 @@ public class PartnerServiceImpl implements PartnerService {
     public PartnerResponse savePartner(Partner partner) {
         if (legacySbbolAdapter.checkMigration(partner.getDigitalId())) {
             var partnerEntity = partnerMapper.toPartner(partner);
-            for (PartnerEmailEntity email : partnerEntity.getEmails()) {
-                email.setPartner(partnerEntity);
-            }
-            for (PartnerPhoneEntity phone : partnerEntity.getPhones()) {
-                phone.setPartner(partnerEntity);
-            }
             var savePartner = partnerRepository.save(partnerEntity);
             MergeHistoryEntity history = new MergeHistoryEntity();
             history.setPartnerUuid(savePartner.getUuid());

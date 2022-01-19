@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -46,4 +47,24 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(account.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
     void updateAccount(Account account, @MappingTarget() AccountEntity accountEntity);
+
+    @AfterMapping
+    default void mapBidirectional(@MappingTarget AccountEntity account) {
+        var banks = account.getBanks();
+        if (banks != null) {
+            for (var bank : banks) {
+                bank.setAccount(account);
+            }
+        }
+    }
+
+    @AfterMapping
+    default void mapBidirectional(@MappingTarget BankEntity bank) {
+        var bankAccounts = bank.getBankAccounts();
+        if (bankAccounts != null) {
+            for (var bankAccount : bankAccounts) {
+                bankAccount.setBank(bank);
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -72,4 +73,24 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);
+
+    @AfterMapping
+    default void mapBidirectional(@MappingTarget PartnerEntity partner) {
+        var phones = partner.getPhones();
+        if (phones != null) {
+            for (var phone : phones) {
+                if (phone != null) {
+                    phone.setPartner(partner);
+                }
+            }
+        }
+        var emails = partner.getEmails();
+        if (emails != null) {
+            for (var email : emails) {
+                if (email != null) {
+                    email.setPartner(partner);
+                }
+            }
+        }
+    }
 }

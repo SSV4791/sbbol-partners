@@ -32,7 +32,6 @@ class AccountControllerTest extends AbstractIntegrationTest {
                 AccountResponse.class,
                 account.getDigitalId(), account.getId()
             );
-
         assertThat(actualAccount)
             .isNotNull();
         assertThat(actualAccount.getAccount())
@@ -80,18 +79,23 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .isEqualTo(account);
     }
 
+    @Test
+    void testCreateNotValidAccount() {
+        var partner = createValidPartner();
+        var error = createNotValidAccount(partner.getId());
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
 
     @Test
     void testUpdateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId());
         String newName = "Новое наименование";
-        var updateAccount = new Account();
-        updateAccount.id(account.getId());
-        updateAccount.digitalId(account.getDigitalId());
-        updateAccount.partnerId(account.getPartnerId());
-        updateAccount.name(newName);
-        var newUpdateAccount = put(baseRoutePath + "/account", updateAccount, AccountResponse.class);
+        account.setName(newName);
+        var newUpdateAccount = put(baseRoutePath + "/account", account, AccountResponse.class);
         assertThat(newUpdateAccount)
             .isNotNull();
         assertThat(newUpdateAccount.getAccount().getName())
@@ -147,28 +151,27 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .partnerId(partnerUuid)
             .digitalId(digitalId)
             .name("111111")
-            .account("222222")
+            .account("40802810500490014206")
             .banks(List.of(
                     new Bank()
                         .version(0L)
-                        .bic("1111111")
+                        .bic("044525411")
                         .name("222222")
                         .addBankAccountsItem(
                             new BankAccount()
                                 .id(UUID.randomUUID().toString())
-                                .account("111111111111111"))
+                                .account("30101810145250000411"))
                 )
             )
             .state(Account.StateEnum.NOT_SIGNED);
     }
 
-    private static Account createValidAccount(String partnerUuid, String digitalId) {
+    private static void createValidAccount(String partnerUuid, String digitalId) {
         var createAccount = createPost(baseRoutePath + "/account", getValidAccount(partnerUuid, digitalId), AccountResponse.class);
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())
             .isNull();
-        return createAccount.getAccount();
     }
 
     private static Account createValidAccount(String partnerUuid) {
@@ -178,5 +181,14 @@ class AccountControllerTest extends AbstractIntegrationTest {
         assertThat(createAccount.getErrors())
             .isNull();
         return createAccount.getAccount();
+    }
+
+    private static Error createNotValidAccount(String partnerUuid) {
+        var account = getValidAccount(partnerUuid);
+        account.setAccount("222222");
+        for (Bank bank : account.getBanks()) {
+            bank.setBic("44444");
+        }
+        return createBadRequestPost(baseRoutePath + "/account", account, Error.class);
     }
 }

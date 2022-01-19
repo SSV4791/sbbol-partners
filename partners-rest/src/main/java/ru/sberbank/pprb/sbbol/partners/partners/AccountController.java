@@ -4,11 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAccountsApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerAccountValidator;
 
 @RestController
 public class AccountController implements PartnerAccountsApi {
@@ -36,12 +38,12 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> create(Account account) {
+    public ResponseEntity<AccountResponse> create(@Validation(type = PartnerAccountValidator.class) Account account) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.saveAccount(account));
     }
 
     @Override
-    public ResponseEntity<AccountResponse> update(Account account) {
+    public ResponseEntity<AccountResponse> update(@Validation(type = PartnerAccountValidator.class) Account account) {
         return ResponseEntity.ok(accountService.updateAccount(account));
     }
 }
