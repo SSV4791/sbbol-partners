@@ -126,7 +126,7 @@ public class AccountEntity extends BaseEntity {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        AddressEntity that = (AddressEntity) obj;
+        AccountEntity that = (AccountEntity) obj;
         if (getUuid() == null || that.getUuid() == null) {
             return false;
         }

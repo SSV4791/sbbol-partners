@@ -2,8 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
@@ -70,12 +68,6 @@ public class ContactServiceImpl implements ContactService {
             throw new EntryNotFoundException("partner", contact.getDigitalId(), contact.getId());
         }
         var requestContact = contactMapper.toContact(contact);
-        for (ContactEmailEntity email : requestContact.getEmails()) {
-            email.setContact(requestContact);
-        }
-        for (ContactPhoneEntity phone : requestContact.getPhones()) {
-            phone.setContact(requestContact);
-        }
         var saveContact = contactRepository.save(requestContact);
         var response = contactMapper.toContact(saveContact);
         return new ContactResponse().contact(response);
@@ -96,7 +88,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public void  deleteContact(String digitalId, String id) {
+    public void deleteContact(String digitalId, String id) {
         var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundContact == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);

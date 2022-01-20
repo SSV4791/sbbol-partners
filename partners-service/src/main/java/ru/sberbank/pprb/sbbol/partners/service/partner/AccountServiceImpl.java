@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -84,16 +83,8 @@ public class AccountServiceImpl implements AccountService {
                 throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
             }
             var requestAccount = accountMapper.toAccount(account);
-            if (!CollectionUtils.isEmpty(requestAccount.getBanks())) {
-                for (var bank : requestAccount.getBanks()) {
-                    bank.setAccount(requestAccount);
-                    for (var bankAccount : bank.getBankAccounts()) {
-                        bankAccount.setBank(bank);
-                    }
-                }
-            }
-            var saveAccount = accountRepository.save(requestAccount);
-            var response = accountMapper.toAccount(saveAccount);
+            var savedAccount = accountRepository.save(requestAccount);
+            var response = accountMapper.toAccount(savedAccount);
             return new AccountResponse().account(response);
         } else {
             //TODO DCBBRAIN-1642 реализация работы с legacy
@@ -111,8 +102,8 @@ public class AccountServiceImpl implements AccountService {
             }
             accountMapper.updateAccount(account, foundAccount);
             var saveAccount = accountRepository.save(foundAccount);
-            var response = accountMapper.toAccount(saveAccount);
-            return new AccountResponse().account(response);
+            var mappedAccount = accountMapper.toAccount(saveAccount);
+            return new AccountResponse().account(mappedAccount);
         } else {
             //TODO DCBBRAIN-1642 реализация работы с legacy
         }

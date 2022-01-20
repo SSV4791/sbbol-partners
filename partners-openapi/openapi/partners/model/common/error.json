@@ -9,8 +9,11 @@
       "title": "Код ошибки"
     },
     "text": {
-      "type": "string",
-      "title": "Описание ошибки"
+      "type": "array",
+      "title": "Описание ошибок",
+      "items": {
+        "type": "string"
+      }
     }
   }
 }

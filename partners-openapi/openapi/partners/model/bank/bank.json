@@ -27,7 +27,8 @@
     },
     "mediary": {
       "type": "boolean",
-      "title": "Является транзитным банком"
+      "title": "Является транзитным банком",
+      "default": false
     },
     "bankAccounts": {
       "type": "array",
