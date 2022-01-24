@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners.model;
+package ru.sberbank.pprb.sbbol.partners.model.sbbol;
 
 /**
  * Результат проверки в СББОЛ реквизитов получателя платежа по справочнику контрагентов

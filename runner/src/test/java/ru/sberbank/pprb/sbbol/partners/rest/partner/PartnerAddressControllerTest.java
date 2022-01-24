@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
@@ -15,7 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
-public class PartnerAddressControllerTest extends AbstractIntegrationTest {
+public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     public static final String baseRoutePath = "/partner";
 

@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
@@ -17,7 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
-public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
+public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     public static final String baseRoutePath = "/partner";
 
@@ -119,7 +119,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
-                document.getDigitalId(),document.getId()
+                document.getDigitalId(), document.getId()
             );
         assertThat(actualDocument)
             .isNotNull();

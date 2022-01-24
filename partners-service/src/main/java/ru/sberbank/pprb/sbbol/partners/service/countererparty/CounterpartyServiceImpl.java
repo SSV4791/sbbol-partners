@@ -5,7 +5,7 @@ import ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
-import ru.sberbank.pprb.sbbol.partners.model.CounterpartyCheckRequisitesResult;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisitesResult;
 import ru.sberbank.pprb.sbbol.partners.service.counterparty.CounterpartyService;
 
 import static ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult.StatusEnum.NOTFOUND;
