@@ -1,34 +1,105 @@
 package ru.sberbank.pprb.sbbol.partners;
 
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import ru.sberbank.pprb.sbbol.partners.model.CounterpartyCheckRequisitesResult;
-import ru.sberbank.pprb.sbbol.partners.model.CounterpartyCheckRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisitesResult;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyFilter;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartySignData;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyView;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.ListResponse;
 
-import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
-public class LegacySbbolAdapter {
+/**
+ * Адаптер работы с легаси
+ */
+public interface LegacySbbolAdapter {
 
-    private final RestTemplate restTemplate;
-    private final HttpHeaders httpHeaders;
+    /**
+     * Удаление контрагента по pprbGuid
+     *
+     * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
+     * @param pprbGuid  идентификатор контрагента в ППРБ
+     */
+    void delete(String digitalId, String pprbGuid);
 
-    public LegacySbbolAdapter(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-        this.httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    }
+    /**
+     * Добавить нового контрагента
+     *
+     * @param digitalId    идентификатор договора ДБО организации в фабрике ППРБ
+     * @param counterparty данные контрагента
+     * @return Донные сохраненного контрагента
+     */
+    Counterparty create(String digitalId, Counterparty counterparty);
 
-    public boolean checkMigration(String digitalId) {
-        //TODO Проверка подключенности
-        return true;
-    }
+    /**
+     * Изменение существующего контрагента
+     *
+     * @param digitalId    идентификатор договора ДБО организации в фабрике ППРБ
+     * @param counterparty данные контрагента
+     * @return Донные измененного контрагента
+     */
+    Counterparty update(String digitalId, Counterparty counterparty);
+
+    /**
+     * Получить контрагентов организации
+     *
+     * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
+     * @return список контрагентов
+     */
+    List<CounterpartyView> list(String digitalId);
+
+    /**
+     * Получить контрагента по pprbGuid
+     *
+     * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
+     * @param pprbGuid  идентификатор контрагента в ППРБ
+     * @return Донные контрагента
+     */
+    Counterparty getByPprbGuid(String digitalId, String pprbGuid);
+
+    /**
+     * Сохранение подписи контрагента
+     *
+     * @param digitalUserId идентификатор пользователя подписавшего документ
+     * @param signData      данные подписи контрагента
+     */
+    void saveSign(String digitalUserId, CounterpartySignData signData);
+
+    /**
+     * Удаление подписи контрагента
+     *
+     * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
+     * @param pprbGuid  идентификатор контрагента в ППРБ
+     */
+    void removeSign(String digitalId, String pprbGuid);
+
+    /**
+     * Получить контрагентов организации с пагинацией
+     *
+     * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
+     * @param filter    фильтр контрагентов
+     * @return список контрагентов
+     */
+    ListResponse<CounterpartyView> viewRequest(String digitalId, CounterpartyFilter filter);
+
+    /**
+     * Получить признак миграции клиента
+     *
+     * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
+     * @return мигрирован клиент или нет
+     */
+    boolean checkMigration(String digitalId);
+
+    /**
+     * Получить список ИНН поставщиков ЖКУ
+     *
+     * @param digitalId        идентификатор договора ДБО организации в фабрике ППРБ
+     * @param counterpartyInns список ИНН контрагентов для проверки
+     * @return список ИНН поставщиков ЖКУ
+     */
+    Set<String> getHousingInn(String digitalId, Set<String> counterpartyInns);
 
     /**
      * Проверка контрагента по реквизитам
@@ -36,20 +107,5 @@ public class LegacySbbolAdapter {
      * @param request запрос на проверку
      * @return результат проверки контрагента
      */
-    public CounterpartyCheckRequisitesResult checkRequisites(CounterpartyCheckRequisites request) {
-        try {
-            ResponseEntity<CounterpartyCheckRequisitesResult> responseEntity = restTemplate.exchange(
-                "/counterparty/check-requisites",
-                HttpMethod.POST,
-                new HttpEntity<>(request, httpHeaders),
-                new ParameterizedTypeReference<>() {
-                });
-            return responseEntity.getBody();
-        } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
-        } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
-        }
-    }
+    CounterpartyCheckRequisitesResult checkRequisites(CounterpartyCheckRequisites request);
 }

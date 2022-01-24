@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners.model;
+package ru.sberbank.pprb.sbbol.partners.model.sbbol;
 
 /**
  * Запрос на поиск контрагента по реквизитам

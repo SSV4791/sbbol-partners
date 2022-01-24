@@ -2,6 +2,7 @@ plugins {
     id("dependency-locking-conventions")
     id("java-conventions")
     id("org.springframework.boot") apply false
+    id("test-conventions")
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -12,12 +13,6 @@ the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().a
 }
 
 tasks {
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
     clean {
         delete("target")
     }

@@ -6,7 +6,7 @@ import ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.model.CounterpartyCheckRequisitesResult;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisitesResult;
 
 import java.util.UUID;
 

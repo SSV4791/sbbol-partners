@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.counterparty;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
-import ru.sberbank.pprb.sbbol.partners.model.CounterpartyCheckRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisites;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 

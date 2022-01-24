@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapterImpl;
 
 import java.util.Collections;
 
@@ -42,6 +44,6 @@ public class PartnerAdapterConfiguration {
 
     @Bean
     public LegacySbbolAdapter legacySbbolAdapter(RestTemplate restTemplate) {
-        return new LegacySbbolAdapter(restTemplate);
+        return new LegacySbbolAdapterImpl(restTemplate);
     }
 }
