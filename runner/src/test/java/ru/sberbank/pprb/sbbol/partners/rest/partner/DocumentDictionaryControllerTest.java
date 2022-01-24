@@ -6,7 +6,6 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,13 +63,5 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
         var searchDocument = get(baseRoutePath + "/{status}", DocumentsTypeResponse.class, false);
         assertThat(searchDocument.getDocumentType())
             .contains(updateDocument.getDocumentType());
-    }
-
-    protected static DocumentType getDocumentType() {
-        var createPartner = get(baseRoutePath + "/{status}", DocumentsTypeResponse.class, false);
-        assertThat(createPartner)
-            .isNotNull();
-        Optional<DocumentType> type = createPartner.getDocumentType().stream().filter(value -> value.getDocumentType().equals("PASSPORT_OF_RUSSIA")).findAny();
-        return type.get();
     }
 }

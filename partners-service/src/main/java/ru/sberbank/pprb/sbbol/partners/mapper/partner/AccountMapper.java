@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -13,13 +14,18 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
+import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface AccountMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(account.getUuid().toString())")
     @Mapping(target = "partnerId", expression = "java(account.getPartnerUuid().toString())")
-    Account toAccount(AccountEntity account);
+    @Mapping(target = "budget", ignore = true)
+    Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
 
     @Mapping(target = "id", expression = "java(bank.getUuid().toString())")
     @Mapping(target = "partnerAccountId", expression = "java(bank.getAccount().getUuid().toString())")
@@ -64,6 +70,15 @@ public interface AccountMapper extends BaseMapper {
         if (bankAccounts != null) {
             for (var bankAccount : bankAccounts) {
                 bankAccount.setBank(bank);
+            }
+        }
+    }
+
+    @AfterMapping
+    default void mapBudgetMask(@MappingTarget Account account, @Context BudgetMaskService budgetMaskService) {
+        for (Bank bank : account.getBanks()) {
+            for (BankAccount bankAccount : bank.getBankAccounts()) {
+                account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getAccount()));
             }
         }
     }

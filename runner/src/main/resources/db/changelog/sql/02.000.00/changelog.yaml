@@ -41,3 +41,9 @@ databaseChangeLog:
   - include:
       file: 1640097483333_delete_dataspace_structure.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1642673521243_create_dictionary_structure_budgen_mask.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1642673545563_create_dictionary_structure_fill_budgen_mask.sql
+      relativeToChangelogFile: true

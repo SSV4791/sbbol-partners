@@ -22,7 +22,7 @@
       "title": "Версия"
     },
     "documentType": {
-      "$ref": "document_type.json",
+      "$ref": "../dictionary/document_type.json",
       "title": "Тип документа"
     },
     "series": {

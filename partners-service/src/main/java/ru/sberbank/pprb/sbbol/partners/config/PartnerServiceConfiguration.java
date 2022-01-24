@@ -7,6 +7,8 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactEmailMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactEmailMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
@@ -25,6 +27,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
@@ -33,6 +36,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AddressService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactAddressServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactDocumentServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactService;
@@ -99,12 +104,23 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
+    BudgetMaskMapper budgetMaskMapper() {
+        return new BudgetMaskMapperImpl();
+    }
+
+    @Bean
     AccountService accountService(
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        LegacySbbolAdapter legacySbbolAdapter,
+        BudgetMaskService budgetMaskService
     ) {
-        return new AccountServiceImpl(partnerRepository, accountRepository, legacySbbolAdapter, accountMapper());
+        return new AccountServiceImpl(partnerRepository, accountRepository, legacySbbolAdapter, budgetMaskService, accountMapper());
+    }
+
+    @Bean
+    BudgetMaskService budgetMaskService(BudgetMaskDictionaryRepository budgetMaskDictionaryRepository) {
+        return new BudgetMaskServiceImpl(budgetMaskDictionaryRepository, budgetMaskMapper());
     }
 
     @Bean

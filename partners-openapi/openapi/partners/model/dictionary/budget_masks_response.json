@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse",
+  "type": "object",
+  "title": "Ответ на запрос бюджетных масок",
+  "properties": {
+    "masks": {
+      "type": "array",
+      "items": {
+        "$ref": "budget_mask.json"
+      }
+    }
+  }
+}

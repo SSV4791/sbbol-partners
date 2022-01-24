@@ -67,3 +67,9 @@ Credentials хранятся в `GRADLE_HOME/gradle.encrypted.properties`
 ###Создание отчёта SONAR при локальном запуске
 `./gradlew sonar`
 
+### Генерация sql патча
+`./gradlew newpatch -Ppatchname=newpatch`
+
+Для изменения директории создания патча использовать с флагом
+
+`./gradlew newpatch -Ppatchname=newpatch -Preleaseversion='01.000.00'` или изменить версию в gradle.properties

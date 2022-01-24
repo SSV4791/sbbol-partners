@@ -23,17 +23,20 @@ public class AccountServiceImpl implements AccountService {
     private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
     private final LegacySbbolAdapter legacySbbolAdapter;
+    private final BudgetMaskService budgetMaskService;
     private final AccountMapper accountMapper;
 
     public AccountServiceImpl(
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
         LegacySbbolAdapter legacySbbolAdapter,
+        BudgetMaskService budgetMaskService,
         AccountMapper accountMapper
     ) {
         this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
         this.legacySbbolAdapter = legacySbbolAdapter;
+        this.budgetMaskService = budgetMaskService;
         this.accountMapper = accountMapper;
     }
 
@@ -45,7 +48,7 @@ public class AccountServiceImpl implements AccountService {
             if (account == null) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            var response = accountMapper.toAccount(account);
+            var response = accountMapper.toAccount(account, budgetMaskService);
             return new AccountResponse().account(response);
         } else {
             //TODO DCBBRAIN-1642 реализация работы с legacy
@@ -60,7 +63,9 @@ public class AccountServiceImpl implements AccountService {
             var response = accountRepository.findByFilter(accountsFilter);
             var accountsResponse = new AccountsResponse();
             for (var entity : response) {
-                accountsResponse.addAccountsItem(accountMapper.toAccount(entity));
+                var item = accountMapper.toAccount(entity, budgetMaskService);
+                accountsResponse.addAccountsItem(item);
+
             }
             accountsResponse.setPagination(
                 new Pagination()
@@ -84,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
             }
             var requestAccount = accountMapper.toAccount(account);
             var savedAccount = accountRepository.save(requestAccount);
-            var response = accountMapper.toAccount(savedAccount);
+            var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             return new AccountResponse().account(response);
         } else {
             //TODO DCBBRAIN-1642 реализация работы с legacy
@@ -102,7 +107,7 @@ public class AccountServiceImpl implements AccountService {
             }
             accountMapper.updateAccount(account, foundAccount);
             var saveAccount = accountRepository.save(foundAccount);
-            var mappedAccount = accountMapper.toAccount(saveAccount);
+            var mappedAccount = accountMapper.toAccount(saveAccount, budgetMaskService);
             return new AccountResponse().account(mappedAccount);
         } else {
             //TODO DCBBRAIN-1642 реализация работы с legacy

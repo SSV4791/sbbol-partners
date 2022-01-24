@@ -46,14 +46,6 @@ class PartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
-    void toPartnerType() {
-        Partner.PartnerTypeEnum typeEnum = factory.manufacturePojo(Partner.PartnerTypeEnum.class);
-        PartnerType partnerType = PartnerMapper.toPartnerType(typeEnum);
-        assertThat(typeEnum)
-            .isEqualTo(PartnerMapper.toPartnerType(partnerType));
-    }
-
-    @Test
     void toLegalType() {
         LegalForm typeEnum = factory.manufacturePojo(LegalForm.class);
         LegalType legalType = PartnerMapper.toLegalType(typeEnum);

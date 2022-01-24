@@ -1,5 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +16,8 @@ import java.util.Objects;
 @Table(name = "bank_account", indexes = {
     @Index(name = "i_bank_account_bank_uuid", columnList = "bank_uuid")
 })
+@DynamicUpdate
+@DynamicInsert
 @Entity
 public class BankAccountEntity extends BaseEntity {
 
