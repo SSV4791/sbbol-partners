@@ -10,7 +10,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -27,15 +26,9 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 public interface PartnerMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(partner.getUuid().toString())")
-    @Mapping(target = "partnerType", source = "type", qualifiedByName = "toPartnerType")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     Partner toPartner(PartnerEntity partner);
-
-    @Named("toPartnerType")
-    static Partner.PartnerTypeEnum toPartnerType(PartnerType partnerType) {
-        return partnerType != null ? Partner.PartnerTypeEnum.valueOf(partnerType.name()) : null;
-    }
 
     @Named("toLegalType")
     static LegalForm toLegalType(LegalType legalType) {
@@ -48,7 +41,7 @@ public interface PartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
-    @Mapping(target = "type ", source = "partnerType", qualifiedByName = "toPartnerType")
+    @Mapping(target = "type ", constant = "PARTNER")
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     PartnerEntity toPartner(Partner partner);
@@ -58,18 +51,12 @@ public interface PartnerMapper extends BaseMapper {
         return legalType != null ? LegalType.valueOf(legalType.getValue()) : null;
     }
 
-    @Named("toPartnerType")
-    static PartnerType toPartnerType(Partner.PartnerTypeEnum partnerType) {
-        return partnerType != null ? PartnerType.valueOf(partnerType.getValue()) : null;
-    }
-
     @Named("toCitizenshipType")
     static PartnerCitizenshipType toCitizenshipType(Partner.CitizenshipEnum citizenshipEnum) {
         return citizenshipEnum != null ? PartnerCitizenshipType.valueOf(citizenshipEnum.getValue()) : null;
     }
 
     @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
-    @Mapping(target = "type", source = "partnerType", qualifiedByName = "toPartnerType")
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);

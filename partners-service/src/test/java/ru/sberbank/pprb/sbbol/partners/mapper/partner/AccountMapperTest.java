@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.mockito.Mockito;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
@@ -9,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
+import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.UUID;
 
@@ -34,9 +36,10 @@ public class AccountMapperTest extends BaseConfiguration {
                 bankAccount.setBank(bank);
             }
         }
-        var actual = mapper.toAccount(account);
+        var actual = mapper.toAccount(account, Mockito.mock(BudgetMaskService.class));
         assertThat(expected)
             .usingRecursiveComparison()
+            .ignoringFields("budget")
             .isEqualTo(actual);
     }
 

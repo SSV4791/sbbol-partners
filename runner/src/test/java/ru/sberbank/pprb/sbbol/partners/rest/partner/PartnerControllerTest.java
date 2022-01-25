@@ -175,7 +175,6 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
         return new Partner()
             .version(0L)
             .digitalId(digitalId)
-            .partnerType(Partner.PartnerTypeEnum.PARTNER)
             .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName("Наименование компании")
             .firstName("Имя клиента")

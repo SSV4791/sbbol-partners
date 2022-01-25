@@ -1,5 +1,6 @@
 plugins {
     jacoco
+    id("create-liquibase-path-conventions")
     id("dependency-locking-conventions")
     id("java-conventions")
     id("meta-conventions")

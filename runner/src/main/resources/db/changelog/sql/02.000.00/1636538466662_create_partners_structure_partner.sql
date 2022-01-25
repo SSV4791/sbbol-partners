@@ -4,10 +4,10 @@
 CREATE TABLE PARTNER
 (
     uuid        UUID PRIMARY KEY,
-    digital_id  VARCHAR(40)      NOT NULL,
-    version     BIGINT default 0 NOT NULL,
-    type        VARCHAR(254)     NOT NULL,
-    legal_type  VARCHAR(254)     NOT NULL,
+    digital_id  VARCHAR(40)                    NOT NULL,
+    version     BIGINT       default 0         NOT NULL,
+    type        VARCHAR(254) default 'PARTNER' NOT NULL,
+    legal_type  VARCHAR(254)                   NOT NULL,
     org_name    VARCHAR(350),
     first_name  VARCHAR(50),
     second_name VARCHAR(50),

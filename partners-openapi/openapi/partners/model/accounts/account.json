@@ -21,6 +21,10 @@
       "format": "int64",
       "title": "Версия"
     },
+    "budget": {
+      "type": "boolean",
+      "title": "Признак бюджетности"
+    },
     "name": {
       "type": "string",
       "title": "Наименование счёта"
