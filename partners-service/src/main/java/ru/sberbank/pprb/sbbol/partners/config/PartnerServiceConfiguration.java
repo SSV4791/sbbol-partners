@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
@@ -35,6 +37,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.MergeHistoryRepository
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AddressService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskServiceImpl;
@@ -56,6 +60,11 @@ public class PartnerServiceConfiguration {
     @Bean
     AccountMapper accountMapper() {
         return new AccountMapperImpl();
+    }
+
+    @Bean
+    AccountSingMapper accountSingMapper() {
+        return new AccountSingMapperImpl();
     }
 
     @Bean
@@ -116,6 +125,11 @@ public class PartnerServiceConfiguration {
         BudgetMaskService budgetMaskService
     ) {
         return new AccountServiceImpl(partnerRepository, accountRepository, legacySbbolAdapter, budgetMaskService, accountMapper());
+    }
+
+    @Bean
+    AccountSignService accountSignService(AccountRepository accountRepository) {
+        return new AccountSignServiceImpl(accountRepository, accountSingMapper());
     }
 
     @Bean

@@ -1,9 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
-import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
@@ -43,16 +43,17 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     @Test
     void testGetOnePartners() {
-        var createdPartner1 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner2)
             .isNotNull();
 
         var filter = new PartnersFilter();
-        filter.setDigitalId("111111");
+        filter.setDigitalId(digitalId);
         filter.setPagination(
             new Pagination()
                 .offset(1)
@@ -68,16 +69,17 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     @Test
     void testGetAllPartners() {
-        var createdPartner1 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner2)
             .isNotNull();
 
         var filter = new PartnersFilter();
-        filter.setDigitalId("111111");
+        filter.setDigitalId(digitalId);
         filter.setPagination(
             new Pagination()
                 .offset(0)
@@ -168,7 +170,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     public static Partner getValidPartner() {
-        return getValidPartner("111111");
+        return getValidPartner(RandomStringUtils.randomAlphabetic(10));
     }
 
     public static Partner getValidPartner(String digitalId) {

@@ -28,7 +28,7 @@ public class ContactViewRepositoryImpl implements ContactViewRepository, BaseRep
             predicates.add(root.get("uuid").in(filter.getIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
         criteria.orderBy(defaultOrder(builder, root));
-        criteria.select(root).where(builder.and(predicates.toArray(new Predicate[0])));
+        criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));
         var query = entityManager.createQuery(criteria);
         var pagination = filter.getPagination();
         if (pagination != null) {

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -23,8 +24,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testGetPartnerDocument() {
-        var partner = createValidPartner();
-        var document = createValidPartnerDocument(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
@@ -40,7 +41,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testViewPartnerDocument() {
-        var partner = createValidPartner("7777");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
@@ -81,8 +82,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testCreatePartnerDocument() {
-        var partner = createValidPartner();
-        var document = createValidPartnerDocument(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         assertThat(document)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -93,8 +94,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testUpdatePartnerDocument() {
-        var partner = createValidPartner();
-        var document = createValidPartnerDocument(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         String newName = "Новое номер";
         var updateDocument = new Document();
         updateDocument.id(document.getId());
@@ -113,8 +114,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testDeletePartnerDocument() {
-        var partner = createValidPartner();
-        var document = createValidPartnerDocument(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
@@ -157,19 +158,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         assertThat(response.getErrors())
             .isNull();
         return response.getDocument();
-    }
-
-    private static Document createValidPartnerDocument(String partnerUuid) {
-        var response = createPost(baseRoutePath + "/document", getValidPartnerDocument(partnerUuid), DocumentResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getDocument();
-    }
-
-    private static Document getValidPartnerDocument(String partnerUuid) {
-        return getValidPartnerDocument(partnerUuid, "111111");
     }
 
     private static Document getValidPartnerDocument(String partnerUuid, String digitalId) {

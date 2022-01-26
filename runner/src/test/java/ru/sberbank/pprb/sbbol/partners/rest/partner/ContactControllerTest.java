@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -24,8 +25,8 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     @Test
     void testGetContact() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
                 baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
@@ -41,7 +42,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     @Test
     void testViewContact() {
-        var partner = createValidPartner("2222");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
         var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
         var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
@@ -107,8 +108,8 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     @Test
     void testCreateContact() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
         assertThat(contact)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -123,8 +124,8 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     @Test
     void testUpdateContact() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
         String newName = "Новое наименование";
         var updateContact = new Contact();
         updateContact.id(contact.getId());
@@ -143,8 +144,8 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     @Test
     void testDeleteContact() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
                 baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
