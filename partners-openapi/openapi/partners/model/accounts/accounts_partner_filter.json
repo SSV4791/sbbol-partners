@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsPartnerFilter",
+  "type": "object",
+  "title": "Счетa Партнера",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "partnersId": {
+      "type": "array",
+      "title": "Счетa Партнера",
+      "items": {
+        "$ref": "accounts_partner_pagination.json"
+      }
+    },
+    "sign_status": {
+      "type": "string",
+      "title": "Статус подписания счетов",
+      "enum": [
+        "SIGNED",
+        "NOT_SIGNED",
+        "NULL"
+      ]
+    },
+    "accountType": {
+      "title": "Фильтр для отображения счетов бюджетных организаций",
+      "type": "boolean",
+      "default": false
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса Счетов"
+    },
+    "errors": {
+      "type": "array",
+      "title": "Ошибки",
+      "items": {
+        "$ref": "../common/error.json"
+      }
+    }
+  }
+}

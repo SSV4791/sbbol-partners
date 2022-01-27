@@ -6,7 +6,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор phone"
+      "title": "Идентификатор телефонаа"
     },
     "unifiedId": {
       "type": "string",

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.EmailAddressesResponse",
+  "type": "object",
+  "title": "Ответ на запрос электронных адресов адресов партнеров/контактов",
+  "properties": {
+    "emails": {
+      "type": "array",
+      "items": {
+        "$ref": "email.json"
+      },
+      "title": "Электронные адреса"
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры ответа партнеров/контактов"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}

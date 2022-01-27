@@ -1,0 +1,125 @@
+openapi: "3.0.3"
+info:
+  title: Request for contact phone number
+  version: 1.0.0
+  description: OpenAPI Specification for contact phone number
+
+servers:
+  - url: /
+
+paths:
+  /partner/contact/phone/view:
+    post:
+      tags:
+        - Contact Phone
+      description: Получения номеров телефона контакта
+      operationId: list
+      requestBody:
+        description: Фильтр для запроса номеров телефона контактов
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: 'model/phone/phones_filter.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/phone/phones_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partner/contact/phone/{digitalId}/{id}:
+    delete:
+      tags:
+        - Contact Phone
+      description: Удаление phone numbers контакта
+      operationId: delete
+      parameters:
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор личного кабинета
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор номера телефона
+      responses:
+        204:
+          description: Успешный ответ
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partner/contact/phone:
+    post:
+      tags:
+        - Contact Phone
+      description: Создание email адреса контакта
+      operationId: create
+      requestBody:
+        description: Номер телефона
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/phone/phone.json'
+      responses:
+        201:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/phone/phone_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+    put:
+      tags:
+        - Contact Phone
+      description: Обновление номера телефона контакта
+      operationId: update
+      requestBody:
+        description: Phone
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/phone/phone.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/phone/phone_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden

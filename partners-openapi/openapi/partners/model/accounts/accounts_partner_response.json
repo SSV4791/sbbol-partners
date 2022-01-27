@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsPartnerResponsePagination",
+  "type": "object",
+  "title": "Счетa Партнера",
+  "properties": {
+    "partnerAccounts": {
+      "type": "array",
+      "title": "Список аккаунтов в разрезе партнера",
+      "items": {
+        "$ref": "accounts_partner_response_pagination.json"
+      }
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса"
+    }
+  }
+}

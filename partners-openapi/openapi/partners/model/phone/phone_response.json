@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "ru.sberbank.pprb.sbbol.partners.model.PhoneResponse",
   "type": "object",
-  "title": "Ответ на запрос phone адреса",
+  "title": "Ответ на запрос Телефонов",
   "properties": {
     "phone": {
       "$ref": "phone.json"
