@@ -12,8 +12,18 @@
       "type": "string",
       "title": "Маска"
     },
+    "condition": {
+      "type": "string",
+      "title": "Условие"
+    },
     "maskType": {
       "$ref": "../common/budget_mask_form.json"
     }
-  }
+  },
+  "required": [
+    "id",
+    "mask",
+    "condition",
+    "maskType"
+  ]
 }

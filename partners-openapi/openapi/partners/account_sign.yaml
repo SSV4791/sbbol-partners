@@ -9,25 +9,25 @@ servers:
 
 paths:
   /partner/accounts/sign:
-    put:
+    post:
       tags:
         - Accounts Sign
-      description: Обновление подписи счёта
-      operationId: update
+      description: Подпись
+      operationId: create
       requestBody:
-        description: Обновление статуса подписания счёта
+        description: Подписание счёта партнера
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/sign/accounts_sign_status.json'
+              $ref: 'model/sign/accounts_sign_info.json'
       responses:
         200:
           description: Успешный ответ
           content:
             application/json:
               schema:
-                $ref: 'model/sign/accounts_sign_response.json'
+                $ref: 'model/sign/accounts_sign_info_response.json'
         404:
           description: Not Found
         400:
@@ -57,6 +57,70 @@ paths:
             application/json:
               schema:
                 $ref: 'model/sign/accounts_sign_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partner/accounts/sign/{digitalId}/{accountId}:
+    get:
+      tags:
+        - Accounts Sign
+      description: Проверка подписи аккаунта
+      operationId: get-by-id
+      parameters:
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор личного кабинета
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор счёта
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/sign/account_sign_info.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+    delete:
+      tags:
+        - Accounts Sign
+      description: Удаление подписи счёта по идентификатору аккаунта
+      operationId: delete
+      parameters:
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор личного кабинета
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор счёта
+      responses:
+        204:
+          description: Успешный ответ
         404:
           description: Not Found
         400:

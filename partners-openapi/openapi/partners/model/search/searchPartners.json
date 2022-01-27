@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.SearchPartners",
+  "type": "object",
+  "title": "Поиск партнера",
+  "properties": {
+    "search": {
+      "type": "string",
+      "title": "Параметры для поиска ИНН или ФИО или НАЗВАНИЕ ОРГАНИЗАЦИИ"
+    }
+  }
+}
