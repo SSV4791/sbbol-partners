@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -22,9 +23,9 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testGetContactAddress() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var address = createValidAddress(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var address = createValidAddress(contact.getId(), partner.getDigitalId());
         var actualAddress = get(
             baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
             AddressResponse.class,
@@ -39,7 +40,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testViewContactAddress() {
-        var partner = createValidPartner("3333");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         createValidAddress(contact.getId(), contact.getDigitalId());
         createValidAddress(contact.getId(), contact.getDigitalId());
@@ -81,9 +82,9 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testCreateContactAddress() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var address = createValidAddress(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var address = createValidAddress(contact.getId(), contact.getDigitalId());
         assertThat(address)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -94,9 +95,9 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testUpdateContactAddress() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var address = createValidAddress(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var address = createValidAddress(contact.getId(), contact.getDigitalId());
         String newName = "Новое наименование";
         var updateAddress = new Address();
         updateAddress.id(address.getId());
@@ -115,9 +116,9 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testDeleteContactAddress() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var address = createValidAddress(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var address = createValidAddress(contact.getId(), contact.getDigitalId());
         var actualAddress =
             get(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
@@ -160,19 +161,6 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         assertThat(response.getErrors())
             .isNull();
         return response.getAddress();
-    }
-
-    private static Address createValidAddress(String partnerUuid) {
-        var response = createPost(baseRoutePath + "/address", getValidPartnerAddress(partnerUuid), AddressResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getAddress();
-    }
-
-    private static Address getValidPartnerAddress(String partnerUuid) {
-        return getValidPartnerAddress(partnerUuid, "111111");
     }
 
     private static Address getValidPartnerAddress(String partnerUuid, String digitalId) {

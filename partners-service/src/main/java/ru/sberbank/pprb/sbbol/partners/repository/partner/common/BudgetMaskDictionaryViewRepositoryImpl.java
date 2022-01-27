@@ -22,7 +22,7 @@ public class BudgetMaskDictionaryViewRepositoryImpl implements BudgetMaskDiction
         List<Predicate> predicates = new ArrayList<>();
         var root = criteria.from(BudgetMaskEntity.class);
         predicates.add(builder.equal(root.get("type"), BudgetMaskType.valueOf(filter.getMaskType().name())));
-        criteria.select(root).where(builder.and(predicates.toArray(new Predicate[0])));
+        criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));
         var query = entityManager.createQuery(criteria);
         return query.getResultList();
     }

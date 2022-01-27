@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountSign",
+  "type": "object",
+  "title": "Подпись счетов",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "accountId": {
+      "type": "string",
+      "title": "Идентификатор счёта"
+    },
+    "state": {
+      "type": "string",
+      "title": "Признак 'Подписан'",
+      "enum": [
+        "SIGNED",
+        "NOT_SIGNED"
+      ]
+    },
+    "signId": {
+      "type": "string",
+      "title": "Идентефикатор подписи"
+    }
+  }
+}

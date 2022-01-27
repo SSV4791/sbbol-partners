@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -26,9 +27,9 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testGetContactDocument() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var document = createValidContactDocument(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
         var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
@@ -44,7 +45,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testViewContactDocument() {
-        Partner partner = createValidPartner("6666");
+        Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         Contact contact = createValidContact(partner.getId(), partner.getDigitalId());
         createValidContactDocument(contact.getId(), contact.getDigitalId());
         createValidContactDocument(contact.getId(), contact.getDigitalId());
@@ -92,9 +93,9 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testCreateContactDocument() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var document = createValidContactDocument(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
         assertThat(document)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -105,9 +106,9 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testUpdateContactDocument() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var document = createValidContactDocument(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
         String newName = "Новое номер";
         var updateDocument = new Document();
         updateDocument.id(document.getId());
@@ -126,9 +127,9 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     @Test
     void testDeleteContactDocument() {
-        var partner = createValidPartner();
-        var contact = createValidContact(partner.getId());
-        var document = createValidContactDocument(contact.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
         var actualDocument =
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
@@ -164,10 +165,6 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
-    public static Document getValidContactDocument(String partnerUuid) {
-        return getValidContactDocument(partnerUuid, "111111");
-    }
-
     public static Document getValidContactDocument(String partnerUuid, String digitalId) {
         return new Document()
             .version(0L)
@@ -190,15 +187,6 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     private static Document createValidContactDocument(String partnerUuid, String digitalId) {
         var documentResponse = createPost(baseRoutePath + "/document", getValidContactDocument(partnerUuid, digitalId), DocumentResponse.class);
-        assertThat(documentResponse)
-            .isNotNull();
-        assertThat(documentResponse.getErrors())
-            .isNull();
-        return documentResponse.getDocument();
-    }
-
-    private static Document createValidContactDocument(String partnerUuid) {
-        var documentResponse = createPost(baseRoutePath + "/document", getValidContactDocument(partnerUuid), DocumentResponse.class);
         assertThat(documentResponse)
             .isNotNull();
         assertThat(documentResponse.getErrors())

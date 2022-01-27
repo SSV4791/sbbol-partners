@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -21,8 +22,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testGetPartnerAddress() {
-        var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var address = createValidAddress(partner.getId(), partner.getDigitalId());
         var actualAddress = get(
             baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
             AddressResponse.class,
@@ -37,7 +38,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testViewPartnerAddress() {
-        var partner = createValidPartner("3333");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         createValidAddress(partner.getId(), partner.getDigitalId());
         createValidAddress(partner.getId(), partner.getDigitalId());
         createValidAddress(partner.getId(), partner.getDigitalId());
@@ -78,8 +79,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testCreatePartnerAddress() {
-        var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var address = createValidAddress(partner.getId(), partner.getDigitalId());
         assertThat(address)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -90,8 +91,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testUpdatePartnerAddress() {
-        var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var address = createValidAddress(partner.getId(), partner.getDigitalId());
         String newName = "Новое наименование";
         var updateAddress = new Address();
         updateAddress.id(address.getId());
@@ -110,8 +111,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     @Test
     void testDeletePartnerAddress() {
-        var partner = createValidPartner();
-        var address = createValidAddress(partner.getId());
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var address = createValidAddress(partner.getId(), partner.getDigitalId());
         var actualAddress =
             get(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
@@ -154,19 +155,6 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
         assertThat(response.getErrors())
             .isNull();
         return response.getAddress();
-    }
-
-    private static Address createValidAddress(String partnerUuid) {
-        var response = createPost(baseRoutePath + "/address", getValidPartnerAddress(partnerUuid), AddressResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getAddress();
-    }
-
-    private static Address getValidPartnerAddress(String partnerUuid) {
-        return getValidPartnerAddress(partnerUuid, "111111");
     }
 
     private static Address getValidPartnerAddress(String partnerUuid, String digitalId) {

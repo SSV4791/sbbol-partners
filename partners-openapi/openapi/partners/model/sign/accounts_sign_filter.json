@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountSignFilter",
+  "type": "object",
+  "title": "Запрос Партнеров по фильтру",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "partnerId": {
+      "type": "string",
+      "title": "Идентификатор партнера"
+    },
+    "accountsId": {
+      "type": "array",
+      "title": "Идентификатор счетов",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса Партнеров"
+    }
+  }
+}
+

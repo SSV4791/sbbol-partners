@@ -3,7 +3,9 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.SignAccountException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
@@ -13,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @Logged(printRequestResponse = true)
@@ -104,6 +107,9 @@ public class AccountServiceImpl implements AccountService {
             var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()));
             if (foundAccount == null) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId());
+            }
+            if (AccountStateType.SIGNED.equals(foundAccount.getState())) {
+                throw new SignAccountException(Collections.singletonList("Ошибка обновления счёта клиента, нельзя обновлять подписанные счёта"));
             }
             accountMapper.updateAccount(account, foundAccount);
             var saveAccount = accountRepository.save(foundAccount);
