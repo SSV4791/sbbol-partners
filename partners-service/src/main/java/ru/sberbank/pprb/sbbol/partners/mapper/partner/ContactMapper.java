@@ -45,6 +45,7 @@ public interface ContactMapper extends BaseMapper {
     }
 
     @Named("updateContact")
+    @Mapping(target = "type", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
     void updateContact(Contact contact, @MappingTarget() ContactEntity contactEntity);

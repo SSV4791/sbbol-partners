@@ -8,7 +8,7 @@ import ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
 import ru.sberbank.pprb.sbbol.partners.service.counterparty.CounterpartyService;
 
-@Deprecated(since = "2.0", forRemoval = true)
+@Deprecated
 @RestController
 public class CounterpartyController implements CounterpartiesApi {
 

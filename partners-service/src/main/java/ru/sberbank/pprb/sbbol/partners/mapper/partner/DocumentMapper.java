@@ -48,6 +48,7 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(document.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "type", source = "documentType")
+    @Mapping(target = "typeUuid", ignore = true)
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void updateDocument(Document document, @MappingTarget() DocumentEntity documentEntity);
 }

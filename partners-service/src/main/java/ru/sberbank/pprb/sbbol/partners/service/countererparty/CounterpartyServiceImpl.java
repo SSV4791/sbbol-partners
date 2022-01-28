@@ -13,7 +13,7 @@ import static ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesRe
 import static ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult.StatusEnum.SIGNED;
 
 @Service
-@Deprecated(since = "2.0", forRemoval = true)
+@Deprecated
 public class CounterpartyServiceImpl implements CounterpartyService {
 
     private final LegacySbbolAdapter legacySbbolAdapter;

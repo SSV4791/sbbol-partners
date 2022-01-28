@@ -14,6 +14,7 @@ import java.util.Objects;
 /**
  * Адрес регистрации
  */
+@Deprecated
 @Entity
 @Table(name = "T_PHYSICALADDRESS")
 @DynamicUpdate

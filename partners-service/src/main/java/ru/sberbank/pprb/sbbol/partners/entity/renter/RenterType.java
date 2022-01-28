@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.entity.renter;
 /**
  * Тип сущности Партнер
  */
+@Deprecated
 public enum RenterType {
 
     LEGAL_ENTITY("Юр. лицо"),

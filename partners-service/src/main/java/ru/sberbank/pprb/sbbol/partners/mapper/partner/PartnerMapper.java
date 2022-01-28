@@ -41,7 +41,7 @@ public interface PartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
-    @Mapping(target = "type ", constant = "PARTNER")
+    @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     PartnerEntity toPartner(Partner partner);
@@ -57,6 +57,7 @@ public interface PartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
+    @Mapping(target = "type", ignore = true)
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);

@@ -2,12 +2,15 @@ package ru.sberbank.pprb.sbbol.partners.rest.renter;
 
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.entity.renter.DulType;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.renter.model.RenterListResponse;
 import ru.sberbank.pprb.sbbol.renter.model.Version;
+
+import java.time.LocalDate;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -240,6 +243,16 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .kpp("0")
             .ogrn("123456789012345")
             .okpo("1234567890")
+            .lastName("Фамилия")
+            .firstName("Имя")
+            .middleName("Отчество")
+            .dulType(Renter.DulTypeEnum.PASSPORTOFRUSSIA)
+            .dulName(DulType.PASSPORTOFRUSSIA.getDesc())
+            .dulSerie("Серия")
+            .dulNumber("Номер")
+            .dulDivisionIssue("Место")
+            .dulDateIssue(LocalDate.now())
+            .dulDivisionCode("Код")
             .account("40702810538261023926")
             .bankBic("044525225")
             .bankName("ПАО СБЕРБАНК")

@@ -20,6 +20,7 @@ import java.util.Objects;
 /**
  * Партнер
  */
+@Deprecated
 @Table(name = "T_RENTER")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @Inheritance(strategy = InheritanceType.JOINED)

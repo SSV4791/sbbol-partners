@@ -18,7 +18,6 @@ public class DocumentViewRepositoryImpl implements DocumentViewRepository, BaseR
     @PersistenceContext
     private EntityManager entityManager;
 
-
     @Override
     public List<DocumentEntity> findByFilter(DocumentsFilter filter) {
         var builder = entityManager.getCriteriaBuilder();

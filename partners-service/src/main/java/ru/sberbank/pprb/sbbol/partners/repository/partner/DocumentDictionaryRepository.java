@@ -19,6 +19,14 @@ public interface DocumentDictionaryRepository extends CrudRepository<DocumentTyp
     DocumentTypeEntity getByUuid(UUID uuid);
 
     /**
+     * Получение типа документа по системному наименованию
+     *
+     * @param systemName Системное имя документа
+     * @return Тип документа
+     */
+    DocumentTypeEntity getBySystemName(String systemName);
+
+    /**
      * Получение типов документов по фильтру
      *
      * @param deleted тип получаемых документов

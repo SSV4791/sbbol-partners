@@ -31,6 +31,7 @@ public class ValidationAspect {
     /**
      * Метод для валидации объектов в РЕСТ клиентах.
      */
+    @SuppressWarnings("unchecked")
     @Before("execution(* ru.sberbank.pprb.sbbol.partners..*Controller.*(..))")
     public void validate(JoinPoint call) {
         var signature = (MethodSignature) call.getSignature();
@@ -53,6 +54,7 @@ public class ValidationAspect {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T getBean(Class<? extends T> clazz, String beanName) {
         if (!applicationContext.containsBean(beanName)) {
             DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();

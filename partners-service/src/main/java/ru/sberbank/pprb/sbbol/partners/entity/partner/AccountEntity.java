@@ -135,6 +135,6 @@ public class AccountEntity extends BaseEntity {
 
     @Override
     public String getHashKey() {
-        return getUuid().toString();
+        return getPartnerUuid().toString();
     }
 }

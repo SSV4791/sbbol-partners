@@ -6,19 +6,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.common.PartnerViewRepository;
 
 import java.util.UUID;
 
 @Repository
-public interface PartnerRepository extends PagingAndSortingRepository<PartnerEntity, UUID> {
-
-    /**
-     * Получение Партнера по идентификатору
-     *
-     * @param uuid Идентификатор документа
-     * @return Партнер
-     */
-    PartnerEntity getByUuid(UUID uuid);
+public interface PartnerRepository extends PagingAndSortingRepository<PartnerEntity, UUID>, PartnerViewRepository {
 
     /**
      * Получение Партнера

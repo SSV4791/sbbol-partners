@@ -20,6 +20,12 @@ public interface AccountSingMapper extends BaseMapper {
     AccountSign toSignAccount(AccountEntity account);
 
     @Named("updateSignAccount")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "signCollectionId", ignore = true)
+    @Mapping(target = "name", ignore = true)
+    @Mapping(target = "account", ignore = true)
+    @Mapping(target = "partnerUuid", ignore = true)
+    @Mapping(target = "banks", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(account.getAccountId()))")
     void updateSignAccount(AccountSign account, @MappingTarget() AccountEntity accountEntity);
 }

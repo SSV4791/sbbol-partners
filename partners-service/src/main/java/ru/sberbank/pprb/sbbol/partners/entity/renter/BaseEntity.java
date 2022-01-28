@@ -12,6 +12,7 @@ import java.io.Serializable;
 /**
  * Базовый класс модели
  */
+@Deprecated
 @MappedSuperclass
 public abstract class BaseEntity implements Serializable, HashKeyProvider {
 
