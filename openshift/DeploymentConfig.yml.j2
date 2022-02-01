@@ -135,7 +135,7 @@ spec:
               memory: {{ os_project.requests.memory | default("1000Mi") }}
               ephemeral-storage: {{ os_project.requests.ephemeral_storage | default("512Mi") }}
         - name: fluentbit
-          image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/pprb/ci00641491/ci02469991_logger/fluent-bit:1.4.5
+          image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/pprb/ci00641491/ci02469991_logger/fluent-bit@sha256:767f20b9246a0209cd3236c2e53419d96df2f4f013ce59d634b1fd581ee8c951
           imagePullPolicy: Always
           securityContext:
             readOnlyRootFilesystem: true
@@ -184,12 +184,14 @@ spec:
         - name: app-config
           configMap:
             name: cm-app-properties-{{ canary_suffix }}
+            defaultMode: 0400
             items:
               - key: application.properties
                 path: application.properties
         - name: logback-config
           configMap:
             name: cm-logback-{{ canary_suffix }}
+            defaultMode: 0400
             items:
               - key: logback.xml
                 path: logback.xml
