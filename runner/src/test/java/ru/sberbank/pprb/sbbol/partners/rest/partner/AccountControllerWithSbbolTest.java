@@ -1,25 +1,29 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
-import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Bank;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.List;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createNotValidAccount;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
-class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
+class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
+
+    @MockBean
+    private BudgetMaskService budgetMaskService;
 
     public static final String baseRoutePath = "/partner";
 
@@ -27,6 +31,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     void testGetAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var executeAccount = counterpartyMapper.toAccount(counterparty, partner.getDigitalId(), UUID.fromString(account.getId()), budgetMaskService);
         var actualAccount =
             get(
                 baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
@@ -37,32 +42,30 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isNotNull();
         assertThat(actualAccount.getAccount())
             .isNotNull()
-            .isEqualTo(account);
+            .isEqualTo(executeAccount);
     }
 
     @Test
     void testViewAccount() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
+        var partner = createValidPartner(randomAlphabetic(10));
         createValidAccount(partner.getId(), partner.getDigitalId());
         createValidAccount(partner.getId(), partner.getDigitalId());
 
-        var filter1 = new AccountsFilter()
+        var filter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
-            .partnerIds(List.of(partner.getId()))
+            .partnerIds(List.of(partner.getId(), counterpartyView.getPprbGuid()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
-        var response1 = post(
+        var response = post(
             baseRoutePath + "/accounts/view",
-            filter1,
+            filter,
             AccountsResponse.class
         );
-        assertThat(response1)
+        assertThat(response)
             .isNotNull();
-        assertThat(response1.getAccounts().size())
-            .isEqualTo(4);
+        assertThat(response.getAccounts().size())
+            .isEqualTo(1);
     }
 
     @Test
@@ -93,14 +96,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     void testUpdateAccount() {
         var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        String newName = "Новое наименование";
-        account.setName(newName);
-        var newUpdateAccount = put(baseRoutePath + "/account", account, AccountResponse.class);
+        var executeAccount = counterpartyMapper.toAccount(updatedCounterparty, partner.getDigitalId(), null, budgetMaskService);
+        var newUpdateAccount = put(baseRoutePath + "/account", executeAccount, AccountResponse.class);
         assertThat(newUpdateAccount)
             .isNotNull();
-        assertThat(newUpdateAccount.getAccount().getName())
-            .isEqualTo(newName);
+        assertThat(newUpdateAccount.getAccount().getAccount())
+            .isEqualTo(newAcc);
         assertThat(newUpdateAccount.getErrors())
             .isNull();
     }
@@ -109,6 +110,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     void testDeleteAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var executeAccount = counterpartyMapper.toAccount(counterparty, partner.getDigitalId(), UUID.fromString(account.getId()), budgetMaskService);
         var actualAccount =
             get(
                 baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
@@ -119,7 +121,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isNotNull();
         assertThat(actualAccount.getAccount())
             .isNotNull()
-            .isEqualTo(account);
+            .isEqualTo(executeAccount);
 
         var deleteAccount =
             delete(
@@ -139,41 +141,5 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isNotNull();
         assertThat(searchAccount.getCode())
             .isEqualTo(HttpStatus.NOT_FOUND.name());
-    }
-
-    private static Account getValidAccount(String partnerUuid, String digitalId) {
-        return new Account()
-            .version(0L)
-            .partnerId(partnerUuid)
-            .digitalId(digitalId)
-            .name("111111")
-            .account("40802810500490014206")
-            .addBanksItem(new Bank()
-                .version(0L)
-                .bic("044525411")
-                .name("222222")
-                .addBankAccountsItem(
-                    new BankAccount()
-                        .account("30101810145250000411"))
-            )
-            .state(Account.StateEnum.NOT_SIGNED);
-    }
-
-    public static Account createValidAccount(String partnerUuid, String digitalId) {
-        var createAccount = createPost(baseRoutePath + "/account", getValidAccount(partnerUuid, digitalId), AccountResponse.class);
-        assertThat(createAccount)
-            .isNotNull();
-        assertThat(createAccount.getErrors())
-            .isNull();
-        return createAccount.getAccount();
-    }
-
-    public static Error createNotValidAccount(String partnerUuid, String digitalId) {
-        var account = getValidAccount(partnerUuid, digitalId);
-        account.setAccount("222222");
-        for (Bank bank : account.getBanks()) {
-            bank.setBic("44444");
-        }
-        return createBadRequestPost(baseRoutePath + "/account", account, Error.class);
     }
 }

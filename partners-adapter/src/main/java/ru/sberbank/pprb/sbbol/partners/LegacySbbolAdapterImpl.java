@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -200,6 +201,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
+    @Cacheable("migration")
     public boolean checkMigration(String digitalId) {
         try {
             ResponseEntity<Boolean> response = restTemplate.exchange(
@@ -220,6 +222,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
+    @Cacheable("housingInns")
     public Set<String> getHousingInn(String digitalId, Set<String> counterpartyInns) {
         try {
             ResponseEntity<Set<String>> response = restTemplate.exchange(

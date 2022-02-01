@@ -19,7 +19,7 @@ import java.util.UUID;
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "replication_history")
-public class ReplicationHistory implements Serializable, HashKeyProvider {
+public class ReplicationHistoryEntity implements Serializable, HashKeyProvider {
 
     @Serial
     private static final long serialVersionUID = 1;
@@ -150,7 +150,7 @@ public class ReplicationHistory implements Serializable, HashKeyProvider {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        ReplicationHistory that = (ReplicationHistory) obj;
+        ReplicationHistoryEntity that = (ReplicationHistoryEntity) obj;
         if (getUuid() == null || that.getUuid() == null) {
             return false;
         }
@@ -159,6 +159,6 @@ public class ReplicationHistory implements Serializable, HashKeyProvider {
 
     @Override
     public String getHashKey() {
-        return null;
+        return getPartnerUuid().toString();
     }
 }
