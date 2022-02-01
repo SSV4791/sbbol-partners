@@ -2,7 +2,7 @@ import ru.sbrf.ufs.pipeline.Const
 
 @Library(['ufs-jobs@master']) _
 
-def ufsCredential = 'DS_CAB-SA-CI000825'
+def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
 
 def labels = [
     build    : [
@@ -47,12 +47,12 @@ pipeline {
             steps {
                 script {
                     def defaultLabels = [PR_CHECK_LABEL]
-                    def changedFiles = git.getPrDiffFiles(GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger(), [], ufsCredential)
+                    def changedFiles = git.getPrDiffFiles(GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger(), [], credential)
                     def checkingPaths = labels.collect { it.value.entries }.flatten().unique()
                     def intersectEntries = fileUtils.intersect(checkingPaths, changedFiles)
                     additionalLabels = labels.findAll { it.value.entries.any { entry -> intersectEntries.contains(entry) } }.keySet()
 
-                    bitbucket.setLabels(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger(), defaultLabels + additionalLabels as Set)
+                    bitbucket.setLabels(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger(), defaultLabels + additionalLabels as Set)
                 }
             }
         }
@@ -74,13 +74,13 @@ pipeline {
     post {
         success {
             script {
-                bitbucket.setJenkinsLabelStatus(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
-                bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
+                bitbucket.setJenkinsLabelStatus(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
+                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
             }
         }
         failure {
             script {
-                bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
+                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
             }
         }
         cleanup {

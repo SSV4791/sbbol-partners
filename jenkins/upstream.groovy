@@ -4,7 +4,7 @@ import ru.sbrf.ufs.pipeline.Const
 
 def pullRequest = null
 def upstreamBranchName = ''
-def pprbCredential = 'DS_CAB-SA-CI000825'
+def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
 
 pipeline {
     agent {
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     currentBuild.getChangeSets().clear()
-                    pullRequest = bitbucket.getPullRequest(pprbCredential, params.projectKey, params.repoSlug, params.sourcePullRequestId.toInteger())
+                    pullRequest = bitbucket.getPullRequest(credential, params.projectKey, params.repoSlug, params.sourcePullRequestId.toInteger())
                     setJobPullRequestLink(pullRequest)
                     if (pullRequest.state != 'MERGED') {
                         error("Только вмердженные ПРы можно переливать!")
@@ -38,7 +38,7 @@ pipeline {
         stage('Upstream pull request') {
             steps {
                 script {
-                    def commits = bitbucket.getPullRequestCommits(pprbCredential, params.projectKey, params.repoSlug, params.sourcePullRequestId)
+                    def commits = bitbucket.getPullRequestCommits(credential, params.projectKey, params.repoSlug, params.sourcePullRequestId)
                     echo "Upstream commits:"
                     commits.each { echo "${it.id}:${it.message}" }
                     upstreamBranchName = params.sourcePullRequestId + "-upstream"
@@ -62,7 +62,7 @@ pipeline {
         success {
             script {
                 upstreamResult(
-                    credentialsId: pprbCredential,
+                    credentialsId: credential,
                     projectKey: params.projectKey,
                     repoSlug: params.repoSlug,
                     sourcePrId: params.sourcePullRequestId,
@@ -77,7 +77,7 @@ pipeline {
                     def authorPr = pullRequest.author.user.name
                     def fields = [
                         project          : [
-                            id: jira.getProject('cab-sa-pyjobs01', bitbucket.getJiraKeyByLogin(pprbCredential, authorPr)).id
+                            id: jira.getProject('cab-sa-pyjobs01', bitbucket.getJiraKeyByLogin(credential, authorPr)).id
                         ],
                         summary          : "Задача на перелитие ПРа ${params.sourcePullRequestId}",
                         description      : "Этот ПР необходимо перелить в ветку ${params.targetBranch} самостоятельно, " +
@@ -95,7 +95,7 @@ pipeline {
                     ]
                     def jiraIssue = jira.createIssue('cab-sa-pyjobs01', fields)
                     upstreamResult(
-                        credentialsId: pprbCredential,
+                        credentialsId: credential,
                         projectKey: params.projectKey,
                         repoSlug: params.repoSlug,
                         sourcePrId: params.sourcePullRequestId,
@@ -105,7 +105,7 @@ pipeline {
                 } catch (e) {
                     println(e)
                     upstreamResult(
-                        credentialsId: pprbCredential,
+                        credentialsId: credential,
                         projectKey: params.projectKey,
                         repoSlug: params.repoSlug,
                         sourcePrId: params.sourcePullRequestId,
