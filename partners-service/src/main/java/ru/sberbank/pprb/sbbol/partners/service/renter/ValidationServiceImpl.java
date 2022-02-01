@@ -18,6 +18,7 @@ import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.ENTREPRENEUR;
 import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.LEGAL_ENTITY;
 import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.PHYSICAL_PERSON;
 
+@Deprecated
 @Service
 public class ValidationServiceImpl implements ValidationService {
     @Override

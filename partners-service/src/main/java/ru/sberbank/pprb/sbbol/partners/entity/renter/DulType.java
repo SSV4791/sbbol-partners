@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.entity.renter;
 /**
  * Тип удостоверяющего документа (физ. лицо)
  */
+@Deprecated
 public enum DulType {
 
     PASSPORTOFRUSSIA("Паспорт гражданина РФ"),

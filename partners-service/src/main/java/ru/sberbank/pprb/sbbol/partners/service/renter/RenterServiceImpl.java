@@ -4,18 +4,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterMapper;
+import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 import ru.sberbank.pprb.sbbol.renter.model.CheckResult;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.renter.model.RenterListResponse;
-import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Deprecated
 @Service
 public class RenterServiceImpl implements RenterService {
 

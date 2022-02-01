@@ -38,6 +38,7 @@ public interface AccountMapper extends BaseMapper {
 
     @Mapping(target = "uuid", expression = "java(mapUuid(account.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
+    @Mapping(target = "signCollectionId", ignore = true)
     AccountEntity toAccount(Account account);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
@@ -52,6 +53,7 @@ public interface AccountMapper extends BaseMapper {
     @Named("updateAccount")
     @Mapping(target = "uuid", expression = "java(mapUuid(account.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
+    @Mapping(target = "signCollectionId", ignore = true)
     void updateAccount(Account account, @MappingTarget() AccountEntity accountEntity);
 
     @AfterMapping

@@ -18,6 +18,7 @@ import java.util.Objects;
 /**
  * Адрес регистрации
  */
+@Deprecated
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "T_LEGALADDRESS")

@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
@@ -27,6 +28,9 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
@@ -35,6 +39,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepo
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.MergeHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
@@ -52,7 +58,10 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerAddressServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerDocumentServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
-import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.renter.PartnerServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
+import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
 
 @Configuration
 public class PartnerServiceConfiguration {
@@ -110,6 +119,11 @@ public class PartnerServiceConfiguration {
     @Bean
     PartnerMapper partnerMapper() {
         return new PartnerMapperImpl(partnerEmailMapper(), partnerPhoneMapper());
+    }
+
+    @Bean
+    RenterPartnerMapper renterPartnerMapper() {
+        return new RenterPartnerMapperImpl();
     }
 
     @Bean
@@ -182,6 +196,36 @@ public class PartnerServiceConfiguration {
         MergeHistoryRepository mergeHistoryRepository,
         LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new PartnerServiceImpl(partnerRepository, mergeHistoryRepository, legacySbbolAdapter, partnerMapper());
+        return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(partnerRepository, mergeHistoryRepository, legacySbbolAdapter, partnerMapper());
+    }
+
+    @Bean
+    RenterService renterService(RenterRepository repository,
+                                ValidationService validationService,
+                                RenterMapper renterMapper) {
+        return new RenterServiceImpl(repository, validationService, renterMapper);
+    }
+
+    @Bean
+    @Primary
+    RenterService renterService(
+        PartnerRepository partnerRepository,
+        AccountRepository accountRepository,
+        AddressRepository addressRepository,
+        DocumentRepository documentRepository,
+        DocumentDictionaryRepository dictionaryRepository,
+        FlatRenterRepository flatRenterRepository,
+        ValidationService validationService
+    ) {
+        return new PartnerServiceImpl(
+            partnerRepository,
+            accountRepository,
+            addressRepository,
+            documentRepository,
+            dictionaryRepository,
+            flatRenterRepository,
+            validationService,
+            renterPartnerMapper()
+        );
     }
 }

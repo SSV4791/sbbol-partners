@@ -47,3 +47,6 @@ databaseChangeLog:
   - include:
       file: 1642673545563_create_dictionary_structure_fill_budgen_mask.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1643211397327_create_partners_structure_flat_renter.sql
+      relativeToChangelogFile: true

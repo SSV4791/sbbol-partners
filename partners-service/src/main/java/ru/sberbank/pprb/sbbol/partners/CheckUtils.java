@@ -7,6 +7,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class CheckUtils {
 
     private CheckUtils() {
