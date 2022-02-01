@@ -5,7 +5,8 @@ import ru.sbrf.ufs.pipeline.docker.DockerRunBuilder
 
 def pullRequest = null
 def latestCommitHash = ""
-def ufsCredential = 'DS_CAB-SA-CI000825'
+def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
+def bitbucketCredential = Const.BITBUCKET_DBO_KEY_SECMAN
 def network = UUID.randomUUID()
 
 pipeline {
@@ -30,7 +31,6 @@ pipeline {
         POSTGRES_DB_USER = 'user'
         POSTGRES_DB_PASSWORD = 'pass'
         LIQUIBASE_DOWNLOAD_URI = 'https://nexus.sigma.sbrf.ru/nexus/service/local/repositories/SBT_CI_distr_repo/content/SBBOL_UFS/liquibase/3.7.0-postgres/liquibase-3.7.0-postgres-bin.tar.gz'
-        NEXUS_CREDS = credentials("${ufsCredential}")
     }
 
     stages {
@@ -45,10 +45,10 @@ pipeline {
         stage('Preparing job') {
             steps {
                 script {
-                    pullRequest = bitbucket.getPullRequest(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
+                    pullRequest = bitbucket.getPullRequest(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
                     setJobPullRequestLink(pullRequest)
-                    bitbucket.setJenkinsLabelInfo(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
-                    bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")
+                    bitbucket.setJenkinsLabelInfo(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
+                    bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")
                 }
             }
         }
@@ -56,7 +56,7 @@ pipeline {
         stage('Prepare project') {
             steps {
                 script {
-                    latestCommitHash = git.checkoutRef 'bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, "${pullRequest.fromRef.displayId}:${pullRequest.fromRef.displayId} ${pullRequest.toRef.displayId}:${pullRequest.toRef.displayId} "
+                    latestCommitHash = git.checkoutRef bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, "${pullRequest.fromRef.displayId}:${pullRequest.fromRef.displayId} ${pullRequest.toRef.displayId}:${pullRequest.toRef.displayId} "
                     sh "git merge ${pullRequest.toRef.displayId}"
                 }
             }
@@ -67,7 +67,7 @@ pipeline {
                 script {
                     sh("docker network create ${network}")
                     new DockerRunBuilder(this)
-                            .registry(Const.OPENSHIFT_REGISTRY, ufsCredential)
+                            .registry(Const.OPENSHIFT_REGISTRY, credential)
                             .env("POSTGRES_USER", "${POSTGRES_DB_USER}")
                             .env("POSTGRES_PASSWORD", "${POSTGRES_DB_PASSWORD}")
                             .env("POSTGRES_DB", "${POSTGRES_DB_NAME}")
@@ -84,10 +84,11 @@ pipeline {
         stage('Check sql script') {
             steps {
                 script {
-                    sh "curl -u ${NEXUS_CREDS_USR}:${NEXUS_CREDS_PSW} -kL ${LIQUIBASE_DOWNLOAD_URI} | tar -xz"
-
+                    vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
+                        sh "curl -u ${NEXUS_USER}:${NEXUS_PASSWORD} -kL ${LIQUIBASE_DOWNLOAD_URI} | tar -xz"
+                    }
                     new DockerRunBuilder(this)
-                            .registry(Const.OPENSHIFT_REGISTRY, ufsCredential)
+                            .registry(Const.OPENSHIFT_REGISTRY, credential)
                             .volume("${WORKSPACE}", "/build")
                             .extra("-w /build")
                             .extra("--network=${network}")
@@ -113,13 +114,13 @@ pipeline {
     post {
         success {
             script {
-                bitbucket.setJenkinsLabelStatus(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
-                bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
+                bitbucket.setJenkinsLabelStatus(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
+                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
             }
         }
         failure {
             script {
-                bitbucket.updateBitbucketHistoryBuild(ufsCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
+                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
             }
         }
         cleanup {

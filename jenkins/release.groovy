@@ -3,6 +3,9 @@ import ru.sbrf.ufs.pipeline.docker.DockerRunBuilder
 
 @Library(['ufs-jobs@master']) _
 
+def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
+def sonarCredential = secman.makeCredMap('DS_CAB-SA-CI000825-sonar-token')
+def bitbucketCredential = Const.BITBUCKET_DBO_KEY_SECMAN
 def projectLog = ''
 
 pipeline {
@@ -19,7 +22,6 @@ pipeline {
     }
     parameters {
         string(name: 'branch', defaultValue: 'develop', description: 'Ветка для сборки образа')
-        choice(name: 'credentialID', choices: ['DS_CAB-SA-CI000825'], description: 'ТУЗ, используемая для сборки')
         string(name: 'istio_tag', defaultValue: '01.000.03', description: 'Тег для шаблонов istio')
         string(name: 'commitOrTag', description: 'Хэш коммита или тэг от которого формируется release-notes')
         booleanParam(name: 'checkmarx', defaultValue: false, description: 'Прохождение проверки Checkmarx')
@@ -27,8 +29,6 @@ pipeline {
         choice(name: 'build_type', choices: ['develop', 'release'], description: "Тип сборки")
     }
     environment {
-        NEXUS_CREDS = credentials("${params.credentialID}")
-        SONAR_TOKEN = credentials('sonar-token-partners')
         // Паттерн версии для определения последней сборки по тегу. В данном случае будет искаться последняя сборка 01.000.00_хххх
         VERSION_PATTERN = /\d{2}\.\d{3}\.\d{2}_\d{4}/
         // Паттерн, по которому определяется начальная версия, если поиск по VERSION_PATTERN ничего не нашел
@@ -61,7 +61,7 @@ pipeline {
         stage('Checkout git') {
             steps {
                 script {
-                    LATEST_COMMIT_HASH = git.checkoutRef('bitbucket-dbo-key', GIT_PROJECT, GIT_REPOSITORY, branch)
+                    LATEST_COMMIT_HASH = git.checkoutRef(bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, branch)
                 }
             }
         }
@@ -91,7 +91,7 @@ pipeline {
             steps {
                 script {
                     // Ставим git tag с версией сборки на текущий commit
-                    git.tag('bitbucket-dbo-key', VERSION)
+                    git.tag(bitbucketCredential, VERSION)
                     currentBuild.displayName += " D-$VERSION"
                     rtp stableText: "<h1>Build number: D-$VERSION</h1>"
                 }
@@ -104,22 +104,26 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    new DockerRunBuilder(this)
-                        .registry(Const.OPENSHIFT_REGISTRY, params.credentialID)
-                        .volume("${WORKSPACE}", "/build")
-                        .extra("-w /build")
-                        .cpu(2)
-                        .memory("2g")
-                        .image(BUILD_JAVA_DOCKER_IMAGE)
-                        .cmd('./gradlew ' +
-                            "-PnexusLogin=${NEXUS_CREDS_USR} " +
-                            "-PnexusPassword=${NEXUS_CREDS_PSW} " +
-                            "-Pversion=${VERSION} " +
-                            "-Dsonar.login=${SONAR_TOKEN} " +
-                            "-Dsonar.branch.name=${params.branch} " +
-                            'build sonarqube --parallel'
-                        )
-                        .run()
+                    vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
+                        vault.withSecretKey([path: sonarCredential.path, secretKeyVar: "SONAR_TOKEN"]) {
+                            new DockerRunBuilder(this)
+                                .registry(Const.OPENSHIFT_REGISTRY, credential)
+                                .volume("${WORKSPACE}", "/build")
+                                .extra("-w /build")
+                                .cpu(2)
+                                .memory("2g")
+                                .image(BUILD_JAVA_DOCKER_IMAGE)
+                                .cmd('./gradlew ' +
+                                    "-PnexusLogin=${NEXUS_USER} " +
+                                    "-PnexusPassword=${NEXUS_PASSWORD} " +
+                                    "-Pversion=${VERSION} " +
+                                    "-Dsonar.login=${SONAR_TOKEN} " +
+                                    "-Dsonar.branch.name=${params.branch} " +
+                                    'build sonarqube --parallel'
+                                )
+                                .run()
+                        }
+                    }
                 }
             }
         }
@@ -136,8 +140,9 @@ pipeline {
                             break
                     }
                     DOCKER_IMAGE_NAME = "${DOCKER_REGISTRY}/${DOCKER_IMAGE_REPOSITORY}/${ARTIFACT_ID}:${VERSION}"
-                    docker.withRegistry(Const.OPENSHIFT_REGISTRY, params.credentialID) {
-                        docker.build(DOCKER_IMAGE_NAME, "--force-rm .").push()
+                    vault.withRegistry(Const.OPENSHIFT_REGISTRY, credential) {
+                        docker.build(DOCKER_IMAGE_NAME, "--force-rm .")
+                        sh "docker push ${DOCKER_IMAGE_NAME}"
                     }
                 }
             }
@@ -150,8 +155,8 @@ pipeline {
             steps {
                 script {
                     dir('openshift') {
-                        istio.getOSTemplates('bitbucket-dbo-key', 'istio', 'openshift', params.istio_tag, './istio')
-                        git.raw(params.credentialID, 'cibufs', 'sbbol-params', 'master', "${ARTIFACT_ID}/${params.branch}/params.yml")
+                        istio.getOSTemplates(bitbucketCredential, 'istio', 'openshift', params.istio_tag, './istio')
+                        git.raw(credential, 'cibufs', 'sbbol-params', 'master', "${ARTIFACT_ID}/${params.branch}/params.yml")
                         def repoDigest = sh(script: "docker inspect ${DOCKER_IMAGE_NAME} --format='{{index .RepoDigests 0}}'", returnStdout: true).trim()
                         DOCKER_IMAGE_HASH = repoDigest.split('@').last()
                         log.info('Docker image hash: ' + DOCKER_IMAGE_HASH)
@@ -166,23 +171,25 @@ pipeline {
         stage('Publish artifacts') {
             steps {
                 script {
-                    new DockerRunBuilder(this)
-                        .registry(Const.OPENSHIFT_REGISTRY, params.credentialID)
-                        .env("GRADLE_USER_HOME", '/build/.gradle')
-                        .volume("${WORKSPACE}", "/build")
-                        .extra("-w /build")
-                        .cpu(1)
-                        .memory("1g")
-                        .image(BUILD_JAVA_DOCKER_IMAGE)
-                        .cmd('./gradlew ' +
-                            "-PnexusLogin=${NEXUS_CREDS_USR} " +
-                            "-PnexusPassword='${NEXUS_CREDS_PSW}' " +
-                            "-Pversion=D-${VERSION} " +
-                            "-PdockerImage='${DOCKER_IMAGE_REPOSITORY}/${ARTIFACT_ID}@${DOCKER_IMAGE_HASH}' " +
-                            "${params.build_type} " +
-                            "${params.reverseAndPublish ? 'reverseAndPublish' : ''}"
-                        )
-                        .run()
+                    vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
+                        new DockerRunBuilder(this)
+                            .registry(Const.OPENSHIFT_REGISTRY, credential)
+                            .env("GRADLE_USER_HOME", '/build/.gradle')
+                            .volume("${WORKSPACE}", "/build")
+                            .extra("-w /build")
+                            .cpu(1)
+                            .memory("1g")
+                            .image(BUILD_JAVA_DOCKER_IMAGE)
+                            .cmd('./gradlew ' +
+                                "-PnexusLogin=${NEXUS_USER} " +
+                                "-PnexusPassword='${NEXUS_PASSWORD}' " +
+                                "-Pversion=D-${VERSION} " +
+                                "-PdockerImage='${DOCKER_IMAGE_REPOSITORY}/${ARTIFACT_ID}@${DOCKER_IMAGE_HASH}' " +
+                                "${params.build_type} " +
+                                "${params.reverseAndPublish ? 'reverseAndPublish' : ''}"
+                            )
+                            .run()
+                    }
                 }
             }
         }
@@ -241,8 +248,8 @@ pipeline {
             steps {
                 script {
                     dir('distrib') {
-                        qgm.publishReleaseNotes(GROUP_ID, ARTIFACT_ID, "D-$VERSION", releaseNotes, params.credentialID)
-                        nexus.publishZip(GROUP_ID, ARTIFACT_ID, "distrib.lock", ARTIFACT_NAME_LOCK, "D-$VERSION", params.credentialID)
+                        qgm.publishReleaseNotes(GROUP_ID, ARTIFACT_ID, "D-$VERSION", releaseNotes, credential)
+                        nexus.publishZip(GROUP_ID, ARTIFACT_ID, "distrib.lock", ARTIFACT_NAME_LOCK, "D-$VERSION", credential)
                     }
                 }
             }
@@ -255,7 +262,7 @@ pipeline {
             steps {
                 script {
                     def docsPath = "${ARTIFACT_ID}/${env.BRANCH_NAME}" as String // путь для публикации документации
-                    docs.publish('documentation-publisher', 'docs/build/docs/', docsPath)
+                    docs.publish(Const.DOCS_PUBLISHER_SECMAN, 'docs/build/docs/', docsPath)
                 }
             }
         }
@@ -286,7 +293,7 @@ pipeline {
         stage('Push technical flags') {
             steps {
                 script {
-                    dpm.publishFlags("D-$VERSION", ARTIFACT_ID, GROUP_ID, ["bvt", "ci", "smart_regress_ift", "smart_regress_st", "smoke_ift", "smoke_st"], params.credentialID)
+                    qgm.publishFlags("D-$VERSION", ARTIFACT_ID, GROUP_ID, ['bvt': 'ok', 'ci': 'ok', 'smart_regress_ift': 'ok', 'smart_regress_st': 'ok', 'smoke_ift': 'ok', 'smoke_st': 'ok'], credential)
                 }
             }
         }
@@ -307,7 +314,7 @@ pipeline {
 
                     jiraIssues.each { jiraIssue ->
                         try {
-                            jira.setFixBuild(jiraIssue, VERSION, params.credentialID)
+                            jira.setFixBuild(jiraIssue, VERSION, credential)
                         } catch (e) {
                             log.error("Failed to update fixBuild for ${jiraIssue}: ${e}")
                         }
