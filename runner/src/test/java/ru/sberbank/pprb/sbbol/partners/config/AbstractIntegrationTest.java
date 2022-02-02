@@ -18,6 +18,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import static io.restassured.RestAssured.given;
 
@@ -33,6 +35,8 @@ import static io.restassured.RestAssured.given;
 public abstract class AbstractIntegrationTest {
 
     private static final String BASE_URI = "http://localhost";
+
+    protected static final PodamFactory factory = new PodamFactoryImpl();
 
     @LocalServerPort
     protected int port;

@@ -69,6 +69,6 @@ public class BankAccountEntity extends BaseEntity {
 
     @Override
     public String getHashKey() {
-        return bank.getHashKey();
+        return getBank().getHashKey();
     }
 }

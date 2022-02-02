@@ -1,9 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.model.sbbol;
 
+import java.io.Serializable;
+
 /**
  * Контрагент
  */
-public class Counterparty {
+public class Counterparty implements Serializable {
 
     /**
      * GUID операции в справочнике контрагентов
@@ -198,5 +200,26 @@ public class Counterparty {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Counterparty{" +
+            "operationGuid='" + operationGuid + '\'' +
+            ", name='" + name + '\'' +
+            ", taxNumber='" + taxNumber + '\'' +
+            ", kpp='" + kpp + '\'' +
+            ", account='" + account + '\'' +
+            ", bankBic='" + bankBic + '\'' +
+            ", corrAccount='" + corrAccount + '\'' +
+            ", bankName='" + bankName + '\'' +
+            ", bankCity='" + bankCity + '\'' +
+            ", settlementType='" + settlementType + '\'' +
+            ", pprbGuid='" + pprbGuid + '\'' +
+            ", signed=" + signed +
+            ", counterpartyPhone='" + counterpartyPhone + '\'' +
+            ", counterpartyEmail='" + counterpartyEmail + '\'' +
+            ", description='" + description + '\'' +
+            '}';
     }
 }

@@ -14,8 +14,9 @@ public interface AccountRepository extends CrudRepository<AccountEntity, UUID>, 
      * Получение счёта Партнера
      *
      * @param digitalId Идентификатор личного кабинета
-     * @param uuid      Идентификатор документа
+     * @param uuid      Идентификатор счёта
      * @return счёт Партнер
      */
     AccountEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
+
 }

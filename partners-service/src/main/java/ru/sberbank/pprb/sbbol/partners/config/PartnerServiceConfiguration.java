@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
@@ -39,6 +41,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepo
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.MergeHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.ReplicationHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
@@ -62,6 +65,9 @@ import ru.sberbank.pprb.sbbol.partners.service.renter.PartnerServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationHistoryService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationHistoryServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.utils.PartnerUtils;
 
 @Configuration
 public class PartnerServiceConfiguration {
@@ -132,13 +138,46 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
+    CounterpartyMapper counterpartyMapper() {
+        return new CounterpartyMapperImpl();
+    }
+
+    @Bean
+    ReplicationHistoryService replicationHistoryService(
+        AccountRepository accountRepository,
+        ReplicationHistoryRepository replicationHistoryRepository,
+        LegacySbbolAdapter legacySbbolAdapter,
+        PartnerUtils partnerUtils
+    ) {
+        return new ReplicationHistoryServiceImpl(
+            accountRepository,
+            replicationHistoryRepository,
+            legacySbbolAdapter,
+            partnerUtils,
+            counterpartyMapper(),
+            accountMapper());
+    }
+
+    @Bean
     AccountService accountService(
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
+        ReplicationHistoryRepository replicationHistoryRepository,
+        ReplicationHistoryService replicationHistoryService,
         LegacySbbolAdapter legacySbbolAdapter,
-        BudgetMaskService budgetMaskService
+        BudgetMaskService budgetMaskService,
+        PartnerUtils partnerUtils
     ) {
-        return new AccountServiceImpl(partnerRepository, accountRepository, legacySbbolAdapter, budgetMaskService, accountMapper());
+        return new AccountServiceImpl(
+            partnerRepository,
+            accountRepository,
+            replicationHistoryRepository,
+            replicationHistoryService,
+            legacySbbolAdapter,
+            budgetMaskService,
+            partnerUtils,
+            accountMapper(),
+            counterpartyMapper());
     }
 
     @Bean
@@ -194,9 +233,21 @@ public class PartnerServiceConfiguration {
     PartnerService partnerService(
         PartnerRepository partnerRepository,
         MergeHistoryRepository mergeHistoryRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        ReplicationHistoryRepository replicationHistoryRepository,
+        ReplicationHistoryService replicationHistoryService,
+        LegacySbbolAdapter legacySbbolAdapter,
+        PartnerUtils partnerUtils
     ) {
-        return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(partnerRepository, mergeHistoryRepository, legacySbbolAdapter, partnerMapper());
+        return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
+            partnerRepository,
+            mergeHistoryRepository,
+            replicationHistoryRepository,
+            replicationHistoryService,
+            legacySbbolAdapter,
+            partnerUtils,
+            partnerMapper(),
+            counterpartyMapper()
+        );
     }
 
     @Bean
@@ -227,5 +278,22 @@ public class PartnerServiceConfiguration {
             validationService,
             renterPartnerMapper()
         );
+    }
+
+    @Bean
+    PartnerUtils partnerUtils(AccountRepository accountRepository,
+                              PartnerRepository partnerRepository,
+                              MergeHistoryRepository mergeHistoryRepository,
+                              ReplicationHistoryRepository replicationHistoryRepository,
+                              LegacySbbolAdapter legacySbbolAdapter) {
+        return new PartnerUtils(
+            accountRepository,
+            partnerRepository,
+            mergeHistoryRepository,
+            replicationHistoryRepository,
+            legacySbbolAdapter,
+            partnerMapper(),
+            counterpartyMapper(),
+            accountMapper());
     }
 }
