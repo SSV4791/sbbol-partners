@@ -127,12 +127,12 @@ spec:
             initialDelaySeconds: 80
           resources:
             limits:
-              cpu: {{ os_project.limits.cpu | default("1") }}
-              memory: {{ os_project.limits.memory | default("1000Mi") }}
+              cpu: {{ os_project.limits.cpu | default("500m") }}
+              memory: {{ os_project.limits.memory | default("500Mi") }}
               ephemeral-storage: {{ os_project.limits.ephemeral_storage | default("768Mi") }}
             requests:
-              cpu: {{ os_project.requests.cpu | default("1") }}
-              memory: {{ os_project.requests.memory | default("1000Mi") }}
+              cpu: {{ os_project.requests.cpu | default("500m") }}
+              memory: {{ os_project.requests.memory | default("500Mi") }}
               ephemeral-storage: {{ os_project.requests.ephemeral_storage | default("512Mi") }}
         - name: fluentbit
           image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/pprb/ci00641491/ci02469991_logger/fluent-bit@sha256:767f20b9246a0209cd3236c2e53419d96df2f4f013ce59d634b1fd581ee8c951

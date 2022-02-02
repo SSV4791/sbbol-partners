@@ -2,7 +2,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: cm-logback
+  name: cm-logback-{{ canary_suffix }}
 data:
   logback.xml: |-
     <?xml version="1.0" encoding="UTF-8"?>
