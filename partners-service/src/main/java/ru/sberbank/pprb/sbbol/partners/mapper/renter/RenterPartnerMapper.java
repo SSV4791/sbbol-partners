@@ -106,14 +106,15 @@ public interface RenterPartnerMapper extends BaseMapper {
             return null;
         }
         var bank = new BankEntity();
-        var bankAccountEntity = new BankAccountEntity();
-        bankAccountEntity.setBank(bank);
-        bankAccountEntity.setAccount(renter.getBankAccount());
         bank.setName(renter.getBankName());
-        bank.setBankAccounts(
-            List.of(bankAccountEntity)
-        );
         bank.setBic(renter.getBankBic());
+        if (renter.getBankAccount() != null) {
+            var bankAccountEntity = new BankAccountEntity();
+            bankAccountEntity.setAccount(renter.getBankAccount());
+            bank.setBankAccounts(
+                List.of(bankAccountEntity)
+            );
+        }
         return List.of(bank);
     }
 
