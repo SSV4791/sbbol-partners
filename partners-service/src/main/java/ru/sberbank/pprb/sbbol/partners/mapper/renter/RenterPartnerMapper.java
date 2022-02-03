@@ -154,6 +154,9 @@ public interface RenterPartnerMapper extends BaseMapper {
 
     @Named("toDocumentType")
     static DocumentType toDocumentType(Renter.DulTypeEnum type) {
+        if (type == null) {
+            return null;
+        }
         return switch (type) {
             case SEAMANPASSPORT -> DocumentType.SEAMAN_PASSPORT;
             case FOREIGNPASSPORT -> DocumentType.FOREIGN_PASSPORT;
@@ -337,6 +340,9 @@ public interface RenterPartnerMapper extends BaseMapper {
 
     @Named("toLegalType")
     static LegalType toLegalType(Renter.TypeEnum type) {
+        if (type == null) {
+            return null;
+        }
         return switch (type) {
             case LEGAL_ENTITY -> LegalType.LEGAL_ENTITY;
             case PHYSICAL_PERSON -> LegalType.PHYSICAL_PERSON;
