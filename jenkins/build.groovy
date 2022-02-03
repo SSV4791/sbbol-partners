@@ -74,7 +74,7 @@ pipeline {
                                     "-Dsonar.pullrequest.key=${params.pullRequestId} " +
                                     "-Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId} " +
                                     "-Dsonar.pullrequest.base=${pullRequest.toRef.displayId} " +
-                                    "clean build sonarqube -x test --parallel"
+                                    "clean build sonarqube --parallel"
                                 )
                                 .run()
                         }
