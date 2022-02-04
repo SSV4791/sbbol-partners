@@ -111,6 +111,7 @@ public interface RenterPartnerMapper extends BaseMapper {
         if (renter.getBankAccount() != null) {
             var bankAccountEntity = new BankAccountEntity();
             bankAccountEntity.setAccount(renter.getBankAccount());
+            bankAccountEntity.setBank(bank);
             bank.setBankAccounts(
                 List.of(bankAccountEntity)
             );
