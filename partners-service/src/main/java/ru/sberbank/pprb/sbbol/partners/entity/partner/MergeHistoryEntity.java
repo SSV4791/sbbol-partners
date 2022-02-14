@@ -9,13 +9,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "merge_history")
+@Table(
+    name = "merge_history",
+    indexes = {
+        @Index(name = "merge_history_pkey", columnList = "uuid", unique = true),
+        @Index(name = "i_merge_history_partner_uuid", columnList = "partner_uuid", unique = true)
+    }
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity

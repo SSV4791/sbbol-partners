@@ -17,9 +17,13 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "budget_mask_dictionary", indexes = {
-    @Index(name = "i_budget_mask_dictionary_type", columnList = "type")
-})
+@Table(
+    name = "budget_mask_dictionary",
+    indexes = {
+        @Index(name = "budget_mask_dictionary_pkey", columnList = "uuid", unique = true),
+        @Index(name = "i_budget_mask_dictionary_type", columnList = "type")
+    }
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity
@@ -34,6 +38,9 @@ public class BudgetMaskEntity implements Serializable, HashKeyProvider {
 
     @Column(name = "mask", nullable = false, length = 20)
     private String mask;
+
+    @Column(name = "condition", nullable = false, length = 20)
+    private String condition;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 50)
@@ -53,6 +60,14 @@ public class BudgetMaskEntity implements Serializable, HashKeyProvider {
 
     public void setMask(String mask) {
         this.mask = mask;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 
     public UUID getUuid() {

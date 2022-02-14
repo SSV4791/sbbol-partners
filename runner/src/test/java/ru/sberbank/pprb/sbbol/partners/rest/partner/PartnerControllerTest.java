@@ -13,10 +13,12 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 
 class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
@@ -57,6 +59,205 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
         filter.setPagination(
             new Pagination()
                 .offset(1)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchInnPartners() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.search(
+            new SearchPartners()
+                .search(createdPartner1.getPartner().getInn().substring(4))
+        );
+        filter.setPagination(
+            new Pagination()
+                .offset(1)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchBudgetPartners() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+        createValidBudgetAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
+
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.BUDGET);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchOrgNamePartners() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.search(
+            new SearchPartners()
+                .search(createdPartner1.getPartner().getOrgName().substring(4))
+        );
+        filter.setPagination(
+            new Pagination()
+                .offset(1)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchFIOPartners() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+
+        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.search(
+            new SearchPartners()
+                .search(createdPartner1.getPartner().getSecondName() + " " + createdPartner1.getPartner().getFirstName())
+        );
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchLegalPersonPartners() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+
+        var createdPartner2 = createPost(baseRoutePath, getValidPhysicalPersonPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.LEGAL_ENTITY);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchPhysicalPersonPartners() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+
+        var createdPartner2 = createPost(baseRoutePath, getValidPhysicalPersonPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.PHYSICAL_PERSON);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchEntrepreneurPersonPartners() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+
+        var createdPartner2 = createPost(baseRoutePath, getValidEntrepreneurPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.ENTREPRENEUR);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
                 .count(1)
         );
 
@@ -197,6 +398,18 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
             ))
             .comment("555555")
             ;
+    }
+
+    private static Partner getValidPhysicalPersonPartner(String digitalId) {
+        var partner = getValidPartner(digitalId);
+        partner.setLegalForm(LegalForm.PHYSICAL_PERSON);
+        return partner;
+    }
+
+    private static Partner getValidEntrepreneurPartner(String digitalId) {
+        var partner = getValidPartner(digitalId);
+        partner.setLegalForm(LegalForm.ENTREPRENEUR);
+        return partner;
     }
 
     protected static Partner createValidPartner() {

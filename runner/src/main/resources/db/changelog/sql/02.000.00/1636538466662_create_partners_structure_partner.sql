@@ -3,21 +3,23 @@
 
 CREATE TABLE PARTNER
 (
-    uuid        UUID PRIMARY KEY,
-    digital_id  VARCHAR(40)                    NOT NULL,
-    version     BIGINT       default 0         NOT NULL,
-    type        VARCHAR(254) default 'PARTNER' NOT NULL,
-    legal_type  VARCHAR(254)                   NOT NULL,
-    org_name    VARCHAR(350),
-    first_name  VARCHAR(50),
-    second_name VARCHAR(50),
-    middle_name VARCHAR(50),
-    inn         VARCHAR(12),
-    kpp         VARCHAR(9),
-    ogrn        VARCHAR(15),
-    okpo        VARCHAR(30),
-    citizenship VARCHAR(20),
-    comment     VARCHAR(255),
+    uuid               UUID PRIMARY KEY,
+    create_date        TIMESTAMP                      NOT NULL,
+    last_modified_date TIMESTAMP                      NOT NULL,
+    digital_id         VARCHAR(40)                    NOT NULL,
+    version            BIGINT       default 0         NOT NULL,
+    type               VARCHAR(254) default 'PARTNER' NOT NULL,
+    legal_type         VARCHAR(254)                   NOT NULL,
+    org_name           VARCHAR(350),
+    first_name         VARCHAR(50),
+    second_name        VARCHAR(50),
+    middle_name        VARCHAR(50),
+    inn                VARCHAR(12),
+    kpp                VARCHAR(9),
+    ogrn               VARCHAR(15),
+    okpo               VARCHAR(30),
+    citizenship        VARCHAR(20),
+    comment            VARCHAR(255),
     CONSTRAINT CK_PARTNER_CITIZENSHIP CHECK
         (
                 CITIZENSHIP = 'UNKNOWN' OR
@@ -40,6 +42,8 @@ CREATE TABLE PARTNER
 
 COMMENT ON TABLE PARTNER IS 'Партнеры';
 COMMENT ON COLUMN PARTNER.UUID IS 'Уникальный идентификатор партнера';
+COMMENT ON COLUMN PARTNER.CREATE_DATE IS 'Время создания записи';
+COMMENT ON COLUMN PARTNER.LAST_MODIFIED_DATE IS 'Время изменения записи';
 COMMENT ON COLUMN PARTNER.DIGITAL_ID IS 'Идентификатор личного кабинета клиента';
 COMMENT ON COLUMN PARTNER.VERSION IS 'Версия (служебное поле Hibernate)';
 COMMENT ON COLUMN PARTNER.TYPE IS 'Тип партнера';
@@ -56,3 +60,5 @@ COMMENT ON COLUMN PARTNER.COMMENT IS 'Комментарий пользоват�
 COMMENT ON COLUMN PARTNER.CITIZENSHIP IS 'Признак /"Гражданин РФ/", заполняется для физ. лиц';
 
 CREATE INDEX I_PARTNER_DIGITAL_ID ON PARTNER (DIGITAL_ID);
+CREATE INDEX I_PARTNER_DIGITAL_ID_INN ON PARTNER (DIGITAL_ID, INN);
+CREATE INDEX I_PARTNER_DIGITAL_ID_LEGAL_TYPE ON PARTNER (DIGITAL_ID, LEGAL_TYPE);

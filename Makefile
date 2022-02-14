@@ -13,5 +13,8 @@ runDevPG:
 runDevPGDebug:
 	./gradlew bootRun --args='--spring.profiles.active=dev-postgres' --debug-jvm
 
+buildNoCache:
+	./gradlew clean build --no-build-cache
+
 ping:
 	curl localhost:8080/actuator/health

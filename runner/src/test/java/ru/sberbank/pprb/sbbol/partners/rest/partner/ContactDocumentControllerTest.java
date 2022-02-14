@@ -181,8 +181,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
                     .description("Паспорт РФ")
                     .deleted(false)
                     .documentType("PASSPORT_OF_RUSSIA")
-            )
-            ;
+            );
     }
 
     private static Document createValidContactDocument(String partnerUuid, String digitalId) {

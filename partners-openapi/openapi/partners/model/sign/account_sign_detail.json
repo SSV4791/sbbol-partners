@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsSignDetail",
+  "type": "object",
+  "title": "Подпись счетов",
+  "properties": {
+    "entityId": {
+      "type": "string",
+      "title": "Глобальный уникальный идентификатор подписи из БПС Подтверждения"
+    },
+    "accountId": {
+      "type": "string",
+      "title": "Идентификатор счёта или контрагента"
+    },
+    "digest": {
+      "type": "string",
+      "title": "Дайджест"
+    },
+    "sign": {
+      "type": "string",
+      "title": "Подпись"
+    },
+    "signProfileId": {
+      "type": "string",
+      "title": "Идентификатор криптопрофиля"
+    },
+    "externalDataFileId": {
+      "type": "string",
+      "title": "Идентификатор созданного документа в ЕСМ"
+    },
+    "externalDataSignFileId": {
+      "type": "string",
+      "title": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
+    },
+    "dateTimeOfSign": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Время подписи"
+    }
+  },
+  "required": [
+    "entityId",
+    "sign",
+    "digest"
+  ]
+}

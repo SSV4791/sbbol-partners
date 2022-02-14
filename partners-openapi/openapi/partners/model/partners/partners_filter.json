@@ -8,6 +8,22 @@
       "type": "string",
       "title": "Идентификатор личного кабинета клиента"
     },
+    "search": {
+      "title": "Поиск партнера по имени, названию компании, инн",
+      "type": "string",
+      "$ref": "../search/searchPartners.json"
+    },
+    "partnersType": {
+      "title": "Фильтр по видам партнеров и правовой формы ЮЛ",
+      "type": "string",
+      "enum": [
+        "LEGAL_ENTITY",
+        "ENTREPRENEUR",
+        "PHYSICAL_PERSON",
+        "GKU",
+        "BUDGET"
+      ]
+    },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
       "title": "Параметры запроса Партнеров"

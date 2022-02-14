@@ -23,7 +23,8 @@
     },
     "budget": {
       "type": "boolean",
-      "title": "Признак бюджетности"
+      "title": "Признак бюджетности",
+      "default": false
     },
     "name": {
       "type": "string",

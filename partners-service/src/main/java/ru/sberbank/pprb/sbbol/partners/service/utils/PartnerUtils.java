@@ -21,7 +21,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.MergeHistoryRepository;
@@ -30,6 +29,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ReplicationHistoryRepo
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Logged(printRequestResponse = true)
@@ -94,7 +94,7 @@ public class PartnerUtils {
      * @param partner Партнёр
      * @return Обновленный партнёр
      */
-    public PartnerResponse updatePartnerByPartner(Partner partner) {
+    public Partner updatePartnerByPartner(Partner partner) {
         MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(partner.getId()));
         if (history == null) {
             throw new EntryNotFoundException(MERGE_HISTORY_NAME, partner.getDigitalId(), partner.getId());
@@ -105,10 +105,7 @@ public class PartnerUtils {
         }
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
-        var response = partnerMapper.toPartner(savePartner);
-        var partnerResponse = new PartnerResponse();
-        partnerResponse.partner(response);
-        return partnerResponse;
+        return partnerMapper.toPartner(savePartner);
     }
 
     /**
@@ -117,7 +114,7 @@ public class PartnerUtils {
      * @param partner Партнёр
      * @return Обновлённый контрагент
      */
-    public PartnerResponse updateCounterpartyByPartner(Partner partner) {
+    public Partner updateCounterpartyByPartner(Partner partner) {
         Counterparty counterparty = legacySbbolAdapter.getByPprbGuid(partner.getDigitalId(), partner.getId());
         Counterparty updatedCounterparty = (Counterparty) SerializationUtils.clone(counterparty);
         counterpartyMapper.updateCounterparty(updatedCounterparty, partner);
@@ -129,7 +126,7 @@ public class PartnerUtils {
             throw new ModelValidationException(Collections.singletonList("Обновление контрагента в СББОЛ невозможно, поля контрагента не отличаются" + updatedCounterparty));
         } else {
             Counterparty sbbolUpdatedCounterparty = legacySbbolAdapter.update(partner.getDigitalId(), updatedCounterparty);
-            return new PartnerResponse().partner(counterpartyMapper.toPartner(sbbolUpdatedCounterparty, partner.getDigitalId()));
+            return counterpartyMapper.toPartner(sbbolUpdatedCounterparty, partner.getDigitalId());
         }
     }
 
@@ -231,4 +228,18 @@ public class PartnerUtils {
         }
     }
 
+    /**
+     * Получение признака ЖКУ
+     *
+     * @param digitalId Идентификатор личного кабинета
+     * @param inn       ИНН
+     * @return признак принадлежит инн ЖКУ true - да, false - нет
+     */
+    public Boolean getGku(String digitalId, String inn) {
+        var housingInn = legacySbbolAdapter.getHousingInn(digitalId, Set.of(inn));
+        if (!CollectionUtils.isEmpty(housingInn)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
 }

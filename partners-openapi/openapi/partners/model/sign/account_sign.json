@@ -10,7 +10,7 @@
     },
     "accountId": {
       "type": "string",
-      "title": "Идентификатор счёта"
+      "title": "Идентификатор счёта или контрагента"
     },
     "state": {
       "type": "string",
@@ -19,10 +19,6 @@
         "SIGNED",
         "NOT_SIGNED"
       ]
-    },
-    "signId": {
-      "type": "string",
-      "title": "Идентефикатор подписи"
     }
   }
 }

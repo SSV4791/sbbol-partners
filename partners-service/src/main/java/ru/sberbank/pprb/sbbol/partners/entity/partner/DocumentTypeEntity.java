@@ -14,7 +14,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "document_type_dictionary",
+@Table(
+    name = "document_type_dictionary",
     indexes = {
         @Index(name = "i_document_type_dictionary_system_name", columnList = "system_name")
     }

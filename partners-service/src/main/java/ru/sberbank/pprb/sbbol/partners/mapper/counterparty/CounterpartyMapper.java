@@ -14,7 +14,9 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
@@ -23,16 +25,22 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisites;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyFilter;
+import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyView;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
+import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface CounterpartyMapper {
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
+public interface CounterpartyMapper extends BaseMapper {
 
     CounterpartyCheckRequisites toCounterpartyCheckRequisites(CounterpartySearchRequest request);
 
@@ -263,5 +271,18 @@ public interface CounterpartyMapper {
                 account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getAccount()));
             }
         }
+    }
+
+    @Mapping(target = "pprbGuid", expression = "java(mapUuid(sign.getAccountId()))")
+    @Mapping(target = "signProfileId", source = "signProfileId")
+    @Mapping(target = "signDate", source = "dateTimeOfSign", qualifiedByName = "toDate")
+    @Mapping(target = "base64sign", source = "sign")
+    @Mapping(target = "digest", source = "digest")
+    @Mapping(target = "dcsId", source = "externalDataFileId")
+    CounterpartySignData toCounterpartySignedData(AccountSignDetail sign);
+
+    @Named("toDate")
+    static Date toDate(OffsetDateTime date) {
+        return new Date(date.toString());
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import ru.sberbank.pprb.sbbol.partners.exception.SbbolException;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisites;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisitesResult;
@@ -57,10 +58,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
                 digitalId,
                 pprbGuid);
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -77,10 +77,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -97,10 +96,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -117,10 +115,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -138,10 +135,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -155,10 +151,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
                 Void.class,
                 digitalUserId);
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -173,10 +168,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
                 digitalId,
                 pprbGuid);
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -193,10 +187,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -214,10 +207,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             );
             return Boolean.TRUE.equals(response.getBody());
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 
@@ -235,10 +227,9 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            String msg = String.format("Error execute http-request to SBBOL: StatusCode: %s, Message: %s", e.getStatusCode(), e.getMessage());
-            throw new RuntimeException(msg);
+            throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending request to SBBOL: " + e.getMessage(), e);
+            throw new SbbolException(e.getMessage(), e);
         }
     }
 

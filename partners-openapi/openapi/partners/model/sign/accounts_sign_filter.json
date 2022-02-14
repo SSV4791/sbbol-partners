@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountSignFilter",
   "type": "object",
-  "title": "Запрос Партнеров по фильтру",
+  "title": "Запрос подписи по фильтру",
   "properties": {
     "digitalId": {
       "type": "string",

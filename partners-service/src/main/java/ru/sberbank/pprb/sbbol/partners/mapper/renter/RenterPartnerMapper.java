@@ -97,7 +97,6 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "state", constant = "NOT_SIGNED")
     @Mapping(target = "banks", source = "renter", qualifiedByName = "toBanks")
-    @Mapping(target = "signCollectionId", ignore = true)
     AccountEntity toAccount(Renter renter);
 
     @Named("toBanks")

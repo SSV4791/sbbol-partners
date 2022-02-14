@@ -34,6 +34,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
@@ -181,8 +182,12 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
-    AccountSignService accountSignService(AccountRepository accountRepository) {
-        return new AccountSignServiceImpl(accountRepository, accountSingMapper());
+    AccountSignService accountSignService(
+        AccountRepository accountRepository,
+        AccountSignRepository accountSignRepository,
+        LegacySbbolAdapter legacySbbolAdapter
+    ) {
+        return new AccountSignServiceImpl(accountRepository, accountSignRepository, accountSingMapper(), counterpartyMapper(), legacySbbolAdapter);
     }
 
     @Bean

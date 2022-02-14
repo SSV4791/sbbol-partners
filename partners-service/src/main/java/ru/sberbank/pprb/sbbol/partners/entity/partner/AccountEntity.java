@@ -1,7 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 
 import javax.persistence.CascadeType;
@@ -13,14 +15,19 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "account",
+@Table(
+    name = "account",
     indexes = {
+        @Index(name = "account_pkey", columnList = "uuid", unique = true),
         @Index(name = "i_account_digital_id", columnList = "digital_id"),
+        @Index(name = "i_account_digital_id_partner_uuid", columnList = "digital_id, partner_uuid"),
+        @Index(name = "i_account_digital_id_partner_uuid_account", columnList = "digital_id, partner_uuid, account"),
         @Index(name = "i_account_partner_uuid", columnList = "partner_uuid")
     }
 )
@@ -31,6 +38,14 @@ public class AccountEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1;
+
+    @CreationTimestamp
+    @Column(name = "create_date", nullable = false)
+    private OffsetDateTime createDate;
+
+    @UpdateTimestamp
+    @Column(name = "last_modified_date", nullable = false)
+    private OffsetDateTime lastModifiedDate;
 
     @Column(name = "partner_uuid", nullable = false)
     private UUID partnerUuid;
@@ -51,15 +66,20 @@ public class AccountEntity extends BaseEntity {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BankEntity> banks;
 
-    @Column(name = "sign_collection_id", length = 36)
-    private String signCollectionId;
-
-    public String getSignCollectionId() {
-        return signCollectionId;
+    public OffsetDateTime getCreateDate() {
+        return createDate;
     }
 
-    public void setSignCollectionId(String signCollectionId) {
-        this.signCollectionId = signCollectionId;
+    public void setCreateDate(OffsetDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public OffsetDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getDigitalId() {

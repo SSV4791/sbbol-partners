@@ -14,8 +14,10 @@ import java.io.Serial;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "address",
+@Table(
+    name = "address",
     indexes = {
+        @Index(name = "address_pkey", columnList = "uuid", unique = true),
         @Index(name = "i_address_digital_id", columnList = "digital_id"),
         @Index(name = "i_address_unified_uuid", columnList = "unified_uuid")
     }

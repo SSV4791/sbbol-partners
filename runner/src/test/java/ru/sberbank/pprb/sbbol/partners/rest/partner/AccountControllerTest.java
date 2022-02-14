@@ -12,9 +12,9 @@ import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -48,21 +48,73 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         createValidAccount(partner.getId(), partner.getDigitalId());
         createValidAccount(partner.getId(), partner.getDigitalId());
 
-        var filter1 = new AccountsFilter()
+        var filter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            filter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts().size())
+            .isEqualTo(4);
+    }
+
+    @Test
+    void testViewSearchAccount() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var filter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .search(new SearchAccounts().search(account.getAccount().substring(6)))
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            filter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts().size())
+            .isEqualTo(4);
+    }
+
+    @Test
+    void testViewBudgetAccount() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidBudgetAccount(partner.getId(), partner.getDigitalId());
+
+        var filter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .isBudget(true)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
         var response1 = post(
             baseRoutePath + "/accounts/view",
-            filter1,
+            filter,
             AccountsResponse.class
         );
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getAccounts().size())
-            .isEqualTo(4);
+            .isEqualTo(1);
     }
 
     @Test
@@ -157,6 +209,20 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
                         .account("30101810145250000411"))
             )
             .state(Account.StateEnum.NOT_SIGNED);
+    }
+
+    private static Account getValidBudgetAccount(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        account.setAccount("40601810300490014209");
+        return account;
+    }
+
+    public static void createValidBudgetAccount(String partnerUuid, String digitalId) {
+        var createAccount = createPost(baseRoutePath + "/account", getValidBudgetAccount(partnerUuid, digitalId), AccountResponse.class);
+        assertThat(createAccount)
+            .isNotNull();
+        assertThat(createAccount.getErrors())
+            .isNull();
     }
 
     public static Account createValidAccount(String partnerUuid, String digitalId) {

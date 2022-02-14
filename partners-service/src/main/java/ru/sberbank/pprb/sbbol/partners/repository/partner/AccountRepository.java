@@ -18,5 +18,4 @@ public interface AccountRepository extends CrudRepository<AccountEntity, UUID>, 
      * @return счёт Партнер
      */
     AccountEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
-
 }

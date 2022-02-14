@@ -13,9 +13,13 @@ import javax.persistence.Table;
 import java.io.Serial;
 import java.util.Objects;
 
-@Table(name = "bank_account", indexes = {
-    @Index(name = "i_bank_account_bank_uuid", columnList = "bank_uuid")
-})
+@Table(
+    name = "bank_account",
+    indexes = {
+        @Index(name = "bank_account_pkey", columnList = "uuid", unique = true),
+        @Index(name = "i_bank_account_bank_uuid", columnList = "bank_uuid")
+    }
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity

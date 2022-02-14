@@ -1,7 +1,7 @@
 plugins {
-    jacoco
     id("create-liquibase-path-conventions")
     id("dependency-locking-conventions")
+    id("jacoco-conventions")
     id("java-conventions")
     id("meta-conventions")
     id("org.sonarqube") version "3.3"
@@ -9,10 +9,6 @@ plugins {
     id("publish-release-conventions")
     id("publish-snapshot-conventions")
     id("ru.sbrf.build.gradle.qa.reporter") version "2.0.0"
-}
-
-jacoco {
-    toolVersion = "0.8.6"
 }
 
 tasks {

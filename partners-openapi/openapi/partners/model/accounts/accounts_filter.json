@@ -15,6 +15,16 @@
       },
       "title": "Идентификаторы партнеров"
     },
+    "isBudget": {
+      "title": "Фильтр для отображения счетов бюджетных организаций",
+      "type": "boolean",
+      "default": false
+    },
+    "search": {
+      "title": "Поиск счета по номеру",
+      "type": "string",
+      "$ref": "../search/searchAccounts.json"
+    },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
       "title": "Параметры запроса Счетов"

@@ -17,8 +17,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "document",
+@Table(
+    name = "document",
     indexes = {
+        @Index(name = "document_pkey", columnList = "uuid", unique = true),
         @Index(name = "i_document_unified_uuid", columnList = "unified_uuid"),
         @Index(name = "i_document_digital_id", columnList = "digital_id")
     }

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse",
+  "type": "object",
+  "title": "Подпись счетов",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "accountsSignDetail": {
+      "type": "array",
+      "items": {
+        "$ref": "account_sign_detail.json"
+      },
+      "title": "Изменение статуса подписи счетов"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}
