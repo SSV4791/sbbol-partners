@@ -17,9 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Table(name = "bank", indexes = {
-    @Index(name = "i_bank_account_uuid", columnList = "account_uuid")
-})
+@Table(
+    name = "bank",
+    indexes = {
+        @Index(name = "bank_pkey", columnList = "uuid", unique = true),
+        @Index(name = "i_bank_account_uuid", columnList = "account_uuid")
+    }
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity

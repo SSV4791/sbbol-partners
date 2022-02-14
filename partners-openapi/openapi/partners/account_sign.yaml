@@ -78,13 +78,13 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: accountId
           in: path
           required: true
           schema:
             type: string
-          description: Идентефикатор счёта
+          description: Идентификатор счёта
       responses:
         200:
           description: Успешный ответ
@@ -111,13 +111,13 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: accountId
           in: path
           required: true
           schema:
             type: string
-          description: Идентефикатор счёта
+          description: Идентификатор счёта
       responses:
         204:
           description: Успешный ответ

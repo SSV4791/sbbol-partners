@@ -5,6 +5,7 @@ import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 import uk.co.jemos.podam.typeManufacturers.AbstractTypeManufacturer;
+import uk.co.jemos.podam.typeManufacturers.BooleanTypeManufacturerImpl;
 import uk.co.jemos.podam.typeManufacturers.StringTypeManufacturerImpl;
 
 import java.lang.reflect.Type;
@@ -21,7 +22,8 @@ public abstract class BaseConfiguration {
     static {
         factory.getStrategy()
             .addOrReplaceTypeManufacturer(BigDecimal.class, new BaseConfiguration.BigDecimalManufacturerImpl())
-            .addOrReplaceTypeManufacturer(String.class, new BaseConfiguration.StringManufacturerImpl());
+            .addOrReplaceTypeManufacturer(String.class, new BaseConfiguration.StringManufacturerImpl())
+            .addOrReplaceTypeManufacturer(Boolean.class, new BaseConfiguration.BooleanManufacturerImpl());
     }
 
     public static class BigDecimalManufacturerImpl extends AbstractTypeManufacturer<BigDecimal> {
@@ -35,8 +37,18 @@ public abstract class BaseConfiguration {
         @Override
         public String getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata, Map<String, Type> genericTypesArgumentsMap) {
             return switch (attributeMetadata.getAttributeName()) {
-                case "id", "uuid", "unifiedId", "partnerId", "partnerAccountId", "accountId", "bankId" -> UUID.randomUUID().toString();
+                case "id", "uuid", "unifiedId", "entityId", "partnerId", "partnerAccountId", "accountId", "bankId" -> UUID.randomUUID().toString();
                 case "phone" -> "007" + randomNumeric(9);
+                default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
+            };
+        }
+    }
+
+    public static class BooleanManufacturerImpl extends BooleanTypeManufacturerImpl {
+        @Override
+        public Boolean getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata, Map<String, Type> genericTypesArgumentsMap) {
+            return switch (attributeMetadata.getAttributeName()) {
+                case "gku", "budget" -> false;
                 default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
             };
         }

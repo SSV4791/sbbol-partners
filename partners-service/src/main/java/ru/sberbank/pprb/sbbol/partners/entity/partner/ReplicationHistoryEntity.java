@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
@@ -18,7 +19,21 @@ import java.util.UUID;
 @Entity
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "replication_history")
+@Table(
+    name = "replication_history",
+    indexes = {
+        @Index(name = "replication_history_pkey", columnList = "uuid", unique = true),
+        @Index(name = "i_replication_history_account_uuid", columnList = "account_uuid"),
+        @Index(name = "i_replication_history_address_uuid", columnList = "address_uuid"),
+        @Index(name = "i_replication_history_bank_account_uuid", columnList = "bank_account_uuid"),
+        @Index(name = "i_replication_history_bank_uuid", columnList = "bank_uuid"),
+        @Index(name = "i_replication_history_document_uuid", columnList = "document_uuid"),
+        @Index(name = "i_replication_history_email_uuid", columnList = "email_uuid"),
+        @Index(name = "i_replication_history_partner_uuid", columnList = "partner_uuid"),
+        @Index(name = "i_replication_history_phone_uuid", columnList = "phone_uuid"),
+        @Index(name = "i_replication_history_sbbol_guid", columnList = "sbbol_guid")
+    }
+)
 public class ReplicationHistoryEntity implements Serializable, HashKeyProvider {
 
     @Serial

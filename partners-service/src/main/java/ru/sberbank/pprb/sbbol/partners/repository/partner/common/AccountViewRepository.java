@@ -23,4 +23,13 @@ public interface AccountViewRepository {
      * @return Информация о подписях
      */
     List<AccountEntity> findByFilter(AccountsSignFilter filter);
+
+    /**
+     * Получение бюджетных счетов
+     *
+     * @param digitalId      Идентификатор личного кабинета
+     * @param masksCondition Список масок для поиска
+     * @return Список бюджетных счетов
+     */
+    List<AccountEntity> findBudgetAccount(String digitalId, List<String> masksCondition);
 }

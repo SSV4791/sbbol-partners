@@ -1,9 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.MergeHistoryEntity;
@@ -29,6 +27,7 @@ import ru.sberbank.pprb.sbbol.partners.service.utils.PartnerUtils;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Logged(printRequestResponse = true)
 public class PartnerServiceImpl implements PartnerService {
@@ -67,6 +66,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional(readOnly = true)
     public PartnerResponse getPartner(String digitalId, String id) {
+        Partner response;
         if (legacySbbolAdapter.checkMigration(digitalId)) {
             UUID uuid = UUID.fromString(id);
             var history = mergeHistoryRepository.getByPartnerUuid(uuid);
@@ -77,17 +77,16 @@ public class PartnerServiceImpl implements PartnerService {
             if (partner == null) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            var response = partnerMapper.toPartner(partner);
-            var partnerResponse = new PartnerResponse();
-            partnerResponse.partner(response);
-            return partnerResponse;
+            response = partnerMapper.toPartner(partner);
         } else {
             Counterparty counterparty = legacySbbolAdapter.getByPprbGuid(digitalId, id);
             if (counterparty == null) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            return new PartnerResponse().partner(counterpartyMapper.toPartner(counterparty, digitalId));
+            response = counterpartyMapper.toPartner(counterparty, digitalId);
         }
+        response.setGku(partnerUtils.getGku(response.getDigitalId(), response.getInn()));
+        return new PartnerResponse().partner(response);
     }
 
     @Override
@@ -95,22 +94,14 @@ public class PartnerServiceImpl implements PartnerService {
     public PartnersResponse getPartners(PartnersFilter partnersFilter) {
         PartnersResponse partnersResponse = new PartnersResponse();
         if (legacySbbolAdapter.checkMigration(partnersFilter.getDigitalId())) {
-            Slice<PartnerEntity> response;
-            if (partnersFilter.getPagination() == null) {
-                response = partnerRepository.findAllByDigitalId(partnersFilter.getDigitalId(), Sort.by("digitalId"));
-            } else {
-                Pagination pagination = partnersFilter.getPagination();
-                PageRequest paginationRequest = PageRequest.of(pagination.getOffset(), pagination.getCount(), Sort.by("digitalId"));
-                response = partnerRepository.findAllByDigitalId(partnersFilter.getDigitalId(), paginationRequest);
-            }
+            var response = partnerRepository.findByFilter(partnersFilter);
             for (PartnerEntity entity : response) {
                 partnersResponse.addPartnersItem(partnerMapper.toPartner(entity));
             }
             partnersResponse.setPagination(
                 new Pagination()
-                    .offset(response.getNumber())
-                    .count(partnersResponse.getPartners().size())
-                    .hasNextPage(response.isLast())
+                    .offset(partnersFilter.getPagination().getOffset())
+                    .count(partnersFilter.getPagination().getCount())
             );
         } else {
             List<Partner> counterparties;
@@ -135,7 +126,18 @@ public class PartnerServiceImpl implements PartnerService {
             }
             partnersResponse.setPartners(counterparties);
         }
-        return partnersResponse;
+        var partners = partnersResponse.getPartners();
+        if (CollectionUtils.isEmpty(partners)) {
+            return partnersResponse;
+        }
+        var inns = partners.stream().map(Partner::getInn).collect(Collectors.toSet());
+        var housingInn = legacySbbolAdapter.getHousingInn(partnersFilter.getDigitalId(), inns);
+        for (Partner partner : partners) {
+            if (housingInn.contains(partner.getInn())) {
+                partner.setGku(Boolean.TRUE);
+            }
+        }
+        return partnersResponse.partners(partners);
     }
 
     @Override
@@ -148,6 +150,7 @@ public class PartnerServiceImpl implements PartnerService {
         history.setMainUuid(savePartner.getUuid());
         mergeHistoryRepository.save(history);
         var response = partnerMapper.toPartner(savePartner);
+        response.setGku(partnerUtils.getGku(response.getDigitalId(), response.getInn()));
         var partnerResponse = new PartnerResponse();
         partnerResponse.partner(response);
         var replicationHistory = new ReplicationHistoryEntity();
@@ -159,15 +162,16 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     public PartnerResponse updatePartner(Partner partner) {
+        Partner response;
         if (legacySbbolAdapter.checkMigration(partner.getDigitalId())) {
-            PartnerResponse partnerResponse = partnerUtils.updatePartnerByPartner(partner);
+            response = partnerUtils.updatePartnerByPartner(partner);
             replicationHistoryService.updateCounterparty(partner);
-            return partnerResponse;
         } else {
-            PartnerResponse partnerResponse = partnerUtils.updateCounterpartyByPartner(partner);
+            response = partnerUtils.updateCounterpartyByPartner(partner);
             replicationHistoryService.updatePartner(partner);
-            return partnerResponse;
         }
+        response.setGku(partnerUtils.getGku(response.getDigitalId(), response.getInn()));
+        return new PartnerResponse().partner(response);
     }
 
     @Override

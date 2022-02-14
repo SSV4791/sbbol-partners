@@ -1,7 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
@@ -15,13 +17,17 @@ import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Table(name = "partner", indexes = {
-    @Index(name = "i_partner_uuid", columnList = "digital_id")
-})
+@Table(
+    name = "partner",
+    indexes = {
+        @Index(name = "i_partner_uuid", columnList = "digital_id")
+    }
+)
 @DynamicUpdate
 @DynamicInsert
 @Entity
@@ -29,6 +35,14 @@ public class PartnerEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1;
+
+    @CreationTimestamp
+    @Column(name = "create_date", nullable = false)
+    private OffsetDateTime createDate;
+
+    @UpdateTimestamp
+    @Column(name = "last_modified_date", nullable = false)
+    private OffsetDateTime lastModifiedDate;
 
     @Column(name = "digital_id")
     private String digitalId;
@@ -77,6 +91,22 @@ public class PartnerEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnerEmailEntity> emails;
+
+    public OffsetDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(OffsetDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public OffsetDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 
     public String getDigitalId() {
         return digitalId;

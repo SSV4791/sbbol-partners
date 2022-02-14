@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class DocumentViewRepositoryImpl implements DocumentViewRepository, BaseRepository {
+public class DocumentViewRepositoryImpl implements DocumentViewRepository, BaseRepository<DocumentEntity> {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -32,8 +32,7 @@ public class DocumentViewRepositoryImpl implements DocumentViewRepository, BaseR
             Join<DocumentEntity, DocumentTypeEntity> type = root.join("type");
             predicates.add(builder.equal(type.get("systemName"), (filter.getDocumentType())));
         }
-        defaultOrder(builder, root);
-        criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));
+        defaultSelect(criteria, root, builder, predicates);
         var query = entityManager.createQuery(criteria);
         var pagination = filter.getPagination();
         if (pagination != null) {

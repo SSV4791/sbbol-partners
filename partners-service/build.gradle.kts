@@ -29,7 +29,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.7.5")
     implementation("org.hibernate:hibernate-jcache:5.6.1.Final")
     implementation("org.mapstruct:mapstruct:1.4.2.Final")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.5.6")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("sbp.integration.orm:sbp-hibernate-standin:4.1.14")
     //Поддержка генераторов ID на время перехода.
     implementation("sbp.com.sbt.dataspace:jpa-model-support:4.3.34")
@@ -37,7 +37,7 @@ dependencies {
     runtimeOnly("org.ehcache:ehcache:3.9.7")
     runtimeOnly("org.aspectj:aspectjweaver:1.9.7")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.6")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("uk.co.jemos.podam:podam:7.2.7.RELEASE")
 }
 

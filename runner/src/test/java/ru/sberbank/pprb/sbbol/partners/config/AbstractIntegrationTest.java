@@ -24,7 +24,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import static io.restassured.RestAssured.given;
 
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
     classes = {Runner.class}
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

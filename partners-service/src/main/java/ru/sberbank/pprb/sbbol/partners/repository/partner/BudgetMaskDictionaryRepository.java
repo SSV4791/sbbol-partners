@@ -27,4 +27,11 @@ public interface BudgetMaskDictionaryRepository extends CrudRepository<BudgetMas
      * @return Маски
      */
     List<BudgetMaskEntity> findAllByType(BudgetMaskType type);
+
+    /**
+     * Получение маски бюджетности
+     *
+     * @return Маски
+     */
+    List<BudgetMaskEntity> findAll();
 }

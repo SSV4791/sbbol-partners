@@ -125,8 +125,8 @@ dependencies {
 
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("javax.validation:validation-api:2.0.1.Final")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.5.6")
-    implementation("org.springframework.boot:spring-boot-starter-web:2.5.6")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 }
 
 description = "REST Controllers ППРБ.Digital.Партнеры"

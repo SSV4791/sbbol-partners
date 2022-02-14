@@ -30,6 +30,7 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
         var budgetMask = new BudgetMask()
             .id(UUID.randomUUID().toString())
             .mask(mask)
+            .condition(mask)
             .maskType(BudgetMaskForm.BIC);
         var saveDocument = createPost(baseRoutePath, budgetMask, BudgetMask.class);
         assertThat(saveDocument)
@@ -48,6 +49,7 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
         var budgetMask = new BudgetMask()
             .id(UUID.randomUUID().toString())
             .mask("Рик и Морти")
+            .condition("%Рик и Морти%")
             .maskType(BudgetMaskForm.BUDGET_CORR_ACCOUNT);
         var saveDocument = createPost(baseRoutePath, budgetMask, BudgetMask.class);
         assertThat(saveDocument)

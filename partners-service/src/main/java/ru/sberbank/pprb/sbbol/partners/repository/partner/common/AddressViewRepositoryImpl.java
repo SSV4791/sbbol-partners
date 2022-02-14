@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class AddressViewRepositoryImpl implements AddressViewRepository, BaseRepository {
+public class AddressViewRepositoryImpl implements AddressViewRepository, BaseRepository<AddressEntity> {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -30,8 +30,7 @@ public class AddressViewRepositoryImpl implements AddressViewRepository, BaseRep
         if (filter.getType() != null) {
             predicates.add(builder.equal(root.get("type"), AddressType.valueOf(filter.getType())));
         }
-        criteria.orderBy(defaultOrder(builder, root));
-        criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));
+        defaultSelect(criteria, root, builder, predicates);
         var query = entityManager.createQuery(criteria);
         var pagination = filter.getPagination();
         if (pagination != null) {

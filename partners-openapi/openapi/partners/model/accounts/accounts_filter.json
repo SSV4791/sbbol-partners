@@ -15,7 +15,7 @@
       },
       "title": "Идентификаторы партнеров"
     },
-    "accountType": {
+    "isBudget": {
       "title": "Фильтр для отображения счетов бюджетных организаций",
       "type": "boolean",
       "default": false

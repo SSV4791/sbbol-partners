@@ -4,7 +4,6 @@
   "type": "object",
   "title": "Подпись счетов",
   "properties": {
-
     "digitalId": {
       "type": "string",
       "title": "Идентификатор личного кабинета клиента"

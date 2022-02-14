@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class ContactViewRepositoryImpl implements ContactViewRepository, BaseRepository {
+public class ContactViewRepositoryImpl implements ContactViewRepository, BaseRepository<ContactEntity> {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -27,8 +27,7 @@ public class ContactViewRepositoryImpl implements ContactViewRepository, BaseRep
         if (filter.getIds() != null) {
             predicates.add(root.get("uuid").in(filter.getIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
-        criteria.orderBy(defaultOrder(builder, root));
-        criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));
+        defaultSelect(criteria, root, builder, predicates);
         var query = entityManager.createQuery(criteria);
         var pagination = filter.getPagination();
         if (pagination != null) {
