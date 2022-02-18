@@ -1,0 +1,64 @@
+POST http://localhost:8080/correspondents/migrate
+Cache-Control: no-cache
+Content-Type: application/json
+
+{
+    "id": "1578943121",
+    "jsonrpc": "2.0",
+    "method": "migrate",
+    "params": {
+        "digitalId": "123456789",
+        "correspondents": [
+            {
+                "name": "Контрагент 1",
+                "inn": "873628374684",
+                "kpp": "238476283",
+                "account": "23498810489729384799",
+                "bic": "041235000",
+                "description": null,
+                "replicationGuid": "d48287ba-ccc9-45fe-b539-8d8b92b453cc",
+                "signCollectionId": null,
+                "corrPhoneNumber": null,
+                "corrEmail": null,
+                "pprbGuid": null,
+                "bankAccount": null,
+                "version": 1,
+                "signed": true,
+                "legalType": "PHYSICAL_PERSON"
+            },
+            {
+                "name": "Контрагент 2",
+                "inn": "121231231231",
+                "kpp": "123123123",
+                "account": "12312810112312312310",
+                "bic": "041235000",
+                "description": null,
+                "replicationGuid": "3b43d875-598a-46ee-ac9f-ffc0d0bc33a9",
+                "signCollectionId": null,
+                "corrPhoneNumber": null,
+                "corrEmail": null,
+                "pprbGuid": null,
+                "bankAccount": null,
+                "signed": false,
+                "legalType": "LEGAL_ENTITY"
+            },
+            {
+                "name": "Контрагент 3",
+                "inn": "12345",
+                "kpp": "123456789",
+                "account": "11111111611111111111",
+                "bic": "040037469",
+                "description": "Полная хрень",
+                "replicationGuid": "a5352519-b59f-4926-a99c-d6c470ead07e",
+                "signCollectionId": "sjhdfgjshdfg",
+                "corrPhoneNumber": "1029830192",
+                "corrEmail": "dssdfsdfsdf",
+                "pprbGuid": "a5352519-b59f-4926-a99c-d6c470ead07e",
+                "bankAccount": "236754726354726354",
+                "signed": false,
+                "version": 9,
+                "legalType": "LEGAL_ENTITY"
+            }
+        ]
+    }
+}

@@ -26,6 +26,7 @@ dependencies {
     implementation(project(":partners-api"))
     implementation(project(":partners-rest"))
     implementation(project(":partners-service"))
+    implementation(project(":migration-service"))
 
     implementation("net.logstash.logback:logstash-logback-encoder:6.6")
     implementation("org.springframework.boot:spring-boot-starter")
