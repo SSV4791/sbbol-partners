@@ -24,7 +24,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     @Test
     void testCreateDocuments() {
         var documentType = new DocumentType()
-            .id(UUID.randomUUID().toString())
             .deleted(false)
             .documentType("NEW_CREATE_TYPE")
             .description("Описание для создания");
@@ -32,6 +31,8 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getDocumentType())
+            .usingRecursiveComparison()
+            .ignoringFields("id")
             .isEqualTo(documentType);
         var searchDocument = get(baseRoutePath + "/{status}", DocumentsTypeResponse.class, false);
         assertThat(searchDocument.getDocumentType())
