@@ -3,9 +3,11 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
@@ -30,6 +32,8 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
 
     @Column(name = "uuid", nullable = false)
     @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID uuid;
 
     @Column(name = "system_name", nullable = false, length = 50)
