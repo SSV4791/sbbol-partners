@@ -32,6 +32,7 @@ gradleEnterprise {
 rootProject.name = "partners"
 
 include(":docs")
+include(":migration-service")
 include(":partners-adapter")
 include(":partners-api")
 include(":partners-openapi")

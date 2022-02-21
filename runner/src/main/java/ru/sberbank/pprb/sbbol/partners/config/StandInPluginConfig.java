@@ -8,6 +8,7 @@ import com.sbt.pprb.integration.replication.journal.JournalHashKeyResolver;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+// TODO DCBBRAIN-2268 Вынести конфигурацию из модуля Runner в отдельный модуль
 @Component
 @ConfigurationProperties(prefix = "standin.plugin.configuration")
 public class StandInPluginConfig {

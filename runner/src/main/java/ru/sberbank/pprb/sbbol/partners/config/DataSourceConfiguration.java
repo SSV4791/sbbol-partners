@@ -23,12 +23,19 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+// TODO DCBBRAIN-2268 Вынести конфигурацию из модуля Runner в отдельный модуль
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(value = "ru.sberbank.pprb.sbbol.partners.repository")
+@EnableJpaRepositories(value = {
+    "ru.sberbank.pprb.sbbol.partners.repository",
+    "ru.sberbank.pprb.sbbol.migration.correspondents.repository"
+})
 public class DataSourceConfiguration {
 
-    private static final String[] PACKAGES_TO_SCAN = {"ru.sberbank.pprb.sbbol.partners.entity"};
+    private static final String[] PACKAGES_TO_SCAN = {
+        "ru.sberbank.pprb.sbbol.partners.entity",
+        "ru.sberbank.pprb.sbbol.migration.correspondents.entity"
+    };
 
     // MAIN DATASOURCE CONFIGS
 

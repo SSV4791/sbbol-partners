@@ -13,6 +13,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
 import static org.springframework.http.converter.json.Jackson2ObjectMapperBuilder.json;
 
+// TODO DCBBRAIN-2268 Вынести конфигурацию из модуля Runner в отдельный модуль
 @Configuration
 public class PartnerRunnerConfiguration {
 

@@ -17,6 +17,7 @@ import ru.sbrf.journal.standin.consumer.api.SubscriptionService;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+// TODO DCBBRAIN-2268 Вынести конфигурацию из модуля Runner в отдельный модуль
 /**
  * Конфигурация прикладного журнала. Обеспечивает отправку в ПЖ векторов изменений и их применение на другую БД
  */

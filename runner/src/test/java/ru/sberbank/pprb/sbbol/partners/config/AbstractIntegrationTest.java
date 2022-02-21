@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.config;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.response.ResponseBody;
@@ -53,6 +54,8 @@ public abstract class AbstractIntegrationTest {
 
     protected static ResponseSpecification notFoundResponseSpec;
 
+    protected static ResponseSpecification internalServerErrorResponseSpec;
+
     @BeforeAll
     public final void setup() {
         initTest();
@@ -83,6 +86,10 @@ public abstract class AbstractIntegrationTest {
 
         notFoundResponseSpec = new ResponseSpecBuilder()
             .expectStatusCode(HttpStatus.NOT_FOUND.value())
+            .build();
+
+        internalServerErrorResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
             .build();
     }
 
@@ -148,6 +155,29 @@ public abstract class AbstractIntegrationTest {
             .spec(responseSpec)
             .extract()
             .as(response);
+    }
+
+    protected static <T, BODY> T post(String url, BODY body, TypeRef<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(response);
+    }
+
+    protected static <BODY> void postWithInternalServerErrorExpected(String url, BODY body) {
+        given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(internalServerErrorResponseSpec)
+            .extract();
     }
 
     protected static <T, BODY> T put(String url, BODY body, Class<T> response) {
