@@ -47,6 +47,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         createValidAccount(partner.getId(), partner.getDigitalId());
         createValidAccount(partner.getId(), partner.getDigitalId());
         createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
 
         var filter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
@@ -63,6 +64,8 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isNotNull();
         assertThat(response.getAccounts().size())
             .isEqualTo(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
     @Test
@@ -217,8 +220,22 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         return account;
     }
 
+    private static Account getValidSignedAccount(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        account.setState(Account.StateEnum.SIGNED);
+        return account;
+    }
+
     public static void createValidBudgetAccount(String partnerUuid, String digitalId) {
         var createAccount = createPost(baseRoutePath + "/account", getValidBudgetAccount(partnerUuid, digitalId), AccountResponse.class);
+        assertThat(createAccount)
+            .isNotNull();
+        assertThat(createAccount.getErrors())
+            .isNull();
+    }
+
+    public static void createValidSignedAccount(String partnerUuid, String digitalId) {
+        var createAccount = createPost(baseRoutePath + "/account", getValidSignedAccount(partnerUuid, digitalId), AccountResponse.class);
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())

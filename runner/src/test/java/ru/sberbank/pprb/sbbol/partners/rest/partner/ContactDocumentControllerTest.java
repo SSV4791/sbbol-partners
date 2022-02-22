@@ -51,6 +51,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         createValidContactDocument(contact.getId(), contact.getDigitalId());
         createValidContactDocument(contact.getId(), contact.getDigitalId());
         createValidContactDocument(contact.getId(), contact.getDigitalId());
+        createValidContactDocument(contact.getId(), contact.getDigitalId());
 
         DocumentsFilter filter1 = new DocumentsFilter()
             .digitalId(contact.getDigitalId())
@@ -88,6 +89,8 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
             .isNotNull();
         assertThat(response2.getDocuments().size())
             .isEqualTo(4);
+        assertThat(response2.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
 

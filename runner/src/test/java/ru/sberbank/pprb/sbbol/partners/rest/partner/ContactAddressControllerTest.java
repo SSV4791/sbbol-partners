@@ -46,6 +46,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         createValidAddress(contact.getId(), contact.getDigitalId());
         createValidAddress(contact.getId(), contact.getDigitalId());
         createValidAddress(contact.getId(), contact.getDigitalId());
+        createValidAddress(contact.getId(), contact.getDigitalId());
 
         var filter1 = new AddressesFilter()
             .digitalId(contact.getDigitalId())
@@ -62,6 +63,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
             .isNotNull();
         assertThat(response1.getAddresses().size())
             .isEqualTo(4);
+
         var filter2 = new AddressesFilter()
             .digitalId(contact.getDigitalId())
             .unifiedIds(List.of(contact.getId()))
@@ -78,6 +80,8 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
             .isNotNull();
         assertThat(response2.getAddresses().size())
             .isEqualTo(4);
+        assertThat(response2.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
     @Test

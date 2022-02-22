@@ -36,7 +36,6 @@ import java.util.UUID;
 public class PartnerUtils {
     private static final Logger LOG = LoggerFactory.getLogger(PartnerUtils.class);
 
-    private static final String MERGE_HISTORY_NAME = "merge_history";
     private static final String PARTNER_NAME = "partner";
     private static final String ACCOUNT_NAME = "account";
 
@@ -76,11 +75,7 @@ public class PartnerUtils {
      * @param id        Идентификатор партнёра
      */
     public void deletePartnerByDigitalIdAndId(String digitalId, String id) {
-        MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(id));
-        if (history == null) {
-            throw new EntryNotFoundException(MERGE_HISTORY_NAME, digitalId, id);
-        }
-        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, history.getMainUuid());
+        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundPartner == null) {
             throw new EntryNotFoundException(PARTNER_NAME, digitalId, id);
         }
@@ -95,11 +90,7 @@ public class PartnerUtils {
      * @return Обновленный партнёр
      */
     public Partner updatePartnerByPartner(Partner partner) {
-        MergeHistoryEntity history = mergeHistoryRepository.getByPartnerUuid(UUID.fromString(partner.getId()));
-        if (history == null) {
-            throw new EntryNotFoundException(MERGE_HISTORY_NAME, partner.getDigitalId(), partner.getId());
-        }
-        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), history.getMainUuid());
+        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()));
         if (foundPartner == null) {
             throw new EntryNotFoundException(PARTNER_NAME, partner.getDigitalId(), partner.getId());
         }

@@ -41,7 +41,7 @@ paths:
     delete:
       tags:
         - Contact Phone
-      description: Удаление phone numbers контакта
+      description: Удаление номера телефона контакта
       operationId: delete
       parameters:
         - name: digitalId
@@ -72,7 +72,7 @@ paths:
     post:
       tags:
         - Contact Phone
-      description: Создание email адреса контакта
+      description: Создание телефона контакта
       operationId: create
       requestBody:
         description: Номер телефона
@@ -102,7 +102,7 @@ paths:
       description: Обновление номера телефона контакта
       operationId: update
       requestBody:
-        description: Phone
+        description: Телефон
         required: true
         content:
           application/json:

@@ -4,56 +4,42 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
-import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PartnerViewRepositoryImpl implements PartnerViewRepository, BaseRepository<PartnerEntity> {
-
-    @PersistenceContext
-    private EntityManager entityManager;
+public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, PartnersFilter> implements PartnerViewRepository {
 
     private final AccountRepository accountRepository;
     private final BudgetMaskDictionaryRepository dictionaryRepository;
 
-    public PartnerViewRepositoryImpl(AccountRepository accountRepository, BudgetMaskDictionaryRepository dictionaryRepository) {
+    public PartnerViewRepositoryImpl(EntityManager entityManager, AccountRepository accountRepository, BudgetMaskDictionaryRepository dictionaryRepository) {
+        super(entityManager, PartnerEntity.class);
         this.accountRepository = accountRepository;
         this.dictionaryRepository = dictionaryRepository;
     }
 
     @Override
-    public List<PartnerEntity> findByFilter(RenterFilter filter) {
-        var builder = entityManager.getCriteriaBuilder();
-        var criteria = builder.createQuery(PartnerEntity.class);
-        var root = criteria.from(PartnerEntity.class);
-        List<Predicate> predicates = List.of(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        defaultSelect(criteria, root, builder, predicates);
-        var query = entityManager.createQuery(criteria);
-        var pagination = filter.getPagination();
-        if (pagination != null) {
-            query.setFirstResult(pagination.getOffset());
-            query.setMaxResults(pagination.getCount());
-        }
-        return query.getResultList();
+    public List<PartnerEntity> findByFilter(PartnersFilter filter) {
+        return filter(filter);
     }
 
     @Override
-    public List<PartnerEntity> findByFilter(PartnersFilter filter) {
-        var builder = entityManager.getCriteriaBuilder();
-        var criteria = builder.createQuery(PartnerEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
-        var root = criteria.from(PartnerEntity.class);
+    void createPredicate(CriteriaBuilder builder, CriteriaQuery<PartnerEntity> criteria, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getSearch() != null) {
             var search = filter.getSearch();
@@ -80,6 +66,13 @@ public class PartnerViewRepositoryImpl implements PartnerViewRepository, BaseRep
                 )
             );
         }
+        if (filter.getAccountSignType() != null) {
+            var accounts = switch (filter.getAccountSignType()) {
+                case SIGNED -> accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(PartnersFilter.AccountSignTypeEnum.SIGNED.name()));
+                case NOT_SIGNED -> accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(PartnersFilter.AccountSignTypeEnum.NOT_SIGNED.name()));
+            };
+            predicates.add(root.get("uuid").in(accounts.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
+        }
         if (filter.getPartnersType() != null) {
             switch (filter.getPartnersType()) {
                 case GKU -> {
@@ -89,7 +82,7 @@ public class PartnerViewRepositoryImpl implements PartnerViewRepository, BaseRep
                 case BUDGET -> {
                     var allBudgetMasks = dictionaryRepository.findAll();
                     var masks = allBudgetMasks.stream().map(BudgetMaskEntity::getCondition).collect(Collectors.toList());
-                    var budgetAccount = accountRepository.findBudgetAccount(filter.getDigitalId(), masks);
+                    var budgetAccount = accountRepository.findBudgetAccounts(filter.getDigitalId(), masks);
                     predicates.add(root.get("uuid").in(budgetAccount.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
                 }
                 case ENTREPRENEUR -> predicates.add(builder.equal(root.get("legalType"), LegalType.ENTREPRENEUR));
@@ -97,13 +90,22 @@ public class PartnerViewRepositoryImpl implements PartnerViewRepository, BaseRep
                 case LEGAL_ENTITY -> predicates.add(builder.equal(root.get("legalType"), LegalType.LEGAL_ENTITY));
             }
         }
-        defaultSelect(criteria, root, builder, predicates);
-        var query = entityManager.createQuery(criteria);
+    }
+
+    @Override
+    List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
+        return List.of(
+            builder.desc(root.get("digitalId")),
+            builder.desc(root.get("uuid"))
+        );
+    }
+
+    @Override
+    void pagination(TypedQuery<PartnerEntity> query, PartnersFilter filter) {
         var pagination = filter.getPagination();
         if (pagination != null) {
             query.setFirstResult(pagination.getOffset());
-            query.setMaxResults(pagination.getCount());
+            query.setMaxResults(pagination.getCount() + 1);
         }
-        return query.getResultList();
     }
 }

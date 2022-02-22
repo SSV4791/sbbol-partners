@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "ru.sberbank.pprb.sbbol.partners.model.EmailAddressFilter",
   "type": "object",
-  "title": "Фильтр для запроса электронных адресов адресов партнера/контакта",
+  "title": "Фильтр для запроса электронных адресов партнера/контакта",
   "properties": {
     "digitalId": {
       "type": "string",

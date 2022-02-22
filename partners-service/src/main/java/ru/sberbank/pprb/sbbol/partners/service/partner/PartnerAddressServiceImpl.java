@@ -28,18 +28,6 @@ public class PartnerAddressServiceImpl extends AddressServiceImpl {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public AddressResponse getAddress(String digitalId, String id) {
-        return super.getAddress(digitalId, id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public AddressesResponse getAddresses(AddressesFilter addressesFilter) {
-        return super.getAddresses(addressesFilter);
-    }
-
-    @Override
     @Transactional
     public AddressResponse saveAddress(Address address) {
         var partner = partnerRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getUnifiedId()));
@@ -47,17 +35,5 @@ public class PartnerAddressServiceImpl extends AddressServiceImpl {
             throw new EntryNotFoundException("partner", address.getDigitalId(), address.getId());
         }
         return super.saveAddress(address);
-    }
-
-    @Override
-    @Transactional
-    public AddressResponse updateAddress(Address address) {
-        return super.updateAddress(address);
-    }
-
-    @Override
-    @Transactional
-    public void deleteAddress(String digitalId, String id) {
-        super.deleteAddress(digitalId, id);
     }
 }

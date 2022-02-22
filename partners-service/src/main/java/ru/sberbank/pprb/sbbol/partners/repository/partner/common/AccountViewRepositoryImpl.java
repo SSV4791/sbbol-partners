@@ -1,38 +1,39 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
-import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class AccountViewRepositoryImpl implements AccountViewRepository, BaseRepository<AccountEntity> {
-
-    @PersistenceContext
-    private EntityManager entityManager;
+public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, AccountsFilter> implements AccountViewRepository {
 
     private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;
 
-    public AccountViewRepositoryImpl(BudgetMaskDictionaryRepository budgetMaskDictionaryRepository) {
+    public AccountViewRepositoryImpl(EntityManager entityManager, BudgetMaskDictionaryRepository budgetMaskDictionaryRepository) {
+        super(entityManager, AccountEntity.class);
         this.budgetMaskDictionaryRepository = budgetMaskDictionaryRepository;
     }
 
     @Override
     public List<AccountEntity> findByFilter(AccountsFilter filter) {
-        var builder = entityManager.getCriteriaBuilder();
-        var criteria = builder.createQuery(AccountEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
-        var root = criteria.from(AccountEntity.class);
+        return filter(filter);
+    }
+
+    @Override
+    void createPredicate(CriteriaBuilder builder, CriteriaQuery<AccountEntity> criteria, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getSearch() != null) {
             var search = filter.getSearch();
@@ -51,53 +52,22 @@ public class AccountViewRepositoryImpl implements AccountViewRepository, BaseRep
             }
             predicates.add(builder.or(maskPredicate.toArray(Predicate[]::new)));
         }
-        defaultSelect(criteria, root, builder, predicates);
-        var query = entityManager.createQuery(criteria);
-        var pagination = filter.getPagination();
-        if (pagination != null) {
-            query.setFirstResult(pagination.getOffset());
-            query.setMaxResults(pagination.getCount());
-        }
-        return query.getResultList();
     }
 
     @Override
-    public List<AccountEntity> findByFilter(AccountsSignFilter filter) {
-        var builder = entityManager.getCriteriaBuilder();
-        var criteria = builder.createQuery(AccountEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
-        var root = criteria.from(AccountEntity.class);
-        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        if (filter.getPartnerId() != null) {
-            predicates.add(builder.equal(root.get("partnerUuid"), UUID.fromString(filter.getPartnerId())));
-        }
-        if (!CollectionUtils.isEmpty(filter.getAccountsId())) {
-            predicates.add(root.get("uuid").in(filter.getAccountsId().stream().map(UUID::fromString).collect(Collectors.toList())));
-        }
-        defaultSelect(criteria, root, builder, predicates);
-        var query = entityManager.createQuery(criteria);
-        var pagination = filter.getPagination();
-        if (pagination != null) {
-            query.setFirstResult(pagination.getOffset());
-            query.setMaxResults(pagination.getCount());
-        }
-        return query.getResultList();
+    public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
+        return List.of(
+            builder.desc(root.get("digitalId")),
+            builder.desc(root.get("uuid"))
+        );
     }
 
     @Override
-    public List<AccountEntity> findBudgetAccount(String digitalId, List<String> masksCondition) {
-        var builder = entityManager.getCriteriaBuilder();
-        var criteria = builder.createQuery(AccountEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
-        var root = criteria.from(AccountEntity.class);
-        predicates.add(builder.equal(root.get("digitalId"), digitalId));
-        List<Predicate> maskPredicate = new ArrayList<>();
-        for (String mask : masksCondition) {
-            maskPredicate.add(builder.or(builder.like(builder.upper(root.get("account")), mask.toLowerCase(Locale.getDefault()))));
+    void pagination(TypedQuery<AccountEntity> query, AccountsFilter filter) {
+        if (filter.getPagination() != null) {
+            var pagination = filter.getPagination();
+            query.setFirstResult(pagination.getOffset());
+            query.setMaxResults(pagination.getCount() + 1);
         }
-        predicates.add(builder.or(maskPredicate.toArray(Predicate[]::new)));
-        defaultSelect(criteria, root, builder, predicates);
-        var query = entityManager.createQuery(criteria);
-        return query.getResultList();
     }
 }

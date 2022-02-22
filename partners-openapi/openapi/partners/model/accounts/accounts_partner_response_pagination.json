@@ -10,7 +10,7 @@
     },
     "accounts": {
       "type": "array",
-      "title": "Список аккаунтов",
+      "title": "Список счетов",
       "items": {
         "$ref": "../../model/accounts/accounts_pagination.json"
       }

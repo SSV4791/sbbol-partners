@@ -28,18 +28,6 @@ public class ContactDocumentServiceImpl extends DocumentServiceImpl {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public DocumentResponse getDocument(String digitalId, String id) {
-        return super.getDocument(digitalId, id);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public DocumentsResponse getDocuments(DocumentsFilter documentsFilter) {
-        return super.getDocuments(documentsFilter);
-    }
-
-    @Override
     @Transactional
     public DocumentResponse saveDocument(Document document) {
         var contact = contactRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getUnifiedId()));
@@ -47,17 +35,5 @@ public class ContactDocumentServiceImpl extends DocumentServiceImpl {
             throw new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId());
         }
         return super.saveDocument(document);
-    }
-
-    @Override
-    @Transactional
-    public DocumentResponse updateDocument(Document document) {
-        return super.updateDocument(document);
-    }
-
-    @Override
-    @Transactional
-    public void deleteDocument(String digitalId, String id) {
-        super.deleteDocument(digitalId, id);
     }
 }

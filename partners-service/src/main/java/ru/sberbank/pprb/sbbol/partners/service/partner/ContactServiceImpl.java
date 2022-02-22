@@ -52,11 +52,17 @@ public class ContactServiceImpl implements ContactService {
         for (var entity : response) {
             contactResponse.addContactsItem(contactMapper.toContact(entity));
         }
+        var pagination = contactsFilter.getPagination();
         contactResponse.setPagination(
             new Pagination()
-                .offset(contactsFilter.getPagination().getOffset())
-                .count(contactsFilter.getPagination().getCount())
+                .offset(pagination.getOffset())
+                .count(pagination.getCount())
         );
+        var size = response.size();
+        if (pagination.getCount() < size) {
+            contactResponse.getPagination().hasNextPage(Boolean.TRUE);
+            contactResponse.getContacts().remove(size - 1);
+        }
         return contactResponse;
     }
 

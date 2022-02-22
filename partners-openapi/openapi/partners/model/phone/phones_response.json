@@ -13,7 +13,7 @@
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
-      "title": "Параметры ответа партнеров/контактов"
+      "title": "Параметры пагинации"
     },
     "errors": {
       "type": "array",

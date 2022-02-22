@@ -53,11 +53,17 @@ public class AccountSignServiceImpl implements AccountSignService {
         for (AccountEntity account : foundSignedAccounts) {
             accountsSignResponse.addAccountsSignItem(accountSingMapper.toSignAccount(account));
         }
+        var pagination = filter.getPagination();
         accountsSignResponse.setPagination(
             new Pagination()
-                .offset(filter.getPagination().getOffset())
-                .count(filter.getPagination().getCount())
+                .offset(pagination.getOffset())
+                .count(pagination.getCount())
         );
+        var size = foundSignedAccounts.size();
+        if (pagination.getCount() < size) {
+            accountsSignResponse.getPagination().hasNextPage(Boolean.TRUE);
+            accountsSignResponse.getAccountsSign().remove(size - 1);
+        }
         return accountsSignResponse;
     }
 

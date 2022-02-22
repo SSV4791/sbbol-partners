@@ -8,20 +8,19 @@
       "type": "string",
       "title": "Идентификатор личного кабинета клиента"
     },
-    "partnersId": {
+    "partnersIds": {
       "type": "array",
-      "title": "Счетa Партнера",
+      "title": "Идентификаторы партнеров",
       "items": {
         "$ref": "accounts_partner_pagination.json"
       }
     },
-    "sign_status": {
+    "signStatus": {
       "type": "string",
       "title": "Статус подписания счетов",
       "enum": [
         "SIGNED",
-        "NOT_SIGNED",
-        "NULL"
+        "NOT_SIGNED"
       ]
     },
     "accountType": {

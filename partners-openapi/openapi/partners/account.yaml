@@ -37,14 +37,14 @@ paths:
         403:
           description: Forbidden
 
-  /partner/accounts/listSorting:
+  /partner/accounts/list:
     post:
       tags:
         - Partner Accounts
       description: Получение счётов в разрезе партнеров
       operationId: view
       requestBody:
-        description: Фильтр для запроса счётов в разразее партнеров
+        description: Фильтр для запроса счётов в разразе партнеров
         required: false
         content:
           application/json:

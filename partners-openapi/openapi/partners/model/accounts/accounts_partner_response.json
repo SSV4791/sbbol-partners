@@ -6,14 +6,14 @@
   "properties": {
     "partnerAccounts": {
       "type": "array",
-      "title": "Список аккаунтов в разрезе партнера",
+      "title": "Список счетов",
       "items": {
         "$ref": "accounts_partner_response_pagination.json"
       }
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
-      "title": "Параметры запроса"
+      "title": "Параметры пагинации"
     }
   }
 }

@@ -18,7 +18,9 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidSignedAccount;
 
 class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
@@ -269,6 +271,63 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    void testGetPartnersNotSignedAccount() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+        createValidAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
+
+        var createdPartner2 = createPost(baseRoutePath, getValidEntrepreneurPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.accountSignType(PartnersFilter.AccountSignTypeEnum.NOT_SIGNED);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetPartnersSignedAccount() {
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner1)
+            .isNotNull();
+        createValidSignedAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
+
+        var createdPartner2 = createPost(baseRoutePath, getValidEntrepreneurPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.accountSignType(PartnersFilter.AccountSignTypeEnum.SIGNED);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+
+        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+
+    @Test
     void testGetAllPartners() {
         var digitalId = RandomStringUtils.randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
@@ -277,6 +336,10 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
         var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner2)
+            .isNotNull();
+
+        var createdPartner3 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
+        assertThat(createdPartner3)
             .isNotNull();
 
         var filter = new PartnersFilter();
@@ -292,6 +355,8 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isNotNull();
         assertThat(response.getPartners().size())
             .isEqualTo(2);
+        assertThat(response.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
     @Test

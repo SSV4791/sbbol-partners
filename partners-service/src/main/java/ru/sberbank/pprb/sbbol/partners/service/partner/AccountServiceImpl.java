@@ -101,11 +101,17 @@ public class AccountServiceImpl implements AccountService {
                 var item = accountMapper.toAccount(entity, budgetMaskService);
                 accountsResponse.addAccountsItem(item);
             }
+            var pagination = accountsFilter.getPagination();
             accountsResponse.setPagination(
                 new Pagination()
-                    .offset(accountsFilter.getPagination().getOffset())
-                    .count(accountsFilter.getPagination().getCount())
+                    .offset(pagination.getOffset())
+                    .count(pagination.getCount())
             );
+            var size = response.size();
+            if (pagination.getCount() < size) {
+                accountsResponse.getPagination().hasNextPage(Boolean.TRUE);
+                accountsResponse.getAccounts().remove(size - 1);
+            }
         } else {
             List<Account> counterpartyAccounts;
             Integer offset;

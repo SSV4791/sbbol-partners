@@ -5,24 +5,29 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
+import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class AddressViewRepositoryImpl implements AddressViewRepository, BaseRepository<AddressEntity> {
+public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, AddressesFilter> implements AddressViewRepository {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    public AddressViewRepositoryImpl(EntityManager entityManager) {
+        super(entityManager, AddressEntity.class);
+    }
 
     @Override
     public List<AddressEntity> findByFilter(AddressesFilter filter) {
-        var builder = entityManager.getCriteriaBuilder();
-        var criteria = builder.createQuery(AddressEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
-        var root = criteria.from(AddressEntity.class);
+        return filter(filter);
+    }
+
+    @Override
+    void createPredicate(CriteriaBuilder builder, CriteriaQuery<AddressEntity> criteria, List<Predicate> predicates, Root<AddressEntity> root, AddressesFilter filter) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
             predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
@@ -30,13 +35,22 @@ public class AddressViewRepositoryImpl implements AddressViewRepository, BaseRep
         if (filter.getType() != null) {
             predicates.add(builder.equal(root.get("type"), AddressType.valueOf(filter.getType())));
         }
-        defaultSelect(criteria, root, builder, predicates);
-        var query = entityManager.createQuery(criteria);
-        var pagination = filter.getPagination();
-        if (pagination != null) {
+    }
+
+    @Override
+    public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
+        return List.of(
+            builder.desc(root.get("digitalId")),
+            builder.desc(root.get("uuid"))
+        );
+    }
+
+    @Override
+    void pagination(TypedQuery<AddressEntity> query, AddressesFilter filter) {
+        if (filter.getPagination() != null) {
+            var pagination = filter.getPagination();
             query.setFirstResult(pagination.getOffset());
-            query.setMaxResults(pagination.getCount());
+            query.setMaxResults(pagination.getCount() + 1);
         }
-        return query.getResultList();
     }
 }

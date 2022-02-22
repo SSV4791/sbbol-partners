@@ -14,13 +14,5 @@ public interface PartnerViewRepository {
      * @param filter Фильтр для запроса партнеров
      * @return Партнеры
      */
-    List<PartnerEntity> findByFilter(RenterFilter filter);
-
-    /**
-     * Получение партнеров
-     *
-     * @param filter Фильтр для запроса партнеров
-     * @return Партнеры
-     */
     List<PartnerEntity> findByFilter(PartnersFilter filter);
 }

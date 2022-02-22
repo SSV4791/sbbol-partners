@@ -41,11 +41,17 @@ abstract class DocumentServiceImpl implements DocumentService {
         for (var entity : response) {
             documentsResponse.addDocumentsItem(documentMapper.toDocument(entity));
         }
+        var pagination = documentsFilter.getPagination();
         documentsResponse.setPagination(
             new Pagination()
-                .offset(documentsFilter.getPagination().getOffset())
-                .count(documentsFilter.getPagination().getCount())
+                .offset(pagination.getOffset())
+                .count(pagination.getCount())
         );
+        var size = response.size();
+        if (pagination.getCount() < size) {
+            documentsResponse.getPagination().hasNextPage(Boolean.TRUE);
+            documentsResponse.getDocuments().remove(size - 1);
+        }
         return documentsResponse;
     }
 

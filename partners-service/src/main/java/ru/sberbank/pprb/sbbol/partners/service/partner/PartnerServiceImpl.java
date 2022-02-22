@@ -35,7 +35,6 @@ public class PartnerServiceImpl implements PartnerService {
     public static final String DOCUMENT_NAME = "partner";
 
     private final PartnerRepository partnerRepository;
-    private final MergeHistoryRepository mergeHistoryRepository;
     private final ReplicationHistoryRepository replicationHistoryRepository;
     private final ReplicationHistoryService replicationHistoryService;
     private final LegacySbbolAdapter legacySbbolAdapter;
@@ -45,7 +44,6 @@ public class PartnerServiceImpl implements PartnerService {
 
     public PartnerServiceImpl(
         PartnerRepository partnerRepository,
-        MergeHistoryRepository mergeHistoryRepository,
         ReplicationHistoryRepository replicationHistoryRepository,
         ReplicationHistoryService replicationHistoryService,
         LegacySbbolAdapter legacySbbolAdapter,
@@ -54,7 +52,6 @@ public class PartnerServiceImpl implements PartnerService {
         CounterpartyMapper counterpartyMapper
     ) {
         this.partnerRepository = partnerRepository;
-        this.mergeHistoryRepository = mergeHistoryRepository;
         this.replicationHistoryRepository = replicationHistoryRepository;
         this.replicationHistoryService = replicationHistoryService;
         this.legacySbbolAdapter = legacySbbolAdapter;
@@ -69,11 +66,7 @@ public class PartnerServiceImpl implements PartnerService {
         Partner response;
         if (legacySbbolAdapter.checkMigration(digitalId)) {
             UUID uuid = UUID.fromString(id);
-            var history = mergeHistoryRepository.getByPartnerUuid(uuid);
-            if (history == null) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
-            }
-            PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, history.getMainUuid());
+            PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (partner == null) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
@@ -98,11 +91,17 @@ public class PartnerServiceImpl implements PartnerService {
             for (PartnerEntity entity : response) {
                 partnersResponse.addPartnersItem(partnerMapper.toPartner(entity));
             }
+            var pagination = partnersFilter.getPagination();
             partnersResponse.setPagination(
                 new Pagination()
-                    .offset(partnersFilter.getPagination().getOffset())
-                    .count(partnersFilter.getPagination().getCount())
+                    .offset(pagination.getOffset())
+                    .count(pagination.getCount())
             );
+            var size = response.size();
+            if (pagination.getCount() < size) {
+                partnersResponse.getPagination().hasNextPage(Boolean.TRUE);
+                partnersResponse.getPartners().remove(size - 1);
+            }
         } else {
             List<Partner> counterparties;
             if (partnersFilter.getPagination() != null) {
@@ -145,10 +144,6 @@ public class PartnerServiceImpl implements PartnerService {
     public PartnerResponse savePartner(Partner partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
-        MergeHistoryEntity history = new MergeHistoryEntity();
-        history.setPartnerUuid(savePartner.getUuid());
-        history.setMainUuid(savePartner.getUuid());
-        mergeHistoryRepository.save(history);
         var response = partnerMapper.toPartner(savePartner);
         response.setGku(partnerUtils.getGku(response.getDigitalId(), response.getInn()));
         var partnerResponse = new PartnerResponse();

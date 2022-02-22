@@ -5,7 +5,7 @@
   "title": "Счетa Партнера",
   "accounts": {
     "type": "array",
-    "title": "Список аккаунтов",
+    "title": "Список счетов",
     "items": {
       "$ref": "../../model/accounts/accounts_partner.json"
     }
