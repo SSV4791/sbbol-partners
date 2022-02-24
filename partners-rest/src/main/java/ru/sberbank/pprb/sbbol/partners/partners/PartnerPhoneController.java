@@ -4,11 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerPhoneApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PhoneService;
+import ru.sberbank.pprb.sbbol.partners.validation.PhoneValidation;
 
 @RestController
 public class PartnerPhoneController implements PartnerPhoneApi {
@@ -20,7 +22,7 @@ public class PartnerPhoneController implements PartnerPhoneApi {
     }
 
     @Override
-    public ResponseEntity<PhoneResponse> create(Phone phone) {
+    public ResponseEntity<PhoneResponse> create(@Validation(type = PhoneValidation.class) Phone phone) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerPhoneService.savePhone(phone));
     }
 
@@ -36,7 +38,7 @@ public class PartnerPhoneController implements PartnerPhoneApi {
     }
 
     @Override
-    public ResponseEntity<PhoneResponse> update(Phone phone) {
+    public ResponseEntity<PhoneResponse> update(@Validation(type = PhoneValidation.class) Phone phone) {
         return ResponseEntity.ok(partnerPhoneService.updatePhone(phone));
     }
 }

@@ -4,11 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerDocumentApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
+import ru.sberbank.pprb.sbbol.partners.validation.DocumentValidation;
 
 @RestController
 public class PartnerDocumentController implements PartnerDocumentApi {
@@ -20,7 +22,7 @@ public class PartnerDocumentController implements PartnerDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> create(Document document) {
+    public ResponseEntity<DocumentResponse> create(@Validation(type = DocumentValidation.class) Document document) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerDocumentService.saveDocument(document));
     }
 
@@ -41,7 +43,7 @@ public class PartnerDocumentController implements PartnerDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> update(Document document) {
+    public ResponseEntity<DocumentResponse> update(@Validation(type = DocumentValidation.class) Document document) {
         return ResponseEntity.ok(partnerDocumentService.updateDocument(document));
     }
 }

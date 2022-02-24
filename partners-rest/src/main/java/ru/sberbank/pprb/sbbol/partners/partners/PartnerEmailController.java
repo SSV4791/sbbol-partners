@@ -4,11 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerEmailApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.EmailService;
+import ru.sberbank.pprb.sbbol.partners.validation.EmailValidation;
 
 @RestController
 public class PartnerEmailController implements PartnerEmailApi {
@@ -20,7 +22,7 @@ public class PartnerEmailController implements PartnerEmailApi {
     }
 
     @Override
-    public ResponseEntity<EmailResponse> create(Email email) {
+    public ResponseEntity<EmailResponse> create(@Validation(type = EmailValidation.class) Email email) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerEmailService.saveEmail(email));
     }
 
@@ -36,7 +38,7 @@ public class PartnerEmailController implements PartnerEmailApi {
     }
 
     @Override
-    public ResponseEntity<EmailResponse> update(Email email) {
+    public ResponseEntity<EmailResponse> update(@Validation(type = EmailValidation.class) Email email) {
         return ResponseEntity.ok(partnerEmailService.updateEmail(email));
     }
 }

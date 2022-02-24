@@ -3,11 +3,13 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PartnerAccountValidator implements Validator<Account> {
 
@@ -18,22 +20,26 @@ public class PartnerAccountValidator implements Validator<Account> {
     public static final int BIC_VALID_LENGTH = 9;
 
     @Override
-    public ArrayList<String> validation(Account entity) {
+    public List<String> validation(Account entity) {
         var errors = new ArrayList<String>();
         if (entity.getPartnerId() == null) {
-            errors.add("Ошибка заполнения partnerId, поле обязательно для заполнения");
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "partnerId"));
+
         }
         if (entity.getDigitalId() == null) {
-            errors.add("Ошибка заполнения digitalId, поле обязательно для заполнения");
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "digitalId"));
+
         }
         if (entity.getAccount() == null) {
-            errors.add("Ошибка заполнения поля account, поле обязательно к заполнению");
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "account"));
+
         }
         if (entity.getAccount().length() != ACCOUNT_VALID_LENGTH) {
-            errors.add("Ошибка заполнения поля account, поле меньше/больше 20 символов");
+            errors.add(MessagesTranslator.toLocale("account.account.length"));
+
         }
         if (CollectionUtils.isEmpty(entity.getBanks())) {
-            errors.add("Ошибка заполнения поля bank, поле обязательно к заполнению");
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "bank"));
         } else {
             checkBank(entity, errors);
         }
@@ -43,21 +49,24 @@ public class PartnerAccountValidator implements Validator<Account> {
     private void checkBank(Account entity, ArrayList<String> errors) {
         for (Bank bank : entity.getBanks()) {
             if (bank.getBic() == null) {
-                errors.add("Ошибка заполнения поля bank.bic, поле обязательно к заполнению");
+                errors.add(MessagesTranslator.toLocale("default.field.is_null", "bank.bic"));
+
             }
             if (bank.getBic().length() != BIC_VALID_LENGTH) {
-                errors.add("Ошибка заполнения поля bic, поле меньше/больше 9 символов");
+                errors.add("account.bic.length");
             }
             if (bank.getName() == null) {
-                errors.add("Ошибка заполнения поля bank.name, поле обязательно к заполнению");
+                errors.add(MessagesTranslator.toLocale("default.field.is_null", "bank.name"));
             }
             if (CollectionUtils.isEmpty(bank.getBankAccounts())) {
-                errors.add("Ошибка заполнения поля bank.bankAccounts, поле обязательно к заполнению");
+                errors.add(MessagesTranslator.toLocale("default.field.is_null", "bank.bankAccounts"));
+
+
             } else {
                 checkBankAccount(bank, errors);
             }
             if (!userAccountValid(entity.getAccount(), bank.getBic())) {
-                errors.add("Ошибка заполнения поля account, " + entity.getAccount() + " не проходит проверку контрольного числа");
+                errors.add(MessagesTranslator.toLocale("account.account.control_number", entity.getAccount()));
             }
         }
     }
@@ -65,10 +74,12 @@ public class PartnerAccountValidator implements Validator<Account> {
     private void checkBankAccount(Bank bank, ArrayList<String> errors) {
         for (BankAccount bankAccount : bank.getBankAccounts()) {
             if (bankAccount.getAccount() == null) {
-                errors.add("Ошибка заполнения поля bank.bankAccount.account, поле обязательно к заполнению");
+                errors.add(MessagesTranslator.toLocale("default.field.is_null", "bank.bankAccount.account"));
+
             }
             if (!bankAccountValid(bankAccount.getAccount(), bank.getBic())) {
-                errors.add("Ошибка заполнения поля account, " + bankAccount.getAccount() + " не проходит проверку контрольного числа");
+                errors.add(MessagesTranslator.toLocale("account.bank_account.control_number", bankAccount.getAccount()));
+
             }
         }
     }
