@@ -8,6 +8,8 @@ import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
+import ru.sberbank.pprb.sbbol.partners.model.AccountsPartnerFilter;
+import ru.sberbank.pprb.sbbol.partners.model.AccountsPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnerAccountValidator;
@@ -45,5 +47,11 @@ public class AccountController implements PartnerAccountsApi {
     @Override
     public ResponseEntity<AccountResponse> update(@Validation(type = PartnerAccountValidator.class) Account account) {
         return ResponseEntity.ok(accountService.updateAccount(account));
+    }
+
+    @Override
+    public ResponseEntity<AccountsPartnerResponse> view(AccountsPartnerFilter accountsPartnerFilter) {
+        //TODO DCBBRAIN-2265
+        return null;
     }
 }

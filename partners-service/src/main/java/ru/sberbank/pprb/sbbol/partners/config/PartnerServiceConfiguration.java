@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -24,15 +25,20 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
@@ -40,8 +46,10 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRe
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.MergeHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ReplicationHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
@@ -54,14 +62,20 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactAddressServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactDocumentServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.partner.ContactEmailServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.partner.ContactPhoneServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.partner.EmailService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerAddressServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerDocumentServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerEmailServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerPhoneServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.PhoneService;
 import ru.sberbank.pprb.sbbol.partners.service.renter.PartnerServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
@@ -141,6 +155,16 @@ public class PartnerServiceConfiguration {
     @Bean
     CounterpartyMapper counterpartyMapper() {
         return new CounterpartyMapperImpl();
+    }
+
+    @Bean
+    EmailMapper emailMapper() {
+        return new EmailMapperImpl();
+    }
+
+    @Bean
+    PhoneMapper phoneMapper() {
+        return new PhoneMapperImpl();
     }
 
     @Bean
@@ -235,9 +259,28 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
+    PhoneService partnerPhoneService(PartnerRepository partnerRepository, PhoneRepository phoneRepository) {
+        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper());
+    }
+
+    @Bean
+    PhoneService contactPhoneService(ContactRepository contactRepository, PhoneRepository phoneRepository) {
+        return new ContactPhoneServiceImpl(contactRepository, phoneRepository, phoneMapper());
+    }
+
+    @Bean
+    EmailService partnerEmailService(PartnerRepository partnerRepository, EmailRepository emailRepository) {
+        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper());
+    }
+
+    @Bean
+    EmailService contactEmailService(ContactRepository contactRepository, EmailRepository emailRepository) {
+        return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper());
+    }
+
+    @Bean
     PartnerService partnerService(
         PartnerRepository partnerRepository,
-        MergeHistoryRepository mergeHistoryRepository,
         ReplicationHistoryRepository replicationHistoryRepository,
         ReplicationHistoryService replicationHistoryService,
         LegacySbbolAdapter legacySbbolAdapter,
@@ -245,7 +288,6 @@ public class PartnerServiceConfiguration {
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
             partnerRepository,
-            mergeHistoryRepository,
             replicationHistoryRepository,
             replicationHistoryService,
             legacySbbolAdapter,

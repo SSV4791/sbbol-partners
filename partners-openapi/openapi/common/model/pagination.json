@@ -13,6 +13,7 @@
     },
     "hasNextPage": {
       "type": "boolean",
+      "default": false,
       "title": "Признак наличия следующей страницы"
     }
   },

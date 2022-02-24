@@ -32,6 +32,7 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
         var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
         var account3 = createValidAccount(partner.getId(), partner.getDigitalId());
         var account4 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account5 = createValidAccount(partner.getId(), partner.getDigitalId());
 
         var filter1 = new AccountsSignFilter()
             .digitalId(partner.getDigitalId())
@@ -41,20 +42,23 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
                     account1.getId(),
                     account2.getId(),
                     account3.getId(),
-                    account4.getId()
+                    account4.getId(),
+                    account5.getId()
                 ))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
-        var response1 = post(
+        var response = post(
             baseRoutePath + "/view",
             filter1,
             AccountsSignResponse.class
         );
-        assertThat(response1)
+        assertThat(response)
             .isNotNull();
-        assertThat(response1.getAccountsSign().size())
+        assertThat(response.getAccountsSign().size())
             .isEqualTo(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
     @Test

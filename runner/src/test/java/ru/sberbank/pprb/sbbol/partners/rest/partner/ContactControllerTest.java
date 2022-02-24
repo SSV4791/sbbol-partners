@@ -47,6 +47,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
         var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
         var contact4 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact5 = createValidContact(partner.getId(), partner.getDigitalId());
 
         var filter1 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
@@ -89,7 +90,8 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
                     contact1.getId(),
                     contact2.getId(),
                     contact3.getId(),
-                    contact4.getId()
+                    contact4.getId(),
+                    contact5.getId()
                 )
             )
             .pagination(new Pagination()
@@ -104,6 +106,8 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isNotNull();
         assertThat(response3.getContacts().size())
             .isEqualTo(4);
+        assertThat(response3.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
     @Test

@@ -20,6 +20,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
+import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
@@ -122,6 +123,8 @@ public interface CounterpartyMapper extends BaseMapper {
     @Mapping(target = "phones", ignore = true)
     @Mapping(target = "secondName", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "gku", ignore = true)
+    @Mapping(target = "budget", ignore = true)
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "id", source = "counterparty.pprbGuid")
     @Mapping(target = "orgName", source = "counterparty.name")
@@ -171,6 +174,8 @@ public interface CounterpartyMapper extends BaseMapper {
     @Mapping(target = "phones", ignore = true)
     @Mapping(target = "secondName", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "gku", ignore = true)
+    @Mapping(target = "budget", ignore = true)
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "id", source = "counterparty.pprbGuid")
     @Mapping(target = "orgName", source = "counterparty.name")

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PhoneNumbersResponse",
+  "type": "object",
+  "title": "Ответ на запрос номеров телефона партнеров/контактов",
+  "properties": {
+    "phones": {
+      "type": "array",
+      "items": {
+        "$ref": "phone.json"
+      },
+      "title": "Номера телефонов"
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры пагинации"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}

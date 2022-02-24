@@ -43,6 +43,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
         createValidAddress(partner.getId(), partner.getDigitalId());
         createValidAddress(partner.getId(), partner.getDigitalId());
         createValidAddress(partner.getId(), partner.getDigitalId());
+        createValidAddress(partner.getId(), partner.getDigitalId());
 
         var filter1 = new AddressesFilter()
             .digitalId(partner.getDigitalId())
@@ -75,6 +76,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
             .isNotNull();
         assertThat(response2.getAddresses().size())
             .isEqualTo(4);
+        assertThat(response2.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
     @Test

@@ -23,7 +23,7 @@
     "search": {
       "title": "Поиск счета по номеру",
       "type": "string",
-      "$ref": "../search/searchAccounts.json"
+      "$ref": "../search/search_accounts.json"
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",

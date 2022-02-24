@@ -25,6 +25,8 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 )
 public interface PartnerMapper extends BaseMapper {
 
+    @Mapping(target = "gku", ignore = true)
+    @Mapping(target = "budget", ignore = true)
     @Mapping(target = "id", expression = "java(partner.getUuid().toString())")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
@@ -40,6 +42,8 @@ public interface PartnerMapper extends BaseMapper {
         return citizenshipType != null ? Partner.CitizenshipEnum.valueOf(citizenshipType.name()) : null;
     }
 
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
@@ -58,6 +62,8 @@ public interface PartnerMapper extends BaseMapper {
 
     @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
     @Mapping(target = "type", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);

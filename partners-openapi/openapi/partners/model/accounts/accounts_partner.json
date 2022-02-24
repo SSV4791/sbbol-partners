@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsPartner",
+  "type": "object",
+  "title": "Счёт партнера",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор счёта"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "budget": {
+      "type": "boolean",
+      "title": "Признак бюджетности",
+      "default": false
+    },
+    "name": {
+      "type": "string",
+      "title": "Наименование счёта"
+    },
+    "account": {
+      "type": "string",
+      "title": "Счёт"
+    },
+    "banks": {
+      "type": "array",
+      "items": {
+        "$ref": "../../model/bank/bank.json"
+      },
+      "title": "Банки"
+    },
+    "state": {
+      "type": "string",
+      "title": "Признак 'Подписан'",
+      "enum": [
+        "SIGNED",
+        "NOT_SIGNED"
+      ]
+    }
+  }
+}
+
+

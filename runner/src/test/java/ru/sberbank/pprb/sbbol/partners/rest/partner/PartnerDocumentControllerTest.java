@@ -46,6 +46,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
 
         var filter1 = new DocumentsFilter()
             .digitalId(partner.getDigitalId())
@@ -78,6 +79,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
             .isNotNull();
         assertThat(response2.getDocuments().size())
             .isEqualTo(4);
+        assertThat(response2.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
     }
 
     @Test

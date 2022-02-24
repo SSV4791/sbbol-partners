@@ -18,4 +18,12 @@ public interface ContactRepository extends CrudRepository<ContactEntity, UUID>, 
      * @return контакт Партнера
      */
     ContactEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
+
+    /**
+     * Получение контакта Партнера
+     *
+     * @param uuid Идентификатор контакта
+     * @return контакт Партнера
+     */
+    ContactEntity getByUuid(UUID uuid);
 }

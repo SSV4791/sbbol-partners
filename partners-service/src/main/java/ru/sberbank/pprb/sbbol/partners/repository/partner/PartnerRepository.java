@@ -1,17 +1,15 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.PartnerViewRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.common.RenterViewRepository;
 
 import java.util.UUID;
 
 @Repository
-public interface PartnerRepository extends PagingAndSortingRepository<PartnerEntity, UUID>, PartnerViewRepository {
+public interface PartnerRepository extends PagingAndSortingRepository<PartnerEntity, UUID>, PartnerViewRepository, RenterViewRepository {
 
     /**
      * Получение Партнера
@@ -23,20 +21,10 @@ public interface PartnerRepository extends PagingAndSortingRepository<PartnerEnt
     PartnerEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
 
     /**
-     * Получение списка Партнеров c сортировкой
+     * Получение Партнера
      *
-     * @param digitalId Идентификатор личного кабинета
-     * @param sort      Параметры сортировки
-     * @return Список партнеров
+     * @param uuid Идентификатор документа
+     * @return Партнер
      */
-    Slice<PartnerEntity> findAllByDigitalId(String digitalId, Sort sort);
-
-    /**
-     * Получение списка Партнеров c пагинацией
-     *
-     * @param digitalId Идентификатор личного кабинета
-     * @param pageable  Параметры пагинации
-     * @return Список партнеров
-     */
-    Slice<PartnerEntity> findAllByDigitalId(String digitalId, Pageable pageable);
+    PartnerEntity getByUuid(UUID uuid);
 }

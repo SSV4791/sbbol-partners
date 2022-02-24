@@ -46,11 +46,17 @@ abstract class AddressServiceImpl implements AddressService {
         for (var entity : response) {
             addressesResponse.addAddressesItem(addressMapper.toAddress(entity));
         }
+        var pagination = addressesFilter.getPagination();
         addressesResponse.setPagination(
             new Pagination()
-                .offset(addressesFilter.getPagination().getOffset())
-                .count(addressesFilter.getPagination().getCount())
+                .offset(pagination.getOffset())
+                .count(pagination.getCount())
         );
+        var size = response.size();
+        if (pagination.getCount() < size) {
+            addressesResponse.getPagination().hasNextPage(Boolean.TRUE);
+            addressesResponse.getAddresses().remove(size - 1);
+        }
         return addressesResponse;
     }
 
