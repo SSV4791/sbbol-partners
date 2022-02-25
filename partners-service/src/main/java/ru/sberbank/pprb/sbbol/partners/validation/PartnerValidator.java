@@ -1,10 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PartnerValidator implements Validator<Partner> {
 
@@ -19,13 +21,13 @@ public class PartnerValidator implements Validator<Partner> {
 
 
     @Override
-    public ArrayList<String> validation(Partner entity) {
+    public List<String> validation(Partner entity) {
         var errors = new ArrayList<String>();
         if (entity.getDigitalId() == null) {
-            errors.add("Ошибка заполнения digitalId, поле обязательно для заполнения");
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "digitalId"));
         }
         if (entity.getLegalForm() == null) {
-            errors.add("Ошибка заполнения legalForm, поле обязательно для заполнения");
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "legalForm"));
         } else {
             checkLegalFormProperty(entity, errors);
         }
@@ -35,47 +37,47 @@ public class PartnerValidator implements Validator<Partner> {
     private void checkLegalFormProperty(Partner entity, ArrayList<String> errors) {
         if (entity.getLegalForm() == LegalForm.LEGAL_ENTITY) {
             if (entity.getOrgName() == null) {
-                errors.add("Ошибка заполнения orgName, поле обязательно для заполнения при legalForm.LEGAL_ENTITY");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "orgName", "legalForm.LEGAL_ENTITY"));
             }
             if (entity.getInn() == null) {
-                errors.add("Ошибка заполнения inn, поле обязательно для заполнения при legalForm.LEGAL_ENTITY");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "inn", "legalForm.LEGAL_ENTITY"));
             } else if (!checkInn(entity.getInn())) {
-                errors.add("Ошибка заполнения inn, поле не проходит проверку контрольного числа");
+                errors.add(MessagesTranslator.toLocale("default.field.control_number", "inn"));
             }
             if (entity.getKpp() == null) {
-                errors.add("Ошибка заполнения kpp, поле обязательно для заполнения при legalForm.LEGAL_ENTITY");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "kpp", "legalForm.LEGAL_ENTITY"));
             } else {
                 if (entity.getKpp().length() != KPP_VALID_LENGTH) {
-                    errors.add("Ошибка заполнения kpp, поле не равно " + KPP_VALID_LENGTH + " символам");
+                    errors.add(MessagesTranslator.toLocale("partner.kpp.length"));
                 }
             }
             if (entity.getOgrn() == null) {
-                errors.add("Ошибка заполнения ogrn, поле обязательно для заполнения при legalForm.LEGAL_ENTITY");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "ogrn", "legalForm.LEGAL_ENTITY"));
             } else {
                 if (!checkOgrn(entity.getOgrn())) {
-                    errors.add("Ошибка заполнения ogrn, поле не проходит проверку контрольного числа");
+                    errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
                 }
             }
         } else if (entity.getLegalForm() == LegalForm.ENTREPRENEUR) {
             if (entity.getOrgName() == null) {
-                errors.add("Ошибка заполнения orgName, поле обязательно для заполнения при legalForm.ENTREPRENEUR");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "orgName", "legalForm.ENTREPRENEUR"));
             }
             if (entity.getInn() == null) {
-                errors.add("Ошибка заполнения inn, поле обязательно для заполнения при legalForm.ENTREPRENEUR");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "inn", "legalForm.ENTREPRENEUR"));
             }
             if (entity.getOgrn() == null) {
-                errors.add("Ошибка заполнения ogrn, поле обязательно для заполнения при legalForm.ENTREPRENEUR");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "ogrn", "legalForm.ENTREPRENEUR"));
             } else {
                 if (!checkOgrn(entity.getOgrn())) {
-                    errors.add("Ошибка заполнения ogrn, поле не проходит проверку контрольного числа");
+                    errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
                 }
             }
         } else if (entity.getLegalForm() == LegalForm.PHYSICAL_PERSON) {
             if (entity.getFirstName() == null) {
-                errors.add("Ошибка заполнения firstName, поле обязательно для заполнения при legalForm.PHYSICAL_PERSON");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "firstName", "legalForm.PHYSICAL_PERSON"));
             }
             if (entity.getSecondName() == null) {
-                errors.add("Ошибка заполнения secondName, поле обязательно для заполнения при legalForm.PHYSICAL_PERSON");
+                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "secondName", "legalForm.PHYSICAL_PERSON"));
             }
         }
     }

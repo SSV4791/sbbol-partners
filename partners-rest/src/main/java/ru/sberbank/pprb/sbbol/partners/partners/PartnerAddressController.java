@@ -4,11 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAddressApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AddressService;
+import ru.sberbank.pprb.sbbol.partners.validation.AddressValidation;
 
 @RestController
 public class PartnerAddressController implements PartnerAddressApi {
@@ -20,7 +22,7 @@ public class PartnerAddressController implements PartnerAddressApi {
     }
 
     @Override
-    public ResponseEntity<AddressResponse> create(Address address) {
+    public ResponseEntity<AddressResponse> create(@Validation(type = AddressValidation.class) Address address) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerAddressService.saveAddress(address));
     }
 
@@ -41,7 +43,7 @@ public class PartnerAddressController implements PartnerAddressApi {
     }
 
     @Override
-    public ResponseEntity<AddressResponse> update(Address address) {
+    public ResponseEntity<AddressResponse> update(@Validation(type = AddressValidation.class) Address address) {
         return ResponseEntity.ok(partnerAddressService.updateAddress(address));
     }
 }
