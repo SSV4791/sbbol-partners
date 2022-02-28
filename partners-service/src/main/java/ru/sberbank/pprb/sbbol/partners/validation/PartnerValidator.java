@@ -51,12 +51,8 @@ public class PartnerValidator implements Validator<Partner> {
                     errors.add(MessagesTranslator.toLocale("partner.kpp.length"));
                 }
             }
-            if (entity.getOgrn() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "ogrn", "legalForm.LEGAL_ENTITY"));
-            } else {
-                if (!checkOgrn(entity.getOgrn())) {
-                    errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
-                }
+            if (entity.getOgrn() != null && !checkOgrn(entity.getOgrn())) {
+                errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
             }
         } else if (entity.getLegalForm() == LegalForm.ENTREPRENEUR) {
             if (entity.getOrgName() == null) {
@@ -65,12 +61,8 @@ public class PartnerValidator implements Validator<Partner> {
             if (entity.getInn() == null) {
                 errors.add(MessagesTranslator.toLocale("default.fields.is_null", "inn", "legalForm.ENTREPRENEUR"));
             }
-            if (entity.getOgrn() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "ogrn", "legalForm.ENTREPRENEUR"));
-            } else {
-                if (!checkOgrn(entity.getOgrn())) {
-                    errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
-                }
+            if (entity.getOgrn() != null && !checkOgrn(entity.getOgrn())) {
+                errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
             }
         } else if (entity.getLegalForm() == LegalForm.PHYSICAL_PERSON) {
             if (entity.getFirstName() == null) {
