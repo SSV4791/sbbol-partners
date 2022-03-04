@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.PhonesCreate",
+  "type": "object",
+  "title": "Номера телефонов",
+  "properties": {
+    "phones": {
+      "type": "array",
+      "items": {
+        "$ref": "phone_create.json"
+      }
+    }
+  }
+}

@@ -16,7 +16,7 @@ paths:
       operationId: list
       requestBody:
         description: Фильтр для запроса номеров телефона контактов
-        required: false
+        required: true
         content:
           application/json:
             schema:
@@ -49,7 +49,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -72,15 +72,15 @@ paths:
     post:
       tags:
         - Contact Phone
-      description: Создание телефона контакта
+      description: Создание телефонов контакта
       operationId: create
       requestBody:
-        description: Номер телефона
+        description: Номер телефонов
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/phone/phone.json'
+              $ref: 'model/phone/phone_create.json'
       responses:
         201:
           description: Успешный ответ
@@ -99,10 +99,10 @@ paths:
     put:
       tags:
         - Contact Phone
-      description: Обновление номера телефона контакта
+      description: Обновление номера телефонов контакта
       operationId: update
       requestBody:
-        description: Телефон
+        description: Телефоны
         required: true
         content:
           application/json:

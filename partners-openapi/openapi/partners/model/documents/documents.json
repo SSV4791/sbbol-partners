@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.Documents",
+  "type": "object",
+  "title": "Документы",
+  "properties": {
+    "documents": {
+      "type": "array",
+      "items": {
+        "$ref": "document.json"
+      }
+    }
+  }
+}

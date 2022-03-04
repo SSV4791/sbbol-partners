@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.EmailCreate",
+  "type": "object",
+  "title": "Электронный адрес",
+  "properties": {
+    "unifiedId": {
+      "type": "string",
+      "title": "Идентификатор партнера или контакта"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "email": {
+      "type": "string",
+      "title": "Электронный адрес"
+    }
+  }
+}

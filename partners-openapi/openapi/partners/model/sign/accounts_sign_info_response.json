@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountsSignInfoResponse",
   "type": "object",
   "title": "Подпись счетов",
   "properties": {

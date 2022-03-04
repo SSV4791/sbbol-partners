@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PartnersFilter",
+  "javaType": "ru.sberbank.pprb.partners.model.PartnersFilter",
   "type": "object",
   "title": "Запрос Партнеров по фильтру",
   "properties": {
@@ -10,7 +10,7 @@
     },
     "search": {
       "title": "Поиск партнера по имени, названию компании, инн",
-      "type": "string",
+      "type": "object",
       "$ref": "../search/search_partners.json"
     },
     "partnersType": {

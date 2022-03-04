@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PhoneNumbersFilter",
+  "javaType": "ru.sberbank.pprb.partners.model.PhoneNumbersFilter",
   "type": "object",
   "title": "Фильтр для запроса номеров телефона партнера/контакта",
   "properties": {

@@ -16,7 +16,7 @@ paths:
       operationId: list
       requestBody:
         description: Фильтр для запроса адресов партнеров
-        required: false
+        required: true
         content:
           application/json:
             schema:
@@ -49,7 +49,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -82,7 +82,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -105,7 +105,7 @@ paths:
     post:
       tags:
         - Partner Address
-      description: Создание адреса партнера
+      description: Создание адресов партнера
       operationId: create
       requestBody:
         description: адрес
@@ -113,7 +113,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: 'model/address/address.json'
+              $ref: 'model/address/address_create.json'
       responses:
         201:
           description: Успешный ответ
@@ -132,7 +132,7 @@ paths:
     put:
       tags:
         - Partner Address
-      description: Обновление адреса партнера
+      description: Обновление адресов партнера
       operationId: update
       requestBody:
         description: Адрес
@@ -156,3 +156,4 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
+

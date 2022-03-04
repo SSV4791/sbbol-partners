@@ -12,7 +12,11 @@ CREATE TABLE CONTACT
     first_name   VARCHAR(50),
     second_name  VARCHAR(50),
     middle_name  VARCHAR(50),
-    position     VARCHAR(100)
+    position     VARCHAR(100),
+    CONSTRAINT CK_CONTACT_LEGAL_TYPE CHECK
+        (LEGAL_TYPE = 'LEGAL_ENTITY' OR
+         LEGAL_TYPE = 'ENTREPRENEUR' OR
+         LEGAL_TYPE = 'PHYSICAL_PERSON')
 );
 
 COMMENT ON TABLE CONTACT IS 'Контакты';

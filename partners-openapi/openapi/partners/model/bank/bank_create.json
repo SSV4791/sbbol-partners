@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.BankCreate",
+  "type": "object",
+  "title": "Банк",
+  "properties": {
+    "bic": {
+      "type": "string",
+      "title": "БИК"
+    },
+    "name": {
+      "type": "string",
+      "title": "Наименование"
+    },
+    "mediary": {
+      "type": "boolean",
+      "title": "Является транзитным банком",
+      "default": false
+    },
+    "bankAccounts": {
+      "type": "array",
+      "title": "Корреспондентские счета",
+      "items": {
+        "$ref": "bank_account_create.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountCreate",
+  "type": "object",
+  "title": "Счёт партнера",
+  "properties": {
+    "partnerId": {
+      "type": "string",
+      "title": "Идентификатор партнера"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "name": {
+      "type": "string",
+      "title": "Наименование счёта"
+    },
+    "account": {
+      "type": "string",
+      "title": "Счёт"
+    },
+    "banks": {
+      "type": "array",
+      "items": {
+        "$ref": "../bank/bank_create.json"
+      },
+      "title": "Банки"
+    }
+  }
+}

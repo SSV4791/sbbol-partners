@@ -8,7 +8,7 @@ servers:
   - url: /
 
 paths:
-  /partners/{digitalId}/{id}:
+  /partner/{digitalId}/{id}:
     get:
       tags:
         - Partners
@@ -20,7 +20,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -53,7 +53,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -72,19 +72,19 @@ paths:
         403:
           description: Forbidden
 
-  /partners:
+  /partner:
     post:
       tags:
         - Partners
-      description: Создание партнера
+      description: Создание партнеров
       operationId: create
       requestBody:
-        description: Партнер
+        description: Партнеры
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/partners/partner.json'
+              $ref: 'model/partners/partner_create.json'
       responses:
         201:
           description: Успешный ответ
@@ -103,7 +103,7 @@ paths:
     put:
       tags:
         - Partners
-      description: Обновление Партнера
+      description: Обновление Партнеров
       operationId: update
       requestBody:
         description: Партнер

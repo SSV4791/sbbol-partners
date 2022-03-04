@@ -16,7 +16,7 @@ paths:
       operationId: list
       requestBody:
         description: Фильтр для запроса номеров телефона контактов
-        required: false
+        required: true
         content:
           application/json:
             schema:
@@ -41,7 +41,7 @@ paths:
     delete:
       tags:
         - Partner Phone
-      description: Удаление phone numbers контакта
+      description: Удаление phone контакта
       operationId: delete
       parameters:
         - name: digitalId
@@ -49,7 +49,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -72,15 +72,15 @@ paths:
     post:
       tags:
         - Partner Phone
-      description: Создание email адреса контакта
+      description: Обновление номера телефона партнера
       operationId: create
       requestBody:
-        description: Номер телефона
+        description: Номера телефонов
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/phone/phone.json'
+              $ref: 'model/phone/phone_create.json'
       responses:
         201:
           description: Успешный ответ
@@ -99,7 +99,7 @@ paths:
     put:
       tags:
         - Partner Phone
-      description: Обновление номера телефона контакта
+      description: Обновление номера телефона партнера
       operationId: update
       requestBody:
         description: Phone
@@ -123,4 +123,3 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
-

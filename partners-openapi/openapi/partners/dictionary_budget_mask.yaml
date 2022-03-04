@@ -70,7 +70,7 @@ paths:
       operationId: list
       requestBody:
         description: Фильтр для запроса масок бюджетности
-        required: false
+        required: true
         content:
           application/json:
             schema:
