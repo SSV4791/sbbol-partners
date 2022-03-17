@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.PartnersMerge",
+  "javaType": "ru.sberbank.pprb.partners.model.PartnersMerge",
   "type": "object",
   "title": "Объединение партнеров",
   "properties": {

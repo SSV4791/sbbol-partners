@@ -4,7 +4,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -27,7 +26,14 @@ public class EmailViewRepositoryImpl extends BaseRepository<EmailEntity, EmailsF
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<EmailEntity> criteria, List<Predicate> predicates, Root<EmailEntity> root, EmailsFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<EmailEntity> criteria,
+        List<Predicate> predicates,
+        Root<EmailEntity> root,
+        EmailsFilter filter
+    ) {
+        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
             predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
@@ -36,6 +42,7 @@ public class EmailViewRepositoryImpl extends BaseRepository<EmailEntity, EmailsF
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
+            builder.desc(root.get("digitalId")),
             builder.desc(root.get("unifiedUuid")),
             builder.desc(root.get("uuid"))
         );

@@ -47,8 +47,8 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "type", constant = "RENTER")
     @Mapping(target = "orgName", source = "legalName")
     @Mapping(target = "secondName", source = "lastName")
-    @Mapping(target = "phones", source = "phoneNumbers", qualifiedByName = "toPhones")
-    @Mapping(target = "emails", source = "emails", qualifiedByName = "toEmails")
+    @Mapping(target = "phones", expression ="java(toPhones(renter.getPhoneNumbers(), renter.getDigitalId()))")
+    @Mapping(target = "emails", expression ="java(toEmails(renter.getEmails(), renter.getDigitalId()))")
     @Mapping(target = "legalType", source = "type", qualifiedByName = "toLegalType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "comment", ignore = true)
@@ -58,22 +58,24 @@ public interface RenterPartnerMapper extends BaseMapper {
     PartnerEntity toPartner(Renter renter);
 
     @Named("toPhones")
-    static List<PartnerPhoneEntity> toPhones(String phone) {
+    default List<PartnerPhoneEntity> toPhones(String phone, String digitalId) {
         if (phone == null) {
             return null;
         }
         var phoneEntity = new PartnerPhoneEntity();
         phoneEntity.setPhone(phone);
+        phoneEntity.setDigitalId(digitalId);
         return List.of(phoneEntity);
     }
 
     @Named("toEmails")
-    static List<PartnerEmailEntity> toEmails(String email) {
+    default List<PartnerEmailEntity> toEmails(String email, String digitalId) {
         if (email == null) {
             return null;
         }
         var emailEntity = new PartnerEmailEntity();
         emailEntity.setEmail(email);
+        emailEntity.setDigitalId(digitalId);
         return List.of(emailEntity);
     }
 

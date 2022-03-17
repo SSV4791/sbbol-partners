@@ -4,30 +4,36 @@ import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation.checkInn;
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation.checkOgrn;
+
 public class PartnerValidator implements Validator<Partner> {
 
-    private static final int KPP_VALID_LENGTH = 9;
-    private static final int INN_10_VALID_LENGTH = 10;
-    private static final int INN_12_VALID_LENGTH = 12;
-    private static final int OGRN_13_VALID_LENGTH = 13;
-    private static final int OGRN_15_VALID_LENGTH = 15;
-    private static final int[] INN_12_SYMBOL_CONTROL_KEY_ONE = {7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
-    private static final int[] INN_12_SYMBOL_CONTROL_KEY_TWO = {3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
-    private static final int[] INN_10_SYMBOL_CONTROL_KEY = {2, 4, 10, 3, 5, 9, 4, 6, 8};
+    public static final String DEFAULT_MESSAGE_FIELD_IS_NULL = "default.field.is_null";
+    public static final String DEFAULT_MESSAGE_FIELDS_IS_NULL = "default.fields.is_null";
+    public static final String DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER = "default.field.control_number";
+
+    public static final String LEGAL_FORM_LEGAL_ENTITY = "legalForm.LEGAL_ENTITY";
+    public static final String LEGAL_FORM_ENTREPRENEUR = "legalForm.ENTREPRENEUR";
+    public static final String LEGAL_FORM_PHYSICAL_PERSON = "legalForm.PHYSICAL_PERSON";
 
 
     @Override
     public List<String> validation(Partner entity) {
         var errors = new ArrayList<String>();
+        if (entity.getId() == null) {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "id"));
+        }
         if (entity.getDigitalId() == null) {
-            errors.add(MessagesTranslator.toLocale("default.field.is_null", "digitalId"));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "digitalId"));
         }
         if (entity.getLegalForm() == null) {
-            errors.add(MessagesTranslator.toLocale("default.field.is_null", "legalForm"));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "legalForm"));
         } else {
             checkLegalFormProperty(entity, errors);
         }
@@ -37,101 +43,40 @@ public class PartnerValidator implements Validator<Partner> {
     private void checkLegalFormProperty(Partner entity, ArrayList<String> errors) {
         if (entity.getLegalForm() == LegalForm.LEGAL_ENTITY) {
             if (entity.getOrgName() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "orgName", "legalForm.LEGAL_ENTITY"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "orgName", LEGAL_FORM_LEGAL_ENTITY));
             }
             if (entity.getInn() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "inn", "legalForm.LEGAL_ENTITY"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "inn", LEGAL_FORM_LEGAL_ENTITY));
             } else if (!checkInn(entity.getInn())) {
-                errors.add(MessagesTranslator.toLocale("default.field.control_number", "inn"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
             }
             if (entity.getKpp() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "kpp", "legalForm.LEGAL_ENTITY"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "kpp", LEGAL_FORM_LEGAL_ENTITY));
             } else {
-                if (entity.getKpp().length() != KPP_VALID_LENGTH) {
+                if (entity.getKpp().length() != BasePartnerValidation.KPP_VALID_LENGTH) {
                     errors.add(MessagesTranslator.toLocale("partner.kpp.length"));
                 }
             }
             if (entity.getOgrn() != null && !checkOgrn(entity.getOgrn())) {
-                errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ogrn"));
             }
         } else if (entity.getLegalForm() == LegalForm.ENTREPRENEUR) {
             if (entity.getOrgName() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "orgName", "legalForm.ENTREPRENEUR"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "orgName", LEGAL_FORM_ENTREPRENEUR));
             }
             if (entity.getInn() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "inn", "legalForm.ENTREPRENEUR"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "inn", LEGAL_FORM_ENTREPRENEUR));
             }
             if (entity.getOgrn() != null && !checkOgrn(entity.getOgrn())) {
-                errors.add(MessagesTranslator.toLocale("default.field.control_number", "ogrn"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ogrn"));
             }
         } else if (entity.getLegalForm() == LegalForm.PHYSICAL_PERSON) {
             if (entity.getFirstName() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "firstName", "legalForm.PHYSICAL_PERSON"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "firstName", LEGAL_FORM_PHYSICAL_PERSON));
             }
             if (entity.getSecondName() == null) {
-                errors.add(MessagesTranslator.toLocale("default.fields.is_null", "secondName", "legalForm.PHYSICAL_PERSON"));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "secondName", LEGAL_FORM_PHYSICAL_PERSON));
             }
         }
-    }
-
-    private static boolean checkInn(String inn) {
-        return switch (inn.length()) {
-            /*
-              1. Вычисляется контрольная сумма со следующими весовыми коэффициентами: (2,4,10,3,5,9,4,6,8) на 9 первых чисел ИНН
-              2. Вычисляется контрольное число как остаток от деления контрольной суммы на 11
-              3. Если контрольное число больше 9, то контрольное число вычисляется как остаток от деления контрольного числа на 10
-              4. Контрольное число проверяется с десятым знаком ИНН. В случае их равенства ИНН считается правильным.
-             */
-            case INN_10_VALID_LENGTH -> checkInn(inn, INN_10_SYMBOL_CONTROL_KEY);
-            /*
-              1. Вычисляется контрольная сумма по 11-ти знакам со следующими весовыми коэффициентами: (7,2,4,10,3,5,9,4,6,8) на 10 первых чисел ИНН
-              2. Вычисляется контрольное число(1) как остаток от деления контрольной суммы на 11
-              3. Если контрольное число(1) больше 9, то контрольное число(1) вычисляется как остаток от деления контрольного числа(1) на 10
-              4. Вычисляется контрольная сумма по 12-ти знакам со следующими весовыми коэффициентами: (3,7,2,4,10,3,5,9,4,6,8) на 11 первых чисел ИНН
-              5. Вычисляется контрольное число(2) как остаток от деления контрольной суммы на 11
-              6. Если контрольное число(2) больше 9, то контрольное число(2) вычисляется как остаток от деления контрольного числа(2) на 10
-              7. Контрольное число(1) проверяется с одиннадцатым знаком ИНН и контрольное число(2) проверяется с двенадцатым знаком ИНН.
-             */
-            case INN_12_VALID_LENGTH -> checkInn(inn, INN_12_SYMBOL_CONTROL_KEY_ONE) && checkInn(inn, INN_12_SYMBOL_CONTROL_KEY_TWO);
-            default -> false;
-        };
-    }
-
-    private static boolean checkInn(String inn, int[] control) {
-        int checkSum = 0;
-        for (int i = 0; i < control.length; i++) {
-            var checkSymbol = inn.substring(i, i + 1);
-            checkSum += Integer.parseInt(checkSymbol) * control[i];
-        }
-        return checkSum % 11 == Integer.parseInt(inn.substring(control.length, control.length + 1));
-    }
-
-    private static boolean checkOgrn(String ogrn) {
-        return switch (ogrn.length()) {
-            /*
-              1. Берем первые 12 чисел из 13
-              2. Получить остаток от деления первых 12 чисел из 13 на делить = 11 - это и будет контрольным числом
-              3. Если контрольное число/остаток больше 9, то считаем что контрольное число = последней цифре остатка (например 12 = 2)
-              4. Остаток от деления сравниваем с числом 13 ОГРН, если есть равенство, то ОГРН верный
-             */
-            case OGRN_13_VALID_LENGTH -> checkOgrn(ogrn, ogrnControlNumber(ogrn.substring(0, ogrn.length() - 1), 11));
-            /*
-              1. То же самое что для 13, только: Для вычисления необходимо брать первые 14 из 15 знаков и делитель будет = 13
-             */
-            case OGRN_15_VALID_LENGTH -> checkOgrn(ogrn, ogrnControlNumber(ogrn.substring(0, ogrn.length() - 1), 13));
-            default -> false;
-        };
-    }
-
-    private static boolean checkOgrn(String ogrn, long controlSum) {
-        int controlNum = Integer.parseInt(ogrn.substring(ogrn.length() - 1));
-        if (controlSum > 9) {
-            return controlNum == (controlSum % 10);
-        }
-        return controlNum == controlSum;
-    }
-
-    private static long ogrnControlNumber(String dividend, int divider) {
-        return Long.parseLong(dividend) % divider;
     }
 }

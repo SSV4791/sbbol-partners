@@ -1,12 +1,20 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountsPartner",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountChange",
   "type": "object",
   "title": "Счёт партнера",
   "properties": {
     "id": {
       "type": "string",
       "title": "Идентификатор счёта"
+    },
+    "partnerId": {
+      "type": "string",
+      "title": "Идентификатор партнера"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
     },
     "version": {
       "type": "integer",
@@ -43,5 +51,3 @@
     }
   }
 }
-
-

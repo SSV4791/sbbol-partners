@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse",
+  "javaType": "ru.sberbank.pprb.partners.model.DocumentsTypeResponse",
   "type": "object",
   "title": "Ответ на запрос видов документа",
   "properties": {

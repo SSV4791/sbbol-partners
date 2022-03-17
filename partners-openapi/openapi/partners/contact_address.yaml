@@ -16,7 +16,7 @@ paths:
       operationId: list
       requestBody:
         description: Фильтр для запроса адресов контактов
-        required: false
+        required: true
         content:
           application/json:
             schema:
@@ -49,7 +49,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -82,7 +82,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -105,15 +105,15 @@ paths:
     post:
       tags:
         - Contact Address
-      description: Создание адреса контакта
+      description: Создание адресов контакта
       operationId: create
       requestBody:
-        description: Адрес
+        description: Адреса
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/address/address.json'
+              $ref: 'model/address/address_create.json'
       responses:
         201:
           description: Успешный ответ
@@ -132,10 +132,10 @@ paths:
     put:
       tags:
         - Contact Address
-      description: Обновление адреса контакта
+      description: Обновление адресов контакта
       operationId: update
       requestBody:
-        description: Адрес
+        description: Адреса
         required: true
         content:
           application/json:

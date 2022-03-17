@@ -17,7 +17,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 
 class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
 
-    public static final String baseRoutePath = "/partners";
+    public static final String baseRoutePath = "/partner";
 
     @Test
     void testGetPartner() {
@@ -54,7 +54,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size()).isEqualTo(1);
@@ -79,7 +79,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
                 .count(2)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())

@@ -5,6 +5,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
@@ -46,7 +47,7 @@ abstract class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
-    public PhoneResponse savePhone(Phone phone) {
+    public PhoneResponse savePhone(PhoneCreate phone) {
         var phoneEntity = phoneMapper.toPhone(phone);
         PhoneEntity savedPhone = phoneRepository.save(phoneEntity);
         var response = phoneMapper.toPhone(savedPhone);
@@ -56,7 +57,7 @@ abstract class PhoneServiceImpl implements PhoneService {
     @Override
     public PhoneResponse updatePhone(Phone phone) {
         var uuid = UUID.fromString(phone.getId());
-        var foundPhone = phoneRepository.getByUuid(uuid);
+        var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid);
         if (foundPhone == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, uuid);
         }
@@ -68,7 +69,7 @@ abstract class PhoneServiceImpl implements PhoneService {
 
     @Override
     public void deletePhone(String digitalId, String id) {
-        var foundPhone = phoneRepository.getByUuid(UUID.fromString(id));
+        var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundPhone == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
         }

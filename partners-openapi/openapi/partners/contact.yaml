@@ -8,11 +8,11 @@ servers:
   - url: /
 
 paths:
-  /partner/contacts/{digitalId}/{id}:
+  /partner/contact/{digitalId}/{id}:
     get:
       tags:
         - Partner Contacts
-      description: Получение Контакта по его идентификатору
+      description: Получение Контактов по его идентификатору
       operationId: get-by-id
       parameters:
         - name: digitalId
@@ -20,7 +20,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -53,7 +53,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -76,15 +76,15 @@ paths:
     post:
       tags:
         - Partner Contacts
-      description: Создание контакта
+      description: Создание контактов
       operationId: create
       requestBody:
-        description: Контакт
+        description: Контакты
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/contact/contact.json'
+              $ref: 'model/contact/contact_create.json'
       responses:
         201:
           description: Успешный ответ
@@ -103,10 +103,10 @@ paths:
     put:
       tags:
         - Partner Contacts
-      description: Обновление Контакта
+      description: Обновление Контактов
       operationId: update
       requestBody:
-        description: Контакт
+        description: Контакты
         required: true
         content:
           application/json:

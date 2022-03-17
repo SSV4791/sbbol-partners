@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.Contacts",
+  "type": "object",
+  "title": "Контакты партнера",
+  "properties": {
+    "contacts": {
+      "type": "array",
+      "title": "Контакты партнера",
+      "items": {
+        "$ref": "contact.json"
+      }
+    }
+  }
+}
+

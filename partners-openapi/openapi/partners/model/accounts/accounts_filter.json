@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.AccountFilter",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountFilter",
   "type": "object",
   "title": "Фильтр счетов Партнеров",
   "properties": {
@@ -22,7 +22,7 @@
     },
     "search": {
       "title": "Поиск счета по номеру",
-      "type": "string",
+      "type": "object",
       "$ref": "../search/search_accounts.json"
     },
     "pagination": {

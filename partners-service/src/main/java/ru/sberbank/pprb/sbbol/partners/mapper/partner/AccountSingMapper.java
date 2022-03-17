@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
@@ -31,6 +30,7 @@ public interface AccountSingMapper extends BaseMapper {
     @Mapping(target = "externalDataFileId", source = "externalDataFileId")
     @Mapping(target = "externalDataSignFileId", source = "externalDataSignFileId")
     @Mapping(target = "dateTimeOfSign", source = "dateTimeOfSign")
+    @Mapping(target = "signProfileId", ignore = true)
     AccountSignDetail toSignAccount(SignEntity sign);
 
     @Mapping(target = "digitalId", source = "digitalId")

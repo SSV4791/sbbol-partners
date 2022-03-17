@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -38,7 +37,6 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
@@ -228,8 +226,12 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
-    DocumentService contactDocumentService(ContactRepository contactRepository, DocumentRepository documentRepository) {
-        return new ContactDocumentServiceImpl(contactRepository, documentRepository, documentMapper());
+    DocumentService contactDocumentService(
+        ContactRepository contactRepository,
+        DocumentRepository documentRepository,
+        DocumentDictionaryRepository documentDictionaryRepository
+    ) {
+        return new ContactDocumentServiceImpl(contactRepository, documentRepository, documentDictionaryRepository, documentMapper());
     }
 
     @Bean
@@ -254,8 +256,12 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
-    DocumentService partnerDocumentService(PartnerRepository partnerRepository, DocumentRepository documentRepository) {
-        return new PartnerDocumentServiceImpl(partnerRepository, documentRepository, documentMapper());
+    DocumentService partnerDocumentService(
+        PartnerRepository partnerRepository,
+        DocumentRepository documentRepository,
+        DocumentDictionaryRepository documentDictionaryRepository
+    ) {
+        return new PartnerDocumentServiceImpl(partnerRepository, documentRepository, documentDictionaryRepository, documentMapper());
     }
 
     @Bean

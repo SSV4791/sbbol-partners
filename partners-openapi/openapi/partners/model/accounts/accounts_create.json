@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.ufs.partner.model.AccountsCreate",
+  "type": "object",
+  "title": "Счета партнера",
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "title": "Счета партнера",
+      "items": {
+        "$ref": "account_create.json"
+      }
+    }
+  }
+}

@@ -4,7 +4,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.MergeHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ReplicationHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -12,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
@@ -19,7 +19,6 @@ import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyFilter;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyView;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.ListResponse;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.MergeHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ReplicationHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationHistoryService;
@@ -141,7 +140,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public PartnerResponse savePartner(Partner partner) {
+    public PartnerResponse savePartner(PartnerCreate partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
         var response = partnerMapper.toPartner(savePartner);

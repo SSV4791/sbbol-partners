@@ -36,8 +36,11 @@ public abstract class BaseConfiguration {
     public static class StringManufacturerImpl extends StringTypeManufacturerImpl {
         @Override
         public String getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata, Map<String, Type> genericTypesArgumentsMap) {
+            if (attributeMetadata.getAttributeName() == null) {
+                return super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
+            }
             return switch (attributeMetadata.getAttributeName()) {
-                case "id", "uuid", "unifiedId", "entityId", "partnerId", "partnerAccountId", "accountId", "bankId" -> UUID.randomUUID().toString();
+                case "id", "uuid", "unifiedId", "entityId", "partnerId", "partnerAccountId", "accountId", "bankId", "documentTypeId" -> UUID.randomUUID().toString();
                 case "phone" -> "007" + randomNumeric(9);
                 default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
             };

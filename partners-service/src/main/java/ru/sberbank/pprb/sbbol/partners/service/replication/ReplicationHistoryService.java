@@ -2,7 +2,8 @@ package ru.sberbank.pprb.sbbol.partners.service.replication;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 
@@ -46,7 +47,7 @@ public interface ReplicationHistoryService {
      * @param account      Счёт на обновление
      * @param savedAccount Сохранённый счёт
      */
-    void saveCounterparty(PartnerEntity partner, Account account, AccountEntity savedAccount);
+    void saveCounterparty(PartnerEntity partner, AccountCreate account, AccountEntity savedAccount);
 
     /**
      * Сохранить счёт по истории репликации
@@ -55,14 +56,14 @@ public interface ReplicationHistoryService {
      * @param sbbolUpdatedCounterparty Обновленный в СББОЛ контрагент
      * @return Идентификатор счёта
      */
-    UUID saveAccount(Account account, Counterparty sbbolUpdatedCounterparty);
+    UUID saveAccount(AccountCreate account, Counterparty sbbolUpdatedCounterparty);
 
     /**
      * Обновить контрагент по истории репликации
      *
      * @param account Счёт для обновления
      */
-    void updateCounterparty(Account account);
+    void updateCounterparty(AccountChange account);
 
     /**
      * Обновить счёт по истории репликации
@@ -71,7 +72,7 @@ public interface ReplicationHistoryService {
      * @param sbbolUpdatedCounterparty Контрагент
      * @return Идентификатор счёта
      */
-    UUID updateAccount(Account account, Counterparty sbbolUpdatedCounterparty);
+    UUID updateAccount(AccountChange account, Counterparty sbbolUpdatedCounterparty);
 
     /**
      * Удалить счёт по истории репликации

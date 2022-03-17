@@ -4,15 +4,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
-import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 
 import java.util.List;
@@ -20,11 +19,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidSignedAccount;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountSign;
 
 class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
-    public static final String baseRoutePath = "/partners";
+    public static final String baseRoutePath = "/partner";
 
     @Test
     void testGetPartner() {
@@ -64,7 +63,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -94,7 +93,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -122,7 +121,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -152,7 +151,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -182,7 +181,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -209,7 +208,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -236,7 +235,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -263,7 +262,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -291,7 +290,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -304,7 +303,8 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
-        createValidSignedAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
+        var validAccount = createValidAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
+        createValidAccountSign(createdPartner1.getPartner().getDigitalId(), validAccount.getId());
 
         var createdPartner2 = createPost(baseRoutePath, getValidEntrepreneurPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner2)
@@ -319,7 +319,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -350,7 +350,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(2)
         );
 
-        var response = post(baseRoutePath + "/view", filter, PartnersResponse.class);
+        var response = post("/partners/view", filter, PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -435,13 +435,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
-    public static Partner getValidPartner() {
+    public static PartnerCreate getValidPartner() {
         return getValidPartner(RandomStringUtils.randomAlphabetic(10));
     }
 
-    public static Partner getValidPartner(String digitalId) {
-        return new Partner()
-            .version(0L)
+    public static PartnerCreate getValidPartner(String digitalId) {
+        return new PartnerCreate()
             .digitalId(digitalId)
             .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName("Наименование компании")
@@ -454,38 +453,37 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .okpo("444444")
             .phones(
                 List.of(
-                    new Phone().phone("+79241111111")
-                        .version(0L)
+                    "+79241111111"
                 ))
-            .emails(List.of(
-                new Email().email("a.a.a@sberbank.ru")
-                    .version(0L)
-            ))
+            .emails(
+                List.of(
+                    "a.a.a@sberbank.ru"
+                ))
             .comment("555555")
             ;
     }
 
-    private static Partner getValidPhysicalPersonPartner(String digitalId) {
+    private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {
         var partner = getValidPartner(digitalId);
         partner.setLegalForm(LegalForm.PHYSICAL_PERSON);
         return partner;
     }
 
-    private static Partner getValidEntrepreneurPartner(String digitalId) {
+    private static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
         var partner = getValidPartner(digitalId);
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
         return partner;
     }
 
     protected static Partner createValidPartner() {
-        var createPartner = createPost("/partners", getValidPartner(), PartnerResponse.class);
+        var createPartner = createPost("/partner", getValidPartner(), PartnerResponse.class);
         assertThat(createPartner)
             .isNotNull();
         return createPartner.getPartner();
     }
 
     protected static Partner createValidPartner(String digitalId) {
-        var createPartner = createPost("/partners", getValidPartner(digitalId), PartnerResponse.class);
+        var createPartner = createPost("/partner", getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createPartner)
             .isNotNull();
         return createPartner.getPartner();
@@ -494,7 +492,6 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     private static Error createNotValidPartner() {
         var partner = getValidPartner();
         partner.setInn("222222");
-
-        return createBadRequestPost("/partners", partner, Error.class);
+        return createBadRequestPost("/partner", partner);
     }
 }

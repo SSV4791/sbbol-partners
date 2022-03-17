@@ -5,11 +5,15 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ReplicationHistoryEntity;
+import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
@@ -141,7 +145,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse saveAccount(Account account) {
+    public AccountResponse saveAccount(AccountCreate account) {
         if (legacySbbolAdapter.checkMigration(account.getDigitalId())) {
             var partner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
             if (partner == null) {
@@ -154,7 +158,7 @@ public class AccountServiceImpl implements AccountService {
             return new AccountResponse().account(response);
         } else {
             if (CollectionUtils.isEmpty(account.getBanks())) {
-                throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ не возможно, поле банк обязательно для заполнния"));
+                throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ не возможно, поле банк обязательно для заполнения"));
             }
             Counterparty sbbolCounterparty = legacySbbolAdapter.getByPprbGuid(account.getDigitalId(), account.getPartnerId());
             if (sbbolCounterparty == null) {
@@ -170,7 +174,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse updateAccount(Account account) {
+    public AccountResponse updateAccount(AccountChange account) {
         if (legacySbbolAdapter.checkMigration(account.getDigitalId())) {
             var saveAccount = partnerUtils.updatePartnerAccount(account);
             var mappedAccount = accountMapper.toAccount(saveAccount, budgetMaskService);
@@ -198,5 +202,25 @@ public class AccountServiceImpl implements AccountService {
             partnerUtils.deleteCounterpartyAndReplicationHistory(digitalId, id, true);
             replicationHistoryService.deleteAccount(digitalId, id);
         }
+    }
+
+    @Override
+    @Transactional
+    public AccountResponse changePriority(AccountPriority accountPriority) {
+        var digitalId = accountPriority.getDigitalId();
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountPriority.getId()));
+        if (foundAccount == null) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountPriority.getId());
+        }
+        if (accountPriority.getPriorityAccount()) {
+            var foundAccounts = accountRepository.findByDigitalIdAndPriorityAccountIsTrue(digitalId);
+            if (!CollectionUtils.isEmpty(foundAccounts)) {
+                throw new BadRequestException("У пользователя digitalId: " + digitalId + "Уже есть приоритетные счета");
+            }
+        }
+        foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());
+        var savedAccount = accountRepository.save(foundAccount);
+        var account = accountMapper.toAccount(savedAccount, budgetMaskService);
+        return new AccountResponse().account(account);
     }
 }

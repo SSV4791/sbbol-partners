@@ -4,9 +4,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
+import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -28,7 +30,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         var actualDocument =
             get(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -100,7 +102,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         String newName = "Новое номер";
-        var updateDocument = new Document();
+        var updateDocument = new DocumentChange();
         updateDocument.id(document.getId());
         updateDocument.digitalId(document.getDigitalId());
         updateDocument.unifiedId(document.getUnifiedId());
@@ -121,7 +123,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         var actualDocument =
             get(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -134,7 +136,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
         var deleteDocument =
             delete(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getId()
             );
         assertThat(deleteDocument)
@@ -142,7 +144,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
         var searchDocument =
             getNotFound(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 Error.class,
                 document.getDigitalId(), document.getId()
             );
@@ -163,23 +165,19 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         return response.getDocument();
     }
 
-    private static Document getValidPartnerDocument(String partnerUuid, String digitalId) {
-        return new Document()
-            .version(0L)
+    private static DocumentCreate getValidPartnerDocument(String partnerUuid, String digitalId) {
+        return new DocumentCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .certifierName("Имя")
-            .certifierType(Document.CertifierTypeEnum.NOTARY)
+            .certifierType(CertifierType.NOTARY)
             .dateIssue(LocalDate.now())
             .divisionCode("1111")
+            .divisionIssue("444")
             .number("23")
-            .documentType(
-                new DocumentType()
-                    .id("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2")
-                    .description("Паспорт моряка (удостоверение личности моряка)")
-                    .deleted(false)
-                    .documentType("SEAMAN_PASSPORT")
-            )
+            .series("111")
+            .positionCertifier("12345")
+            .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2")
             ;
     }
 }

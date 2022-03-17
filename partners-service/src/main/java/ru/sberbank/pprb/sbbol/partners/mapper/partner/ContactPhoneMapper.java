@@ -10,7 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Phone;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ContactPhoneMapper extends BaseMapper {
 
-    @Mapping(target = "id", expression = "java(phone.getUuid().toString())")
+    @Mapping(target = "id", expression = "java(phone.getUuid() == null ? null : phone.getUuid().toString())")
     @Mapping(target = "unifiedId", expression = "java(phone.getHashKey())")
     Phone toPhone(ContactPhoneEntity phone);
 

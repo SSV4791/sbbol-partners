@@ -25,6 +25,9 @@ public class MigrationPartnerPhoneEntity extends MigrationBaseEntity {
     @JoinColumn(name = "unified_uuid")
     private MigrationPartnerEntity partner;
 
+    @Column(name = "digital_id")
+    private String digitalId;
+
     @Column(name = "phone", length = 50)
     private String phone;
 
@@ -34,6 +37,14 @@ public class MigrationPartnerPhoneEntity extends MigrationBaseEntity {
 
     public void setPartner(MigrationPartnerEntity partner) {
         this.partner = partner;
+    }
+
+    public String getDigitalId() {
+        return digitalId;
+    }
+
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
     }
 
     public String getPhone() {

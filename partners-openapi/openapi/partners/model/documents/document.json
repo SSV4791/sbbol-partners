@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Document",
+  "javaType": "ru.sberbank.pprb.partners.model.Document",
   "type": "object",
   "title": "Документ",
   "properties": {
@@ -55,12 +55,7 @@
       "title": "Должность удостоверяющего сотрудника"
     },
     "certifierType": {
-      "type": "string",
-      "title": "Тип удостоверяющего сотрудника",
-      "enum": [
-        "NOTARY",
-        "UNKNOWN"
-      ]
+      "$ref": "../common/certifier_type.json"
     }
   }
 }

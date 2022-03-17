@@ -1,17 +1,23 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +40,46 @@ class PartnerMapperTest extends BaseConfiguration {
     @Test
     void toPartner() {
         Partner expected = factory.manufacturePojo(Partner.class);
+        PartnerEntity partnerEntity = mapper.toPartner(expected);
+        Partner actual = mapper.toPartner(partnerEntity);
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "phones",
+                "emails"
+            )
+            .isEqualTo(actual);
+    }
+
+    @Test
+    void testToPartnerPhoneString() {
+        List<String> phones = factory.manufacturePojo(ArrayList.class, String.class);
+        var digitalId = RandomStringUtils.randomAlphanumeric(10);
+        List<PartnerPhoneEntity> actual = mapper.toPhone(phones, digitalId);
+        for (PartnerPhoneEntity partnerPhone : actual) {
+            assertThat(partnerPhone.getDigitalId())
+                .isEqualTo(digitalId);
+            assertThat(phones)
+                .contains(partnerPhone.getPhone());
+        }
+    }
+
+    @Test
+    void testToPartnerEmailString() {
+        List<String> emails = factory.manufacturePojo(ArrayList.class, String.class);
+        var digitalId = RandomStringUtils.randomAlphanumeric(10);
+        List<PartnerEmailEntity> actual = mapper.toEmail(emails, digitalId);
+        for (PartnerEmailEntity partnerEmail : actual) {
+            assertThat(partnerEmail.getDigitalId())
+                .isEqualTo(digitalId);
+            assertThat(emails)
+                .contains(partnerEmail.getEmail());
+        }
+    }
+
+    @Test
+    void toPartnerCreate() {
+        PartnerCreate expected = factory.manufacturePojo(PartnerCreate.class);
         PartnerEntity partnerEntity = mapper.toPartner(expected);
         Partner actual = mapper.toPartner(partnerEntity);
         assertThat(expected)

@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.PartnerCreate",
+  "type": "object",
+  "title": "Партнер",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации партнера"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя партнера"
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия партнера"
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество партнера"
+    },
+    "inn": {
+      "type": "string",
+      "title": "ИНН"
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП"
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН"
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО"
+    },
+    "phones": {
+      "type": "array",
+      "title": "Номера телефона контакта",
+      "items": {
+        "type": "string"
+      }
+    },
+    "emails": {
+      "type": "array",
+      "title": "Номера телефона контакта",
+      "items": {
+        "type": "string"
+      }
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий пользователя"
+    },
+    "citizenship": {
+      "type": "string",
+      "title": "Гражданство партнера",
+      "enum": [
+        "UNKNOWN",
+        "RUSSIA",
+        "ANOTHER_COUNTRY"
+      ]
+    }
+  }
+}

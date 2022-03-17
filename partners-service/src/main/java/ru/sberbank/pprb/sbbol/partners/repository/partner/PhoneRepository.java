@@ -14,8 +14,9 @@ public interface PhoneRepository extends CrudRepository<PhoneEntity, UUID>, Phon
     /**
      * Получение телефона
      *
-     * @param uuid Идентификатор документа
+     * @param digitalId Идентификатор личного кабинета
+     * @param uuid      Идентификатор документа
      * @return Телефон
      */
-    PhoneEntity getByUuid(UUID uuid);
+    PhoneEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
 }

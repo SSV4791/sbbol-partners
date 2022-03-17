@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,6 +18,20 @@ class EmailMapperTest extends BaseConfiguration {
         var actual = mapper.toEmail(expected);
         assertThat(expected)
             .usingRecursiveComparison()
+            .isEqualTo(mapper.toEmail(actual));
+    }
+
+    @Test
+    void toEmailCreate() {
+        var expected = factory.manufacturePojo(EmailCreate.class);
+        var actual = mapper.toEmail(expected);
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "id",
+                "digitalId",
+                "version"
+            )
             .isEqualTo(mapper.toEmail(actual));
     }
 }

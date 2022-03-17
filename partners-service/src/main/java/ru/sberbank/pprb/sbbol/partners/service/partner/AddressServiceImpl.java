@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
@@ -62,7 +63,7 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressResponse saveAddress(Address address) {
+    public AddressResponse saveAddress(AddressCreate address) {
         var requestAddress = addressMapper.toAddress(address);
         var saveAddress = addressRepository.save(requestAddress);
         var response = addressMapper.toAddress(saveAddress);

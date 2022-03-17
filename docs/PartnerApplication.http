@@ -74,3 +74,23 @@ Content-Type: application/json
         "count": 1
     }
 }
+
+###
+POST http://ci02281165-sbbol-partners.apps.dev-gen2.sigma.sbrf.ru/partner/contact/address
+Content-Type: application/json
+
+{
+
+"type": "LEGAL_ADDRESS",
+"digitalId": "6933363154490000000",
+
+"zipCode": "112344",
+"region": "Регион",
+"regionCode": "0332",
+"city": "МоскоуСити",
+"location": "РусиаЛокатион",
+"street": "КутузСтрит",
+"building": "32Билдин",
+"buildingBlock": "1Строение",
+"flat": "ФлатХз что"
+}

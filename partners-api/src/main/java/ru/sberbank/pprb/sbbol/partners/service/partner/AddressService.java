@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Address;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
@@ -34,7 +35,7 @@ public interface AddressService {
      * @param address данные адреса
      * @return Адрес
      */
-    AddressResponse saveAddress(Address address);
+    AddressResponse saveAddress(AddressCreate address);
 
     /**
      * Обновление адреса

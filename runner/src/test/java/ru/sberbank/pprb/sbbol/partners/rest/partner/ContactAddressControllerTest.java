@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
@@ -167,9 +168,8 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         return response.getAddress();
     }
 
-    private static Address getValidPartnerAddress(String partnerUuid, String digitalId) {
-        return new Address()
-            .version(0L)
+    private static AddressCreate getValidPartnerAddress(String partnerUuid, String digitalId) {
+        return new AddressCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .building("1")
@@ -180,7 +180,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
             .region("6")
             .regionCode("7")
             .street("8")
-            .type(Address.TypeEnum.LEGAL_ADDRESS)
+            .type(AddressCreate.TypeEnum.LEGAL_ADDRESS)
             .zipCode("9")
             ;
     }

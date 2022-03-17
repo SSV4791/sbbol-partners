@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends CrudRepository<AccountEntity, UUID>, AccountViewRepository, AccountSignViewRepository, AccountBudgetViewRepository {
+public interface AccountRepository
+    extends CrudRepository<AccountEntity, UUID>, AccountViewRepository, AccountSignViewRepository, AccountBudgetViewRepository {
 
     /**
      * Получение счёта Партнера
@@ -31,4 +32,12 @@ public interface AccountRepository extends CrudRepository<AccountEntity, UUID>, 
      * @return Счёта партнера
      */
     List<AccountEntity> findByDigitalIdAndState(String digitalId, AccountStateType state);
+
+    /**
+     * Поиск счетов Партнеров c признаком приоритетных
+     *
+     * @param digitalId Идентификатор личного кабинета
+     * @return Счёта партнера
+     */
+    List<AccountEntity> findByDigitalIdAndPriorityAccountIsTrue(String digitalId);
 }

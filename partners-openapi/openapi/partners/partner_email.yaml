@@ -16,7 +16,7 @@ paths:
       operationId: list
       requestBody:
         description: Фильтр для запроса email адресов контактов
-        required: false
+        required: true
         content:
           application/json:
             schema:
@@ -49,7 +49,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор личного кабинета
+          description: Идентификатор личного кабинета
         - name: id
           in: path
           required: true
@@ -75,12 +75,12 @@ paths:
       description: Создание email адреса контакта
       operationId: create
       requestBody:
-        description: Адрес
+        description: Адреса
         required: true
         content:
           application/json:
             schema:
-              $ref: 'model/email/email.json'
+              $ref: 'model/email/email_create.json'
       responses:
         201:
           description: Успешный ответ
@@ -102,7 +102,7 @@ paths:
       description: Обновление email адреса контакта
       operationId: update
       requestBody:
-        description: Email
+        description: Emails
         required: true
         content:
           application/json:

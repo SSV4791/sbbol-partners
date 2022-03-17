@@ -27,6 +27,6 @@ public class ContactPhoneServiceImpl extends PhoneServiceImpl {
         if (partner == null) {
             throw new EntryNotFoundException("contact", uuid);
         }
-        return super.savePhone(phone);
+        return super.updatePhone(phone);
     }
 }

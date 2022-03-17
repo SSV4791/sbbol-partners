@@ -7,11 +7,17 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(
     componentModel = "spring",
@@ -32,6 +38,35 @@ public interface ContactMapper extends BaseMapper {
     @Named("toLegalType")
     static LegalForm toLegalType(LegalType legalType) {
         return legalType != null ? LegalForm.valueOf(legalType.name()) : null;
+    }
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
+    @Mapping(target = "emails", expression = "java(toEmail(contact.getEmails(), contact.getDigitalId()))")
+    @Mapping(target = "phones", expression = "java(toPhone(contact.getPhones(), contact.getDigitalId()))")
+    @Mapping(target = "type", source = "legalForm", qualifiedByName = "toLegalType")
+    ContactEntity toContact(ContactCreate contact);
+
+    default List<ContactEmailEntity> toEmail(List<String> emails, String digitalId) {
+        return emails.stream()
+            .map(value -> {
+                var contactEmail = new ContactEmailEntity();
+                contactEmail.setEmail(value);
+                contactEmail.setDigitalId(digitalId);
+                return contactEmail;
+            }).collect(Collectors.toList());
+    }
+
+
+    default List<ContactPhoneEntity> toPhone(List<String> phones, String digitalId) {
+        return phones.stream()
+            .map(value -> {
+                var contactPhone = new ContactPhoneEntity();
+                contactPhone.setPhone(value);
+                contactPhone.setDigitalId(digitalId);
+                return contactPhone;
+            }).collect(Collectors.toList());
     }
 
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")

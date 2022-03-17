@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
@@ -21,7 +21,7 @@ public class PartnerPhoneServiceImpl extends PhoneServiceImpl {
     }
 
     @Override
-    public PhoneResponse savePhone(Phone phone) {
+    public PhoneResponse savePhone(PhoneCreate phone) {
         var uuid = UUID.fromString(phone.getUnifiedId());
         var partner = partnerRepository.getByUuid(uuid);
         if (partner == null) {

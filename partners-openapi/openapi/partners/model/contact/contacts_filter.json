@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.ContactFilter",
+  "javaType": "ru.sberbank.pprb.partners.model.ContactFilter",
   "type": "object",
   "title": "Фильтр контактов партнера",
   "properties": {

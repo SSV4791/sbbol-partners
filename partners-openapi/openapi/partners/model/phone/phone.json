@@ -1,12 +1,16 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.sbbol.partners.model.Phone",
+  "javaType": "ru.sberbank.pprb.partners.model.Phone",
   "type": "object",
   "title": "Телефон",
   "properties": {
     "id": {
       "type": "string",
       "title": "Идентификатор телефона"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
     },
     "unifiedId": {
       "type": "string",

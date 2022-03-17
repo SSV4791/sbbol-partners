@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.Document",
+  "type": "object",
+  "title": "Документ",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета"
+    },
+    "unifiedId": {
+      "type": "string",
+      "title": "Идентификатор партнера или контакта"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "documentTypeId": {
+      "type": "string",
+      "title": "Идентификатор типа документа"
+    },
+    "series": {
+      "type": "string",
+      "title": "Серия документа"
+    },
+    "number": {
+      "type": "string",
+      "title": "Номер документа"
+    },
+    "dateIssue": {
+      "type": "string",
+      "format": "date",
+      "title": "Дата выдачи документа"
+    },
+    "divisionIssue": {
+      "type": "string",
+      "title": "Место выдачи документа"
+    },
+    "divisionCode": {
+      "type": "string",
+      "title": "Код документа"
+    },
+    "certifierName": {
+      "type": "string",
+      "title": "Имя удостоверяющего сотрудника"
+    },
+    "positionCertifier": {
+      "type": "string",
+      "title": "Должность удостоверяющего сотрудника"
+    },
+    "certifierType": {
+      "$ref": "../common/certifier_type.json"
+    }
+  }
+}
+

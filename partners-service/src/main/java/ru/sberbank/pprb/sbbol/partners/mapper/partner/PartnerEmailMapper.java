@@ -10,7 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Email;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PartnerEmailMapper extends BaseMapper {
 
-    @Mapping(target = "id", expression = "java(email.getUuid().toString())")
+    @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
     @Mapping(target = "unifiedId", expression = "java(email.getHashKey())")
     Email toEmail(PartnerEmailEntity email);
 

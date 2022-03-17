@@ -26,6 +26,6 @@ public class ContactEmailServiceImpl extends EmailServiceImpl {
         if (partner == null) {
             throw new EntryNotFoundException("partner", UUID.fromString(email.getUnifiedId()));
         }
-        return super.saveEmail(email);
+        return super.updateEmail(email);
     }
 }
