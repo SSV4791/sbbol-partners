@@ -12,7 +12,8 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ReplicationHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
@@ -119,7 +120,7 @@ public class ReplicationHistoryServiceImpl implements ReplicationHistoryService 
     }
 
     @Override
-    public void saveCounterparty(PartnerEntity partner, Account account, AccountEntity savedAccount) {
+    public void saveCounterparty(PartnerEntity partner, AccountCreate account, AccountEntity savedAccount) {
         Counterparty counterparty = counterpartyMapper.toCounterparty(partner, account);
         try {
             Counterparty sbbolUpdatedCounterparty = partnerUtils.createOrUpdateCounterparty(counterparty, account);
@@ -130,7 +131,7 @@ public class ReplicationHistoryServiceImpl implements ReplicationHistoryService 
     }
 
     @Override
-    public UUID saveAccount(Account account, Counterparty sbbolUpdatedCounterparty) {
+    public UUID saveAccount(AccountCreate account, Counterparty sbbolUpdatedCounterparty) {
         var requestAccount = accountMapper.toAccount(account);
         UUID accountUuid = null;
         try {
@@ -144,12 +145,15 @@ public class ReplicationHistoryServiceImpl implements ReplicationHistoryService 
     }
 
     @Override
-    public void updateCounterparty(Account account) {
-        List<ReplicationHistoryEntity> replicationHistoryEntityList = replicationHistoryRepository.findByAccountUuid(UUID.fromString(account.getId()));
+    public void updateCounterparty(AccountChange account) {
+        List<ReplicationHistoryEntity> replicationHistoryEntityList =
+            replicationHistoryRepository.findByAccountUuid(UUID.fromString(account.getId()));
         if (CollectionUtils.isEmpty(replicationHistoryEntityList)) {
             return;
         }
-        List<String> sbbolGuids = replicationHistoryEntityList.stream().map(ReplicationHistoryEntity::getSbbolGuid).filter(Objects::nonNull).collect(Collectors.toList());
+        List<String> sbbolGuids = replicationHistoryEntityList.stream()
+            .map(ReplicationHistoryEntity::getSbbolGuid)
+            .filter(Objects::nonNull).collect(Collectors.toList());
         for (String sbbolGuid : sbbolGuids) {
             try {
                 Counterparty sbbolCounterparty = legacySbbolAdapter.getByPprbGuid(account.getDigitalId(), sbbolGuid);
@@ -161,7 +165,7 @@ public class ReplicationHistoryServiceImpl implements ReplicationHistoryService 
     }
 
     @Override
-    public UUID updateAccount(Account account, Counterparty sbbolUpdatedCounterparty) {
+    public UUID updateAccount(AccountChange account, Counterparty sbbolUpdatedCounterparty) {
         UUID accountUuid = null;
         if (account.getId() == null) {
             return accountUuid;
@@ -262,7 +266,9 @@ public class ReplicationHistoryServiceImpl implements ReplicationHistoryService 
     private void updateReplicationHistory(UUID partnerUuid, UUID accountUuid, UUID bankUuid, UUID bankAccountUuid, String sbbolGuid) {
         List<ReplicationHistoryEntity> replicationHistoryEntityList = replicationHistoryRepository.findByPartnerUuid(partnerUuid);
         var replicationHistory = new ReplicationHistoryEntity();
-        if (!CollectionUtils.isEmpty(replicationHistoryEntityList) && replicationHistoryEntityList.size() == 1 && replicationHistoryEntityList.get(0).getAccountUuid() == null) {
+        if (!CollectionUtils.isEmpty(replicationHistoryEntityList) &&
+                replicationHistoryEntityList.size() == 1 &&
+                replicationHistoryEntityList.get(0).getAccountUuid() == null) {
             replicationHistory = replicationHistoryEntityList.get(0);
         } else {
             replicationHistory.setPartnerUuid(partnerUuid);

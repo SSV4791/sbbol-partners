@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
@@ -23,6 +24,16 @@ public class ContactEmailMapperTest extends BaseConfiguration {
             .usingRecursiveComparison()
             .ignoringFields("unifiedId")
             .isEqualTo(mapper.toEmail(actual));
+    }
+
+    @Test
+    void testToEmailString() {
+        var expected = RandomStringUtils.randomAlphabetic(10);
+        ContactEmailEntity actual = mapper.toEmail(expected);
+        actual.setContact(factory.manufacturePojo(ContactEntity.class));
+        var email = mapper.toEmail(actual);
+        assertThat(expected)
+            .isEqualTo(email.getEmail());
     }
 
     @Test

@@ -19,6 +19,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
+import ru.sberbank.pprb.sbbol.partners.model.Error;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -133,7 +134,7 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
-    protected static <T, BODY> T createBadRequestPost(String url, BODY body, Class<T> response) {
+    protected static <BODY> Error createBadRequestPost(String url, BODY body) {
         return given()
             .spec(requestSpec)
             .body(body)
@@ -142,7 +143,7 @@ public abstract class AbstractIntegrationTest {
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
-            .as(response);
+            .as(Error.class);
     }
 
     protected static <T, BODY> T post(String url, BODY body, Class<T> response) {
@@ -190,6 +191,18 @@ public abstract class AbstractIntegrationTest {
             .spec(responseSpec)
             .extract()
             .as(response);
+    }
+
+    protected static <BODY> Error createBadRequestPut(String url, BODY body) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .put(url)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
     }
 
     protected static ResponseBody<?> delete(String url, Object... params) {

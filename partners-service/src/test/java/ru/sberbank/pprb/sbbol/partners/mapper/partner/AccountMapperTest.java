@@ -7,7 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
-import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
@@ -21,14 +21,8 @@ public class AccountMapperTest extends BaseConfiguration {
     private static final AccountMapper mapper = Mappers.getMapper(AccountMapper.class);
 
     @Test
-    void testToAccount() {
-        var expected = factory.manufacturePojo(Account.class);
-        for (var bank : expected.getBanks()) {
-            bank.setPartnerAccountId(expected.getId());
-            for (var bankAccount : bank.getBankAccounts()) {
-                bankAccount.setBankId(bank.getId());
-            }
-        }
+    void testToAccountCreate() {
+        var expected = factory.manufacturePojo(AccountCreate.class);
         var account = mapper.toAccount(expected);
         for (var bank : account.getBanks()) {
             bank.setAccount(account);
@@ -39,10 +33,12 @@ public class AccountMapperTest extends BaseConfiguration {
         var actual = mapper.toAccount(account, Mockito.mock(BudgetMaskService.class));
         assertThat(expected)
             .usingRecursiveComparison()
-            .ignoringFields("budget")
+            .ignoringFields(
+                "budget",
+                "banks.mediary"
+            )
             .isEqualTo(actual);
     }
-
 
     @Test
     void testToBank() {

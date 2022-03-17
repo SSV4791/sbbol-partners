@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 
 @Mapper(
@@ -33,6 +34,12 @@ public interface ContactMapper extends BaseMapper {
     static LegalForm toLegalType(LegalType legalType) {
         return legalType != null ? LegalForm.valueOf(legalType.name()) : null;
     }
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
+    @Mapping(target = "type", source = "legalForm", qualifiedByName = "toLegalType")
+    ContactEntity toContact(ContactCreate contact);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")

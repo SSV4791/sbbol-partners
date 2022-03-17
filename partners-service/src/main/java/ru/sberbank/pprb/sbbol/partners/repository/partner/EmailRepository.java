@@ -13,8 +13,9 @@ public interface EmailRepository extends CrudRepository<EmailEntity, UUID>, Emai
     /**
      * Получение электронного адреса
      *
-     * @param uuid Идентификатор документа
+     * @param digitalId Идентификатор личного кабинета
+     * @param uuid      Идентификатор документа
      * @return Электронный адрес
      */
-    EmailEntity getByUuid(UUID uuid);
+    EmailEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
 }

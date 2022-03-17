@@ -5,6 +5,7 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
@@ -68,10 +69,10 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public ContactResponse saveContact(Contact contact) {
+    public ContactResponse saveContact(ContactCreate contact) {
         var partner = partnerRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getPartnerId()));
         if (partner == null) {
-            throw new EntryNotFoundException("partner", contact.getDigitalId(), contact.getId());
+            throw new EntryNotFoundException("partner", contact.getDigitalId());
         }
         var requestContact = contactMapper.toContact(contact);
         var saveContact = contactRepository.save(requestContact);

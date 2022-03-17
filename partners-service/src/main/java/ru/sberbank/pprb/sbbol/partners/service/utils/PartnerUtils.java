@@ -7,7 +7,6 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.MergeHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ReplicationHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
@@ -17,9 +16,12 @@ import ru.sberbank.pprb.sbbol.partners.exception.SignAccountException;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
@@ -129,7 +131,45 @@ public class PartnerUtils {
      * @param account           Счёт
      * @return Обновлённый контрагент
      */
-    public Counterparty createOrUpdateCounterparty(Counterparty sbbolCounterparty, Account account) {
+    public Counterparty createOrUpdateCounterparty(Counterparty sbbolCounterparty, AccountCreate account) {
+        if (sbbolCounterparty == null) {
+            return null;
+        }
+        BankCreate bank;
+        BankAccountCreate bankAccount = null;
+        if (CollectionUtils.isEmpty(account.getBanks()) || account.getBanks().size() != 1) {
+            throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ невозможно, банк должен быть заполнен единственным значением"));
+        } else {
+            bank = account.getBanks().get(0);
+            if (!CollectionUtils.isEmpty(bank.getBankAccounts()) && bank.getBankAccounts().size() == 1) {
+                bankAccount = bank.getBankAccounts().get(0);
+            }
+        }
+        Counterparty updatedCounterparty = (Counterparty) SerializationUtils.clone(sbbolCounterparty);
+        counterpartyMapper.updateCounterparty(updatedCounterparty, account, bank, bankAccount);
+        if (updatedCounterparty.getName() == null || updatedCounterparty.getAccount() == null ||
+            updatedCounterparty.getBankBic() == null || updatedCounterparty.getTaxNumber() == null) {
+            throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ невозможно, одно из обязательных полей пусто" + updatedCounterparty));
+        }
+        if (sbbolCounterparty.equals(updatedCounterparty)) {
+            return null;
+        }
+        if (updatedCounterparty.getPprbGuid() == null) {
+            return legacySbbolAdapter.create(account.getDigitalId(), updatedCounterparty);
+        } else {
+            return legacySbbolAdapter.update(account.getDigitalId(), updatedCounterparty);
+        }
+    }
+
+    /**
+     * Сохранение или обновление контрагента
+     * !! Допущение: если контрагент не мигрирован, то мы можем обновить его только одним банком и одним корр счетом
+     *
+     * @param sbbolCounterparty Контрагент
+     * @param account           Счёт
+     * @return Обновлённый контрагент
+     */
+    public Counterparty createOrUpdateCounterparty(Counterparty sbbolCounterparty, AccountChange account) {
         if (sbbolCounterparty == null) {
             return null;
         }
@@ -165,7 +205,7 @@ public class PartnerUtils {
      * @param account Счёт
      * @return Обновлённый счёт
      */
-    public AccountEntity updatePartnerAccount(Account account) {
+    public AccountEntity updatePartnerAccount(AccountChange account) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()));
         if (foundAccount == null) {
             throw new EntryNotFoundException(ACCOUNT_NAME, account.getDigitalId(), account.getId());

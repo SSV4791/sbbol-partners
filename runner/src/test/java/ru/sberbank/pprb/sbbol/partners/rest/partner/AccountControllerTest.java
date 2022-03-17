@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Bank;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
@@ -29,7 +31,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         var actualAccount =
             get(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 AccountResponse.class,
                 account.getDigitalId(), account.getId()
             );
@@ -166,7 +168,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         var actualAccount =
             get(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 AccountResponse.class,
                 account.getDigitalId(), account.getId()
             );
@@ -178,7 +180,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
         var deleteAccount =
             delete(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 actualAccount.getAccount().getDigitalId(), actualAccount.getAccount().getId()
             );
         assertThat(deleteAccount)
@@ -186,7 +188,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
         var searchAccount =
             getNotFound(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 Error.class,
                 account.getDigitalId(), account.getId()
             );
@@ -196,46 +198,74 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
-    private static Account getValidAccount(String partnerUuid, String digitalId) {
-        return new Account()
-            .version(0L)
+    @Test
+    void testPriorityAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var foundAccount =
+            get(
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+                AccountResponse.class,
+                account.getDigitalId(), account.getId()
+            );
+        assertThat(foundAccount)
+            .isNotNull();
+        assertThat(foundAccount.getAccount())
+            .isNotNull()
+            .isEqualTo(account);
+        assertThat(foundAccount.getAccount().getPriorityAccount())
+            .isEqualTo(false);
+
+        createValidPriorityAccount(account.getId(), account.getDigitalId());
+
+        var actualAccount =
+            get(
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+                AccountResponse.class,
+                account.getDigitalId(), account.getId()
+            );
+        assertThat(actualAccount)
+            .isNotNull();
+        assertThat(actualAccount.getAccount().getPriorityAccount())
+            .isEqualTo(true);
+    }
+
+    @Test
+    void testPriorityAccountException() {
+        var partner = createValidPartner();
+        var account1 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidPriorityAccount(account1.getId(), account1.getDigitalId());
+        var error = notCreatePriorityAccount(account2.getId(), account2.getDigitalId());
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    private static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
+        return new AccountCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
             .name("111111")
             .account("40802810500490014206")
-            .addBanksItem(new Bank()
-                .version(0L)
+            .addBanksItem(new BankCreate()
                 .bic("044525411")
                 .name("222222")
                 .addBankAccountsItem(
-                    new BankAccount()
+                    new BankAccountCreate()
                         .account("30101810145250000411"))
-            )
-            .state(Account.StateEnum.NOT_SIGNED);
+            );
     }
 
-    private static Account getValidBudgetAccount(String partnerUuid, String digitalId) {
+    private static AccountCreate getValidBudgetAccount(String partnerUuid, String digitalId) {
         var account = getValidAccount(partnerUuid, digitalId);
         account.setAccount("40601810300490014209");
         return account;
     }
 
-    private static Account getValidSignedAccount(String partnerUuid, String digitalId) {
-        var account = getValidAccount(partnerUuid, digitalId);
-        account.setState(Account.StateEnum.SIGNED);
-        return account;
-    }
-
     public static void createValidBudgetAccount(String partnerUuid, String digitalId) {
         var createAccount = createPost(baseRoutePath + "/account", getValidBudgetAccount(partnerUuid, digitalId), AccountResponse.class);
-        assertThat(createAccount)
-            .isNotNull();
-        assertThat(createAccount.getErrors())
-            .isNull();
-    }
-
-    public static void createValidSignedAccount(String partnerUuid, String digitalId) {
-        var createAccount = createPost(baseRoutePath + "/account", getValidSignedAccount(partnerUuid, digitalId), AccountResponse.class);
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())
@@ -254,9 +284,28 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     public static Error createNotValidAccount(String partnerUuid, String digitalId) {
         var account = getValidAccount(partnerUuid, digitalId);
         account.setAccount("222222");
-        for (Bank bank : account.getBanks()) {
+        for (BankCreate bank : account.getBanks()) {
             bank.setBic("44444");
         }
-        return createBadRequestPost(baseRoutePath + "/account", account, Error.class);
+        return createBadRequestPost(baseRoutePath + "/account", account);
+    }
+
+    private static AccountPriority getValidPriorityAccount(String accountId, String digitalId) {
+        return new AccountPriority()
+            .digitalId(digitalId)
+            .id(accountId)
+            .priorityAccount(true);
+    }
+
+    public static void createValidPriorityAccount(String accountId, String digitalId) {
+        var createAccount = put(baseRoutePath + "/account/priority", getValidPriorityAccount(accountId, digitalId), AccountResponse.class);
+        assertThat(createAccount)
+            .isNotNull();
+        assertThat(createAccount.getErrors())
+            .isNull();
+    }
+
+    public static Error notCreatePriorityAccount(String accountId, String digitalId) {
+        return createBadRequestPut(baseRoutePath + "/account/priority", getValidPriorityAccount(accountId, digitalId));
     }
 }

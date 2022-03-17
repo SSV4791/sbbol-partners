@@ -13,11 +13,22 @@ abstract class PhoneBaseEntity extends BaseEntity {
     @Column(name = "phone", length = 50)
     private String phone;
 
+    @Column(name = "digital_id")
+    private String digitalId;
+
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getDigitalId() {
+        return digitalId;
+    }
+
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
     }
 }

@@ -25,8 +25,8 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "comment", source = "source.description")
     @Mapping(target = "legalType", source = "source.legalType")
     @Mapping(target = "version", source = "source.version")
-    @Mapping(target = "phone", expression = "java(toMigrationPartnerPhoneEntity(source.getCorrPhoneNumber(), source.getVersion()))")
-    @Mapping(target = "email", expression = "java(toMigrationPartnerEmailEntity(source.getCorrEmail(), source.getVersion()))")
+    @Mapping(target = "phone", expression = "java(toMigrationPartnerPhoneEntity(source.getCorrPhoneNumber(), source.getVersion(), digitalId))")
+    @Mapping(target = "email", expression = "java(toMigrationPartnerEmailEntity(source.getCorrEmail(), source.getVersion(), digitalId))")
     @Mapping(target = "account", expression = "java(toMigrationPartnerAccountEntity(digitalId, source))")
     @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
     @Mapping(target = "secondName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
@@ -72,22 +72,24 @@ public interface MigrationPartnerMapper {
         return migrationBankAccountEntity;
     }
 
-    default MigrationPartnerPhoneEntity toMigrationPartnerPhoneEntity(String phone, Long version) {
+    default MigrationPartnerPhoneEntity toMigrationPartnerPhoneEntity(String phone, Long version, String digitalId) {
         if (phone == null || version == null) {
             return null;
         }
         MigrationPartnerPhoneEntity migrationPartnerPhoneEntity = new MigrationPartnerPhoneEntity();
         migrationPartnerPhoneEntity.setPhone(phone);
+        migrationPartnerPhoneEntity.setDigitalId(digitalId);
         migrationPartnerPhoneEntity.setVersion(version);
         return migrationPartnerPhoneEntity;
     }
 
-    default MigrationPartnerEmailEntity toMigrationPartnerEmailEntity(String email, Long version) {
+    default MigrationPartnerEmailEntity toMigrationPartnerEmailEntity(String email, Long version, String digitalId) {
         if (email == null || version == null) {
             return null;
         }
         MigrationPartnerEmailEntity migrationPartnerEmailEntity = new MigrationPartnerEmailEntity();
         migrationPartnerEmailEntity.setEmail(email);
+        migrationPartnerEmailEntity.setDigitalId(digitalId);
         migrationPartnerEmailEntity.setVersion(version);
         return migrationPartnerEmailEntity;
     }

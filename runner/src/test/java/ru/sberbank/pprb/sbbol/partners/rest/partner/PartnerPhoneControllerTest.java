@@ -6,12 +6,12 @@ import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTes
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -23,10 +23,10 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     @Test
     void testViewPartnerPhone() {
         Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        createPhone(partner.getId());
-        createPhone(partner.getId());
-        createPhone(partner.getId());
-        createPhone(partner.getId());
+        createPhone(partner.getId(), partner.getDigitalId());
+        createPhone(partner.getId(), partner.getDigitalId());
+        createPhone(partner.getId(), partner.getDigitalId());
+        createPhone(partner.getId(), partner.getDigitalId());
 
         var filter1 = new PhonesFilter()
             .digitalId(partner.getDigitalId())
@@ -54,7 +54,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     @Test
     void testCreatePartnerPhone() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var phone = createPhone(partner.getId());
+        var phone = createPhone(partner.getId(), partner.getDigitalId());
         assertThat(phone)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -65,12 +65,13 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     @Test
     void testUpdatePartnerPhone() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var phone = createPhone(partner.getId());
+        var phone = createPhone(partner.getId(), partner.getDigitalId());
         String newPhone = "bbbb@sber.ru";
 
         var updatePhone = new Phone();
         updatePhone.id(phone.getId());
         updatePhone.unifiedId(phone.getUnifiedId());
+        updatePhone.digitalId(phone.getDigitalId());
         updatePhone.phone(newPhone);
         var newUpdatePhone = put(baseRoutePath, updatePhone, PhoneResponse.class);
 
@@ -121,16 +122,15 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
             .isNull();
     }
 
-    private static Phone getPhone(String partnerUuid) {
-        return new Phone()
-            .version(0L)
-            .id(UUID.randomUUID().toString())
+    private static PhoneCreate getPhone(String partnerUuid, String digitalId) {
+        return new PhoneCreate()
             .unifiedId(partnerUuid)
+            .digitalId(digitalId)
             .phone(RandomStringUtils.randomAlphabetic(10));
     }
 
-    private static Phone createPhone(String partnerUuid) {
-        var phoneResponse = createPost(baseRoutePath, getPhone(partnerUuid), PhoneResponse.class);
+    private static Phone createPhone(String partnerUuid, String digitalId) {
+        var phoneResponse = createPost(baseRoutePath, getPhone(partnerUuid, digitalId), PhoneResponse.class);
         assertThat(phoneResponse)
             .isNotNull();
         assertThat(phoneResponse.getErrors())

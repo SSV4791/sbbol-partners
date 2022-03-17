@@ -11,9 +11,13 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
@@ -55,9 +59,9 @@ class CounterpartyMapperTest {
     @Test
     void toCounterpartyTest() {
         var partner = factory.manufacturePojo(PartnerEntity.class);
-        var account = factory.manufacturePojo(Account.class);
-        var bank = factory.manufacturePojo(Bank.class);
-        var bankAccount = factory.manufacturePojo(BankAccount.class);
+        var account = factory.manufacturePojo(AccountCreate.class);
+        var bank = factory.manufacturePojo(BankCreate.class);
+        var bankAccount = factory.manufacturePojo(BankAccountCreate.class);
         bank.setBankAccounts(Collections.singletonList(bankAccount));
         account.setBanks(Collections.singletonList(bank));
         Counterparty response = mapper.toCounterparty(partner, account);
@@ -66,7 +70,6 @@ class CounterpartyMapperTest {
         assertEquals(response.getKpp(), partner.getKpp());
         assertEquals(response.getDescription(), partner.getComment());
         assertEquals(response.getAccount(), account.getAccount());
-        assertEquals(response.getSigned(), Account.StateEnum.SIGNED.equals(account.getState()));
         assertEquals(response.getBankName(), bank.getName());
         assertEquals(response.getBankBic(), bank.getBic());
         assertEquals(response.getCorrAccount(), bankAccount.getAccount());
@@ -130,7 +133,7 @@ class CounterpartyMapperTest {
     void updateCounterpartyTest1() {
         var counterparty = factory.manufacturePojo(Counterparty.class);
         var updatedCounterparty = (Counterparty) SerializationUtils.clone(counterparty);
-        var account = factory.manufacturePojo(Account.class);
+        var account = factory.manufacturePojo(AccountChange.class);
         var bank = factory.manufacturePojo(Bank.class);
         var bankAccount = factory.manufacturePojo(BankAccount.class);
         mapper.updateCounterparty(updatedCounterparty, account, bank, bankAccount);
@@ -140,7 +143,7 @@ class CounterpartyMapperTest {
         assertEquals(updatedCounterparty.getKpp(), counterparty.getKpp());
         assertEquals(updatedCounterparty.getDescription(), counterparty.getDescription());
         assertEquals(updatedCounterparty.getAccount(), account.getAccount());
-        assertEquals(updatedCounterparty.getSigned(), Account.StateEnum.SIGNED.equals(account.getState()));
+        assertEquals(updatedCounterparty.getSigned(), AccountChange.StateEnum.SIGNED.equals(account.getState()));
         assertEquals(updatedCounterparty.getBankName(), bank.getName());
         assertEquals(updatedCounterparty.getBankBic(), bank.getBic());
         assertEquals(updatedCounterparty.getCorrAccount(), bankAccount.getAccount());

@@ -16,11 +16,14 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
-import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
@@ -73,11 +76,11 @@ public interface CounterpartyMapper extends BaseMapper {
     @Mapping(target = "kpp", source = "partner.kpp")
     @Mapping(target = "description", source = "partner.comment")
     @Mapping(target = "account", source = "account.account")
-    @Mapping(target = "signed", source = "account.state", qualifiedByName = "toSigned")
+    @Mapping(target = "signed", constant = "true")
     @Mapping(target = "bankName", source = "account.banks", qualifiedByName = "toBankName")
     @Mapping(target = "bankBic", source = "account.banks", qualifiedByName = "toBankBic")
     @Mapping(target = "corrAccount", source = "account.banks", qualifiedByName = "toCorrAccount")
-    Counterparty toCounterparty(PartnerEntity partner, Account account);
+    Counterparty toCounterparty(PartnerEntity partner, AccountCreate account);
 
     @Mapping(target = "operationGuid", ignore = true)
     @Mapping(target = "bankCity", ignore = true)
@@ -110,8 +113,25 @@ public interface CounterpartyMapper extends BaseMapper {
     @Mapping(target = "bankName", source = "bank.name")
     @Mapping(target = "bankBic", source = "bank.bic")
     @Mapping(target = "corrAccount", source = "bankAccount.account")
+    @Mapping(target = "signed", constant = "false")
+    void updateCounterparty(@MappingTarget() Counterparty counterparty, AccountCreate account, BankCreate bank, BankAccountCreate bankAccount);
+
+    @Mapping(target = "operationGuid", ignore = true)
+    @Mapping(target = "bankCity", ignore = true)
+    @Mapping(target = "settlementType", ignore = true)
+    @Mapping(target = "counterpartyPhone", ignore = true)
+    @Mapping(target = "counterpartyEmail", ignore = true)
+    @Mapping(target = "pprbGuid", ignore = true)
+    @Mapping(target = "name", ignore = true)
+    @Mapping(target = "taxNumber", ignore = true)
+    @Mapping(target = "kpp", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "account", source = "account.account")
+    @Mapping(target = "bankName", source = "bank.name")
+    @Mapping(target = "bankBic", source = "bank.bic")
+    @Mapping(target = "corrAccount", source = "bankAccount.account")
     @Mapping(target = "signed", source = "account.state", qualifiedByName = "toSigned")
-    void updateCounterparty(@MappingTarget() Counterparty counterparty, Account account, Bank bank, BankAccount bankAccount);
+    void updateCounterparty(@MappingTarget() Counterparty counterparty, AccountChange account, Bank bank, BankAccount bankAccount);
 
     @Mapping(target = "citizenship", ignore = true)
     @Mapping(target = "emails", ignore = true)
@@ -234,11 +254,19 @@ public interface CounterpartyMapper extends BaseMapper {
     }
 
     @Named("toSigned")
-    static boolean toSigned(Account.StateEnum type) {
+    static boolean toSigned(AccountChange.StateEnum type) {
         if (type == null) {
             return false;
         }
-        return Account.StateEnum.SIGNED.equals(type);
+        return AccountChange.StateEnum.SIGNED.equals(type);
+    }
+
+    @Named("toBankName")
+    static String toBankNameCreate(List<BankCreate> banks) {
+        if (CollectionUtils.isEmpty(banks) || banks.size() != 1) {
+            return null;
+        }
+        return banks.get(0).getName();
     }
 
     @Named("toBankName")
@@ -250,11 +278,31 @@ public interface CounterpartyMapper extends BaseMapper {
     }
 
     @Named("toBankBic")
+    static String toBankBicCreate(List<BankCreate> banks) {
+        if (CollectionUtils.isEmpty(banks) || banks.size() != 1) {
+            return null;
+        }
+        return banks.get(0).getBic();
+    }
+
+    @Named("toBankBic")
     static String toBankBic(List<Bank> banks) {
         if (CollectionUtils.isEmpty(banks) || banks.size() != 1) {
             return null;
         }
         return banks.get(0).getBic();
+    }
+
+    @Named("toCorrAccount")
+    static String toCorrAccountCreate(List<BankCreate> banks) {
+        if (CollectionUtils.isEmpty(banks) || banks.size() != 1) {
+            return null;
+        }
+        var bank = banks.get(0);
+        if (CollectionUtils.isEmpty(bank.getBankAccounts()) || bank.getBankAccounts().size() != 1) {
+            return null;
+        }
+        return bank.getBankAccounts().get(0).getAccount();
     }
 
     @Named("toCorrAccount")
@@ -288,6 +336,6 @@ public interface CounterpartyMapper extends BaseMapper {
 
     @Named("toDate")
     static Date toDate(OffsetDateTime date) {
-        return new Date(date.toString());
+        return Date.from(date.toInstant());
     }
 }

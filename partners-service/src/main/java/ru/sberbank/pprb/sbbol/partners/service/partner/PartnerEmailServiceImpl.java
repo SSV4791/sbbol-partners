@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
@@ -21,7 +21,7 @@ public class PartnerEmailServiceImpl extends EmailServiceImpl {
     }
 
     @Override
-    public EmailResponse saveEmail(Email email) {
+    public EmailResponse saveEmail(EmailCreate email) {
         var uuid = UUID.fromString(email.getUnifiedId());
         var partner = partnerRepository.getByUuid(uuid);
         if (partner == null) {

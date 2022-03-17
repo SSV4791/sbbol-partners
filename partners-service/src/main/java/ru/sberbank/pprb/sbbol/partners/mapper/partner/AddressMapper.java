@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AddressType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AddressMapper extends BaseMapper {
@@ -21,6 +22,17 @@ public interface AddressMapper extends BaseMapper {
     @Named("toAddressType")
     static Address.TypeEnum toAddressType(AddressType addressType) {
         return addressType != null ? Address.TypeEnum.valueOf(addressType.name()) : null;
+    }
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
+    AddressEntity toAddress(AddressCreate address);
+
+    @Named("toAddressType")
+    static AddressType toAddressType(AddressCreate.TypeEnum addressType) {
+        return addressType != null ? AddressType.valueOf(addressType.getValue()) : null;
     }
 
     @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")

@@ -37,7 +37,7 @@ public abstract class BaseConfiguration {
         @Override
         public String getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata, Map<String, Type> genericTypesArgumentsMap) {
             return switch (attributeMetadata.getAttributeName()) {
-                case "id", "uuid", "unifiedId", "entityId", "partnerId", "partnerAccountId", "accountId", "bankId" -> UUID.randomUUID().toString();
+                case "id", "uuid", "unifiedId", "entityId", "partnerId", "partnerAccountId", "accountId", "bankId", "documentTypeId" -> UUID.randomUUID().toString();
                 case "phone" -> "007" + randomNumeric(9);
                 default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
             };

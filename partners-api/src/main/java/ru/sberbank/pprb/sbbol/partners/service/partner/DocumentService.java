@@ -1,10 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import ru.sberbank.pprb.sbbol.partners.model.Document;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 /**
  * Сервис по работе с документами
@@ -34,7 +34,7 @@ public interface DocumentService {
      * @param document данные документа
      * @return Документ
      */
-    DocumentResponse saveDocument(Document document);
+    DocumentResponse saveDocument(DocumentCreate document);
 
     /**
      * Обновление документа
@@ -42,7 +42,7 @@ public interface DocumentService {
      * @param document новые данные документа
      * @return Документ
      */
-    DocumentResponse updateDocument(Document document);
+    DocumentResponse updateDocument(DocumentChange document);
 
     /**
      * Удаление документа

@@ -4,10 +4,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
+import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -32,7 +33,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
         var actualDocument =
             get(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -135,7 +136,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
         var actualDocument =
             get(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -148,7 +149,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
         var deleteDocument =
             delete(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getId()
             );
         assertThat(deleteDocument)
@@ -156,7 +157,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
         var searchDocument =
             getNotFound(
-                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 Error.class,
                 document.getDigitalId(), document.getId()
             );
@@ -168,23 +169,17 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
-    public static Document getValidContactDocument(String partnerUuid, String digitalId) {
-        return new Document()
-            .version(0L)
+    public static DocumentCreate getValidContactDocument(String partnerUuid, String digitalId) {
+        return new DocumentCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .certifierName("Имя")
-            .certifierType(Document.CertifierTypeEnum.NOTARY)
+            .certifierType(CertifierType.NOTARY)
             .dateIssue(LocalDate.now())
             .divisionCode("1111")
             .number("23")
-            .documentType(
-                new DocumentType()
-                    .id("3422aec8-7f44-4089-9a43-f8e3c5b00722")
-                    .description("Паспорт РФ")
-                    .deleted(false)
-                    .documentType("PASSPORT_OF_RUSSIA")
-            );
+            .documentTypeId("3422aec8-7f44-4089-9a43-f8e3c5b00722")
+            ;
     }
 
     private static Document createValidContactDocument(String partnerUuid, String digitalId) {

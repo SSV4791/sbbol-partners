@@ -34,7 +34,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
         var executeAccount = counterpartyMapper.toAccount(counterparty, partner.getDigitalId(), UUID.fromString(account.getId()), budgetMaskService);
         var actualAccount =
             get(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 AccountResponse.class,
                 account.getDigitalId(), account.getId()
             );
@@ -113,7 +113,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
         var executeAccount = counterpartyMapper.toAccount(counterparty, partner.getDigitalId(), UUID.fromString(account.getId()), budgetMaskService);
         var actualAccount =
             get(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 AccountResponse.class,
                 account.getDigitalId(), account.getId()
             );
@@ -125,7 +125,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
 
         var deleteAccount =
             delete(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 actualAccount.getAccount().getDigitalId(), actualAccount.getAccount().getId()
             );
         assertThat(deleteAccount)
@@ -133,7 +133,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
 
         var searchAccount =
             getNotFound(
-                baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 Error.class,
                 account.getDigitalId(), account.getId()
             );

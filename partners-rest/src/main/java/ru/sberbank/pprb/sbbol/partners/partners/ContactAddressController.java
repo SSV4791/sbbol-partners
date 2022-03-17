@@ -6,10 +6,12 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.ContactAddressApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AddressService;
+import ru.sberbank.pprb.sbbol.partners.validation.AddressCreateValidation;
 import ru.sberbank.pprb.sbbol.partners.validation.AddressValidation;
 
 @RestController
@@ -22,7 +24,7 @@ public class ContactAddressController implements ContactAddressApi {
     }
 
     @Override
-    public ResponseEntity<AddressResponse> create(@Validation(type = AddressValidation.class) Address address) {
+    public ResponseEntity<AddressResponse> create(@Validation(type = AddressCreateValidation.class) AddressCreate address) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactAddressService.saveAddress(address));
     }
 

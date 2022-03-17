@@ -26,7 +26,14 @@ public class PhoneViewRepositoryImpl extends BaseRepository<PhoneEntity, PhonesF
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<PhoneEntity> criteria, List<Predicate> predicates, Root<PhoneEntity> root, PhonesFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<PhoneEntity> criteria,
+        List<Predicate> predicates,
+        Root<PhoneEntity> root,
+        PhonesFilter filter
+    ) {
+        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
             predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
@@ -35,6 +42,7 @@ public class PhoneViewRepositoryImpl extends BaseRepository<PhoneEntity, PhonesF
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
+            builder.desc(root.get("digitalId")),
             builder.desc(root.get("unifiedUuid")),
             builder.desc(root.get("uuid"))
         );

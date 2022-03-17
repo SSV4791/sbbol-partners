@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
@@ -24,7 +25,7 @@ public interface EmailService {
      * @param email электронный адрес
      * @return Электронный адрес
      */
-    EmailResponse saveEmail(Email email);
+    EmailResponse saveEmail(EmailCreate email);
 
     /**
      * Обновление Электронного адреса

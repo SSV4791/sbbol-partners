@@ -1,10 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 /**
  * Сервис по работе с счётами Партнера
@@ -34,7 +35,7 @@ public interface AccountService {
      * @param account данные счёта Партнера
      * @return Счёт
      */
-    AccountResponse saveAccount(Account account);
+    AccountResponse saveAccount(AccountCreate account);
 
     /**
      * Обновление счёта Партнера
@@ -42,7 +43,7 @@ public interface AccountService {
      * @param account новые данные счёта Партнера
      * @return Счёт
      */
-    AccountResponse updateAccount(Account account);
+    AccountResponse updateAccount(AccountChange account);
 
     /**
      * Удаление счёта Партнера
@@ -51,4 +52,12 @@ public interface AccountService {
      * @param id        Идентификатор счёта Партнера
      */
     void deleteAccount(String digitalId, String id);
+
+    /**
+     * Изменение приоритетного счета
+     *
+     * @param accountPriority данные по приоритетному счёту
+     */
+    AccountResponse changePriority(AccountPriority accountPriority);
+
 }

@@ -41,19 +41,21 @@ class RenterPartnerMapperTest extends BaseConfiguration {
 
     @Test
     void toPhones() {
-        String expected = RandomStringUtils.randomAlphabetic(10);
-        var phones = RenterPartnerMapper.toPhones(expected);
+        String phone = RandomStringUtils.randomAlphabetic(10);
+        String digitalId = RandomStringUtils.randomAlphabetic(10);
+        var phones = mapper.toPhones(phone, digitalId);
         var actual = RenterPartnerMapper.toRenterPhone(phones);
-        assertThat(expected)
+        assertThat(phone)
             .isEqualTo(actual);
     }
 
     @Test
     void toEmails() {
-        String expected = RandomStringUtils.randomAlphabetic(10);
-        var emails = RenterPartnerMapper.toEmails(expected);
+        String email = RandomStringUtils.randomAlphabetic(10);
+        String digitalId = RandomStringUtils.randomAlphabetic(10);
+        var emails = mapper.toEmails(email, digitalId);
         var actual = RenterPartnerMapper.toRenterEmail(emails);
-        assertThat(expected)
+        assertThat(email)
             .isEqualTo(actual);
     }
 

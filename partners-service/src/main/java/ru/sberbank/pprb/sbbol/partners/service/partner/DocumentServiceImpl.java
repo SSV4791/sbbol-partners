@@ -2,11 +2,13 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Document;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
 import java.util.UUID;
@@ -16,13 +18,16 @@ abstract class DocumentServiceImpl implements DocumentService {
     public static final String DOCUMENT_NAME = "document";
 
     private final DocumentRepository documentRepository;
+    private final DocumentDictionaryRepository documentDictionaryRepository;
     private final DocumentMapper documentMapper;
 
     public DocumentServiceImpl(
         DocumentRepository documentRepository,
+        DocumentDictionaryRepository documentDictionaryRepository,
         DocumentMapper documentMapper
     ) {
         this.documentRepository = documentRepository;
+        this.documentDictionaryRepository = documentDictionaryRepository;
         this.documentMapper = documentMapper;
     }
 
@@ -55,14 +60,18 @@ abstract class DocumentServiceImpl implements DocumentService {
         return documentsResponse;
     }
 
-    public DocumentResponse saveDocument(Document document) {
+    public DocumentResponse saveDocument(DocumentCreate document) {
         var requestDocument = documentMapper.toDocument(document);
+        if (requestDocument.getTypeUuid() != null) {
+            var documentType = documentDictionaryRepository.getByUuid(requestDocument.getTypeUuid());
+            requestDocument.setType(documentType);
+        }
         var saveDocument = documentRepository.save(requestDocument);
         var response = documentMapper.toDocument(saveDocument);
         return new DocumentResponse().document(response);
     }
 
-    public DocumentResponse updateDocument(Document document) {
+    public DocumentResponse updateDocument(DocumentChange document) {
         var foundDocument = documentRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getId()));
         if (foundDocument == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId());

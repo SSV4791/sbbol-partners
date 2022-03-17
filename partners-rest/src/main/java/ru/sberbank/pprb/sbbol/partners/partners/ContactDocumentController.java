@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.ContactDocumentApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
-import ru.sberbank.pprb.sbbol.partners.model.Document;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
+import ru.sberbank.pprb.sbbol.partners.validation.DocumentCreateValidation;
 import ru.sberbank.pprb.sbbol.partners.validation.DocumentValidation;
 
 @RestController
@@ -22,7 +24,7 @@ public class ContactDocumentController implements ContactDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> create(@Validation(type = DocumentValidation.class) Document document) {
+    public ResponseEntity<DocumentResponse> create(@Validation(type = DocumentCreateValidation.class) DocumentCreate document) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactDocumentService.saveDocument(document));
     }
 
@@ -43,7 +45,7 @@ public class ContactDocumentController implements ContactDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> update(@Validation(type = DocumentValidation.class) Document document) {
+    public ResponseEntity<DocumentResponse> update(@Validation(type = DocumentValidation.class) DocumentChange document) {
         return ResponseEntity.ok(contactDocumentService.updateDocument(document));
     }
 }

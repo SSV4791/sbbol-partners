@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipTy
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 
 @Mapper(
     componentModel = "spring",
@@ -27,7 +28,7 @@ public interface PartnerMapper extends BaseMapper {
 
     @Mapping(target = "gku", ignore = true)
     @Mapping(target = "budget", ignore = true)
-    @Mapping(target = "id", expression = "java(partner.getUuid().toString())")
+    @Mapping(target = "id", expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     Partner toPartner(PartnerEntity partner);
@@ -40,6 +41,20 @@ public interface PartnerMapper extends BaseMapper {
     @Named("toCitizenshipType")
     static Partner.CitizenshipEnum toCitizenshipType(PartnerCitizenshipType citizenshipType) {
         return citizenshipType != null ? Partner.CitizenshipEnum.valueOf(citizenshipType.name()) : null;
+    }
+
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "type", constant = "PARTNER")
+    @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
+    @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "version", ignore = true)
+    PartnerEntity toPartner(PartnerCreate partner);
+
+    @Named("toCitizenshipType")
+    static PartnerCitizenshipType toCitizenshipType(PartnerCreate.CitizenshipEnum citizenshipEnum) {
+        return citizenshipEnum != null ? PartnerCitizenshipType.valueOf(citizenshipEnum.getValue()) : null;
     }
 
     @Mapping(target = "createDate", ignore = true)

@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
@@ -34,7 +35,7 @@ public interface ContactService {
      * @param contact данные контакта Партнера
      * @return Контакт
      */
-    ContactResponse saveContact(Contact contact);
+    ContactResponse saveContact(ContactCreate contact);
 
     /**
      * Обновление контакта Партнера

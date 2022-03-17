@@ -66,6 +66,20 @@ public class AccountEntity extends BaseEntity {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BankEntity> banks;
 
+    @Column(name = "priority_account")
+    private Boolean priorityAccount;
+
+    public Boolean getPriorityAccount() {
+        if (priorityAccount == null) {
+            return Boolean.FALSE;
+        }
+        return priorityAccount;
+    }
+
+    public void setPriorityAccount(Boolean priorityAccount) {
+        this.priorityAccount = priorityAccount;
+    }
+
     public OffsetDateTime getCreateDate() {
         return createDate;
     }
@@ -91,6 +105,9 @@ public class AccountEntity extends BaseEntity {
     }
 
     public AccountStateType getState() {
+        if (state == null) {
+            return AccountStateType.NOT_SIGNED;
+        }
         return state;
     }
 

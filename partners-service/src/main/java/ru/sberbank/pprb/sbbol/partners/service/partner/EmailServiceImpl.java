@@ -4,6 +4,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
@@ -46,7 +47,7 @@ abstract class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public EmailResponse saveEmail(Email email) {
+    public EmailResponse saveEmail(EmailCreate email) {
         var emailEntity = emailMapper.toEmail(email);
         EmailEntity savedEmail = emailRepository.save(emailEntity);
         var response = emailMapper.toEmail(savedEmail);
@@ -56,7 +57,7 @@ abstract class EmailServiceImpl implements EmailService {
     @Override
     public EmailResponse updateEmail(Email email) {
         var uuid = UUID.fromString(email.getId());
-        var foundEmail = emailRepository.getByUuid(uuid);
+        var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid);
         if (foundEmail == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, uuid);
         }
@@ -68,7 +69,7 @@ abstract class EmailServiceImpl implements EmailService {
 
     @Override
     public void deleteEmail(String digitalId, String id) {
-        var foundEmail = emailRepository.getByUuid(UUID.fromString(id));
+        var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundEmail == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
         }

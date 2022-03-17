@@ -5,13 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAccountsApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
-import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsPartnerFilter;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerAccountCreateValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnerAccountValidator;
 
 @RestController
@@ -21,6 +22,16 @@ public class AccountController implements PartnerAccountsApi {
 
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> change(AccountPriority accountPriority) {
+        return ResponseEntity.ok(accountService.changePriority(accountPriority));
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> create(@Validation(type = PartnerAccountCreateValidator.class) AccountCreate account) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.saveAccount(account));
     }
 
     @Override
@@ -40,18 +51,7 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> create(@Validation(type = PartnerAccountValidator.class) Account account) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.saveAccount(account));
-    }
-
-    @Override
-    public ResponseEntity<AccountResponse> update(@Validation(type = PartnerAccountValidator.class) Account account) {
+    public ResponseEntity<AccountResponse> update(@Validation(type = PartnerAccountValidator.class) AccountChange account) {
         return ResponseEntity.ok(accountService.updateAccount(account));
-    }
-
-    @Override
-    public ResponseEntity<AccountsPartnerResponse> view(AccountsPartnerFilter accountsPartnerFilter) {
-        //TODO DCBBRAIN-2265
-        return null;
     }
 }

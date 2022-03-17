@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +35,20 @@ class PartnerMapperTest extends BaseConfiguration {
     @Test
     void toPartner() {
         Partner expected = factory.manufacturePojo(Partner.class);
+        PartnerEntity partnerEntity = mapper.toPartner(expected);
+        Partner actual = mapper.toPartner(partnerEntity);
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "phones",
+                "emails"
+            )
+            .isEqualTo(actual);
+    }
+
+    @Test
+    void toPartnerCreate() {
+        PartnerCreate expected = factory.manufacturePojo(PartnerCreate.class);
         PartnerEntity partnerEntity = mapper.toPartner(expected);
         Partner actual = mapper.toPartner(partnerEntity);
         assertThat(expected)

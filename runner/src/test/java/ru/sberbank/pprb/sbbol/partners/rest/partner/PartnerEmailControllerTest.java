@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
@@ -11,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -23,10 +23,10 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     @Test
     void testViewPartnerEmail() {
         Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        createEmail(partner.getId());
-        createEmail(partner.getId());
-        createEmail(partner.getId());
-        createEmail(partner.getId());
+        createEmail(partner.getId(), partner.getDigitalId());
+        createEmail(partner.getId(), partner.getDigitalId());
+        createEmail(partner.getId(), partner.getDigitalId());
+        createEmail(partner.getId(), partner.getDigitalId());
 
         var filter1 = new EmailsFilter()
             .digitalId(partner.getDigitalId())
@@ -55,7 +55,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     @Test
     void testCreatePartnerEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var email = createEmail(partner.getId());
+        var email = createEmail(partner.getId(), partner.getDigitalId());
         assertThat(email)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -66,12 +66,13 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     @Test
     void testUpdatePartnerEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var email = createEmail(partner.getId());
+        var email = createEmail(partner.getId(), partner.getDigitalId());
         String newEmail = "bbbb@sber.ru";
 
         var updateEmail = new Email();
         updateEmail.id(email.getId());
         updateEmail.unifiedId(email.getUnifiedId());
+        updateEmail.digitalId(email.getDigitalId());
         updateEmail.email(newEmail);
         var newUpdateEmail = put(baseRoutePath, updateEmail, EmailResponse.class);
 
@@ -122,16 +123,15 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
             .isNull();
     }
 
-    private static Email getEmail(String partnerUuid) {
-        return new Email()
-            .version(0L)
-            .id(UUID.randomUUID().toString())
+    private static EmailCreate getEmail(String partnerUuid, String digitalId) {
+        return new EmailCreate()
             .unifiedId(partnerUuid)
+            .digitalId(digitalId)
             .email(RandomStringUtils.randomAlphabetic(10));
     }
 
-    private static Email createEmail(String partnerUuid) {
-        var emailResponse = createPost(baseRoutePath, getEmail(partnerUuid), EmailResponse.class);
+    private static Email createEmail(String partnerUuid, String digitalId) {
+        var emailResponse = createPost(baseRoutePath, getEmail(partnerUuid, digitalId), EmailResponse.class);
         assertThat(emailResponse)
             .isNotNull();
         assertThat(emailResponse.getErrors())

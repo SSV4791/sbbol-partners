@@ -13,11 +13,22 @@ abstract class EmailBaseEntity extends BaseEntity {
     @Column(name = "email", length = 100)
     private String email;
 
+    @Column(name = "digital_id")
+    private String digitalId;
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getDigitalId() {
+        return digitalId;
+    }
+
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
     }
 }

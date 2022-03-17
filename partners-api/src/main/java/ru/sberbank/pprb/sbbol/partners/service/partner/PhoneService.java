@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
@@ -24,7 +25,7 @@ public interface PhoneService {
      * @param phone телефон
      * @return Телефон
      */
-    PhoneResponse savePhone(Phone phone);
+    PhoneResponse savePhone(PhoneCreate phone);
 
     /**
      * Обновление Телефона

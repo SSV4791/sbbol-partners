@@ -75,6 +75,9 @@ public class AccountSignServiceImpl implements AccountSignService {
             response.setDigitalId(accountsSign.getDigitalId());
             for (var accountSign : accountsSign.getAccountsSignDetail()) {
                 var account = accountRepository.getByDigitalIdAndUuid(accountsSign.getDigitalId(), UUID.fromString(accountSign.getAccountId()));
+                if (account == null) {
+                    throw new EntryNotFoundException(DOCUMENT_NAME, accountsSign.getDigitalId(), accountSign.getAccountId());
+                }
                 if (AccountStateType.SIGNED.equals(account.getState())) {
                     response.addErrorsItem(
                         new Error()

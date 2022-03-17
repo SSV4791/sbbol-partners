@@ -5,14 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailCreateLight;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneCreateLight;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
-                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
                 ContactResponse.class,
                 contact.getDigitalId(), contact.getId()
             );
@@ -152,7 +153,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
-                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
                 ContactResponse.class,
                 contact.getDigitalId(), contact.getId()
             );
@@ -164,7 +165,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
         var deleteContact =
             delete(
-                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
                 actualContact.getContact().getDigitalId(), actualContact.getContact().getId()
             );
 
@@ -173,7 +174,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
         var searchContact =
             getNotFound(
-                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
                 Error.class,
                 contact.getDigitalId(), contact.getId()
             );
@@ -184,13 +185,12 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
-    public static Contact getValidContact(String partnerUuid) {
+    public static ContactCreate getValidContact(String partnerUuid) {
         return getValidContact(partnerUuid, "111111");
     }
 
-    public static Contact getValidContact(String partnerUuid, String digitalId) {
-        return new Contact()
-            .version(0L)
+    public static ContactCreate getValidContact(String partnerUuid, String digitalId) {
+        return new ContactCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
             .legalForm(LegalForm.LEGAL_ENTITY)
@@ -201,13 +201,16 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .position("Должность")
             .phones(
                 List.of(
-                    new Phone().phone("+79241111111")
-                        .version(0L)
+                    new PhoneCreateLight()
+                        .digitalId(digitalId)
+                        .phone("+79241111111")
                 ))
-            .emails(List.of(
-                new Email().email("a.a.a@sberbank.ru")
-                    .version(0L)
-            ))
+            .emails(
+                List.of(
+                    new EmailCreateLight()
+                        .digitalId(digitalId)
+                        .email("a.a.a@sberbank.ru")
+                ))
             ;
     }
 

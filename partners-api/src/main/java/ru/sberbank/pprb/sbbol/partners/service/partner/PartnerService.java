@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
@@ -34,7 +35,7 @@ public interface PartnerService {
      * @param partner данные Партнера
      * @return Партнер
      */
-    PartnerResponse savePartner(Partner partner);
+    PartnerResponse savePartner(PartnerCreate partner);
 
     /**
      * Обновление Партнера

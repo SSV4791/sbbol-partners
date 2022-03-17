@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -49,6 +50,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleObjectModelValidationException(ModelValidationException ex, HttpServletRequest httpRequest) {
         LOG.error("Ошибка заполнения объекта", ex);
         return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrors(), httpRequest.getRequestURL());
+    }
+
+    @ExceptionHandler({BadRequestException.class})
+    protected ResponseEntity<Object> handleObjectBadRequestException(BadRequestException ex, HttpServletRequest httpRequest) {
+        LOG.error("Ошибка заполнения объекта", ex);
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), httpRequest.getRequestURL());
     }
 
     @ExceptionHandler(Exception.class)
