@@ -17,8 +17,4 @@ public interface PartnerEmailMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
     @Mapping(target = "partner", ignore = true)
     PartnerEmailEntity toEmail(Email email);
-
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partner", ignore = true)
-    PartnerEmailEntity toEmail(String email);
 }

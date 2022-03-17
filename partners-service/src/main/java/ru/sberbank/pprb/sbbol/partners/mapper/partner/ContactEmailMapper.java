@@ -17,8 +17,4 @@ public interface ContactEmailMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
     @Mapping(target = "contact", ignore = true)
     ContactEmailEntity toEmail(Email email);
-
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "contact", ignore = true)
-    ContactEmailEntity toEmail(String email);
 }

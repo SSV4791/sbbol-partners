@@ -7,13 +7,18 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(
     componentModel = "spring",
@@ -46,11 +51,33 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "emails", expression = "java(toEmail(partner.getEmails(), partner.getDigitalId()))")
+    @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), partner.getDigitalId()))")
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "version", ignore = true)
     PartnerEntity toPartner(PartnerCreate partner);
+
+    default List<PartnerEmailEntity> toEmail(List<String> emails, String digitalId) {
+        return emails.stream()
+            .map(value -> {
+                var partnerEmail = new PartnerEmailEntity();
+                partnerEmail.setEmail(value);
+                partnerEmail.setDigitalId(digitalId);
+                return partnerEmail;
+            }).collect(Collectors.toList());
+    }
+
+    default List<PartnerPhoneEntity> toPhone(List<String> phones, String digitalId) {
+        return phones.stream()
+            .map(value -> {
+                var partnerPhone = new PartnerPhoneEntity();
+                partnerPhone.setPhone(value);
+                partnerPhone.setDigitalId(digitalId);
+                return partnerPhone;
+            }).collect(Collectors.toList());
+    }
 
     @Named("toCitizenshipType")
     static PartnerCitizenshipType toCitizenshipType(PartnerCreate.CitizenshipEnum citizenshipEnum) {

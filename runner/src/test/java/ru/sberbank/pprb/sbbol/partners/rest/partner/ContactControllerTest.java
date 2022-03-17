@@ -9,11 +9,9 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.EmailCreateLight;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.model.PhoneCreateLight;
 
 import java.util.List;
 
@@ -201,15 +199,11 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .position("Должность")
             .phones(
                 List.of(
-                    new PhoneCreateLight()
-                        .digitalId(digitalId)
-                        .phone("+79241111111")
+                    "+79241111111"
                 ))
             .emails(
                 List.of(
-                    new EmailCreateLight()
-                        .digitalId(digitalId)
-                        .email("a.a.a@sberbank.ru")
+                    "a.a.a@sberbank.ru"
                 ))
             ;
     }

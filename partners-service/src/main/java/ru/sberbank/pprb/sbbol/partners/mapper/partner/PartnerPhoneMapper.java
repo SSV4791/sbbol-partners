@@ -17,8 +17,4 @@ public interface PartnerPhoneMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(phone.getId()))")
     @Mapping(target = "partner", ignore = true)
     PartnerPhoneEntity toPhone(Phone phone);
-
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partner", ignore = true)
-    PartnerPhoneEntity toPhone(String phone);
 }

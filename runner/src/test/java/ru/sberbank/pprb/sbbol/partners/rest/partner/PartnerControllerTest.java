@@ -4,7 +4,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
-import ru.sberbank.pprb.sbbol.partners.model.EmailCreateLight;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -13,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
-import ru.sberbank.pprb.sbbol.partners.model.PhoneCreateLight;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 
 import java.util.List;
@@ -455,15 +453,11 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .okpo("444444")
             .phones(
                 List.of(
-                    new PhoneCreateLight()
-                        .digitalId(digitalId)
-                        .phone("+79241111111")
+                    "+79241111111"
                 ))
             .emails(
                 List.of(
-                    new EmailCreateLight()
-                        .digitalId(digitalId)
-                        .email("a.a.a@sberbank.ru")
+                    "a.a.a@sberbank.ru"
                 ))
             .comment("555555")
             ;

@@ -45,16 +45,16 @@
     },
     "phones": {
       "type": "array",
-      "title": "Номера телефонов партнера",
+      "title": "Номера телефона контакта",
       "items": {
-        "$ref": "../phone/phone_create_light.json"
+        "type": "string"
       }
     },
     "emails": {
       "type": "array",
-      "title": "Адреса электронной почты партнера",
+      "title": "Номера телефона контакта",
       "items": {
-        "$ref": "../email/email_create_light.json"
+        "type": "string"
       }
     },
     "comment": {

@@ -36,14 +36,14 @@
       "type": "array",
       "title": "Номера телефона контакта",
       "items": {
-        "$ref": "../phone/phone_create_light.json"
+        "type": "string"
       }
     },
     "emails": {
       "type": "array",
-      "title": "Адреса электронной почты контакта",
+      "title": "Номера телефона контакта",
       "items": {
-        "$ref": "../email/email_create_light.json"
+        "type": "string"
       }
     },
     "legalForm": {

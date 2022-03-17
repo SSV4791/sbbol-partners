@@ -27,16 +27,6 @@ public class ContactEmailMapperTest extends BaseConfiguration {
     }
 
     @Test
-    void testToEmailString() {
-        var expected = RandomStringUtils.randomAlphabetic(10);
-        ContactEmailEntity actual = mapper.toEmail(expected);
-        actual.setContact(factory.manufacturePojo(ContactEntity.class));
-        var email = mapper.toEmail(actual);
-        assertThat(expected)
-            .isEqualTo(email.getEmail());
-    }
-
-    @Test
     void testToEmailReverse() {
         ContactEmailEntity expected = factory.manufacturePojo(ContactEmailEntity.class);
         expected.setContact(factory.manufacturePojo(ContactEntity.class));
