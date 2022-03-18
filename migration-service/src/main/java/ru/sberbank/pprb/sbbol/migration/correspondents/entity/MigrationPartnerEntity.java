@@ -53,8 +53,8 @@ public class MigrationPartnerEntity extends MigrationBaseEntity {
     @Column(name = "org_name", length = 50)
     private String orgName;
 
-    @Column(name = "second_name", length = 50)
-    private String secondName;
+    @Column(name = "first_name", length = 50)
+    private String firstName;
 
     @Column(name = "inn", length = 12)
     private String inn;
@@ -126,12 +126,12 @@ public class MigrationPartnerEntity extends MigrationBaseEntity {
         this.orgName = orgName;
     }
 
-    public String getSecondName() {
-        return secondName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName = secondName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getInn() {

@@ -61,7 +61,7 @@ public class MigrationPartnerMapperTest {
         migrationCorrespondentCandidate.setLegalType(MigrationLegalType.LEGAL_ENTITY);
         MigrationPartnerEntity migrationPartnerEntity = mapper.toMigrationPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
         assertThat(migrationPartnerEntity.getOrgName()).isEqualTo(migrationCorrespondentCandidate.getName());
-        assertThat(migrationPartnerEntity.getSecondName()).isNull();
+        assertThat(migrationPartnerEntity.getFirstName()).isNull();
     }
 
     @Test
@@ -70,7 +70,7 @@ public class MigrationPartnerMapperTest {
         migrationCorrespondentCandidate.setLegalType(MigrationLegalType.ENTREPRENEUR);
         MigrationPartnerEntity migrationPartnerEntity = mapper.toMigrationPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
         assertThat(migrationPartnerEntity.getOrgName()).isEqualTo(migrationCorrespondentCandidate.getName());
-        assertThat(migrationPartnerEntity.getSecondName()).isNull();
+        assertThat(migrationPartnerEntity.getFirstName()).isNull();
     }
 
     @Test
@@ -78,7 +78,7 @@ public class MigrationPartnerMapperTest {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setLegalType(MigrationLegalType.PHYSICAL_PERSON);
         MigrationPartnerEntity migrationPartnerEntity = mapper.toMigrationPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
-        assertThat(migrationPartnerEntity.getSecondName()).isEqualTo(migrationCorrespondentCandidate.getName());
+        assertThat(migrationPartnerEntity.getFirstName()).isEqualTo(migrationCorrespondentCandidate.getName());
         assertThat(migrationPartnerEntity.getOrgName()).isNull();
     }
 }

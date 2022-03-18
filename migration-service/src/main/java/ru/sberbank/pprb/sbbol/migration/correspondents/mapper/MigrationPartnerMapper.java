@@ -29,7 +29,7 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "email", expression = "java(toMigrationPartnerEmailEntity(source.getCorrEmail(), source.getVersion(), digitalId))")
     @Mapping(target = "account", expression = "java(toMigrationPartnerAccountEntity(digitalId, source))")
     @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "secondName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "firstName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
     @Mapping(target = "createDate", expression = "java(OffsetDateTime.now())")
     @Mapping(target = "lastModifiedDate", expression = "java(OffsetDateTime.now())")
     MigrationPartnerEntity toMigrationPartnerEntity(String digitalId, MigrationCorrespondentCandidate source);
