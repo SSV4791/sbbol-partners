@@ -46,12 +46,8 @@ public class PartnerCreateValidator implements Validator<PartnerCreate> {
             } else if (!checkInn(entity.getInn())) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
             }
-            if (entity.getKpp() == null) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "kpp", LEGAL_FORM_LEGAL_ENTITY));
-            } else {
-                if (entity.getKpp().length() != BasePartnerValidation.KPP_VALID_LENGTH) {
-                    errors.add(MessagesTranslator.toLocale("partner.kpp.length"));
-                }
+            if (entity.getKpp() != null && entity.getKpp().length() != BasePartnerValidation.KPP_VALID_LENGTH) {
+                errors.add(MessagesTranslator.toLocale("partner.kpp.length"));
             }
             if (entity.getOgrn() != null && !checkOgrn(entity.getOgrn())) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ogrn"));
