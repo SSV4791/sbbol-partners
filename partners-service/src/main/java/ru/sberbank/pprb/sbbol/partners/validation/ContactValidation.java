@@ -4,16 +4,17 @@ import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 
-import java.util.Collections;
 import java.util.List;
 
 public class ContactValidation implements Validator<Contact> {
 
     @Override
-    public List<String> validation(Contact entity) {
-        if (entity.getPartnerId() == null) {
-            return List.of(MessagesTranslator.toLocale("default.field.is_null", "partnerId"));
+    public void validation(List<String> errors, Contact entity) {
+        if (entity.getId() == null) {
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "id"));
         }
-        return Collections.emptyList();
+        if (entity.getPartnerId() == null) {
+            errors.add(MessagesTranslator.toLocale("default.field.is_null", "partnerId"));
+        }
     }
 }

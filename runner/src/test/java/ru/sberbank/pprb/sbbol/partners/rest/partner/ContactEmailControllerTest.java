@@ -77,6 +77,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
         updateEmail.unifiedId(email.getUnifiedId());
         updateEmail.digitalId(email.getDigitalId());
         updateEmail.email(newEmail);
+        updateEmail.setVersion(email.getVersion() + 1);
         var newUpdateEmail = put(baseRoutePath, updateEmail, EmailResponse.class);
 
         assertThat(newUpdateEmail)

@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
@@ -26,6 +28,7 @@ abstract class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PhonesResponse getPhones(PhonesFilter phonesFilter) {
         var response = phoneRepository.findByFilter(phonesFilter);
         var phoneResponse = new PhonesResponse();
@@ -47,6 +50,7 @@ abstract class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
+    @Transactional
     public PhoneResponse savePhone(PhoneCreate phone) {
         var phoneEntity = phoneMapper.toPhone(phone);
         PhoneEntity savedPhone = phoneRepository.save(phoneEntity);
@@ -55,11 +59,16 @@ abstract class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
+    @Transactional
     public PhoneResponse updatePhone(Phone phone) {
         var uuid = UUID.fromString(phone.getId());
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid);
         if (foundPhone == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, uuid);
+        }
+        if (phone.getVersion() <= foundPhone.getVersion()) {
+            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundPhone.getVersion() +
+                " больше или равна версии документа в запросе version=" + phone.getVersion());
         }
         phoneMapper.updatePhone(phone, foundPhone);
         var savedPhone = phoneRepository.save(foundPhone);
@@ -68,6 +77,7 @@ abstract class PhoneServiceImpl implements PhoneService {
     }
 
     @Override
+    @Transactional
     public void deletePhone(String digitalId, String id) {
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundPhone == null) {

@@ -77,6 +77,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
         updatePhone.unifiedId(phone.getUnifiedId());
         updatePhone.digitalId(phone.getDigitalId());
         updatePhone.phone(newPhone);
+        updatePhone.setVersion(phone.getVersion() + 1);
         var newUpdatePhone = put(baseRoutePath, updatePhone, PhoneResponse.class);
 
         assertThat(newUpdatePhone)

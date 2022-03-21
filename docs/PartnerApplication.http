@@ -4,7 +4,7 @@ Content-Type: application/json
 
 
 ### Создание Партнера
-POST http://127.0.0.1:8080/partners
+POST http://127.0.0.1:8080/partner
 Content-Type: application/json
 
 {
@@ -12,19 +12,23 @@ Content-Type: application/json
     "digitalId": "11111",
     "version": 0,
     "partnerType": "PARTNER",
-    "legalForm": "LEGAL_ENTITY"
+    "legalForm": "LEGAL_ENTITY",
+    "orgName": "Малохито",
+    "inn": "4139314257"
 }
 
 
 ### Обновление Партнера
-PUT http://127.0.0.1:8080/partners
+PUT http://127.0.0.1:8080/partner
 Content-Type: application/json
 
 {
-    "uuid": "ccc854a0-ed10-4773-8063-ed6ddd389851",
+    "id": "a5422c7d-cea3-4b57-9a28-bda3e2ca92ca",
     "digitalId": "11111",
     "version": 0,
-    "type": "LEGAL_ENTITY",
+    "legalForm": "LEGAL_ENTITY",
+    "orgName": "Малохито",
+    "inn": "4139314257",
     "contacts": [
         {
             "name": "Рик и Морти"

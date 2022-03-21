@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.utils;
 import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
@@ -40,6 +41,7 @@ public class PartnerUtils {
 
     private static final String PARTNER_NAME = "partner";
     private static final String ACCOUNT_NAME = "account";
+    public static final String SAVE_COUNTERPARTY_MESSAGE_EXCEPTION = "Сохранение контрагента в СББОЛ невозможно, одно из обязательных полей пусто";
 
     private final AccountRepository accountRepository;
     private final PartnerRepository partnerRepository;
@@ -113,10 +115,10 @@ public class PartnerUtils {
         counterpartyMapper.updateCounterparty(updatedCounterparty, partner);
         if (updatedCounterparty.getName() == null || updatedCounterparty.getAccount() == null ||
             updatedCounterparty.getBankBic() == null || updatedCounterparty.getTaxNumber() == null) {
-            throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ невозможно, одно из обязательных полей пусто" + updatedCounterparty));
+            throw new ModelValidationException(SAVE_COUNTERPARTY_MESSAGE_EXCEPTION + updatedCounterparty);
         }
         if (counterparty.equals(updatedCounterparty)) {
-            throw new ModelValidationException(Collections.singletonList("Обновление контрагента в СББОЛ невозможно, поля контрагента не отличаются" + updatedCounterparty));
+            throw new ModelValidationException("Обновление контрагента в СББОЛ невозможно, поля контрагента не отличаются" + updatedCounterparty);
         } else {
             Counterparty sbbolUpdatedCounterparty = legacySbbolAdapter.update(partner.getDigitalId(), updatedCounterparty);
             return counterpartyMapper.toPartner(sbbolUpdatedCounterparty, partner.getDigitalId());
@@ -138,7 +140,9 @@ public class PartnerUtils {
         BankCreate bank;
         BankAccountCreate bankAccount = null;
         if (CollectionUtils.isEmpty(account.getBanks()) || account.getBanks().size() != 1) {
-            throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ невозможно, банк должен быть заполнен единственным значением"));
+            throw new ModelValidationException(
+                "Сохранение контрагента в СББОЛ невозможно, банк должен быть заполнен единственным значением"
+            );
         } else {
             bank = account.getBanks().get(0);
             if (!CollectionUtils.isEmpty(bank.getBankAccounts()) && bank.getBankAccounts().size() == 1) {
@@ -147,9 +151,11 @@ public class PartnerUtils {
         }
         Counterparty updatedCounterparty = (Counterparty) SerializationUtils.clone(sbbolCounterparty);
         counterpartyMapper.updateCounterparty(updatedCounterparty, account, bank, bankAccount);
-        if (updatedCounterparty.getName() == null || updatedCounterparty.getAccount() == null ||
-            updatedCounterparty.getBankBic() == null || updatedCounterparty.getTaxNumber() == null) {
-            throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ невозможно, одно из обязательных полей пусто" + updatedCounterparty));
+        if (updatedCounterparty.getName() == null
+            || updatedCounterparty.getAccount() == null
+            || updatedCounterparty.getBankBic() == null
+            || updatedCounterparty.getTaxNumber() == null) {
+            throw new ModelValidationException(SAVE_COUNTERPARTY_MESSAGE_EXCEPTION + updatedCounterparty);
         }
         if (sbbolCounterparty.equals(updatedCounterparty)) {
             return null;
@@ -176,7 +182,9 @@ public class PartnerUtils {
         Bank bank;
         BankAccount bankAccount = null;
         if (CollectionUtils.isEmpty(account.getBanks()) || account.getBanks().size() != 1) {
-            throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ невозможно, банк должен быть заполнен единственным значением"));
+            throw new ModelValidationException(
+                "Сохранение контрагента в СББОЛ невозможно, банк должен быть заполнен единственным значением"
+            );
         } else {
             bank = account.getBanks().get(0);
             if (!CollectionUtils.isEmpty(bank.getBankAccounts()) && bank.getBankAccounts().size() == 1) {
@@ -187,7 +195,7 @@ public class PartnerUtils {
         counterpartyMapper.updateCounterparty(updatedCounterparty, account, bank, bankAccount);
         if (updatedCounterparty.getName() == null || updatedCounterparty.getAccount() == null ||
             updatedCounterparty.getBankBic() == null || updatedCounterparty.getTaxNumber() == null) {
-            throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ невозможно, одно из обязательных полей пусто" + updatedCounterparty));
+            throw new ModelValidationException(SAVE_COUNTERPARTY_MESSAGE_EXCEPTION + updatedCounterparty);
         }
         if (sbbolCounterparty.equals(updatedCounterparty)) {
             return null;
@@ -209,6 +217,10 @@ public class PartnerUtils {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()));
         if (foundAccount == null) {
             throw new EntryNotFoundException(ACCOUNT_NAME, account.getDigitalId(), account.getId());
+        }
+        if (account.getVersion() <= foundAccount.getVersion()) {
+            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundAccount.getVersion() +
+                " больше или равна версии документа в запросе version=" + account.getVersion());
         }
         if (AccountStateType.SIGNED.equals(foundAccount.getState())) {
             throw new SignAccountException(Collections.singletonList("Ошибка обновления счёта клиента, нельзя обновлять подписанные счёта"));

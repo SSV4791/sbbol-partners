@@ -6,7 +6,6 @@ import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation.checkInn;
@@ -23,8 +22,7 @@ public class PartnerCreateValidator implements Validator<PartnerCreate> {
     public static final String LEGAL_FORM_PHYSICAL_PERSON = "legalForm.PHYSICAL_PERSON";
 
     @Override
-    public List<String> validation(PartnerCreate entity) {
-        var errors = new ArrayList<String>();
+    public void validation(List<String> errors, PartnerCreate entity) {
         if (entity.getDigitalId() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "digitalId"));
         }
@@ -33,10 +31,9 @@ public class PartnerCreateValidator implements Validator<PartnerCreate> {
         } else {
             checkLegalFormProperty(entity, errors);
         }
-        return errors;
     }
 
-    private void checkLegalFormProperty(PartnerCreate entity, ArrayList<String> errors) {
+    private void checkLegalFormProperty(PartnerCreate entity, List<String> errors) {
         if (entity.getLegalForm() == LegalForm.LEGAL_ENTITY) {
             if (entity.getOrgName() == null) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "orgName", LEGAL_FORM_LEGAL_ENTITY));

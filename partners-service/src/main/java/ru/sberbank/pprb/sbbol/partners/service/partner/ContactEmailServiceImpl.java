@@ -1,9 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
@@ -21,11 +22,12 @@ public class ContactEmailServiceImpl extends EmailServiceImpl {
     }
 
     @Override
-    public EmailResponse updateEmail(Email email) {
+    @Transactional
+    public EmailResponse saveEmail(EmailCreate email) {
         var partner = contactRepository.getByUuid(UUID.fromString(email.getUnifiedId()));
         if (partner == null) {
             throw new EntryNotFoundException("partner", UUID.fromString(email.getUnifiedId()));
         }
-        return super.updateEmail(email);
+        return super.saveEmail(email);
     }
 }

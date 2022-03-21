@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.partners.handler;
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,8 +53,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrors(), httpRequest.getRequestURL());
     }
 
-    @ExceptionHandler({BadRequestException.class})
-    protected ResponseEntity<Object> handleObjectBadRequestException(BadRequestException ex, HttpServletRequest httpRequest) {
+    @ExceptionHandler({BadRequestException.class, OptimisticLockingFailureException.class})
+    protected ResponseEntity<Object> handleObjectBadRequestException(Exception ex, HttpServletRequest httpRequest) {
         LOG.error("Ошибка заполнения объекта", ex);
         return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), httpRequest.getRequestURL());
     }

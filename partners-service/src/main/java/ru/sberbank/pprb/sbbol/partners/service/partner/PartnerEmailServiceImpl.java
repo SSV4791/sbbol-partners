@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
@@ -21,6 +22,7 @@ public class PartnerEmailServiceImpl extends EmailServiceImpl {
     }
 
     @Override
+    @Transactional
     public EmailResponse saveEmail(EmailCreate email) {
         var uuid = UUID.fromString(email.getUnifiedId());
         var partner = partnerRepository.getByUuid(uuid);

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
@@ -76,6 +77,10 @@ abstract class AddressServiceImpl implements AddressService {
         var foundAddress = addressRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getId()));
         if (foundAddress == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, address.getDigitalId(), address.getId());
+        }
+        if (address.getVersion() <= foundAddress.getVersion()) {
+            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundAddress.getVersion() +
+                " больше или равна версии документа в запросе version=" + address.getVersion());
         }
         addressMapper.updateAddress(address, foundAddress);
         var saveContact = addressRepository.save(foundAddress);

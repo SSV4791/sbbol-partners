@@ -109,6 +109,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         updateAddress.digitalId(address.getDigitalId());
         updateAddress.unifiedId(address.getUnifiedId());
         updateAddress.city(newName);
+        updateAddress.setVersion(address.getVersion() + 1);
         var newUpdateAddress = put(baseRoutePath + "/address", updateAddress, AddressResponse.class);
 
         assertThat(newUpdateAddress)

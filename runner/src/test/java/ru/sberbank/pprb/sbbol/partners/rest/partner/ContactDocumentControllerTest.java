@@ -119,6 +119,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         updateDocument.digitalId(document.getDigitalId());
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
+        updateDocument.setVersion(document.getVersion() + 1);
         var newUpdateDocument = put(baseRoutePath + "/document", updateDocument, DocumentResponse.class);
 
         assertThat(newUpdateDocument)

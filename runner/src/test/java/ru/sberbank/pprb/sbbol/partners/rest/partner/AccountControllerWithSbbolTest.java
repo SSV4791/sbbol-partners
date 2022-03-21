@@ -96,7 +96,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @Test
     void testUpdateAccount() {
         var partner = createValidPartner();
-        var executeAccount = counterpartyMapper.toAccount(updatedCounterparty, partner.getDigitalId(), null, budgetMaskService);
+        var executeAccount = counterpartyMapper.toAccount(updatedCounterparty, partner.getDigitalId(), UUID.randomUUID(), budgetMaskService);
         var newUpdateAccount = put(baseRoutePath + "/account", executeAccount, AccountResponse.class);
         assertThat(newUpdateAccount)
             .isNotNull();

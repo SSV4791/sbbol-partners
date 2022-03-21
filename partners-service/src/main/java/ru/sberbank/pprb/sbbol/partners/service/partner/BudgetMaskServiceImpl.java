@@ -1,11 +1,13 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
@@ -32,6 +34,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     }
 
     @Override
+    @Transactional
     public BudgetMask saveBudgetMask(BudgetMask budgetMask) {
         var budgetMaskEntity = budgetMaskMapper.toBudgetMask(budgetMask);
         var saved = budgetMaskDictionaryRepository.save(budgetMaskEntity);
@@ -39,6 +42,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BudgetMasksResponse getBudgetMasks(BudgetMaskFilter budgetMaskFilter) {
         var response = budgetMaskDictionaryRepository.findByFilter(budgetMaskFilter);
         BudgetMasksResponse budgetMasksResponse = new BudgetMasksResponse();
@@ -49,6 +53,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     }
 
     @Override
+    @Transactional
     public void deleteBudgetMask(String id) {
         var uuid = UUID.fromString(id);
         var foundMask = budgetMaskDictionaryRepository.getByUuid(uuid);
@@ -120,7 +125,10 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
                 maskFormatter.setMask(mask.getMask());
                 maskFormatter.valueToString(param);
                 return true;
-            } catch (ParseException ignored) {
+            } catch (ParseException e) {
+                throw new ModelValidationException(List.of(
+                    e.getLocalizedMessage()
+                ));
             }
         }
         return false;
