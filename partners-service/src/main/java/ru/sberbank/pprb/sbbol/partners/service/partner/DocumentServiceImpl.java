@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
@@ -31,6 +33,8 @@ abstract class DocumentServiceImpl implements DocumentService {
         this.documentMapper = documentMapper;
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public DocumentResponse getDocument(String digitalId, String id) {
         var document = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (document == null) {
@@ -40,6 +44,8 @@ abstract class DocumentServiceImpl implements DocumentService {
         return new DocumentResponse().document(response);
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public DocumentsResponse getDocuments(DocumentsFilter documentsFilter) {
         var response = documentRepository.findByFilter(documentsFilter);
         var documentsResponse = new DocumentsResponse();
@@ -60,6 +66,8 @@ abstract class DocumentServiceImpl implements DocumentService {
         return documentsResponse;
     }
 
+    @Override
+    @Transactional
     public DocumentResponse saveDocument(DocumentCreate document) {
         var requestDocument = documentMapper.toDocument(document);
         if (requestDocument.getTypeUuid() != null) {
@@ -71,10 +79,16 @@ abstract class DocumentServiceImpl implements DocumentService {
         return new DocumentResponse().document(response);
     }
 
+    @Override
+    @Transactional
     public DocumentResponse updateDocument(DocumentChange document) {
         var foundDocument = documentRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getId()));
         if (foundDocument == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId());
+        }
+        if (document.getVersion() <= foundDocument.getVersion()) {
+            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundDocument.getVersion() +
+                " больше или равна версии документа в запросе version=" + document.getVersion());
         }
         documentMapper.updateDocument(document, foundDocument);
         var saveContact = documentRepository.save(foundDocument);
@@ -82,6 +96,8 @@ abstract class DocumentServiceImpl implements DocumentService {
         return new DocumentResponse().document(response);
     }
 
+    @Override
+    @Transactional
     public void deleteDocument(String digitalId, String id) {
         var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundDocument == null) {

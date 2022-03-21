@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface Validator<T> {
 
-    List<String> validation(T entity);
+    void validation(List<String> errors, T entity);
 }

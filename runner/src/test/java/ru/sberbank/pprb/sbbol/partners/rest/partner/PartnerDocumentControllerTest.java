@@ -107,6 +107,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         updateDocument.digitalId(document.getDigitalId());
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
+        updateDocument.setVersion(document.getVersion() + 1);
         DocumentResponse newUpdateDocument = put(baseRoutePath + "/document", updateDocument, DocumentResponse.class);
 
         assertThat(newUpdateDocument)

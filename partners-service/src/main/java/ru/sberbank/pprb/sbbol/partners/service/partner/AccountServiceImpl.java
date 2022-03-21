@@ -85,7 +85,9 @@ public class AccountServiceImpl implements AccountService {
             if (CollectionUtils.isEmpty(replicationHistoryEntityList)) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
-            List<ReplicationHistoryEntity> replicationHistoryEntityListWithSbbolGuids = replicationHistoryEntityList.stream().filter(r -> r.getSbbolGuid() != null).collect(Collectors.toList());
+            List<ReplicationHistoryEntity> replicationHistoryEntityListWithSbbolGuids = replicationHistoryEntityList.stream()
+                .filter(r -> r.getSbbolGuid() != null)
+                .collect(Collectors.toList());
             if (CollectionUtils.isEmpty(replicationHistoryEntityListWithSbbolGuids) || replicationHistoryEntityListWithSbbolGuids.size() != 1) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
@@ -158,7 +160,9 @@ public class AccountServiceImpl implements AccountService {
             return new AccountResponse().account(response);
         } else {
             if (CollectionUtils.isEmpty(account.getBanks())) {
-                throw new ModelValidationException(Collections.singletonList("Сохранение контрагента в СББОЛ не возможно, поле банк обязательно для заполнения"));
+                throw new ModelValidationException(
+                    Collections.singletonList("Сохранение контрагента в СББОЛ не возможно, поле банк обязательно для заполнения")
+                );
             }
             Counterparty sbbolCounterparty = legacySbbolAdapter.getByPprbGuid(account.getDigitalId(), account.getPartnerId());
             if (sbbolCounterparty == null) {
@@ -184,7 +188,8 @@ public class AccountServiceImpl implements AccountService {
             Counterparty sbbolCounterparty = legacySbbolAdapter.getByPprbGuid(account.getDigitalId(), account.getPartnerId());
             Counterparty sbbolUpdatedCounterparty = partnerUtils.createOrUpdateCounterparty(sbbolCounterparty, account);
             UUID accountUuid = replicationHistoryService.updateAccount(account, sbbolUpdatedCounterparty);
-            return new AccountResponse().account(counterpartyMapper.toAccount(sbbolUpdatedCounterparty, account.getDigitalId(), accountUuid, budgetMaskService));
+            return new AccountResponse()
+                .account(counterpartyMapper.toAccount(sbbolUpdatedCounterparty, account.getDigitalId(), accountUuid, budgetMaskService));
         }
     }
 

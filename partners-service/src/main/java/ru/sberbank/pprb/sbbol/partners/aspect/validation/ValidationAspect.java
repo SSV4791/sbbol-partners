@@ -13,7 +13,7 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Аспект, обрабатывающий вызов методов с валидацией, отмеченных аннотацией {@link Validation}
@@ -45,7 +45,8 @@ public class ValidationAspect {
                 }
                 var type = ((Validation) annotation).type();
                 Validator bean = getBean(type, type.getName());
-                List<String> errors = bean.validation(args[argIndex]);
+                var errors = new ArrayList<String>();
+                bean.validation(errors, args[argIndex]);
                 if (CollectionUtils.isEmpty(errors)) {
                     return;
                 }

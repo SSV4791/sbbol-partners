@@ -1,9 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
-import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
@@ -21,12 +22,13 @@ public class ContactPhoneServiceImpl extends PhoneServiceImpl {
     }
 
     @Override
-    public PhoneResponse updatePhone(Phone phone) {
+    @Transactional
+    public PhoneResponse savePhone(PhoneCreate phone) {
         var uuid = UUID.fromString(phone.getUnifiedId());
         var partner = contactRepository.getByUuid(uuid);
         if (partner == null) {
             throw new EntryNotFoundException("contact", uuid);
         }
-        return super.updatePhone(phone);
+        return super.savePhone(phone);
     }
 }

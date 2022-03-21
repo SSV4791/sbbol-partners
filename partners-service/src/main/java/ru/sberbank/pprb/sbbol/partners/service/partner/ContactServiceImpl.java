@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -86,6 +87,10 @@ public class ContactServiceImpl implements ContactService {
         var foundContact = contactRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getId()));
         if (foundContact == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, contact.getDigitalId(), contact.getId());
+        }
+        if (contact.getVersion() <= foundContact.getVersion()) {
+            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundContact.getVersion() +
+                " больше или равна версии документа в запросе version=" + contact.getVersion());
         }
         contactMapper.updateContact(contact, foundContact);
         var saveContact = contactRepository.save(foundContact);

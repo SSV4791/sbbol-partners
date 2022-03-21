@@ -27,7 +27,6 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "id", expression = "java(account.getUuid() == null ? null :account.getUuid().toString())")
     @Mapping(target = "partnerId", expression = "java(account.getPartnerUuid() == null ? null : account.getPartnerUuid().toString())")
     @Mapping(target = "budget", ignore = true)
-    @Mapping(target = "version", ignore = true)
     Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
 
     @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")

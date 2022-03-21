@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
@@ -152,8 +153,16 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         String newName = "Новое наименование";
-        account.setName(newName);
-        var newUpdateAccount = put(baseRoutePath + "/account", account, AccountResponse.class);
+        var updatedAccount = new AccountChange()
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .digitalId(account.getDigitalId())
+            .version(account.getVersion() + 1)
+            .budget(account.getBudget())
+            .name(newName)
+            .account(account.getAccount())
+            .banks(account.getBanks());
+        var newUpdateAccount = put(baseRoutePath + "/account", updatedAccount, AccountResponse.class);
         assertThat(newUpdateAccount)
             .isNotNull();
         assertThat(newUpdateAccount.getAccount().getName())

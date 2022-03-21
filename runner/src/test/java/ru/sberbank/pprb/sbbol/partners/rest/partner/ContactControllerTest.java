@@ -135,6 +135,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         updateContact.digitalId(contact.getDigitalId());
         updateContact.partnerId(contact.getPartnerId());
         updateContact.orgName(newName);
+        updateContact.setVersion(contact.getVersion() + 1);
         var newUpdateContact = put(baseRoutePath + "/contact", updateContact, ContactResponse.class);
 
         assertThat(newUpdateContact)

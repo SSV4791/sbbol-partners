@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
@@ -26,6 +28,7 @@ abstract class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EmailsResponse getEmails(EmailsFilter emailsFilter) {
         var response = emailRepository.findByFilter(emailsFilter);
         var emailResponse = new EmailsResponse();
@@ -47,6 +50,7 @@ abstract class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Transactional
     public EmailResponse saveEmail(EmailCreate email) {
         var emailEntity = emailMapper.toEmail(email);
         EmailEntity savedEmail = emailRepository.save(emailEntity);
@@ -55,11 +59,16 @@ abstract class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Transactional
     public EmailResponse updateEmail(Email email) {
         var uuid = UUID.fromString(email.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid);
         if (foundEmail == null) {
             throw new EntryNotFoundException(DOCUMENT_NAME, uuid);
+        }
+        if (email.getVersion() <= foundEmail.getVersion()) {
+            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundEmail.getVersion() +
+                " больше или равна версии документа в запросе version=" + email.getVersion());
         }
         emailMapper.updateEmail(email, foundEmail);
         var savedEmail = emailRepository.save(foundEmail);
@@ -68,6 +77,7 @@ abstract class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Transactional
     public void deleteEmail(String digitalId, String id) {
         var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundEmail == null) {
