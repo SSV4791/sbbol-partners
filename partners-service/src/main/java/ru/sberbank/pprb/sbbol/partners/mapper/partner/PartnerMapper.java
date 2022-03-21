@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
@@ -17,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,6 +62,9 @@ public interface PartnerMapper extends BaseMapper {
     PartnerEntity toPartner(PartnerCreate partner);
 
     default List<PartnerEmailEntity> toEmail(List<String> emails, String digitalId) {
+        if (CollectionUtils.isEmpty(emails)) {
+            return Collections.emptyList();
+        }
         return emails.stream()
             .map(value -> {
                 var partnerEmail = new PartnerEmailEntity();
@@ -70,6 +75,9 @@ public interface PartnerMapper extends BaseMapper {
     }
 
     default List<PartnerPhoneEntity> toPhone(List<String> phones, String digitalId) {
+        if (CollectionUtils.isEmpty(phones)) {
+            return Collections.emptyList();
+        }
         return phones.stream()
             .map(value -> {
                 var partnerPhone = new PartnerPhoneEntity();
