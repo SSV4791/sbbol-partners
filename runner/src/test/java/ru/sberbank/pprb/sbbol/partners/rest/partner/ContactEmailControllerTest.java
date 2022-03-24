@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -21,6 +22,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     public static final String baseRoutePath = "/partner/contact/email";
 
     @Test
+    @AllureId("34150")
     void testViewContactEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -54,6 +56,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
 
 
     @Test
+    @AllureId("34181")
     void testCreateContactEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -66,6 +69,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     @Test
+    @AllureId("34130")
     void testUpdateContactEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -89,6 +93,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     @Test
+    @AllureId("34137")
     void testDeleteContactEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());

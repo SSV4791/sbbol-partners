@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.renter;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -14,6 +15,7 @@ class RenterPartnerMapperTest extends BaseConfiguration {
     private static final RenterPartnerMapper mapper = Mappers.getMapper(RenterPartnerMapper.class);
 
     @Test
+    @AllureId("34055")
     void toPartner() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var renter = mapper.toPartner(expected);
@@ -40,6 +42,7 @@ class RenterPartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34106")
     void toPhones() {
         String phone = RandomStringUtils.randomAlphabetic(10);
         String digitalId = RandomStringUtils.randomAlphabetic(10);
@@ -50,6 +53,7 @@ class RenterPartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34091")
     void toEmails() {
         String email = RandomStringUtils.randomAlphabetic(10);
         String digitalId = RandomStringUtils.randomAlphabetic(10);
@@ -60,6 +64,7 @@ class RenterPartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34074")
     void toAccount() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var account = mapper.toAccount(expected);
@@ -82,6 +87,7 @@ class RenterPartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34086")
     void toBanks() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var banks = RenterPartnerMapper.toBanks(expected);
@@ -96,6 +102,7 @@ class RenterPartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34065")
     void toAddress() {
         RenterAddress expected = factory.manufacturePojo(RenterAddress.class);
         var renter = mapper.toAddress(expected);
@@ -106,6 +113,7 @@ class RenterPartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34098")
     void toDocument() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var document = mapper.toDocument(expected);

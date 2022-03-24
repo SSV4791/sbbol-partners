@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
@@ -16,6 +17,7 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/dictionary/budget-mask";
 
     @Test
+    @AllureId("34157")
     void testViewBudgetMasks() {
         var filter1 = new BudgetMaskFilter()
             .maskType(BudgetMaskForm.BUDGET_ACCOUNT);
@@ -25,6 +27,7 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @AllureId("34205")
     void testCreateBudgetMasks() {
         var mask = "Новая маска";
         var budgetMask = new BudgetMask()
@@ -45,6 +48,7 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @AllureId("34193")
     void testDeleteBudgetMasks() {
         var budgetMask = new BudgetMask()
             .id(UUID.randomUUID().toString())

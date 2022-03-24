@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -17,6 +18,7 @@ public class AccountSignMapperTest extends BaseConfiguration {
     private static final AccountSingMapper mapper = Mappers.getMapper(AccountSingMapper.class);
 
     @Test
+    @AllureId("34105")
     void testToAccount() {
         var expected = factory.manufacturePojo(AccountEntity.class);
         var actual = mapper.toSignAccount(expected);
@@ -28,6 +30,7 @@ public class AccountSignMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34069")
     void testToSignAccount() {
         var expected = factory.manufacturePojo(SignEntity.class);
         var actual = mapper.toSignAccount(expected);
@@ -49,6 +52,7 @@ public class AccountSignMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34069")
     void testToSignAccountInfo() {
         var expected = factory.manufacturePojo(SignEntity.class);
         var expectedDigitalId = RandomStringUtils.randomAlphabetic(10);
@@ -74,6 +78,7 @@ public class AccountSignMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34069")
     void testToSign() {
         var expected = factory.manufacturePojo(AccountSignDetail.class);
         var actual = mapper.toSing(expected, UUID.randomUUID());

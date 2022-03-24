@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
@@ -13,6 +14,7 @@ class PhoneMapperTest extends BaseConfiguration {
     private static final PhoneMapper mapper = Mappers.getMapper(PhoneMapper.class);
 
     @Test
+    @AllureId("34380")
     void toPhone() {
         var expected = factory.manufacturePojo(Phone.class);
         var actual = mapper.toPhone(expected);
@@ -22,6 +24,7 @@ class PhoneMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34380")
     void toPhoneCreate() {
         var expected = factory.manufacturePojo(PhoneCreate.class);
         var actual = mapper.toPhone(expected);

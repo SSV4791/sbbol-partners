@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
     public static final String baseRoutePath = "/partner/accounts/sign";
 
     @Test
+    @AllureId("34175")
     void testViewSignAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var account1 = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -62,6 +64,7 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
     }
 
     @Test
+    @AllureId("34190")
     void testCreateSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -72,6 +75,7 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
     }
 
     @Test
+    @AllureId("34203")
     void testGetSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -95,6 +99,7 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
     }
 
     @Test
+    @AllureId("34135")
     void testDeleteSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());

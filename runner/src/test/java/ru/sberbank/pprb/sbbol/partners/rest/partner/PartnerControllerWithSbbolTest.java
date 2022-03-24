@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
+    @AllureId("34191")
     void testGetPartner() {
         var digitalId = RandomStringUtils.randomAlphabetic(10);
         var partner = counterpartyMapper.toPartner(counterparty, digitalId);
@@ -36,6 +38,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34187")
     void testPartners() {
         var digitalId = RandomStringUtils.randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
@@ -61,6 +64,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34166")
     void testGetAllPartners() {
         var digitalId = RandomStringUtils.randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
@@ -87,6 +91,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34156")
     void testCreatePartner() {
         var digitalId = RandomStringUtils.randomAlphabetic(10);
         var partner = counterpartyMapper.toPartner(counterparty, digitalId);
@@ -103,6 +108,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34194")
     void testUpdatePartner() {
         var partner = getValidPartner();
         var createdPartner = createPost(baseRoutePath, partner, PartnerResponse.class);
@@ -119,6 +125,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34114")
     void testDeletePartner() {
         var createdPartner = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
         createValidAccount(createdPartner.getPartner().getId(), createdPartner.getPartner().getDigitalId());

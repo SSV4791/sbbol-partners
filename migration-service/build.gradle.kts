@@ -18,6 +18,8 @@ tasks {
     }
 }
 
+val pactVersion: String by rootProject
+
 dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.4.2.Final")
 
@@ -33,6 +35,11 @@ dependencies {
     //Поддержка генераторов ID на время перехода.
     implementation("sbp.com.sbt.dataspace:jpa-model-support:4.3.34")
 
+    testImplementation("io.qameta.allure:allure-junit5:2.16.1")
+    testImplementation("ru.dcbqa.allureee.annotations:dcb-allure-annotations:1.2.+")
+    testImplementation("ru.dcbqa.swagger.coverage.reporter:swagger-coverage-reporter:2.3.+")
+    testImplementation(group = "au.com.dius.pact.consumer", name = "junit5", version = pactVersion)
+    testImplementation(group = "au.com.dius.pact.provider", name = "junit5", version = pactVersion)
 }
 
 description = "Сервис для миграции данных из Legacy СББОЛ"

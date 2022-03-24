@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
@@ -15,6 +16,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/dictionary/documents";
 
     @Test
+    @AllureId("34167")
     void testGetDocuments() {
         var response = get(baseRoutePath + "/{status}", DocumentsTypeResponse.class, false);
         assertThat(response)
@@ -22,6 +24,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @AllureId("34140")
     void testCreateDocuments() {
         var documentType = new DocumentType()
             .deleted(false)
@@ -41,6 +44,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @AllureId("34168")
     void testUpdateDocuments() {
         var documentType = new DocumentType()
             .id(UUID.randomUUID().toString())

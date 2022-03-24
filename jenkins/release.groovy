@@ -6,6 +6,7 @@ import ru.sbrf.ufs.pipeline.docker.DockerRunBuilder
 def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
 def sonarCredential = secman.makeCredMap('DS_CAB-SA-CI000825-sonar-token')
 def bitbucketCredential = Const.BITBUCKET_DBO_KEY_SECMAN
+def pactCredential = Const.PACT_CI_META_SECMAN
 def projectLog = ''
 
 pipeline {
@@ -43,6 +44,7 @@ pipeline {
         VERSION = ''
         LAST_VERSION = ''
         LATEST_COMMIT_HASH = ''
+        ALLURE_PROJECT_ID =  154
     }
 
     stages {
@@ -104,24 +106,43 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
-                        vault.withSecretKey([path: sonarCredential.path, secretKeyVar: "SONAR_TOKEN"]) {
-                            new DockerRunBuilder(this)
-                                .registry(Const.OPENSHIFT_REGISTRY, credential)
-                                .volume("${WORKSPACE}", "/build")
-                                .extra("-w /build")
-                                .cpu(2)
-                                .memory("2g")
-                                .image(BUILD_JAVA_DOCKER_IMAGE)
-                                .cmd('./gradlew ' +
-                                    "-PnexusLogin=${NEXUS_USER} " +
-                                    "-PnexusPassword=${NEXUS_PASSWORD} " +
-                                    "-Pversion=${VERSION} " +
-                                    "-Dsonar.login=${SONAR_TOKEN} " +
-                                    "-Dsonar.branch.name=${params.branch} " +
-                                    'build sonarqube --parallel'
-                                )
-                                .run()
+                    allureEe.run([
+                        projectId   : ALLURE_PROJECT_ID,
+                        allureResult: ["build/allure-results"],
+                        silent      : true
+                    ]) { launch ->
+                        vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
+                            vault.withUserPass([path: pactCredential.path, userVar: "PACT_USER", passVar: "PACT_PASSWORD"]) {
+                                vault.withSecretKey([path: sonarCredential.path, secretKeyVar: "SONAR_TOKEN"]) {
+                                    new DockerRunBuilder(this)
+                                        .registry(Const.OPENSHIFT_REGISTRY, credential)
+                                        .env("GRADLE_USER_HOME", "/build/.gradle")
+                                        .volume("${WORKSPACE}", "/build")
+                                        .extra("-w /build")
+                                        .cpu(2)
+                                        .memory("2g")
+                                        .image(BUILD_JAVA_DOCKER_IMAGE)
+                                        .cmd(["./gradlew",
+                                              "-PnexusLogin=${NEXUS_USER}",
+                                              "-PnexusPassword='${NEXUS_PASSWORD}'",
+                                              "-Dsonar.login=${SONAR_TOKEN}",
+                                              "-Pversion=${VERSION}",
+                                              "build qaReporterUpload sonarqube --info",
+                                              "-Dtest-layer=cdcConsumer,cdcProvider",
+                                              "-Dsonar.branch.name=${params.branch}",
+                                              "-Dpactbroker.url=${Const.PACT_BROKER_URL}",
+                                              "-Dpactbroker.auth.username=${PACT_USER}",
+                                              "-Dpactbroker.auth.password='${PACT_PASSWORD}'",
+                                              "-Dpact.pacticipant.tag=${params.branch}",
+                                              "-Dpact.pacticipant.version=${VERSION}",
+                                              "-Dbuild.link=${env.BUILD_URL}",
+                                              "-Dbuild.type=release",
+                                              "-Dallure.jobrunId=${launch.jobRunId}"]
+                                            .join(' ')
+                                        )
+                                        .run()
+                                }
+                            }
                         }
                     }
                 }

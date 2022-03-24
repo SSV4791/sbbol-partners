@@ -1,9 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.counterparty;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
+import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
@@ -38,12 +40,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@UnitTestLayer
 class CounterpartyMapperTest {
 
     private static final CounterpartyMapper mapper = Mappers.getMapper(CounterpartyMapper.class);
     private static final PodamFactory factory = new PodamFactoryImpl();
 
     @Test
+    @AllureId("34054")
     void toCounterpartyCheckRequisites() {
         var searchRequest = factory.manufacturePojo(CounterpartySearchRequest.class);
         CounterpartyCheckRequisites response = mapper.toCounterpartyCheckRequisites(searchRequest);
@@ -57,6 +61,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34045")
     void toCounterpartyTest() {
         var partner = factory.manufacturePojo(PartnerEntity.class);
         var account = factory.manufacturePojo(AccountCreate.class);
@@ -82,6 +87,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34045")
     void toCounterpartyTest1() {
         var partner = factory.manufacturePojo(PartnerEntity.class);
         var account = factory.manufacturePojo(AccountEntity.class);
@@ -107,6 +113,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34068")
     void updateCounterpartyTest() {
         var counterparty = factory.manufacturePojo(Counterparty.class);
         var updatedCounterparty = (Counterparty) SerializationUtils.clone(counterparty);
@@ -130,6 +137,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34099")
     void updateCounterpartyTest1() {
         var counterparty = factory.manufacturePojo(Counterparty.class);
         var updatedCounterparty = (Counterparty) SerializationUtils.clone(counterparty);
@@ -155,6 +163,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34095")
     void toPartnerTest() {
         var counterparty = factory.manufacturePojo(Counterparty.class);
         String digitalId = randomAlphabetic(10);
@@ -178,6 +187,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34066")
     void toCounterpartyFilterTest() {
         var partnersFilter = factory.manufacturePojo(PartnersFilter.class);
         CounterpartyFilter filter = mapper.toCounterpartyFilter(partnersFilter);
@@ -192,6 +202,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34073")
     void toCounterpartyFilterTest1() {
         var accountsFilter = factory.manufacturePojo(AccountsFilter.class);
         CounterpartyFilter filter = mapper.toCounterpartyFilter(accountsFilter);
@@ -206,6 +217,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34057")
     void toPartnersTest() {
         List<CounterpartyView> counterparties = Collections.singletonList(factory.manufacturePojo(CounterpartyView.class));
         String digitalId = randomAlphabetic(10);
@@ -218,6 +230,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34089")
     void toPartnerTest1() {
         CounterpartyView counterparty = factory.manufacturePojo(CounterpartyView.class);
         String digitalId = randomAlphabetic(10);
@@ -226,6 +239,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34047")
     void toAccountsTest() {
         List<CounterpartyView> counterparties = Collections.singletonList(factory.manufacturePojo(CounterpartyView.class));
         String digitalId = randomAlphabetic(10);
@@ -238,6 +252,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34049")
     void toAccountTest() {
         CounterpartyView counterparty = factory.manufacturePojo(CounterpartyView.class);
         String digitalId = randomAlphabetic(10);
@@ -247,6 +262,7 @@ class CounterpartyMapperTest {
     }
 
     @Test
+    @AllureId("34056")
     void toAccountTest1() {
         Counterparty counterparty = factory.manufacturePojo(Counterparty.class);
         String digitalId = randomAlphabetic(10);
