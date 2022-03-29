@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners.entity.partner;
+package ru.sberbank.pprb.sbbol.migration.gku.entity;
 
 import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.DynamicInsert;
@@ -16,17 +16,16 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(
-    name = "merge_history",
-    indexes = {
-        @Index(name = "merge_history_pkey", columnList = "uuid", unique = true),
-        @Index(name = "i_merge_history_partner_uuid", columnList = "partner_uuid", unique = true)
-    }
-)
+@Entity
 @DynamicUpdate
 @DynamicInsert
-@Entity
-public class MergeHistoryEntity implements Serializable, HashKeyProvider {
+@Table(
+    name = "gku_inn_dictionary",
+    indexes = {
+        @Index(name = "i_gku_inn_dictionary_inn", columnList = "inn")
+    }
+)
+public class MigrationGkuInnEntity implements Serializable, HashKeyProvider {
 
     @Serial
     private static final long serialVersionUID = 1;
@@ -37,21 +36,15 @@ public class MergeHistoryEntity implements Serializable, HashKeyProvider {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID uuid;
 
-    @Column(name = "partner_uuid", nullable = false)
-    private UUID partnerUuid;
+    @Column(name = "inn", nullable = false, length = 12)
+    private String inn;
 
-    @Column(name = "main_uuid", nullable = false)
-    private UUID mainUuid;
-
-    @Column(name = "sbbol_uuid", length = 36)
-    private String sbbolUuid;
-
-    public UUID getMainUuid() {
-        return mainUuid;
+    public String getInn() {
+        return inn;
     }
 
-    public void setMainUuid(UUID mainUuid) {
-        this.mainUuid = mainUuid;
+    public void setInn(String inn) {
+        this.inn = inn;
     }
 
     public UUID getUuid() {
@@ -60,22 +53,6 @@ public class MergeHistoryEntity implements Serializable, HashKeyProvider {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
-    }
-
-    public UUID getPartnerUuid() {
-        return partnerUuid;
-    }
-
-    public void setPartnerUuid(UUID partnerUuid) {
-        this.partnerUuid = partnerUuid;
-    }
-
-    public String getSbbolUuid() {
-        return sbbolUuid;
-    }
-
-    public void setSbbolUuid(String sbbolUuid) {
-        this.sbbolUuid = sbbolUuid;
     }
 
     @Override
@@ -91,7 +68,7 @@ public class MergeHistoryEntity implements Serializable, HashKeyProvider {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        MergeHistoryEntity that = (MergeHistoryEntity) obj;
+        MigrationGkuInnEntity that = (MigrationGkuInnEntity) obj;
         if (getUuid() == null || that.getUuid() == null) {
             return false;
         }
@@ -100,6 +77,6 @@ public class MergeHistoryEntity implements Serializable, HashKeyProvider {
 
     @Override
     public String getHashKey() {
-        return getPartnerUuid().toString();
+        return "7352bf20-bab8-4177-9176-33147d0d31d2";
     }
 }

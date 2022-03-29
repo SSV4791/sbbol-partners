@@ -13,7 +13,7 @@ import java.util.UUID;
 @MappedSuperclass
 public abstract class MigrationBaseEntity implements Serializable, HashKeyProvider {
 
-    @Column(name = "uuid", nullable = false)
+    @Column(name = "uuid", updatable = false, nullable = false)
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")

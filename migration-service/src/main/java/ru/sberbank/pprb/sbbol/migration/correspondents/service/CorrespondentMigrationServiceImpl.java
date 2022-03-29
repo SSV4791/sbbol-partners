@@ -31,7 +31,7 @@ import static org.apache.commons.lang3.ObjectUtils.anyNull;
 @AutoJsonRpcServiceImpl
 public class CorrespondentMigrationServiceImpl implements CorrespondentMigrationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CorrespondentMigrationServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CorrespondentMigrationServiceImpl.class);
 
     private final MigrationPartnerMapper migrationPartnerMapper;
     private final MigrationReplicationHistoryMapper migrationReplicationHistoryMapper;
@@ -53,7 +53,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     @Transactional
     public List<MigratedCorrespondentData> migrate(String digitalId, List<MigrationCorrespondentCandidate> correspondents) {
         var migratedCorrespondentData = new ArrayList<MigratedCorrespondentData>(correspondents.size());
-        logger.debug("Начало миграции контрагентов для организации c digitalId: {}. Количество кандидатов: {}", digitalId, correspondents.size());
+        LOGGER.debug("Начало миграции контрагентов для организации c digitalId: {}. Количество кандидатов: {}", digitalId, correspondents.size());
         MigrationPartnerEntity savedPartnerEntity;
         MigrationReplicationHistoryEntity existingReplicationHistoryEntity;
         for (MigrationCorrespondentCandidate correspondent : correspondents) {
@@ -69,7 +69,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                     savedPartnerEntity = migrationPartnerRepository.save(fillEntityUuids(partnerEntity, existingReplicationHistoryEntity));
                 }
             } catch (Exception ex) {
-                logger.error("В процессе миграции контрагента с sbbolReplicationGuid: {}, произошла ошибка. Причина: {}", correspondent.getReplicationGuid(), ex.getCause());
+                LOGGER.error("В процессе миграции контрагента с sbbolReplicationGuid: {}, произошла ошибка. Причина: {}", correspondent.getReplicationGuid(), ex.getCause());
                 throw ex;
             }
             migratedCorrespondentData.add(new MigratedCorrespondentData(
@@ -78,7 +78,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                 savedPartnerEntity.getVersion())
             );
         }
-        logger.debug("Для организации c digitalId: {}, мигрировано {} контрагентов", digitalId, migratedCorrespondentData.size());
+        LOGGER.debug("Для организации c digitalId: {}, мигрировано {} контрагентов", digitalId, migratedCorrespondentData.size());
         return migratedCorrespondentData;
     }
 

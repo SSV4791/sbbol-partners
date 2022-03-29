@@ -39,7 +39,7 @@ public class MigrationReplicationHistoryEntity implements Serializable, HashKeyP
     @Serial
     private static final long serialVersionUID = 1;
 
-    @Column(name = "uuid", nullable = false)
+    @Column(name = "uuid", updatable = false, nullable = false)
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
