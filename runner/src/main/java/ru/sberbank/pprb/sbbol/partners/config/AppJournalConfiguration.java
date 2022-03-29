@@ -1,9 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
+import com.sbt.pprb.integration.changevector.serialization.SerializerType;
 import com.sbt.pprb.integration.hibernate.standin.StandinPlugin;
 import com.sbt.pprb.integration.replication.OrderingControlStrategy;
 import com.sbt.pprb.integration.replication.PartitionLockMode;
 import com.sbt.pprb.integration.replication.PartitionMultiplyingMode;
+import com.sbt.pprb.integration.replication.ReplicationStrategy;
+import com.sbt.pprb.integration.replication.hashkey.InterfaceBasedHashKeyResolver;
 import com.sbt.pprb.integration.replication.transport.JournalSubscriptionImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +20,6 @@ import ru.sbrf.journal.standin.consumer.api.SubscriptionService;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-// TODO DCBBRAIN-2268 Вынести конфигурацию из модуля Runner в отдельный модуль
 /**
  * Конфигурация прикладного журнала. Обеспечивает отправку в ПЖ векторов изменений и их применение на другую БД
  */
@@ -40,11 +42,11 @@ public class AppJournalConfiguration {
     /**
      * Бин, обеспечивающий отправку векторов изменений в прикладной журнал при выполнении транзакции на основной БД
      *
-     * @param moduleId             идентификатор модуля, по которому фабрика зарегистрирована в ПЖ
-     * @param masterDataSource     основной датасорс
-     * @param standinDataSource    датасорс базы SI
+     * @param moduleId идентификатор модуля, по которому фабрика зарегистрирована в ПЖ
+     * @param masterDataSource основной датасорс
+     * @param standinDataSource датасорс базы SI
      * @param entityManagerFactory фабрика EntityManager
-     * @param journalClient        клиент для работы с Kafka ПЖ
+     * @param journalClient клиент для работы с Kafka ПЖ
      * @return плагин с конфигурацией для отправки векторов в ПЖ
      */
     @Bean
@@ -52,7 +54,6 @@ public class AppJournalConfiguration {
         @Value("${appjournal.moduleId}") String moduleId,
         @Qualifier("mainDataSource") DataSource masterDataSource,
         @Qualifier("standInDataSource") DataSource standinDataSource,
-        StandInPluginConfig pluginConfig,
         EntityManagerFactory entityManagerFactory,
         JournalCreatorClientApi journalClient
     ) {
@@ -61,22 +62,22 @@ public class AppJournalConfiguration {
         configurator.setStandinDataSource(standinDataSource);
         configurator.setJournalClient(journalClient);
 
-        // HashKey функция
-        configurator.setJournalHashKeyResolver(pluginConfig.getJournalHashKeyResolver().instance());
+        // HashKey функция. В данном случае используется определение хэша по интерфейсу HashKeyProvider
+        configurator.setJournalHashKeyResolver(new InterfaceBasedHashKeyResolver());
         // Идентификатор модуля
         configurator.setModuleIdProvider(() -> moduleId);
         // Стратегия репликации - с блокировками или без
-        configurator.setReplicationStrategy(pluginConfig.getReplicationStrategy());
+        configurator.setReplicationStrategy(ReplicationStrategy.STANDIN_LOCKS);
         // Тип сериализатора
-        configurator.setSerializerType(pluginConfig.getSerializerType());
+        configurator.setSerializerType(SerializerType.BINARY_KRYO);
         // Сериализация отправки в ПЖ по hashKey
         configurator.setPartitionLockMode(PartitionLockMode.NONE);
         // Стратегия контроля порядка применения векторов
         configurator.setOrderingControlStrategy(OrderingControlStrategy.DISABLED);
-        // Стратегия работы с несколькими hashKey в одной транзакции
+        // Стратегия работы с несколькими hashKey в одной транзакции. В одной транзакции могут быть только сущности с
+        // одинаковым hashKey
         configurator.setPartitionMultiplyingMode(PartitionMultiplyingMode.FORBIDDEN);
 
         return configurator.configure();
     }
-
 }

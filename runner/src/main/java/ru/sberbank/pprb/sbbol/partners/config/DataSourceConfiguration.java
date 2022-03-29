@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.query.criteria.LiteralHandlingMode;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator;
@@ -27,14 +26,16 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(value = {
-    "ru.sberbank.pprb.sbbol.partners.repository",
-    "ru.sberbank.pprb.sbbol.migration.correspondents.repository"
+    "ru.sberbank.pprb.sbbol.migration.correspondents.repository",
+    "ru.sberbank.pprb.sbbol.migration.gku.repository",
+    "ru.sberbank.pprb.sbbol.partners.repository"
 })
 public class DataSourceConfiguration {
 
     private static final String[] PACKAGES_TO_SCAN = {
-        "ru.sberbank.pprb.sbbol.partners.entity",
-        "ru.sberbank.pprb.sbbol.migration.correspondents.entity"
+        "ru.sberbank.pprb.sbbol.migration.correspondents.entity",
+        "ru.sberbank.pprb.sbbol.migration.gku.entity",
+        "ru.sberbank.pprb.sbbol.partners.entity"
     };
 
     // MAIN DATASOURCE CONFIGS
@@ -96,9 +97,24 @@ public class DataSourceConfiguration {
         return transactionManager;
     }
 
+    /**
+     * HealthCheck для датасорсов.
+     *
+     * По умолчанию Spring включает в HC все объявленные датасорсы. В таком случае при недоступности второй БД
+     * приложение целиком становится недоступно.
+     *
+     * В данном случае HC переопределен. Определяется доступность только текущей БД, с которой работает приложение.
+     *
+     * @param mainDataSource источник данных
+     * @param sessionFactory фабрика соединений
+     * @param transactionManager менеджер транзакций
+     * @return HealthCheck для проверки доступности БД
+     */
     @Bean
     public DataSourceHealthIndicator dataSourceHealthIndicator(DataSource mainDataSource, SessionFactory sessionFactory,
-                                                               @Qualifier("readOnlyTransactionTemplate") TransactionTemplate template) {
+                                                               PlatformTransactionManager transactionManager) {
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.setReadOnly(true);
         return new DataSourceHealthIndicator(mainDataSource) {
             @Override
             protected void doHealthCheck(Health.Builder builder) {
@@ -110,13 +126,4 @@ public class DataSourceConfiguration {
             }
         };
     }
-
-    @Bean
-    @Qualifier("readOnlyTransactionTemplate")
-    public TransactionTemplate readOnlyTransactionTemplate(PlatformTransactionManager transactionManager) {
-        TransactionTemplate template = new TransactionTemplate(transactionManager);
-        template.setReadOnly(true);
-        return template;
-    }
-
 }
