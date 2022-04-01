@@ -29,7 +29,7 @@ gradleEnterprise {
     }
 }
 
-rootProject.name = "partners"
+rootProject.name = "sbbol-partners"
 
 include(":docs")
 include(":migration-service")

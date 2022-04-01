@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.common.mapper.TypeRef;
@@ -17,6 +18,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
+import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -25,6 +28,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import static io.restassured.RestAssured.given;
 
+@ApiTestLayer
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
     classes = {Runner.class}
@@ -66,6 +70,8 @@ public abstract class AbstractIntegrationTest {
             .setPort(port)
             .setAccept(ContentType.JSON)
             .setContentType(ContentType.JSON)
+            .addFilter(new RestAssuredCoverageReporter())
+            .addFilter(new AllureRestAssured())
             .log(LogDetail.ALL)
             .build();
 

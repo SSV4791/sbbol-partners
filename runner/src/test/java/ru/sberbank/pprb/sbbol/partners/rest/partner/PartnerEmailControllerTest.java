@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -21,6 +22,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     public static final String baseRoutePath = "/partner/email";
 
     @Test
+    @AllureId("34136")
     void testViewPartnerEmail() {
         Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         createEmail(partner.getId(), partner.getDigitalId());
@@ -53,6 +55,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
 
 
     @Test
+    @AllureId("34133")
     void testCreatePartnerEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var email = createEmail(partner.getId(), partner.getDigitalId());
@@ -64,6 +67,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     @Test
+    @AllureId("34139")
     void testUpdatePartnerEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var email = createEmail(partner.getId(), partner.getDigitalId());
@@ -86,6 +90,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     @Test
+    @AllureId("34192")
     void testDeletePartnerEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
 

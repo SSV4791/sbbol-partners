@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapterImpl;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
@@ -48,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@UnitTestLayer
 @ExtendWith(SpringExtension.class)
 @MockServerTest("sbbol.mock.url=http://localhost:${mockServerPort}/synapse-in-system-session/api/int-rest")
 class LegacySbbolAdapterTest {
@@ -68,7 +71,6 @@ class LegacySbbolAdapterTest {
     private static final String VIEW = ROOT_URL + "/view/" + DIGITAL_ID;
     private static final String CHECK_MIGRATION = ROOT_URL + "/check-migration/" + DIGITAL_ID;
     private static final String GET_HOUSING_INN = ROOT_URL + "/housing/" + DIGITAL_ID;
-
 
     @Value("${sbbol.mock.url}")
     private String sbbolMockUrl;
@@ -102,6 +104,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#checkMigration(String)}
      */
     @Test
+    @AllureId("34036")
     @DisplayName("Сббол Адаптер контрагенты. Проверка миграции организации")
     void checkMigrationTest() {
         mockServerClient.when(HttpRequest.request(CHECK_MIGRATION).withMethod(HttpMethod.GET.name()).withHeaders(headers))
@@ -113,6 +116,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#checkRequisites(CounterpartyCheckRequisites)}
      */
     @Test
+    @AllureId("34041")
     @DisplayName("Сббол Адаптер контрагенты. Проверка реквизитов контрагента")
     void checkRequisitesTest() {
         var request = factory.manufacturePojo(CounterpartyCheckRequisites.class);
@@ -128,6 +132,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#update(String, Counterparty)}
      */
     @Test
+    @AllureId("34035")
     @DisplayName("Сббол Адаптер контрагенты. Проверка обновления контрагента")
     void updateTest() {
         var request = factory.manufacturePojo(Counterparty.class);
@@ -141,6 +146,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#create(String, Counterparty)}
      */
     @Test
+    @AllureId("34042")
     @DisplayName("Сббол Адаптер контрагенты. Проверка создания контрагента")
     void createTest() {
         var request = factory.manufacturePojo(Counterparty.class);
@@ -154,6 +160,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#getByPprbGuid(String, String)}
      */
     @Test
+    @AllureId("34040")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения контрагента по ППРБ гуиду")
     void getByPprbGuidTest() {
         var response = factory.manufacturePojo(Counterparty.class);
@@ -167,6 +174,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#delete(String, String)}
      */
     @Test
+    @AllureId("34034")
     @DisplayName("Сббол Адаптер контрагенты. Проверка удаления по ППРБ гуиду")
     void deleteTest() {
         mockServerClient.when(HttpRequest.request(DELETE).withMethod(HttpMethod.DELETE.name()).withHeaders(headers))
@@ -178,6 +186,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#list(String)}
      */
     @Test
+    @AllureId("34038")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка по ППРБ гуиду")
     void listTest() {
         List<CounterpartyView> response = factory.manufacturePojo(ArrayList.class, CounterpartyView.class);
@@ -193,6 +202,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#saveSign(String, CounterpartySignData)}
      */
     @Test
+    @AllureId("34043")
     @DisplayName("Сббол Адаптер контрагенты. Проверка сохранения подписи")
     void saveSignTest() {
         var request = factory.manufacturePojo(CounterpartySignData.class);
@@ -205,6 +215,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#removeSign(String, String)}
      */
     @Test
+    @AllureId("34039")
     @DisplayName("Сббол Адаптер контрагенты. Проверка удаления подписи")
     void removeSignTest() {
         mockServerClient.when(HttpRequest.request(SIGN_REMOVE).withMethod(HttpMethod.DELETE.name()).withHeaders(headers))
@@ -216,6 +227,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#getHousingInn(String, Set)}
      */
     @Test
+    @AllureId("34037")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка ИНН контрагентов")
     void getHousingInnTest() {
         Set<String> request = Set.of(randomNumeric(11), randomNumeric(11), randomNumeric(11), randomNumeric(11), randomNumeric(13));
@@ -229,6 +241,7 @@ class LegacySbbolAdapterTest {
      * {@link LegacySbbolAdapter#viewRequest(String, CounterpartyFilter)}
      */
     @Test
+    @AllureId("34033")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка по ППРБ гуиду и фильтру")
     void viewTest() {
         var request = factory.manufacturePojo(CounterpartyFilter.class);

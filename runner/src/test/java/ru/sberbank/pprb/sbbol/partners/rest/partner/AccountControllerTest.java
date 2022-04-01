@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
+    @AllureId("34126")
     void testGetAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -44,6 +46,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34154")
     void testViewAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         createValidAccount(partner.getId(), partner.getDigitalId());
@@ -72,6 +75,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34171")
     void testViewSearchAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -98,6 +102,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34176")
     void testViewBudgetAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         createValidAccount(partner.getId(), partner.getDigitalId());
@@ -124,6 +129,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34182")
     void testCreateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -139,6 +145,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34142")
     void testCreateNotValidAccount() {
         var partner = createValidPartner();
         var error = createNotValidAccount(partner.getId(), partner.getDigitalId());
@@ -149,6 +156,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34188")
     void testUpdateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -172,6 +180,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34185")
     void testDeleteAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -208,6 +217,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34383")
     void testPriorityAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -240,6 +250,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("34378")
     void testPriorityAccountException() {
         var partner = createValidPartner();
         var account1 = createValidAccount(partner.getId(), partner.getDigitalId());

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
@@ -14,6 +15,7 @@ class AddressMapperTest extends BaseConfiguration {
     private static final AddressMapper mapper = Mappers.getMapper(AddressMapper.class);
 
     @Test
+    @AllureId("34079")
     void testToAddress() {
         Address expected = factory.manufacturePojo(Address.class);
         AddressEntity actual = mapper.toAddress(expected);
@@ -23,6 +25,7 @@ class AddressMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34079")
     void testToAddressType() {
         Address.TypeEnum typeEnum = factory.manufacturePojo(Address.TypeEnum.class);
         AddressType addressType = AddressMapper.toAddressType(typeEnum);

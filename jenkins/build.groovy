@@ -1,5 +1,6 @@
 import ru.sbrf.ufs.pipeline.Const
 import ru.sbrf.ufs.pipeline.docker.DockerRunBuilder
+import ru.sbrf.ufs.pipeline.HttpMethod
 
 @Library(['ufs-jobs@master']) _
 
@@ -7,6 +8,7 @@ def pullRequest = null
 def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
 def sonarCredential = secman.makeCredMap('DS_CAB-SA-CI000825-sonar-token')
 def bitbucketCredential = Const.BITBUCKET_DBO_KEY_SECMAN
+String jobAllureServerUrl = ''
 
 pipeline {
     agent {
@@ -58,25 +60,39 @@ pipeline {
         stage('Build Java') {
             steps {
                 script {
-                    vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
-                        vault.withSecretKey([path: sonarCredential.path, secretKeyVar: "SONAR_TOKEN"]) {
-                            new DockerRunBuilder(this)
-                                .registry(Const.OPENSHIFT_REGISTRY, credential)
-                                .volume("${WORKSPACE}", "/build")
-                                .extra("-w /build")
-                                .cpu(2)
-                                .memory("2g")
-                                .image(BUILD_JAVA_DOCKER_IMAGE)
-                                .cmd('./gradlew ' +
-                                    "-PnexusLogin=${NEXUS_USER} " +
-                                    "-PnexusPassword=${NEXUS_PASSWORD} " +
-                                    "-Dsonar.login=${SONAR_TOKEN} " +
-                                    "-Dsonar.pullrequest.key=${params.pullRequestId} " +
-                                    "-Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId} " +
-                                    "-Dsonar.pullrequest.base=${pullRequest.toRef.displayId} " +
-                                    "clean build sonarqube --parallel"
-                                )
-                                .run()
+                    allureEe.run([
+                        projectName : GIT_REPOSITORY
+                    ]) { launch ->
+                        jobAllureServerUrl = "${Const.ALLURE_ENTRYPOINT_URL}jobrun/${launch.jobRunId}"
+                        bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running", jobAllureServerUrl)
+
+                        vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
+                            vault.withSecretKey([path: sonarCredential.path, secretKeyVar: "SONAR_TOKEN"]) {
+                                new DockerRunBuilder(this)
+                                    .registry(Const.OPENSHIFT_REGISTRY, credential)
+                                    .env("GRADLE_USER_HOME", "/build/.gradle")
+                                    .volume("${WORKSPACE}", "/build")
+                                    .extra("-w /build")
+                                    .cpu(2)
+                                    .memory("2g")
+                                    .image(BUILD_JAVA_DOCKER_IMAGE)
+                                    .cmd(["./gradlew",
+                                          "-PnexusLogin=${NEXUS_USER}",
+                                          "-PnexusPassword='${NEXUS_PASSWORD}'",
+                                          "clean build qaReporterUpload",
+                                          "-Dtest-layer=unit,api,configuration,cdcConsumer",
+                                          "-Dsonar.login=${SONAR_TOKEN}",
+                                          "-Dsonar.pullrequest.key=${params.pullRequestId}",
+                                          "-Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}",
+                                          "-Dsonar.pullrequest.base=${pullRequest.toRef.displayId}",
+                                          "-Dpactbroker.url=${Const.PACT_BROKER_URL}",
+                                          "-Dbuild.link=${env.BUILD_URL}",
+                                          "-Dbuild.type=prCheck",
+                                          "-Dallure.jobrunId=${launch.jobRunId}"]
+                                        .join(' ')
+                                    )
+                                    .run()
+                            }
                         }
                     }
                 }
@@ -88,12 +104,12 @@ pipeline {
         success {
             script {
                 bitbucket.setJenkinsLabelStatus(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
-                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
+                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful", jobAllureServerUrl)
             }
         }
         failure {
             script {
-                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
+                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed", jobAllureServerUrl)
             }
         }
         cleanup {
@@ -101,5 +117,23 @@ pipeline {
                 cleanWs()
             }
         }
+    }
+}
+
+def resolveProjectId(def credentialsId, String projectName) {
+    vault.withSecretKey([
+            path        :  credentialsId.path,
+            secretKeyVar: 'allureToken'
+    ]) {
+        def response = httpRequest(
+                ignoreSslErrors: true,
+                quiet: Const.HTTP_REQUEST_QUIET,
+                consoleLogResponseBody: !Const.HTTP_REQUEST_QUIET,
+                url: "${Const.ALLURE_ENTRYPOINT_URL}/api/rs/project?name=${projectName}",
+                contentType: 'APPLICATION_JSON',
+                httpMode: HttpMethod.GET.toString(),
+                customHeaders: [[name: 'Authorization', value: "Api-Token $allureToken"]]
+        )
+        return readJSON(text: response.content).find {it.name == "${projectName}"}?.id
     }
 }

@@ -1,4 +1,6 @@
 plugins {
+    jacoco
+    id("io.qameta.allure") version "2.9.6"
     id("create-liquibase-path-conventions")
     id("dependency-locking-conventions")
     id("jacoco-conventions")
@@ -8,7 +10,15 @@ plugins {
     id("publish-develop-conventions")
     id("publish-release-conventions")
     id("publish-snapshot-conventions")
-    id("ru.sbrf.build.gradle.qa.reporter") version "2.0.0"
+    id("ru.sbrf.build.gradle.qa.reporter") version "3.2.+"
+}
+
+val coverageExclusions = listOf(
+    "**/partners-api/**/*"
+)
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 tasks {
@@ -38,6 +48,10 @@ tasks {
     clean {
         delete(buildDir)
     }
+
+    qaReporterUpload {
+        jacocoExcludes.addAll(coverageExclusions)
+    }
 }
 
 sonarqube {
@@ -49,11 +63,7 @@ sonarqube {
         property("sonar.host.url", "https://sbt-sonarqube.sigma.sbrf.ru")
         property("sonar.login", "$sonarToken")
         property("sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/jacoco/report/report.xml")
-        property(
-            "sonar.coverage.exclusions", """
-            **/partners-api/**/*,
-        """.trimIndent()
-        )
+        property("sonar.coverage.exclusions", coverageExclusions)
         property(
             "sonar.cpd.exclusions", """
                     src/main/java/ru/sberbank/pprb/sbbol/partners/entity/**,
@@ -61,4 +71,13 @@ sonarqube {
         )
 
     }
+}
+
+subprojects {
+    apply(plugin = "jacoco")
+    apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
+}
+
+qaReporter {
+    projectKey.set("sbbol-partners")
 }

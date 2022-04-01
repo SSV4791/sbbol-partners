@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ class PartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34381")
     void toPartner() {
         Partner expected = factory.manufacturePojo(Partner.class);
         PartnerEntity partnerEntity = mapper.toPartner(expected);
@@ -52,6 +54,7 @@ class PartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34102")
     void testToPartnerPhoneString() {
         List<String> phones = factory.manufacturePojo(ArrayList.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);
@@ -65,6 +68,7 @@ class PartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34382")
     void testToPartnerEmailString() {
         List<String> emails = factory.manufacturePojo(ArrayList.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);
@@ -78,6 +82,7 @@ class PartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34381")
     void toPartnerCreate() {
         PartnerCreate expected = factory.manufacturePojo(PartnerCreate.class);
         PartnerEntity partnerEntity = mapper.toPartner(expected);
@@ -92,6 +97,7 @@ class PartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34102")
     void toLegalType() {
         LegalForm typeEnum = factory.manufacturePojo(LegalForm.class);
         LegalType legalType = PartnerMapper.toLegalType(typeEnum);
@@ -100,6 +106,7 @@ class PartnerMapperTest extends BaseConfiguration {
     }
 
     @Test
+    @AllureId("34071")
     void toPartnerCitizenshipType() {
         Partner.CitizenshipEnum typeEnum = factory.manufacturePojo(Partner.CitizenshipEnum.class);
         PartnerCitizenshipType citizenshipType = PartnerMapper.toCitizenshipType(typeEnum);

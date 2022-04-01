@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
+    @AllureId("34208")
     void testGetAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -46,6 +48,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34111")
     void testViewAccount() {
         var partner = createValidPartner(randomAlphabetic(10));
         createValidAccount(partner.getId(), partner.getDigitalId());
@@ -69,6 +72,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34122")
     void testCreateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -84,6 +88,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34179")
     void testCreateNotValidAccount() {
         var partner = createValidPartner();
         var error = createNotValidAccount(partner.getId(), partner.getDigitalId());
@@ -94,6 +99,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34152")
     void testUpdateAccount() {
         var partner = createValidPartner();
         var executeAccount = counterpartyMapper.toAccount(updatedCounterparty, partner.getDigitalId(), UUID.randomUUID(), budgetMaskService);
@@ -107,6 +113,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     }
 
     @Test
+    @AllureId("34159")
     void testDeleteAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());

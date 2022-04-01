@@ -7,6 +7,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import uk.co.jemos.podam.typeManufacturers.AbstractTypeManufacturer;
 import uk.co.jemos.podam.typeManufacturers.BooleanTypeManufacturerImpl;
 import uk.co.jemos.podam.typeManufacturers.StringTypeManufacturerImpl;
+import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 
+@UnitTestLayer
 public abstract class BaseConfiguration {
 
     protected static final PodamFactory factory = new PodamFactoryImpl();
