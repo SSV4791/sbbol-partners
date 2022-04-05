@@ -26,6 +26,8 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.LegalFormMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.LegalFormMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
@@ -119,7 +121,12 @@ public class PartnerServiceConfiguration {
 
     @Bean
     DocumentTypeMapper documentTypeMapper() {
-        return new DocumentTypeMapperImpl();
+        return new DocumentTypeMapperImpl(legalFormMapper());
+    }
+
+    @Bean
+    LegalFormMapper legalFormMapper() {
+        return new LegalFormMapperImpl();
     }
 
     @Bean

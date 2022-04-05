@@ -1,5 +1,5 @@
 -- liquibase formatted sql
--- changeset 19720953:1648723867900_create_funcion_generate_uuid
+-- changeset 19720953:1640012868072_create_funcion_generate_uuid
 
 create or replace function generate_uuid() returns uuid as
 '

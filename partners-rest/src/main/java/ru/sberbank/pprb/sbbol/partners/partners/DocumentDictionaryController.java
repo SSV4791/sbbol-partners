@@ -4,10 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.DocumentTypeDictionaryApi;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeService;
+import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeCreateValidation;
 
 @RestController
 public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
@@ -19,17 +23,24 @@ public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
     }
 
     @Override
-    public ResponseEntity<DocumentTypeResponse> create(DocumentType documentType) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(documentTypeService.saveDocument(documentType));
+    public ResponseEntity<DocumentTypeResponse> create(
+        @Validation(type = DocumentTypeCreateValidation.class) DocumentTypeCreate documentTypeCreate) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentTypeService.saveDocument(documentTypeCreate));
     }
 
     @Override
-    public ResponseEntity<DocumentsTypeResponse> list(Boolean status) {
-        return ResponseEntity.ok(documentTypeService.getDocuments(status));
+    public ResponseEntity<Void> delete(String id) {
+        documentTypeService.deleteDocument(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<DocumentTypeResponse> update(DocumentType documentType) {
-        return ResponseEntity.ok(documentTypeService.updateDocument(documentType));
+    public ResponseEntity<DocumentsTypeResponse> list(DocumentTypeFilter filter) {
+        return ResponseEntity.ok(documentTypeService.getDocuments(filter));
+    }
+
+    @Override
+    public ResponseEntity<DocumentTypeResponse> update(DocumentTypeChange documentTypeChange) {
+        return ResponseEntity.ok(documentTypeService.updateDocument(documentTypeChange));
     }
 }
