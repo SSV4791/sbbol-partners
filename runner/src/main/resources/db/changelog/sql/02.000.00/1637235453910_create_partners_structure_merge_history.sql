@@ -1,5 +1,5 @@
---liquibase formatted sql
---changeset 17480332:1637235453910_create_partners_structure_merge_history
+-- liquibase formatted sql
+-- changeset 17480332:1637235453910_create_partners_structure_merge_history
 
 CREATE TABLE MERGE_HISTORY
 (

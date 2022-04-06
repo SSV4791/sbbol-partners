@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1640097483333_delete_dataspace_structure
+-- changeset 17480332:1640097483333_delete_dataspace_structure
 
 DROP TABLE
     LC_REPL_CR_CRBATCH_IDENTIFIERS,

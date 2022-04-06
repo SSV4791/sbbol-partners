@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1640012868071_create_partners_structure_fill_document_type
+-- changeset 17480332:1640012868071_create_partners_structure_fill_document_type
 
 insert into DOCUMENT_TYPE_DICTIONARY(UUID, system_name, description, deleted)
 values ('3422aec8-7f44-4089-9a43-f8e3c5b00722', 'PASSPORT_OF_RUSSIA', 'Паспорт РФ', false),

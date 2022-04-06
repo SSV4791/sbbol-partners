@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1640009957159_create_partners_structure_phone
+-- changeset 17480332:1640009957159_create_partners_structure_phone
 
 CREATE TABLE PHONE
 (

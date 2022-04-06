@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1640010477558_create_partners_structure_replication_history
+-- changeset 17480332:1640010477558_create_partners_structure_replication_history
 
 CREATE TABLE REPLICATION_HISTORY
 (

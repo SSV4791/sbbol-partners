@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1644241582818_create_partners_structure_account_sign_info.sql
+-- changeset 17480332:1644241582818_create_partners_structure_account_sign_info
 
 CREATE TABLE SIGN
 (

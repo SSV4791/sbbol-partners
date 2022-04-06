@@ -1,5 +1,5 @@
---liquibase formatted sql
---changeset 17480332:1637157928895_create_partners_structure_contact
+-- liquibase formatted sql
+-- changeset 17480332:1637157928895_create_partners_structure_contact
 
 CREATE TABLE CONTACT
 (

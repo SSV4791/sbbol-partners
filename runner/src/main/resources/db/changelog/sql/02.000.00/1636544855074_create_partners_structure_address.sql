@@ -1,5 +1,5 @@
---liquibase formatted sql
---changeset 17480332:1636544855074_create_partners_structure_address
+-- liquibase formatted sql
+-- changeset 17480332:1636544855074_create_partners_structure_address
 
 CREATE TABLE ADDRESS
 (

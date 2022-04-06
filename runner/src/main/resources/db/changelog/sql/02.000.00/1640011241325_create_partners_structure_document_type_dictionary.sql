@@ -1,9 +1,9 @@
 -- liquibase formatted sql
---changeset 17480332:1640011241325_create_partners_structure_document_type_dictionary
+-- changeset 17480332:1640011241325_create_partners_structure_document_type_dictionary
 
 CREATE TABLE DOCUMENT_TYPE_DICTIONARY
 (
-    uuid        UUID        NOT NULL,
+    uuid        UUID        PRIMARY KEY,
     system_name VARCHAR(50) NOT NULL,
     description VARCHAR(100),
     deleted     BOOLEAN
