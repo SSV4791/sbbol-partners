@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Создание партнера==
+Клиент -> ППРБ.Партнеры: POST /partners
+ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
+break#Gold #Pink Ошибка. Прерывание операции
+ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+end
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Создание записи в таблице partner, email, phone
+ППРБ.Партнеры --> Клиент: 201
+end
+@enduml

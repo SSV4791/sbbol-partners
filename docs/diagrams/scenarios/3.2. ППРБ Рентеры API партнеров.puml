@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Создание рентера==
+Клиент -> ППРБ.Партнеры: Создание партнера
+ППРБ.Партнеры -> СББОЛ: Проверка на миграцию
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Создать рентера по старой модели
+ППРБ.Партнеры --> Клиент: Информация о рентере по старой модели
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Создать партнера
+ППРБ.Партнеры --> Клиент: Информация о партнере
+end
+@enduml

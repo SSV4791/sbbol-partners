@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Создание партнера==
+Клиент -> СББОЛ: Создание партнера
+СББОЛ -> СББОЛ: Проверка на миграцию
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ -> СББОЛ: Создать контрагента
+СББОЛ --> Клиент: Информация о контрагенте
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ -> СББОЛ: Изменить аппобж на false
+else appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ -> СББОЛ: Создать контрагента
+СББОЛ --> Клиент: Информация о контрагенте
+end
+@enduml

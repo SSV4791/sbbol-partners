@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Удаление партнера==
+Клиент -> ППРБ.Партнеры: DELETE /partner/{digitalId}/{id}
+ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
+break#Gold #Pink Ошибка. Прерывание операции
+ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+end
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Поиск записи в partner
+ППРБ.Партнеры -> ППРБ.Партнеры: Поиск записей в связанных таблицах account, document, email, phone, contact, address
+alt#Gold Есть запись партнера в таблице partner
+alt#gold Есть запись в таблице account
+ППРБ.Партнеры -> ППРБ.Партнеры: Удаление партнера в таблицах partner, phone, email, account, bank, bank_account, contact, document, address
+ППРБ.Партнеры --> Клиент: 204
+loop#gold = count(account.uuid)
+ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid}
+alt#Gold 200
+СББОЛ --> ППРБ.Партнеры: 200
+ППРБ.Партнеры -> СББОЛ: /delete/{digitalId}/{pprbGuid} (удалить контрагента по account.uuid = pprb_guid)
+СББОЛ -> ППРБ.Партнеры: 200
+group#Gold #pink negative
+СББОЛ --> ППРБ.Партнеры: Error 40*/50*
+ППРБ.Партнеры -> ФП.Журналирование: Отправка месседжа в СББОЛ через кафку
+ППРБ.Партнеры -> Мониторинг: Оповещение об ошибке
+Мониторинг -> BRAIN_TEAM: Разбор ошибки и подготовка исправлений
+СББОЛ ->> ФП.Журналирование: Считывание очереди
+СББОЛ -> СББОЛ: Создание записи
+end
+else 404
+break#Gold #pink
+СББОЛ -> ППРБ.Партнеры: 404
+end
+end
+end
+else Нет записи в таблице account
+ППРБ.Партнеры -> ППРБ.Партнеры: Удаление партнера в таблицах partner, phone, email, contact, document, address
+ППРБ.Партнеры --> Клиент: 204
+end
+else Нет записи в таблице partner
+break#gold #pink
+ППРБ.Партнеры --> Клиент: 404
+end
+end
+end
+@enduml

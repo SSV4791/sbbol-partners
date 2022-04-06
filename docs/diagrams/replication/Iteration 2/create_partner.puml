@@ -1,0 +1,35 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Создание партнера==
+Клиент -> ППРБ.Партнеры: POST /partners
+ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
+ППРБ.Партнеры -> СББОЛ: /create/{digitalId} (Создать партнера без счета)
+break#Gold #Pink Ошибка. Прерывание операции
+СББОЛ --> ППРБ.Партнеры: Error 40*/50*
+ППРБ.Партнеры --> Клиент: Error 40*/50*
+end
+СББОЛ --> ППРБ.Партнеры: 200
+ППРБ.Партнеры -> ППРБ.Партнеры: Создание партнера в таблицах partner, phone, email с partner.uuid = correspondent.replication_guid
+ППРБ.Партнеры --> Клиент: 201
+else
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Создание записи в таблице partner, email, phone
+par#gold
+ППРБ.Партнеры --> Клиент: 201
+ППРБ.Партнеры -> СББОЛ: /create/{digitalId} (создать партнера c pprb_guid = replication_history.uuid)
+end
+СББОЛ -> ППРБ.Партнеры: 200
+group#Gold #pink negative
+СББОЛ --> ППРБ.Партнеры: Error 40*/50*
+ППРБ.Партнеры -> ФП.Журналирование: Отправка месседжа в СББОЛ через кафку
+ППРБ.Партнеры -> Мониторинг: Оповещение об ошибке
+Мониторинг -> BRAIN_TEAM: Разбор ошибки и подготовка исправлений
+СББОЛ ->> ФП.Журналирование: Считывание очереди
+СББОЛ -> СББОЛ: Создание записи
+end
+end
+@enduml
