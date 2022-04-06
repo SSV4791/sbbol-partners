@@ -9,7 +9,10 @@ import ru.sberbank.pprb.sbbol.partners.entity.renter.Renter;
 
 import java.util.List;
 
-@Deprecated
+/**
+ * @deprecated {@link ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository}
+ */
+@Deprecated(forRemoval = true)
 @Repository
 public interface RenterRepository extends PagingAndSortingRepository<Renter, String> {
 

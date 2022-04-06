@@ -57,12 +57,15 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     @AllureId("34119")
     void testCreatePartnerPhone() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var phone = createPhone(partner.getId(), partner.getDigitalId());
+        var expected = getPhone(partner.getId(), partner.getDigitalId());
+        var phone = createPhone(expected);
         assertThat(phone)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid")
-            .isEqualTo(phone);
+                "id",
+                "version"
+            )
+            .isEqualTo(expected);
     }
 
     @Test
@@ -137,6 +140,15 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
 
     private static Phone createPhone(String partnerUuid, String digitalId) {
         var phoneResponse = createPost(baseRoutePath, getPhone(partnerUuid, digitalId), PhoneResponse.class);
+        assertThat(phoneResponse)
+            .isNotNull();
+        assertThat(phoneResponse.getErrors())
+            .isNull();
+        return phoneResponse.getPhone();
+    }
+
+    private static Phone createPhone(PhoneCreate phone) {
+        var phoneResponse = createPost(baseRoutePath, phone, PhoneResponse.class);
         assertThat(phoneResponse)
             .isNotNull();
         assertThat(phoneResponse.getErrors())

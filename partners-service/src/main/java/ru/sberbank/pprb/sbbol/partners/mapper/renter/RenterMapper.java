@@ -10,7 +10,10 @@ import ru.sberbank.pprb.sbbol.partners.entity.renter.PhysicalAddress;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 
-@Deprecated
+/**
+ * @deprecated {@link ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper}
+ */
+@Deprecated(forRemoval = true)
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RenterMapper {
 

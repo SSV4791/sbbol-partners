@@ -42,10 +42,11 @@ public abstract class AbstractIntegrationWithSbbolTest extends AbstractIntegrati
         counterparty.setCorrAccount("30101810145250000411");
         counterpartyView.setPprbGuid(UUID.randomUUID().toString());
         counterpartyMapper = Mappers.getMapper(CounterpartyMapper.class);
-        when(legacySbbolAdapter.checkMigration(any())).thenReturn(false);
-        when(legacySbbolAdapter.checkMigration(any())).thenReturn(false);
+        when(legacySbbolAdapter.checkNotMigration(any())).thenReturn(true);
         when(legacySbbolAdapter.create(any(), any())).thenReturn(counterparty);
-        when(legacySbbolAdapter.getByPprbGuid(any(), any())).thenReturn((Counterparty) SerializationUtils.clone(counterparty)).thenReturn((Counterparty) SerializationUtils.clone(counterparty));
+        when(legacySbbolAdapter.getByPprbGuid(any(), any()))
+            .thenReturn((Counterparty) SerializationUtils.clone(counterparty))
+            .thenReturn((Counterparty) SerializationUtils.clone(counterparty));
         ListResponse<CounterpartyView> viewResponse = new ListResponse<>();
         viewResponse.setItems(Collections.singletonList(counterpartyView));
         viewResponse.setPagination(factory.manufacturePojo(Pagination.class));

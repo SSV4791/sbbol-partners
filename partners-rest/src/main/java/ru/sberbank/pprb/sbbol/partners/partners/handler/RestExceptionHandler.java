@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
+import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 import javax.persistence.EntityNotFoundException;
@@ -41,7 +42,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             httpRequest.getRequestURL());
     }
 
-    @ExceptionHandler({EntryNotFoundException.class, EntityNotFoundException.class, ObjectNotFoundException.class})
+    @ExceptionHandler({EntryNotFoundException.class, EntityNotFoundException.class, ObjectNotFoundException.class, PartnerMigrationException.class})
     protected ResponseEntity<Object> handleObjectNotFoundException(Exception ex, HttpServletRequest httpRequest) {
         LOG.error("Объект не найден", ex);
         return buildResponseEntity(HttpStatus.NOT_FOUND, ex.getLocalizedMessage(), httpRequest.getRequestURL());

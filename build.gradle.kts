@@ -1,5 +1,4 @@
 plugins {
-    jacoco
     id("io.qameta.allure") version "2.9.6"
     id("create-liquibase-path-conventions")
     id("dependency-locking-conventions")
@@ -36,10 +35,6 @@ val coverageExclusions = listOf(
     "**/*Config*"
 )
 
-jacoco {
-    toolVersion = "0.8.7"
-}
-
 tasks {
 
     clean {
@@ -72,13 +67,7 @@ sonarqube {
                     partners-service/src/main/java/ru/sberbank/pprb/sbbol/partners/entity/**,
                 """.trimIndent()
         )
-
     }
-}
-
-subprojects {
-    apply(plugin = "jacoco")
-    apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
 }
 
 qaReporter {

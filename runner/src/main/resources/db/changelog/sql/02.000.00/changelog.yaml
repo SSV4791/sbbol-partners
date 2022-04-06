@@ -18,9 +18,6 @@ databaseChangeLog:
       file: 1637157928895_create_partners_structure_contact.sql
       relativeToChangelogFile: true
   - include:
-      file: 1637235453910_create_partners_structure_merge_history.sql
-      relativeToChangelogFile: true
-  - include:
       file: 1637342055243_create_partners_structure_bank_account.sql
       relativeToChangelogFile: true
   - include:
@@ -28,9 +25,6 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: 1640010377139_create_partners_structure_email.sql
-      relativeToChangelogFile: true
-  - include:
-      file: 1640010477558_create_partners_structure_replication_history.sql
       relativeToChangelogFile: true
   - include:
       file: 1640011241325_create_partners_structure_document_type_dictionary.sql

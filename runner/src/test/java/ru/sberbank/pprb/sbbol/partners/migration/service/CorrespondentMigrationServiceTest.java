@@ -6,19 +6,17 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
+import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
+import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateCorrespondentRequest;
-import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
-import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 // TODO DCBBRAIN-2268 Перенести тесты и модели для migration-service из модуля Runner в свой модуль
 public class CorrespondentMigrationServiceTest extends AbstractIntegrationWithOutSbbolTest {
@@ -39,37 +37,68 @@ public class CorrespondentMigrationServiceTest extends AbstractIntegrationWithOu
 
     @Test
     @AllureId("34177")
-    void migrateFewCorrespondentsTest() {
+    void migrateAndCreateFewCorrespondentsTest() {
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, generateCorrespondents(GENERATE_COUNTERPARTIES_COUNT)));
-        JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {});
-        assertNotNull(response);
-        assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
-        assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
+        JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
+        });
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(JSON_RPC_REQUEST_ID);
+        assertThat(response.getJsonrpc()).isEqualTo(JSON_RPC_VERSION);
         List<MigratedCorrespondentData> correspondentsData = response.getResult();
-        assertFalse(CollectionUtils.isEmpty(correspondentsData));
-        assertEquals(correspondentsData.size(), GENERATE_COUNTERPARTIES_COUNT);
+        assertThat(CollectionUtils.isEmpty(correspondentsData)).isFalse();
+        assertThat(correspondentsData.size()).isEqualTo(GENERATE_COUNTERPARTIES_COUNT);
         correspondentsData.forEach(data -> {
-            assertNotNull(data.getPprbGuid());
-            assertNotNull(data.getSbbolReplicationGuid());
-            assertNotNull(data.getVersion());
+            assertThat(data.getPprbGuid()).isNotNull();
+            assertThat(data.getSbbolReplicationGuid()).isNotNull();
+            assertThat(data.getVersion()).isNotNull();
         });
     }
 
     @Test
     @AllureId("34162")
-    void updateMigratedCorrespondentTest() {
+    void migrateAndCreateCorrespondentTest() {
         MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondent();
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));
-        JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {});
+        JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
+        });
         MigratedCorrespondentData correspondentData = response.getResult().get(0);
-        assertEquals(correspondentData.getVersion(), generatedCorrespondent.getVersion());
-        assertEquals(correspondentData.getSbbolReplicationGuid(), generatedCorrespondent.getReplicationGuid());
+        assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
+        assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
         generatedCorrespondent.setVersion(1);
         generatedCorrespondent.setReplicationGuid(RandomStringUtils.randomAlphanumeric(10));
-        response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {});
+        response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
+        });
         correspondentData = response.getResult().get(0);
-        assertEquals(correspondentData.getVersion(), generatedCorrespondent.getVersion());
-        assertEquals(correspondentData.getSbbolReplicationGuid(), generatedCorrespondent.getReplicationGuid());
+        assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
+        assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
+    }
+
+    @Test
+    void migrateAndUpdateCorrespondentTest() {
+        MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondent();
+        request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));
+        JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
+        });
+        MigratedCorrespondentData correspondentData = response.getResult().get(0);
+        assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
+        assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
+        generatedCorrespondent.setVersion(1);
+        generatedCorrespondent.setReplicationGuid(RandomStringUtils.randomAlphanumeric(10));
+        generatedCorrespondent.setPprbGuid(correspondentData.getPprbGuid());
+        response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
+        });
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(JSON_RPC_REQUEST_ID);
+        assertThat(response.getJsonrpc()).isEqualTo(JSON_RPC_VERSION);
+        List<MigratedCorrespondentData> correspondentsData = response.getResult();
+        assertThat(CollectionUtils.isEmpty(correspondentsData)).isFalse();
+        assertThat(correspondentsData.size()).isEqualTo(1);
+        correspondentsData.forEach(data -> {
+            assertThat(data.getPprbGuid()).isEqualTo(correspondentData.getPprbGuid());
+            assertThat(data.getSbbolReplicationGuid()).isNotNull();
+            assertThat(data.getVersion()).isNotNull();
+        });
+
     }
 
     @Test
@@ -105,7 +134,6 @@ public class CorrespondentMigrationServiceTest extends AbstractIntegrationWithOu
             correspondent.setReplicationGuid(randomReplicationGuid);
             correspondent.setCorrPhoneNumber(eightSymbolsRandomString);
             correspondent.setCorrEmail(eightSymbolsRandomString);
-            correspondent.setPprbGuid(eightSymbolsRandomString);
             correspondent.setBankAccount(eightSymbolsRandomString);
             correspondent.setVersion(0);
             correspondent.setSigned(false);

@@ -47,6 +47,7 @@ import java.util.UUID;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -101,7 +102,7 @@ class LegacySbbolAdapterTest {
     }
 
     /**
-     * {@link LegacySbbolAdapter#checkMigration(String)}
+     * {@link LegacySbbolAdapter#checkNotMigration(String)}
      */
     @Test
     @AllureId("34036")
@@ -109,7 +110,7 @@ class LegacySbbolAdapterTest {
     void checkMigrationTest() {
         mockServerClient.when(HttpRequest.request(CHECK_MIGRATION).withMethod(HttpMethod.GET.name()).withHeaders(headers))
             .respond(HttpResponse.response(getStringObject(true)).withHeaders(headers));
-        assertTrue(adapter.checkMigration(DIGITAL_ID));
+        assertFalse(adapter.checkNotMigration(DIGITAL_ID));
     }
 
     /**
@@ -187,6 +188,7 @@ class LegacySbbolAdapterTest {
      */
     @Test
     @AllureId("34038")
+    @SuppressWarnings("unchecked")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка по ППРБ гуиду")
     void listTest() {
         List<CounterpartyView> response = factory.manufacturePojo(ArrayList.class, CounterpartyView.class);
@@ -242,6 +244,7 @@ class LegacySbbolAdapterTest {
      */
     @Test
     @AllureId("34033")
+    @SuppressWarnings("unchecked")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка по ППРБ гуиду и фильтру")
     void viewTest() {
         var request = factory.manufacturePojo(CounterpartyFilter.class);

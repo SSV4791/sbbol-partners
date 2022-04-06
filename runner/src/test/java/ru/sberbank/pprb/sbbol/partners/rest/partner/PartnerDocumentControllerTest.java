@@ -92,13 +92,16 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
     @AllureId("34184")
     void testCreatePartnerDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        var expected = getValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        var document = createValidPartnerDocument(expected);
         assertThat(document)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid",
-                "unifiedUuid")
-            .isEqualTo(document);
+                "id",
+                "version",
+                "documentType"
+            )
+            .isEqualTo(expected);
     }
 
     @Test
@@ -165,6 +168,15 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
 
     private static Document createValidPartnerDocument(String partnerUuid, String digitalId) {
         var response = createPost(baseRoutePath + "/document", getValidPartnerDocument(partnerUuid, digitalId), DocumentResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getErrors())
+            .isNull();
+        return response.getDocument();
+    }
+
+    private static Document createValidPartnerDocument(DocumentCreate document) {
+        var response = createPost(baseRoutePath + "/document", document, DocumentResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getErrors())

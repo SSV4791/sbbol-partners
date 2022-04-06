@@ -93,13 +93,15 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
     void testCreateContactAddress() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var address = createValidAddress(contact.getId(), contact.getDigitalId());
+        var expected = getValidPartnerAddress(contact.getId(), contact.getDigitalId());
+        var address = createValidAddress(expected);
         assertThat(address)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid",
-                "unifiedUuid")
-            .isEqualTo(address);
+                "id",
+                "version"
+            )
+            .isEqualTo(expected);
     }
 
     @Test
@@ -168,6 +170,15 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
 
     private static Address createValidAddress(String partnerUuid, String digitalId) {
         var response = createPost(baseRoutePath + "/address", getValidPartnerAddress(partnerUuid, digitalId), AddressResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getErrors())
+            .isNull();
+        return response.getAddress();
+    }
+
+    private static Address createValidAddress(AddressCreate address) {
+        var response = createPost(baseRoutePath + "/address", address, AddressResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getErrors())

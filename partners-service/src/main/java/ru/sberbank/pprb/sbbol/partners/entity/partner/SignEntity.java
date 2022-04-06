@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import java.io.Serial;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,6 +23,9 @@ import java.util.UUID;
 @DynamicInsert
 @Entity
 public class SignEntity extends BaseEntity {
+
+    @Serial
+    private static final long serialVersionUID = 1;
 
     @Column(name = "entity_uuid", nullable = false)
     private UUID entityUuid;

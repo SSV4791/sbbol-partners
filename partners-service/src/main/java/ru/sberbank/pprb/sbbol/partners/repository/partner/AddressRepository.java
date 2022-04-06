@@ -6,6 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AddressViewRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -18,7 +19,7 @@ public interface AddressRepository extends CrudRepository<AddressEntity, UUID>, 
      * @param uuid      Идентификатор адреса
      * @return адрес Партнера
      */
-    AddressEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
+    Optional<AddressEntity> getByDigitalIdAndUuid(String digitalId, UUID uuid);
 
     /**
      * Получение списка адресов Партнера

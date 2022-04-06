@@ -103,13 +103,15 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
     void testCreateContactDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
+        var expected = getValidContactDocument(contact.getId(), contact.getDigitalId());
+        var document = createValidContactDocument(expected);
         assertThat(document)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid",
-                "unifiedUuid")
-            .isEqualTo(document);
+                "id",
+                "version",
+                "documentType")
+            .isEqualTo(expected);
     }
 
     @Test
@@ -189,8 +191,17 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
             ;
     }
 
-    private static Document createValidContactDocument(String partnerUuid, String digitalId) {
-        var documentResponse = createPost(baseRoutePath + "/document", getValidContactDocument(partnerUuid, digitalId), DocumentResponse.class);
+    private static Document createValidContactDocument(String contactUuid, String digitalId) {
+        var documentResponse = createPost(baseRoutePath + "/document", getValidContactDocument(contactUuid, digitalId), DocumentResponse.class);
+        assertThat(documentResponse)
+            .isNotNull();
+        assertThat(documentResponse.getErrors())
+            .isNull();
+        return documentResponse.getDocument();
+    }
+
+    private static Document createValidContactDocument(DocumentCreate document) {
+        var documentResponse = createPost(baseRoutePath + "/document", document, DocumentResponse.class);
         assertThat(documentResponse)
             .isNotNull();
         assertThat(documentResponse.getErrors())

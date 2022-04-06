@@ -1,11 +1,9 @@
 
 package ru.sberbank.pprb.sbbol.partners.validation;
 
-import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation;
 
@@ -32,7 +30,7 @@ public class PartnerAccountCreateValidator implements Validator<AccountCreate> {
         if (entity.getAccount().length() != BasePartnerAccountValidation.ACCOUNT_VALID_LENGTH) {
             errors.add(MessagesTranslator.toLocale("account.account.length"));
         }
-        if (CollectionUtils.isEmpty(entity.getBanks())) {
+        if (entity.getBank() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank"));
         } else {
             checkBank(entity, errors);
@@ -40,36 +38,33 @@ public class PartnerAccountCreateValidator implements Validator<AccountCreate> {
     }
 
     private void checkBank(AccountCreate entity, List<String> errors) {
-        for (BankCreate bank : entity.getBanks()) {
-            if (bank.getBic() == null) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bic"));
-            }
-            if (bank.getBic().length() != BasePartnerAccountValidation.BIC_VALID_LENGTH) {
-                errors.add("account.bic.length");
-            }
-            if (bank.getName() == null) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.name"));
-            }
-            if (CollectionUtils.isEmpty(bank.getBankAccounts())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bankAccounts"));
-            } else {
-                checkBankAccount(bank, errors);
-            }
-            if (!userAccountValid(entity.getAccount(), bank.getBic())) {
-                errors.add(MessagesTranslator.toLocale("account.account.control_number", entity.getAccount()));
-            }
+        var bank = entity.getBank();
+        if (bank.getBic() == null) {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bic"));
+        }
+        if (bank.getBic().length() != BasePartnerAccountValidation.BIC_VALID_LENGTH) {
+            errors.add("account.bic.length");
+        }
+        if (bank.getName() == null) {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.name"));
+        }
+        if (bank.getBankAccount() == null) {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bankAccounts"));
+        } else {
+            checkBankAccount(bank, errors);
+        }
+        if (!userAccountValid(entity.getAccount(), bank.getBic())) {
+            errors.add(MessagesTranslator.toLocale("account.account.control_number", entity.getAccount()));
         }
     }
 
     private void checkBankAccount(BankCreate bank, List<String> errors) {
-        for (BankAccountCreate bankAccount : bank.getBankAccounts()) {
-            if (bankAccount.getAccount() == null) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bankAccount.account"));
-            }
-            if (!bankAccountValid(bankAccount.getAccount(), bank.getBic())) {
-                errors.add(MessagesTranslator.toLocale("account.bank_account.control_number", bankAccount.getAccount()));
-            }
+        var bankAccount = bank.getBankAccount();
+        if (bankAccount.getAccount() == null) {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bankAccount.account"));
+        }
+        if (!bankAccountValid(bankAccount.getAccount(), bank.getBic())) {
+            errors.add(MessagesTranslator.toLocale("account.bank_account.control_number", bankAccount.getAccount()));
         }
     }
-
 }

@@ -24,7 +24,13 @@ public class RenterViewRepositoryImpl extends BaseRepository<PartnerEntity, Rent
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<PartnerEntity> criteria, List<Predicate> predicates, Root<PartnerEntity> root, RenterFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<PartnerEntity> criteria,
+        List<Predicate> predicates,
+        Root<PartnerEntity> root,
+        RenterFilter filter
+    ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
     }
 

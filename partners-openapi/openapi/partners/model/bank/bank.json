@@ -8,7 +8,7 @@
       "type": "string",
       "title": "Идентификатор"
     },
-    "partnerAccountId": {
+    "accountId": {
       "type": "string",
       "title": "Идентификатор счёта партнера"
     },
@@ -30,12 +30,9 @@
       "title": "Является транзитным банком",
       "default": false
     },
-    "bankAccounts": {
-      "type": "array",
-      "title": "Корреспондентские счета",
-      "items": {
-        "$ref": "bank_account.json"
-      }
+    "bankAccount": {
+      "$ref": "bank_account.json",
+      "title": "Корреспондентский счёт"
     }
   }
 }

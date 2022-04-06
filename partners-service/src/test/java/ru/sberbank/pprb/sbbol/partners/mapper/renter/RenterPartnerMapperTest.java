@@ -75,30 +75,30 @@ class RenterPartnerMapperTest extends BaseConfiguration {
         assertThat(expected.getAccount())
             .isEqualTo(account.getAccount());
         assertThat(account)
-            .isEqualTo(account.getBanks().get(0).getAccount());
+            .isEqualTo(account.getBank().getAccount());
         assertThat(expected.getBankName())
-            .isEqualTo(account.getBanks().get(0).getName());
+            .isEqualTo(account.getBank().getName());
         assertThat(expected.getBankBic())
-            .isEqualTo(account.getBanks().get(0).getBic());
-        assertThat(account.getBanks().get(0))
-            .isEqualTo(account.getBanks().get(0).getBankAccounts().get(0).getBank());
+            .isEqualTo(account.getBank().getBic());
+        assertThat(account.getBank())
+            .isEqualTo(account.getBank().getBankAccount().getBank());
         assertThat(expected.getBankAccount())
-            .isEqualTo(account.getBanks().get(0).getBankAccounts().get(0).getAccount());
+            .isEqualTo(account.getBank().getBankAccount().getAccount());
     }
 
     @Test
     @AllureId("34086")
     void toBanks() {
         Renter expected = factory.manufacturePojo(Renter.class);
-        var banks = RenterPartnerMapper.toBanks(expected);
+        var bank = RenterPartnerMapper.toBank(expected);
         assertThat(expected.getBankName())
-            .isEqualTo(banks.get(0).getName());
+            .isEqualTo(bank.getName());
         assertThat(expected.getBankBic())
-            .isEqualTo(banks.get(0).getBic());
-        assertThat(banks.get(0))
-            .isEqualTo(banks.get(0).getBankAccounts().get(0).getBank());
+            .isEqualTo(bank.getBic());
+        assertThat(bank)
+            .isEqualTo(bank.getBankAccount().getBank());
         assertThat(expected.getBankAccount())
-            .isEqualTo(banks.get(0).getBankAccounts().get(0).getAccount());
+            .isEqualTo(bank.getBankAccount().getAccount());
     }
 
     @Test

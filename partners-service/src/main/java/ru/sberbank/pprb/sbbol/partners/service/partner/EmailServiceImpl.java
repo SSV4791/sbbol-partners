@@ -2,8 +2,10 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
@@ -21,15 +23,24 @@ abstract class EmailServiceImpl implements EmailService {
 
     private final EmailRepository emailRepository;
     private final EmailMapper emailMapper;
+    private final LegacySbbolAdapter legacySbbolAdapter;
 
-    public EmailServiceImpl(EmailRepository emailRepository, EmailMapper emailMapper) {
+    public EmailServiceImpl(
+        EmailRepository emailRepository,
+        EmailMapper emailMapper,
+        LegacySbbolAdapter legacySbbolAdapter
+    ) {
         this.emailRepository = emailRepository;
         this.emailMapper = emailMapper;
+        this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional(readOnly = true)
     public EmailsResponse getEmails(EmailsFilter emailsFilter) {
+        if (legacySbbolAdapter.checkNotMigration(emailsFilter.getDigitalId())) {
+            throw new PartnerMigrationException();
+        }
         var response = emailRepository.findByFilter(emailsFilter);
         var emailResponse = new EmailsResponse();
         for (var entity : response) {
@@ -52,6 +63,9 @@ abstract class EmailServiceImpl implements EmailService {
     @Override
     @Transactional
     public EmailResponse saveEmail(EmailCreate email) {
+        if (legacySbbolAdapter.checkNotMigration(email.getDigitalId())) {
+            throw new PartnerMigrationException();
+        }
         var emailEntity = emailMapper.toEmail(email);
         EmailEntity savedEmail = emailRepository.save(emailEntity);
         var response = emailMapper.toEmail(savedEmail);
@@ -61,11 +75,12 @@ abstract class EmailServiceImpl implements EmailService {
     @Override
     @Transactional
     public EmailResponse updateEmail(Email email) {
-        var uuid = UUID.fromString(email.getId());
-        var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid);
-        if (foundEmail == null) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, uuid);
+        if (legacySbbolAdapter.checkNotMigration(email.getDigitalId())) {
+            throw new PartnerMigrationException();
         }
+        var uuid = UUID.fromString(email.getId());
+        var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid)
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
         if (email.getVersion() <= foundEmail.getVersion()) {
             throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundEmail.getVersion() +
                 " больше или равна версии документа в запросе version=" + email.getVersion());
@@ -79,10 +94,13 @@ abstract class EmailServiceImpl implements EmailService {
     @Override
     @Transactional
     public void deleteEmail(String digitalId, String id) {
+        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
+            throw new PartnerMigrationException();
+        }
         var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
-        if (foundEmail == null) {
+        if (foundEmail.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
         }
-        emailRepository.delete(foundEmail);
+        emailRepository.delete(foundEmail.get());
     }
 }

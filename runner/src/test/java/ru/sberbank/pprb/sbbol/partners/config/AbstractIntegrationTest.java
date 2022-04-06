@@ -140,6 +140,18 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
+    protected static <BODY> Error postNotFound(String url, BODY body) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(notFoundResponseSpec)
+            .extract()
+            .as(Error.class);
+    }
+
     protected static <BODY> Error createBadRequestPost(String url, BODY body) {
         return given()
             .spec(requestSpec)
@@ -199,6 +211,18 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
+    protected static <BODY> Error putNotFound(String url, BODY body) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .put(url)
+            .then()
+            .spec(notFoundResponseSpec)
+            .extract()
+            .as(Error.class);
+    }
+
     protected static <BODY> Error createBadRequestPut(String url, BODY body) {
         return given()
             .spec(requestSpec)
@@ -220,5 +244,16 @@ public abstract class AbstractIntegrationTest {
             .spec(notContentResponseSpec)
             .extract()
             .response().getBody();
+    }
+
+    protected static Error deleteNotFound(String url, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .delete(url, params)
+            .then()
+            .spec(notFoundResponseSpec)
+            .extract()
+            .as(Error.class);
     }
 }

@@ -18,11 +18,18 @@ import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
+import java.util.List;
+
 @Mapper(
     componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface AccountMapper extends BaseMapper {
+
+    @Mapping(target = "id", expression = "java(accounts.getUuid() == null ? null :accounts.getUuid().toString())")
+    @Mapping(target = "partnerId", expression = "java(accounts.getPartnerUuid() == null ? null : accounts.getPartnerUuid().toString())")
+    @Mapping(target = "budget", ignore = true)
+    List<Account> toAccounts(List<AccountEntity> accounts);
 
     @Mapping(target = "id", expression = "java(account.getUuid() == null ? null :account.getUuid().toString())")
     @Mapping(target = "partnerId", expression = "java(account.getPartnerUuid() == null ? null : account.getPartnerUuid().toString())")
@@ -30,7 +37,7 @@ public interface AccountMapper extends BaseMapper {
     Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
 
     @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")
-    @Mapping(target = "partnerAccountId", expression = "java(bank.getAccount().getUuid() == null ? null : bank.getAccount().getUuid().toString())")
+    @Mapping(target = "accountId", expression = "java(bank.getAccount().getUuid() == null ? null : bank.getAccount().getUuid().toString())")
     @Mapping(target = "mediary", source = "intermediary")
     Bank toBank(BankEntity bank);
 
@@ -60,32 +67,31 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "priorityAccount", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget() AccountEntity accountEntity);
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var banks = account.getBanks();
-        if (banks != null) {
-            for (var bank : banks) {
-                bank.setAccount(account);
-            }
+        var bank = account.getBank();
+        if (bank != null) {
+            bank.setAccount(account);
         }
     }
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget BankEntity bank) {
-        var bankAccounts = bank.getBankAccounts();
-        if (bankAccounts != null) {
-            for (var bankAccount : bankAccounts) {
-                bankAccount.setBank(bank);
-            }
+        var bankAccount = bank.getBankAccount();
+        if (bankAccount != null) {
+            bankAccount.setBank(bank);
         }
     }
 
     @AfterMapping
     default void mapBudgetMask(@MappingTarget Account account, @Context BudgetMaskService budgetMaskService) {
-        for (Bank bank : account.getBanks()) {
-            for (BankAccount bankAccount : bank.getBankAccounts()) {
+        var bank = account.getBank();
+        if (bank != null) {
+            var bankAccount = bank.getBankAccount();
+            if (bankAccount != null) {
                 account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getAccount()));
             }
         }

@@ -17,6 +17,7 @@ public interface EmailMapper extends BaseMapper {
     Email toEmail(EmailEntity email);
 
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
     EmailEntity toEmail(EmailCreate email);
 

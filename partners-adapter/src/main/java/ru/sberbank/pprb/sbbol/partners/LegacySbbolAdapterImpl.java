@@ -195,7 +195,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
 
     @Override
     @Cacheable("migration")
-    public boolean checkMigration(String digitalId) {
+    public boolean checkNotMigration(String digitalId) {
         try {
             ResponseEntity<Boolean> response = restTemplate.exchange(
                 CHECK_MIGRATION,
@@ -205,7 +205,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
                 },
                 digitalId
             );
-            return Boolean.TRUE.equals(response.getBody());
+            return Boolean.FALSE.equals(response.getBody());
         } catch (HttpClientErrorException e) {
             throw new SbbolException(e.getStatusCode(), e.getMessage());
         } catch (Exception e) {

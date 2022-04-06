@@ -4,6 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -15,5 +16,5 @@ public interface AccountSignRepository extends CrudRepository<SignEntity, UUID> 
      * @param accountId идентификатор счёта партнера
      * @return Информация о подписи
      */
-    SignEntity getByAccountUuid(UUID accountId);
+    Optional<SignEntity> getByAccountUuid(UUID accountId);
 }

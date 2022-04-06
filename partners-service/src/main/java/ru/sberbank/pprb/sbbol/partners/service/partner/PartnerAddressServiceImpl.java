@@ -1,8 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
@@ -15,21 +17,27 @@ import java.util.UUID;
 public class PartnerAddressServiceImpl extends AddressServiceImpl {
 
     private final PartnerRepository partnerRepository;
+    private final LegacySbbolAdapter legacySbbolAdapter;
 
     public PartnerAddressServiceImpl(
         PartnerRepository partnerRepository,
         AddressRepository addressRepository,
-        AddressMapper addressMapper
+        AddressMapper addressMapper,
+        LegacySbbolAdapter legacySbbolAdapter
     ) {
-        super(addressRepository, addressMapper);
+        super(addressRepository, addressMapper, legacySbbolAdapter);
         this.partnerRepository = partnerRepository;
+        this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional
     public AddressResponse saveAddress(AddressCreate address) {
+        if (legacySbbolAdapter.checkNotMigration(address.getDigitalId())) {
+            throw new PartnerMigrationException();
+        }
         var partner = partnerRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getUnifiedId()));
-        if (partner == null) {
+        if (partner.isEmpty()) {
             throw new EntryNotFoundException("partner", address.getDigitalId());
         }
         return super.saveAddress(address);

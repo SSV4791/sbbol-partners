@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
+import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationPartnerAccountEntity;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationPartnerEntity;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
@@ -33,6 +34,7 @@ public class MigrationPartnerMapperTest {
         assertThat(migrationPartnerEntity.getAccount().getDigitalId()).isEqualTo(DIGITAL_ID);
         assertThat(migrationPartnerEntity.getAccount().getBank().getVersion()).isEqualTo(expectedVersion);
         assertThat(migrationPartnerEntity.getAccount().getBank().getBic()).isEqualTo(migrationCorrespondentCandidate.getBic());
+        assertThat(migrationPartnerEntity.getAccount().getBank().getName()).isEqualTo(migrationCorrespondentCandidate.getBankName());
         assertThat(migrationPartnerEntity.getAccount().getBank().getIntermediary()).isFalse();
         assertThat(migrationPartnerEntity.getAccount().getBank().getBankAccount().getAccount()).isEqualTo(migrationCorrespondentCandidate.getBankAccount());
         assertThat(migrationPartnerEntity.getEmail().getVersion()).isEqualTo(expectedVersion);
@@ -52,6 +54,9 @@ public class MigrationPartnerMapperTest {
     void toMigrationPartnerEntityWithoutInnerEntitiesTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setAccount(null);
+        migrationCorrespondentCandidate.setBankName(null);
+        migrationCorrespondentCandidate.setBic(null);
+        migrationCorrespondentCandidate.setBankAccount(null);
         migrationCorrespondentCandidate.setCorrEmail(null);
         migrationCorrespondentCandidate.setCorrPhoneNumber(null);
         MigrationPartnerEntity migrationPartnerEntity = mapper.toMigrationPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
@@ -88,5 +93,33 @@ public class MigrationPartnerMapperTest {
         MigrationPartnerEntity migrationPartnerEntity = mapper.toMigrationPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
         assertThat(migrationPartnerEntity.getFirstName()).isEqualTo(migrationCorrespondentCandidate.getName());
         assertThat(migrationPartnerEntity.getOrgName()).isNull();
+    }
+
+    @Test
+    void toUpdateEmptyMigrationPartnerEntityTest() {
+        MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
+        var migrationPartnerEntity = new MigrationPartnerEntity();
+        mapper.toMigrationPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate, migrationPartnerEntity);
+        Long expectedVersion = migrationCorrespondentCandidate.getVersion();
+        assertThat(migrationPartnerEntity.getVersion()).isEqualTo(expectedVersion);
+        assertThat(migrationPartnerEntity.getDigitalId()).isEqualTo(DIGITAL_ID);
+        assertThat(migrationPartnerEntity.getAccount().getVersion()).isEqualTo(expectedVersion);
+        assertThat(migrationPartnerEntity.getAccount().getAccount()).isEqualTo(migrationCorrespondentCandidate.getAccount());
+        assertThat(migrationPartnerEntity.getAccount().getDigitalId()).isEqualTo(DIGITAL_ID);
+        assertThat(migrationPartnerEntity.getAccount().getBank().getVersion()).isEqualTo(expectedVersion);
+        assertThat(migrationPartnerEntity.getAccount().getBank().getBic()).isEqualTo(migrationCorrespondentCandidate.getBic());
+        assertThat(migrationPartnerEntity.getAccount().getBank().getName()).isEqualTo(migrationCorrespondentCandidate.getBankName());
+        assertThat(migrationPartnerEntity.getAccount().getBank().getIntermediary()).isFalse();
+        assertThat(migrationPartnerEntity.getAccount().getBank().getBankAccount().getAccount()).isEqualTo(migrationCorrespondentCandidate.getBankAccount());
+        assertThat(migrationPartnerEntity.getEmail().getVersion()).isEqualTo(expectedVersion);
+        assertThat(migrationPartnerEntity.getEmail().getEmail()).isEqualTo(migrationCorrespondentCandidate.getCorrEmail());
+        assertThat(migrationPartnerEntity.getPhone().getVersion()).isEqualTo(expectedVersion);
+        assertThat(migrationPartnerEntity.getPhone().getPhone()).isEqualTo(migrationCorrespondentCandidate.getCorrPhoneNumber());
+        assertThat(migrationPartnerEntity.getLegalType()).isEqualTo(migrationCorrespondentCandidate.getLegalType());
+        assertThat(migrationPartnerEntity.getPhone().getPartner()).isNotNull();
+        assertThat(migrationPartnerEntity.getEmail().getPartner()).isNotNull();
+        assertThat(migrationPartnerEntity.getAccount().getPartner()).isNotNull();
+        assertThat(migrationPartnerEntity.getAccount().getBank().getAccount()).isNotNull();
+        assertThat(migrationPartnerEntity.getAccount().getBank().getBankAccount().getBank()).isNotNull();
     }
 }

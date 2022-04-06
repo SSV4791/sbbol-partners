@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -9,12 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Table(
@@ -32,7 +30,7 @@ public class BankEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_uuid", nullable = false)
     private AccountEntity account;
 
@@ -42,10 +40,11 @@ public class BankEntity extends BaseEntity {
     @Column(name = "bic", length = 9)
     private String bic;
 
-    @OneToMany(mappedBy = "bank", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BankAccountEntity> bankAccounts;
+    @OneToOne(mappedBy = "bank", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BankAccountEntity bankAccount;
 
     @Column(name = "intermediary")
+    @ColumnDefault(value = "false")
     private Boolean intermediary;
 
     public Boolean getIntermediary() {
@@ -80,15 +79,12 @@ public class BankEntity extends BaseEntity {
         this.account = account;
     }
 
-    public List<BankAccountEntity> getBankAccounts() {
-        if (bankAccounts == null) {
-            bankAccounts = new ArrayList<>();
-        }
-        return bankAccounts;
+    public BankAccountEntity getBankAccount() {
+        return bankAccount;
     }
 
-    public void setBankAccounts(List<BankAccountEntity> bankAccounts) {
-        this.bankAccounts = bankAccounts;
+    public void setBankAccount(BankAccountEntity bankAccount) {
+        this.bankAccount = bankAccount;
     }
 
     @Override

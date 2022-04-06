@@ -16,7 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Deprecated
+/**
+ * @deprecated {@link ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService}
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class RenterServiceImpl implements RenterService {
 

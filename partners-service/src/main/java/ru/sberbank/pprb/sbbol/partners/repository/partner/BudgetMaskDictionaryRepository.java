@@ -7,6 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.BudgetMaskDictionaryViewRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -18,7 +19,7 @@ public interface BudgetMaskDictionaryRepository extends CrudRepository<BudgetMas
      * @param uuid Идентификатор маски
      * @return маска бюджетности
      */
-    BudgetMaskEntity getByUuid(UUID uuid);
+    Optional<BudgetMaskEntity> getByUuid(UUID uuid);
 
     /**
      * Получение маски бюджетности

@@ -12,12 +12,10 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Index;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -63,8 +61,8 @@ public class AccountEntity extends BaseEntity {
     @Column(name = "state", length = 10, columnDefinition = "varchar(10) default 'NOT_SIGN'")
     private AccountStateType state;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BankEntity> banks;
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BankEntity bank;
 
     @Column(name = "priority_account")
     private Boolean priorityAccount;
@@ -139,15 +137,12 @@ public class AccountEntity extends BaseEntity {
         this.partnerUuid = partnerUuid;
     }
 
-    public List<BankEntity> getBanks() {
-        if (banks == null) {
-            banks = new ArrayList<>();
-        }
-        return banks;
+    public BankEntity getBank() {
+        return bank;
     }
 
-    public void setBanks(List<BankEntity> banks) {
-        this.banks = banks;
+    public void setBank(BankEntity bank) {
+        this.bank = bank;
     }
 
     @Override
