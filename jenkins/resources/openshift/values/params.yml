@@ -12,3 +12,4 @@ int_entry:
     db_si: "{{ int.pprb.db_si.v1_0 }}"
   sbbol:
     rest_in: "{{ int.sbbol.rest_in.latest }}"
+  ott: "{{ int.ott.v2_0 }}"

@@ -1,4 +1,6 @@
 ---
+path_version: 00.000
+
 openshift:
   env: dev
   os_host: "dev-gen2.sigma.sbrf.ru"
@@ -10,44 +12,52 @@ os_project:
     - port: 8080
   health_check: false
   host: "https://api.dev-gen2.sigma.sbrf.ru:6443"
-  project: ci02281165-edevgen2-efs-kib-sbbol-dev-test6
-  name: sbbol-partners
+  project: ci02281165-edevgen2-efs-kib-sbbol-dev-test31  #istio2
+  name: sbbol-pprb-draft
   istio:
     ingress:
       mtls:
         route:
-          host: ingress-ci02281165-partners-tls.apps.dev-gen2.sigma.sbrf.ru
+          host: ingress-pprb-draft-tls-test.apps.dev-gen2.sigma.sbrf.ru
           port: 5443
       mtls_geo:
         route:
-          host: ingress-ci02281165-partners-geo-tls.apps.dev-gen2.sigma.sbrf.ru
+          host: ingress-pprb-draft-geo-tls-test.apps.dev-gen2.sigma.sbrf.ru
           port: 5441
       ott:
         route:
-          host: ingress-ci02281165-partners-ott.apps.dev-gen2.sigma.sbrf.ru
+          host: ingress-pprb-draft-ott-test.apps.dev-gen2.sigma.sbrf.ru
           port: 5444
-        key_store: partners_pprb.p12
-        trust_store: sigma_ott_trust.p12
-        OTT_MODULE_ID: partners_pprb
+        key_store: /path/to/sbbol_ufs_draft.p12
+        trust_store: /path/to/sigma_ott_trust.p12
+        OTT_MODULE_ID: sbbol_ufs_draft
       ott_geo:
         route:
-          host: ingress-ci02281165-partners-geo-ott.apps.dev-gen2.sigma.sbrf.ru
+          host: ingress-pprb-draft-geo-ott-test.apps.dev-gen2.sigma.sbrf.ru
           port: 5442
       healthcheck:
         route:
-          host: ingress-ci02281165-partners-tls-hc.apps.dev-gen2.sigma.sbrf.ru
-          port: 5445
+          host: ingress-pprb-draft-geo-hc-test.apps.dev-gen2.sigma.sbrf.ru
+          port: 5446
+
     egress:
+      http:
+        port: 8080
       ott:
         port: 5443
-        key_store: partners_pprb.p12
-        trust_store: sigma_ott_trust.p12
-        OTT_MODULE_ID: partners_pprb
+        key_store: /path/to/sbbol_ufs_draft.p12
+        trust_store: /path/to/sigma_ott_trust.p12
+        OTT_MODULE_ID: sbbol_ufs_draft
       mtls:
         port: 5443
 
+  audit:
+    enabled: false
+    node_id: dev
+    module_id: sbbol-pprb-draft
+
 registry_area: registry.sigma.sbrf.ru
-nexus_area: Nexus_PROD/CI02792425_sbbol-partners
+nexus_area: Nexus_PROD/CI00405008_SBBOL/FP/OS_SBBOL_PPRB
 versionMask: "D-\\d{2}\\.\\d{3}\\.\\d{2}_\\d{4}"
 
 project_suffix: "{{ (os_project.project | hash('md5'))[:6] }}"
@@ -59,13 +69,10 @@ registry_istio_proxy: registry.sigma.sbrf.ru/registry_redhat_io/openshift-servic
 
 canary_suffix: main
 
-context_prefix: /sbbol-partners/
+context_prefix: /sbbol-pprb-draft/
 
 fluentbit:
-  module_id: pprb4-digital-partners
-
-sbbol:
-  url: sbbol-dev-rest-in-ci02281165.apps.dev-gen2.sigma.sbrf.ru
+  module_id: sbbol_pprb_ddm
 
 app_journal:
   secret: secret-appjournalstubsettings

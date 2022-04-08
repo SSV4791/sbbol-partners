@@ -7,11 +7,8 @@ run:
 runDev:
 	./gradlew bootRun --args='--spring.profiles.active=dev'
 
-runDevPG:
-	./gradlew bootRun --args='--spring.profiles.active=dev-postgres'
-
-runDevPGDebug:
-	./gradlew bootRun --args='--spring.profiles.active=dev-postgres' --debug-jvm
+runDevDebug:
+	./gradlew bootRun --args='--spring.profiles.active=dev' --debug-jvm
 
 buildNoCache:
 	./gradlew clean build --no-build-cache
