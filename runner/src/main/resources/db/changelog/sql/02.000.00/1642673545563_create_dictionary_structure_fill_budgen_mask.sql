@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1642673545563_create_dictionary_structure_fill_budgen_mask.sql
+-- changeset 17480332:1642673545563_create_dictionary_structure_fill_budgen_mask
 
 insert into BUDGET_MASK_DICTIONARY(UUID, MASK, CONDITION, TYPE)
 values ('9371a524-c643-44c2-a6d6-9e7c178ce282', '40101###############', '40101%', 'GIS_GMP_ACCOUNT'),

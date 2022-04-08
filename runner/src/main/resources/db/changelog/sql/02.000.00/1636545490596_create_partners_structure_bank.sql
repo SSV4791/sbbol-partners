@@ -1,5 +1,5 @@
---liquibase formatted sql
---changeset 17480332:1636545490596_create_partners_structure_bank
+-- liquibase formatted sql
+-- changeset 17480332:1636545490596_create_partners_structure_bank
 
 CREATE TABLE BANK
 (

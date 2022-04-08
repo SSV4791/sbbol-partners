@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1640010377139_create_partners_structure_email
+-- changeset 17480332:1640010377139_create_partners_structure_email
 
 CREATE TABLE EMAIL
 (

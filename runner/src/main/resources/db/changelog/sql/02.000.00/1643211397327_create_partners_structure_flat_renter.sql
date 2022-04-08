@@ -1,5 +1,5 @@
 -- liquibase formatted sql
---changeset 17480332:1643211397327_create_partners_structure_flat_renter.sql
+-- changeset 17480332:1643211397327_create_partners_structure_flat_renter
 
 CREATE TABLE FLAT_RENTER
 (

@@ -1,5 +1,5 @@
---liquibase formatted sql
---changeset 17480332:1636545764303_create_partners_structure_document
+-- liquibase formatted sql
+-- changeset 17480332:1636545764303_create_partners_structure_document
 
 CREATE TABLE DOCUMENT
 (

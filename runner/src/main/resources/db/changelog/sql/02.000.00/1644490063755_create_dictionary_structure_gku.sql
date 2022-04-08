@@ -1,9 +1,9 @@
 -- liquibase formatted sql
---changeset 17480332:1644490063755_create_dictionary_structure_gku.sql
+-- changeset 17480332:1644490063755_create_dictionary_structure_gku
 
 CREATE TABLE GKU_INN_DICTIONARY
 (
-    uuid UUID        NOT NULL,
+    uuid UUID        PRIMARY KEY,
     inn  VARCHAR(12) NOT NULL
 );
 
