@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface MigrationPartnerRepository extends CrudRepository<MigrationPartnerEntity, UUID> {
+
+    MigrationPartnerEntity findByAccount_Uuid(UUID accountUuid);
 }

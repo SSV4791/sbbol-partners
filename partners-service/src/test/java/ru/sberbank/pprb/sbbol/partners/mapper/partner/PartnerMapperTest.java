@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
+import ru.sberbank.pprb.sbbol.partners.model.Citizenship;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
@@ -55,6 +56,7 @@ class PartnerMapperTest extends BaseConfiguration {
 
     @Test
     @AllureId("34102")
+    @SuppressWarnings("unchecked")
     void testToPartnerPhoneString() {
         List<String> phones = factory.manufacturePojo(ArrayList.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);
@@ -69,6 +71,7 @@ class PartnerMapperTest extends BaseConfiguration {
 
     @Test
     @AllureId("34382")
+    @SuppressWarnings("unchecked")
     void testToPartnerEmailString() {
         List<String> emails = factory.manufacturePojo(ArrayList.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);
@@ -108,7 +111,7 @@ class PartnerMapperTest extends BaseConfiguration {
     @Test
     @AllureId("34071")
     void toPartnerCitizenshipType() {
-        Partner.CitizenshipEnum typeEnum = factory.manufacturePojo(Partner.CitizenshipEnum.class);
+        Citizenship typeEnum = factory.manufacturePojo(Citizenship.class);
         PartnerCitizenshipType citizenshipType = PartnerMapper.toCitizenshipType(typeEnum);
         assertThat(typeEnum)
             .isEqualTo(PartnerMapper.toCitizenshipType(citizenshipType));

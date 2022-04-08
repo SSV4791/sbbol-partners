@@ -6,6 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.PartnerViewRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.RenterViewRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -18,7 +19,7 @@ public interface PartnerRepository extends PagingAndSortingRepository<PartnerEnt
      * @param uuid      Идентификатор документа
      * @return Партнер
      */
-    PartnerEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
+    Optional<PartnerEntity> getByDigitalIdAndUuid(String digitalId, UUID uuid);
 
     /**
      * Получение Партнера
@@ -26,5 +27,5 @@ public interface PartnerRepository extends PagingAndSortingRepository<PartnerEnt
      * @param uuid Идентификатор документа
      * @return Партнер
      */
-    PartnerEntity getByUuid(UUID uuid);
+    Optional<PartnerEntity> getByUuid(UUID uuid);
 }

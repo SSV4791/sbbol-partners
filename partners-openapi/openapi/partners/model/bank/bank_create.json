@@ -17,12 +17,9 @@
       "title": "Является транзитным банком",
       "default": false
     },
-    "bankAccounts": {
-      "type": "array",
-      "title": "Корреспондентские счета",
-      "items": {
-        "$ref": "bank_account_create.json"
-      }
+    "bankAccount": {
+      "title": "Корреспондентский счёт",
+      "$ref": "bank_account_create.json"
     }
   }
 }

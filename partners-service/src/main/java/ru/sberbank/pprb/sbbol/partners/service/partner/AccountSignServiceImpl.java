@@ -5,9 +5,8 @@ import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
+import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
-import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
@@ -28,26 +27,26 @@ public class AccountSignServiceImpl implements AccountSignService {
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
     private final AccountSingMapper accountSingMapper;
-    private final CounterpartyMapper counterpartyMapper;
     private final LegacySbbolAdapter legacySbbolAdapter;
 
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         AccountSingMapper accountSingMapper,
-        CounterpartyMapper counterpartyMapper,
         LegacySbbolAdapter legacySbbolAdapter
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
         this.accountSingMapper = accountSingMapper;
-        this.counterpartyMapper = counterpartyMapper;
         this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional(readOnly = true)
     public AccountsSignResponse getAccountsSign(AccountsSignFilter filter) {
+        if (legacySbbolAdapter.checkNotMigration(filter.getDigitalId())) {
+            throw new PartnerMigrationException();
+        }
         var foundSignedAccounts = accountRepository.findByFilter(filter);
         var accountsSignResponse = new AccountsSignResponse();
         for (AccountEntity account : foundSignedAccounts) {
@@ -70,38 +69,27 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Override
     @Transactional
     public AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign) {
+        if (legacySbbolAdapter.checkNotMigration(accountsSign.getDigitalId())) {
+            throw new PartnerMigrationException();
+        }
         var response = new AccountsSignInfoResponse();
-        if (legacySbbolAdapter.checkMigration(accountsSign.getDigitalId())) {
-            response.setDigitalId(accountsSign.getDigitalId());
-            for (var accountSign : accountsSign.getAccountsSignDetail()) {
-                var account = accountRepository.getByDigitalIdAndUuid(accountsSign.getDigitalId(), UUID.fromString(accountSign.getAccountId()));
-                if (account == null) {
-                    throw new EntryNotFoundException(DOCUMENT_NAME, accountsSign.getDigitalId(), accountSign.getAccountId());
-                }
-                if (AccountStateType.SIGNED.equals(account.getState())) {
-                    response.addErrorsItem(
-                        new Error()
-                            .code("PPRB:PARTNER:SIGN_ACCOUNT_EXCEPTION")
-                            .text(Collections.singletonList("Account " + account.getUuid() + " уже имеет статус " + account.getState()))
-                    );
-                    continue;
-                }
-                var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid());
-                var savedSign = accountSignRepository.save(sign);
-                account.setState(AccountStateType.SIGNED);
-                accountRepository.save(account);
-                response.addAccountsSignDetailItem(accountSingMapper.toSignAccount(savedSign));
-
+        response.setDigitalId(accountsSign.getDigitalId());
+        for (var accountSign : accountsSign.getAccountsSignDetail()) {
+            var account = accountRepository.getByDigitalIdAndUuid(accountsSign.getDigitalId(), UUID.fromString(accountSign.getAccountId()))
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, accountsSign.getDigitalId(), accountSign.getAccountId()));
+            if (AccountStateType.SIGNED.equals(account.getState())) {
+                response.addErrorsItem(
+                    new Error()
+                        .code("PPRB:PARTNER:SIGN_ACCOUNT_EXCEPTION")
+                        .text(Collections.singletonList("Account " + account.getUuid() + " уже имеет статус " + account.getState()))
+                );
+                continue;
             }
-        } else {
-            for (AccountSignDetail accountSign : accountsSign.getAccountsSignDetail()) {
-                var counterpartySignData = counterpartyMapper.toCounterpartySignedData(accountSign);
-                legacySbbolAdapter.saveSign(accountsSign.getDigitalId(), counterpartySignData);
-                var account = accountRepository.getByDigitalIdAndUuid(accountsSign.getDigitalId(), UUID.fromString(accountSign.getAccountId()));
-                var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid());
-                var savedSign = accountSignRepository.save(sign);
-                response.addAccountsSignDetailItem(accountSingMapper.toSignAccount(savedSign));
-            }
+            var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid());
+            var savedSign = accountSignRepository.save(sign);
+            account.setState(AccountStateType.SIGNED);
+            accountRepository.save(account);
+            response.addAccountsSignDetailItem(accountSingMapper.toSignAccount(savedSign));
         }
         return response;
     }
@@ -109,41 +97,34 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Override
     @Transactional
     public void deleteAccountSign(String digitalId, String accountId) {
-        var uuid = UUID.fromString(accountId);
-        if (legacySbbolAdapter.checkMigration(digitalId)) {
-            var account = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
-            if (account == null) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId);
-            }
-            var sign = accountSignRepository.getByAccountUuid(uuid);
-            if (sign == null) {
-                throw new EntryNotFoundException("sign", digitalId, accountId);
-            }
-            accountSignRepository.delete(sign);
-            account.setState(AccountStateType.NOT_SIGNED);
-            accountRepository.save(account);
-        } else {
-            legacySbbolAdapter.removeSign(digitalId, accountId);
-            var sign = accountSignRepository.getByAccountUuid(uuid);
-            if (sign == null) {
-                throw new EntryNotFoundException("sign", digitalId, accountId);
-            }
-            accountSignRepository.delete(sign);
+        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
+            throw new PartnerMigrationException();
         }
+        var uuid = UUID.fromString(accountId);
+        var account = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
+        if (account.isEmpty()) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId);
+        }
+        var sign = accountSignRepository.getByAccountUuid(uuid)
+            .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
+        accountSignRepository.delete(sign);
+        account.get().setState(AccountStateType.NOT_SIGNED);
+        accountRepository.save(account.get());
     }
 
     @Override
     @Transactional(readOnly = true)
     public AccountSignInfo getAccountSign(String digitalId, String accountId) {
+        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
+            throw new PartnerMigrationException();
+        }
         var uuid = UUID.fromString(accountId);
-        var account = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
-        if (account == null) {
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
+        if (foundAccount.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId);
         }
-        var sign = accountSignRepository.getByAccountUuid(uuid);
-        if (sign == null) {
-            throw new EntryNotFoundException("sign", digitalId, accountId);
-        }
+        var sign = accountSignRepository.getByAccountUuid(uuid)
+            .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
         return accountSingMapper.toSignAccount(sign, digitalId);
     }
 }

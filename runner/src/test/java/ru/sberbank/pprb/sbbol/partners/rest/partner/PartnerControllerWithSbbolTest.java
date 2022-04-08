@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
-import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidPartner;
+
 
 class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
 
@@ -23,144 +23,77 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @Test
     @AllureId("34191")
     void testGetPartner() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
-        var partner = counterpartyMapper.toPartner(counterparty, digitalId);
-        var actualPartner = get(
+        var response = getNotFound(
             baseRoutePath + "/{digitalId}" + "/{id}",
-            PartnerResponse.class,
-            partner.getDigitalId(), partner.getId()
+            Error.class,
+            RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)
         );
-        assertThat(actualPartner)
+        assertThat(response)
             .isNotNull();
-        assertThat(actualPartner.getPartner())
-            .isNotNull()
-            .isEqualTo(partner);
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34187")
     void testPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
-        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
-        assertThat(createdPartner1)
-            .isNotNull();
-
-        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
-        assertThat(createdPartner2)
-            .isNotNull();
-
         var filter = new PartnersFilter();
-        filter.setDigitalId(digitalId);
+        filter.setDigitalId(RandomStringUtils.randomAlphabetic(10));
         filter.setPagination(
             new Pagination()
                 .offset(1)
                 .count(1)
         );
-
-        var response = post("/partners/view", filter, PartnersResponse.class);
+        var response = postNotFound("/partners/view", filter);
         assertThat(response)
             .isNotNull();
-        assertThat(response.getPartners().size()).isEqualTo(1);
-    }
-
-    @Test
-    @AllureId("34166")
-    void testGetAllPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
-        var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
-        assertThat(createdPartner1)
-            .isNotNull();
-
-        var createdPartner2 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
-        assertThat(createdPartner2)
-            .isNotNull();
-
-        var filter = new PartnersFilter();
-        filter.setDigitalId(digitalId);
-        filter.setPagination(
-            new Pagination()
-                .offset(0)
-                .count(2)
-        );
-
-        var response = post("/partners/view", filter, PartnersResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getPartners().size())
-            .isEqualTo(1);
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34156")
     void testCreatePartner() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
-        var partner = counterpartyMapper.toPartner(counterparty, digitalId);
-        assertThat(partner)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "uuid",
-                "emails.unifiedUuid",
-                "emails.uuid",
-                "phones.unifiedUuid",
-                "phones.uuid"
-            )
-            .isEqualTo(partner);
+        var response = postNotFound(baseRoutePath, PartnerControllerTest.getValidPartner());
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34194")
     void testUpdatePartner() {
-        var partner = getValidPartner();
-        var createdPartner = createPost(baseRoutePath, partner, PartnerResponse.class);
-        var updatePartner = createdPartner.getPartner();
-        updatePartner.kpp(newKpp);
-        PartnerResponse newUpdatePartner = put(baseRoutePath, updatePartner, PartnerResponse.class);
-
-        assertThat(updatePartner)
+        var partner = new Partner()
+            .id(UUID.randomUUID().toString())
+            .legalForm(LegalForm.LEGAL_ENTITY)
+            .orgName("Наименование компании")
+            .firstName("Имя клиента")
+            .secondName("Фамилия клиента")
+            .middleName("Отчество клиента")
+            .inn("4139314257")
+            .kpp("123456789")
+            .ogrn("1035006110083")
+            .okpo("444444")
+            .comment("555555");
+        partner.setDigitalId(RandomStringUtils.randomAlphabetic(10));
+        var response = putNotFound(baseRoutePath, partner);
+        assertThat(response)
             .isNotNull();
-        assertThat(newUpdatePartner.getPartner().getKpp())
-            .isEqualTo(newKpp);
-        assertThat(newUpdatePartner.getErrors())
-            .isNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34114")
     void testDeletePartner() {
-        var createdPartner = createPost(baseRoutePath, getValidPartner(), PartnerResponse.class);
-        createValidAccount(createdPartner.getPartner().getId(), createdPartner.getPartner().getDigitalId());
-        assertThat(createdPartner)
-            .isNotNull();
-        var executePartner = counterpartyMapper.toPartner(counterparty, createdPartner.getPartner().getDigitalId());
-        var actualPartner =
-            get(
-                baseRoutePath + "/{digitalId}" + "/{id}",
-                PartnerResponse.class,
-                createdPartner.getPartner().getDigitalId(), counterparty.getPprbGuid()
-            );
-        assertThat(actualPartner)
-            .isNotNull();
-        assertThat(actualPartner.getPartner())
-            .isNotNull()
-            .isEqualTo(executePartner);
-
-        delete(
+        var response = deleteNotFound(
             baseRoutePath + "/{digitalId}" + "/{id}",
-            actualPartner.getPartner().getDigitalId(), counterparty.getPprbGuid()
+            RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)
         );
-
-        when(legacySbbolAdapter.getByPprbGuid(actualPartner.getPartner().getDigitalId(), counterparty.getPprbGuid())).thenReturn(null);
-
-        var searchPartner =
-            getNotFound(
-                baseRoutePath + "/{digitalId}" + "/{id}",
-                Error.class,
-                createdPartner.getPartner().getDigitalId(), counterparty.getPprbGuid()
-            );
-        assertThat(searchPartner)
+        assertThat(response)
             .isNotNull();
-
-        assertThat(searchPartner.getCode())
+        assertThat(response.getCode())
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 }

@@ -5,10 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapper;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapperImpl;
-import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationReplicationHistoryMapper;
-import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationReplicationHistoryMapperImpl;
 import ru.sberbank.pprb.sbbol.migration.correspondents.repository.MigrationPartnerRepository;
-import ru.sberbank.pprb.sbbol.migration.correspondents.repository.MigrationReplicationHistoryRepository;
 import ru.sberbank.pprb.sbbol.migration.correspondents.service.CorrespondentMigrationService;
 import ru.sberbank.pprb.sbbol.migration.correspondents.service.CorrespondentMigrationServiceImpl;
 import ru.sberbank.pprb.sbbol.migration.gku.mapper.MigrationGkuMapper;
@@ -26,25 +23,17 @@ public class MigrationServiceConfiguration {
     }
 
     @Bean
-    MigrationReplicationHistoryMapper migrationReplicationHistoryMapper() {
-        return new MigrationReplicationHistoryMapperImpl();
-    }
-
-    @Bean
     MigrationGkuMapper migrationGkuMapper() {
         return new MigrationGkuMapperImpl();
     }
 
     @Bean
     CorrespondentMigrationService correspondentMigrationService(
-        MigrationPartnerRepository migrationPartnerRepository,
-        MigrationReplicationHistoryRepository migrationReplicationHistoryRepository
+        MigrationPartnerRepository migrationPartnerRepository
     ) {
         return new CorrespondentMigrationServiceImpl(
             migrationPartnerMapper(),
-            migrationReplicationHistoryMapper(),
-            migrationPartnerRepository,
-            migrationReplicationHistoryRepository
+            migrationPartnerRepository
         );
     }
 

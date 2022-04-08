@@ -132,15 +132,16 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34182")
     void testCreateAccount() {
         var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var expected = getValidAccount(partner.getId(), partner.getDigitalId());
+        var account = createValidAccount(expected);
         assertThat(account)
             .usingRecursiveComparison()
             .ignoringFields(
                 "uuid",
-                "banks.uuid",
-                "banks.accountUuid",
-                "banks.bankAccounts.uuid",
-                "banks.bankAccounts.bankUuid")
+                "bank.uuid",
+                "bank.accountUuid",
+                "bank.bankAccount.uuid",
+                "bank.bankAccount.bankUuid")
             .isEqualTo(account);
     }
 
@@ -169,7 +170,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .budget(account.getBudget())
             .name(newName)
             .account(account.getAccount())
-            .banks(account.getBanks());
+            .bank(account.getBank());
         var newUpdateAccount = put(baseRoutePath + "/account", updatedAccount, AccountResponse.class);
         assertThat(newUpdateAccount)
             .isNotNull();
@@ -263,16 +264,16 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
     }
 
-    private static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
+    static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
         return new AccountCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
             .name("111111")
             .account("40802810500490014206")
-            .addBanksItem(new BankCreate()
+            .bank(new BankCreate()
                 .bic("044525411")
                 .name("222222")
-                .addBankAccountsItem(
+                .bankAccount(
                     new BankAccountCreate()
                         .account("30101810145250000411"))
             );
@@ -301,12 +302,19 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         return createAccount.getAccount();
     }
 
+    public static Account createValidAccount(AccountCreate account) {
+        var createAccount = createPost(baseRoutePath + "/account", account, AccountResponse.class);
+        assertThat(createAccount)
+            .isNotNull();
+        assertThat(createAccount.getErrors())
+            .isNull();
+        return createAccount.getAccount();
+    }
+
     public static Error createNotValidAccount(String partnerUuid, String digitalId) {
         var account = getValidAccount(partnerUuid, digitalId);
         account.setAccount("222222");
-        for (BankCreate bank : account.getBanks()) {
-            bank.setBic("44444");
-        }
+        account.getBank().setBic("44444");
         return createBadRequestPost(baseRoutePath + "/account", account);
     }
 

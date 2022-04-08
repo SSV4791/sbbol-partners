@@ -10,7 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentCertifierType;
 import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
-import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 
 import static org.assertj.core.api.Assertions.assertThat;

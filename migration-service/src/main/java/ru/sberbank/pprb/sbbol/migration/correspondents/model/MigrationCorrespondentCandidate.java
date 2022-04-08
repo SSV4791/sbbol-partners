@@ -65,6 +65,11 @@ public class MigrationCorrespondentCandidate implements Serializable {
      */
     private MigrationLegalType legalType;
 
+    /**
+     * Наименование банка
+     */
+    private String bankName;
+
     public String getName() {
         return name;
     }
@@ -175,5 +180,13 @@ public class MigrationCorrespondentCandidate implements Serializable {
 
     public void setLegalType(MigrationLegalType legalType) {
         this.legalType = legalType;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
     }
 }

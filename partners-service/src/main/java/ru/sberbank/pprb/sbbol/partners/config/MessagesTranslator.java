@@ -11,7 +11,7 @@ public class MessagesTranslator {
 
     private static ResourceBundleMessageSource messageSource;
 
-    public MessagesTranslator(ResourceBundleMessageSource messageSource) {
+    MessagesTranslator(ResourceBundleMessageSource messageSource) {
         MessagesTranslator.messageSource = messageSource;
     }
 

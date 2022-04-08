@@ -14,7 +14,7 @@ public abstract class AbstractIntegrationWithOutSbbolTest extends AbstractIntegr
 
     @BeforeEach
     void init() {
-        when(legacySbbolAdapter.checkMigration(any())).thenReturn(true);
+        when(legacySbbolAdapter.checkNotMigration(any())).thenReturn(false);
     }
 
 }

@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.AllureId;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -17,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
@@ -49,7 +49,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34174")
     void testGetOnePartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -76,7 +76,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34151")
     void testGetSearchInnPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -107,7 +107,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34141")
     void testGetSearchBudgetPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -136,7 +136,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34124")
     void testGetSearchOrgNamePartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -167,7 +167,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34186")
     void testGetSearchFIOPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -198,7 +198,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34127")
     void testGetSearchLegalPersonPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -226,7 +226,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34128")
     void testGetSearchPhysicalPersonPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -254,7 +254,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34199")
     void testGetSearchEntrepreneurPersonPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -282,7 +282,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34209")
     void testGetPartnersNotSignedAccount() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -311,7 +311,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34132")
     void testGetPartnersSignedAccount() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -342,7 +342,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34148")
     void testGetAllPartners() {
-        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var digitalId = randomAlphabetic(10);
         var createdPartner1 = createPost(baseRoutePath, getValidPartner(digitalId), PartnerResponse.class);
         assertThat(createdPartner1)
             .isNotNull();
@@ -453,12 +453,11 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     public static PartnerCreate getValidPartner() {
-        return getValidPartner(RandomStringUtils.randomAlphabetic(10));
+        return getValidPartner(randomAlphabetic(10));
     }
 
     public static PartnerCreate getValidPartner(String digitalId) {
-        return new PartnerCreate()
-            .digitalId(digitalId)
+        var partner = new PartnerCreate()
             .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName("Наименование компании")
             .firstName("Имя клиента")
@@ -476,8 +475,9 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 List.of(
                     "a.a.a@sberbank.ru"
                 ))
-            .comment("555555")
-            ;
+            .comment("555555");
+        partner.setDigitalId(digitalId);
+        return partner;
     }
 
     private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {

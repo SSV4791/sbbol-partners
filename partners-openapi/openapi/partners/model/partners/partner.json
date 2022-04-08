@@ -81,13 +81,7 @@
       "default": false
     },
     "citizenship": {
-      "type": "string",
-      "title": "Гражданство партнера",
-      "enum": [
-        "UNKNOWN",
-        "RUSSIA",
-        "ANOTHER_COUNTRY"
-      ]
+      "$ref": "../common/citizenship.json"
     }
   }
 }

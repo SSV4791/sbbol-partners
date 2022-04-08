@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Создание партнера==
+Клиент -> СББОЛ: Создание партнера
+СББОЛ -> СББОЛ: Проверка на миграцию
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ -> СББОЛ: Создать контрагента
+СББОЛ --> Клиент: Информация о контрагенте
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ -> ППРБ.Партнеры: Создание партнера в таблице partner, email, phone
+ППРБ.Партнеры --> СББОЛ: Информация о партнере (partner_uuid)
+СББОЛ -> ППРБ.Партнеры: Создать счет по partner_uuid
+ППРБ.Партнеры --> СББОЛ: Счет создан
+СББОЛ --> Клиент: Информация о контрагенте
+group#Gold #pink break
+ППРБ.Партнеры --> СББОЛ: Ошибка
+СББОЛ --> Клиент: Ошибка
+end
+end
+@enduml

@@ -18,19 +18,22 @@ import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.ENTREPRENEUR;
 import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.LEGAL_ENTITY;
 import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.PHYSICAL_PERSON;
 
-@Deprecated
+/**
+ * @deprecated {@link ru.sberbank.pprb.sbbol.partners.validation.PartnerValidator}
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class ValidationServiceImpl implements ValidationService {
     @Override
     public List<CheckResult> check(Renter renter) {
         return Arrays.stream(Check.values())
-                .map(check -> check.validate(renter))
-                .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(CheckFailure::getField,
-                        Collectors.mapping(CheckFailure::getMsg, Collectors.toList())))
-                .entrySet().stream()
-                .map(entry -> new CheckResult().field(entry.getKey()).message(entry.getValue()))
-                .collect(Collectors.toList());
+            .map(check -> check.validate(renter))
+            .filter(Objects::nonNull)
+            .collect(Collectors.groupingBy(CheckFailure::getField,
+                Collectors.mapping(CheckFailure::getMsg, Collectors.toList())))
+            .entrySet().stream()
+            .map(entry -> new CheckResult().field(entry.getKey()).message(entry.getValue()))
+            .collect(Collectors.toList());
     }
 
 
@@ -52,7 +55,7 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        isEmpty(renter.getInn())) {
+                    isEmpty(renter.getInn())) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -62,8 +65,8 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        !isEmpty(renter.getInn()) &&
-                        renter.getInn().length() != 10 && renter.getInn().length() != 12) {
+                    !isEmpty(renter.getInn()) &&
+                    renter.getInn().length() != 10 && renter.getInn().length() != 12) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -73,7 +76,7 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if (PHYSICAL_PERSON == renter.getType() && !isEmpty(renter.getInn()) &&
-                        renter.getInn().length() != 12) {
+                    renter.getInn().length() != 12) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -154,7 +157,7 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        isEmpty(renter.getLegalName())) {
+                    isEmpty(renter.getLegalName())) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -182,8 +185,8 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        !isEmpty(renter.getInn()) &&
-                        renter.getInn().length() == 10 && isEmpty(renter.getKpp())) {
+                    !isEmpty(renter.getInn()) &&
+                    renter.getInn().length() == 10 && isEmpty(renter.getKpp())) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -193,8 +196,8 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        !isEmpty(renter.getInn()) &&
-                        renter.getInn().length() == 10 && "0".equals(renter.getKpp())) {
+                    !isEmpty(renter.getInn()) &&
+                    renter.getInn().length() == 10 && "0".equals(renter.getKpp())) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -204,8 +207,8 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        !isEmpty(renter.getInn()) && renter.getInn().length() == 10 &&
-                        !isEmpty(renter.getOkpo()) && renter.getOkpo().length() != 8) {
+                    !isEmpty(renter.getInn()) && renter.getInn().length() == 10 &&
+                    !isEmpty(renter.getOkpo()) && renter.getOkpo().length() != 8) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -215,8 +218,8 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        !isEmpty(renter.getInn()) && renter.getInn().length() == 12 &&
-                        !isEmpty(renter.getOkpo()) && renter.getOkpo().length() != 10) {
+                    !isEmpty(renter.getInn()) && renter.getInn().length() == 12 &&
+                    !isEmpty(renter.getOkpo()) && renter.getOkpo().length() != 10) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -226,8 +229,8 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        !isEmpty(renter.getInn()) && renter.getInn().length() == 10
-                        && !isEmpty(renter.getOgrn()) && renter.getOgrn().length() != 13) {
+                    !isEmpty(renter.getInn()) && renter.getInn().length() == 10
+                    && !isEmpty(renter.getOgrn()) && renter.getOgrn().length() != 13) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;
@@ -237,8 +240,8 @@ public class ValidationServiceImpl implements ValidationService {
             @Override
             CheckFailure validate(@Nonnull Renter renter) {
                 if ((ENTREPRENEUR == renter.getType() || LEGAL_ENTITY == renter.getType()) &&
-                        !isEmpty(renter.getInn()) && renter.getInn().length() == 12
-                        && !isEmpty(renter.getOgrn()) && renter.getOgrn().length() != 15) {
+                    !isEmpty(renter.getInn()) && renter.getInn().length() == 12
+                    && !isEmpty(renter.getOgrn()) && renter.getOgrn().length() != 15) {
                     return new CheckFailure(this.message, this.field);
                 }
                 return null;

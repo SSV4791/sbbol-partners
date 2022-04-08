@@ -42,10 +42,8 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Override
     @Transactional
     public DocumentTypeResponse updateDocument(DocumentType document) {
-        DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(document.getId()));
-        if (foundDocument == null) {
-            throw new EntryNotFoundException("document_type", document.getId());
-        }
+        DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(document.getId()))
+            .orElseThrow(() -> new EntryNotFoundException("document_type", document.getId()));
         documentTypeMapper.updateDocument(document, foundDocument);
         dictionaryRepository.save(foundDocument);
         return new DocumentTypeResponse().documentType(documentTypeMapper.toDocumentType(foundDocument));

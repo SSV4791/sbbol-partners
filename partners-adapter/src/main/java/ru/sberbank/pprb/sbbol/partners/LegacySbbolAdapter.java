@@ -90,7 +90,7 @@ public interface LegacySbbolAdapter {
      * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
      * @return мигрирован клиент или нет
      */
-    boolean checkMigration(String digitalId);
+    boolean checkNotMigration(String digitalId);
 
     /**
      * Получить список ИНН поставщиков ЖКУ

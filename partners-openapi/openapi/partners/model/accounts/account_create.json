@@ -20,12 +20,9 @@
       "type": "string",
       "title": "Счёт"
     },
-    "banks": {
-      "type": "array",
-      "items": {
-        "$ref": "../bank/bank_create.json"
-      },
-      "title": "Банки"
+    "bank": {
+      "title": "Банк",
+      "$ref": "../bank/bank_create.json"
     }
   }
 }

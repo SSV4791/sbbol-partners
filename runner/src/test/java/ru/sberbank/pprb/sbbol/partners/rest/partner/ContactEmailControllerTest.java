@@ -60,12 +60,15 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     void testCreateContactEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var email = createEmail(contact.getId(), contact.getDigitalId());
+        var expected = getEmail(contact.getId(), contact.getDigitalId());
+        var email = createEmail(expected);
         assertThat(email)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid")
-            .isEqualTo(email);
+                "id",
+                "version"
+            )
+            .isEqualTo(expected);
     }
 
     @Test
@@ -142,6 +145,15 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
 
     private static Email createEmail(String contactUuid, String digitalId) {
         var emailResponse = createPost(baseRoutePath, getEmail(contactUuid, digitalId), EmailResponse.class);
+        assertThat(emailResponse)
+            .isNotNull();
+        assertThat(emailResponse.getErrors())
+            .isNull();
+        return emailResponse.getEmail();
+    }
+
+    private static Email createEmail(EmailCreate email) {
+        var emailResponse = createPost(baseRoutePath, email, EmailResponse.class);
         assertThat(emailResponse)
             .isNotNull();
         assertThat(emailResponse.getErrors())

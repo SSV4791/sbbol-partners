@@ -5,7 +5,10 @@ import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.renter.model.RenterListResponse;
 
-@Deprecated
+/**
+ * @deprecated {@link ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService}
+ */
+@Deprecated(forRemoval = true)
 public interface RenterService {
 
     /**

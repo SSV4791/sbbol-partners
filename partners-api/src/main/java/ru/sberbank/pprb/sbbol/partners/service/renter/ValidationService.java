@@ -5,7 +5,10 @@ import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import java.util.List;
 
-@Deprecated
+/**
+ * @deprecated
+ */
+@Deprecated(forRemoval = true)
 public interface ValidationService {
 
     /**

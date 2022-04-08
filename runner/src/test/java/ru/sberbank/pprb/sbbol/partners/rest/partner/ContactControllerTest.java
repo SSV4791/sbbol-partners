@@ -116,16 +116,17 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34143")
     void testCreateContact() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var expected = getValidContact(partner.getId(), partner.getDigitalId());
+        var contact = createValidContact(expected);
         assertThat(contact)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid",
-                "phones.uuid",
-                "phones.unifiedUuid",
-                "emails.uuid",
-                "emails.unifiedUuid")
-            .isEqualTo(contact);
+                "id",
+                "version",
+                "phones",
+                "emails"
+            )
+            .isEqualTo(expected);
     }
 
 
@@ -224,8 +225,8 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         return createContact.getContact();
     }
 
-    protected static Contact createValidContact(String partnerUuid) {
-        var createContact = createPost(baseRoutePath + "/contact", getValidContact(partnerUuid), ContactResponse.class);
+    protected static Contact createValidContact(ContactCreate contact) {
+        var createContact = createPost(baseRoutePath + "/contact", contact, ContactResponse.class);
         assertThat(createContact)
             .isNotNull();
         assertThat(createContact.getErrors())

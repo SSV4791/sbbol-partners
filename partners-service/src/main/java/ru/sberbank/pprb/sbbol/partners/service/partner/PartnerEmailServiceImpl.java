@@ -1,8 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
@@ -15,18 +17,28 @@ import java.util.UUID;
 public class PartnerEmailServiceImpl extends EmailServiceImpl {
 
     private final PartnerRepository partnerRepository;
+    private final LegacySbbolAdapter legacySbbolAdapter;
 
-    public PartnerEmailServiceImpl(PartnerRepository partnerRepository, EmailRepository emailRepository, EmailMapper emailMapper) {
-        super(emailRepository, emailMapper);
+    public PartnerEmailServiceImpl(
+        PartnerRepository partnerRepository,
+        EmailRepository emailRepository,
+        EmailMapper emailMapper,
+        LegacySbbolAdapter legacySbbolAdapter
+    ) {
+        super(emailRepository, emailMapper, legacySbbolAdapter);
         this.partnerRepository = partnerRepository;
+        this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional
     public EmailResponse saveEmail(EmailCreate email) {
+        if (legacySbbolAdapter.checkNotMigration(email.getDigitalId())) {
+            throw new PartnerMigrationException();
+        }
         var uuid = UUID.fromString(email.getUnifiedId());
-        var partner = partnerRepository.getByUuid(uuid);
-        if (partner == null) {
+        var partner = partnerRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid);
+        if (partner.isEmpty()) {
             throw new EntryNotFoundException("partner", uuid);
         }
         return super.saveEmail(email);

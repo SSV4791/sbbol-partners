@@ -30,6 +30,9 @@ public class MigrationBankEntity extends MigrationBaseEntity {
     @JoinColumn(name = "account_uuid", nullable = false)
     private MigrationPartnerAccountEntity account;
 
+    @Column(name = "name", length = 50)
+    private String name;
+
     @Column(name = "bic", length = 9)
     private String bic;
 
@@ -45,6 +48,14 @@ public class MigrationBankEntity extends MigrationBaseEntity {
 
     public void setIntermediary(Boolean intermediary) {
         this.intermediary = intermediary;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBic() {

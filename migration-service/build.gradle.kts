@@ -6,6 +6,8 @@ plugins {
 }
 
 apply(plugin = "io.spring.dependency-management")
+apply(plugin = "jacoco")
+apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
 the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
     imports {
         mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)

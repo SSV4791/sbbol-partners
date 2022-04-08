@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Создание счетов==
+Клиент -> ППРБ.Партнеры: POST /partners/accounts
+ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
+break#Gold #Pink Ошибка. Прерывание операции
+ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+end
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Поиск партнера по partner_uuid в partner
+alt#Gold Есть запись в таблице partner
+ППРБ.Партнеры -> ППРБ.Партнеры: Создание записей в account, bank, bank_account
+ППРБ.Партнеры --> Клиент: 200
+loop#gold = count(account.uuid)
+ППРБ.Партнеры -> СББОЛ: /update/{digitalId} (создание контрагента используя account.uuid в качестве = correspondent.pprb_guid)
+СББОЛ --> ППРБ.Партнеры: 200
+group#Gold #Pink negative
+СББОЛ --> ППРБ.Партнеры: Error 50*/40*
+ППРБ.Партнеры -> ФП.Журналирование: Отправка месседжа в СББОЛ через кафку
+ППРБ.Партнеры -> Мониторинг: Оповещение об ошибке
+Мониторинг -> BRAIN_TEAM: Разбор ошибки и подготовка исправлений
+СББОЛ ->> ФП.Журналирование: Считывание очереди
+СББОЛ -> СББОЛ: Создание записи
+end
+end
+else В таблице partner отсутствует партнер
+break#Gold #Pink Ошибка. Отсутствует партнер
+ППРБ.Партнеры --> Клиент: Error 40*
+end
+end
+end
+@enduml

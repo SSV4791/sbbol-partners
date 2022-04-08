@@ -26,18 +26,16 @@ public class AccountMapperTest extends BaseConfiguration {
     void testToAccountCreate() {
         var expected = factory.manufacturePojo(AccountCreate.class);
         var account = mapper.toAccount(expected);
-        for (var bank : account.getBanks()) {
-            bank.setAccount(account);
-            for (var bankAccount : bank.getBankAccounts()) {
-                bankAccount.setBank(bank);
-            }
-        }
+        var bank = account.getBank();
+        bank.setAccount(account);
+        var bankAccount = bank.getBankAccount();
+        bankAccount.setBank(bank);
         var actual = mapper.toAccount(account, Mockito.mock(BudgetMaskService.class));
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
                 "budget",
-                "banks.mediary"
+                "bank.mediary"
             )
             .isEqualTo(actual);
     }
@@ -48,16 +46,15 @@ public class AccountMapperTest extends BaseConfiguration {
         var expected = factory.manufacturePojo(Bank.class);
         var actual = mapper.toBank(expected);
         var account = new AccountEntity();
-        account.setUuid(UUID.fromString(expected.getPartnerAccountId()));
+        account.setUuid(UUID.fromString(expected.getAccountId()));
         actual.setAccount(account);
-        for (var bankAccount : actual.getBankAccounts()) {
-            bankAccount.setBank(actual);
-        }
+        var bankAccount = actual.getBankAccount();
+        bankAccount.setBank(actual);
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
-                "partnerAccountId",
-                "bankAccounts.bankId")
+                "accountId",
+                "bankAccount.bankId")
             .isEqualTo(mapper.toBank(actual));
     }
 
@@ -71,7 +68,7 @@ public class AccountMapperTest extends BaseConfiguration {
             .usingRecursiveComparison()
             .ignoringFields(
                 "account",
-                "bankAccounts.bank"
+                "bankAccount.bank"
             )
             .isEqualTo(mapper.toBank(actual));
     }

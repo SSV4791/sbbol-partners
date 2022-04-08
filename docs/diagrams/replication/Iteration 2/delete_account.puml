@@ -1,0 +1,66 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Удаление счетов==
+Клиент -> ППРБ.Партнеры: DELETE /partner/account/{digitalId}/{id}
+ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Поиск партнера в partner
+alt#Gold Есть запись в таблице partner и partner.type != "renter"
+ППРБ.Партнеры -> СББОЛ: /update/{digitalId} (Установить "NULL" в correspondent.account, correspondent.bank_account, correspondent.bic по pprb_guid = replication_guid)
+СББОЛ --> ППРБ.Партнеры: 200
+break#Gold #Pink Ошибка. Прерывание операции
+СББОЛ --> ППРБ.Партнеры: Error 40*/50*
+ППРБ.Партнеры --> Клиент: Error 40*/50*
+end
+ППРБ.Партнеры --> Клиент: 204
+ППРБ.Партнеры -> ППРБ.Партнеры: Поиск счета в account
+ППРБ.Партнеры -> ППРБ.Партнеры: Удаление счета в account, bank, bank_account
+else В таблице partner нет записи
+ППРБ.Партнеры -> СББОЛ: /delete/{digitalId}/{pprbGuid} (удалить партнера c pprb_guid = replication_history.uuid)
+СББОЛ --> ППРБ.Партнеры: 200
+break#Gold #Pink Ошибка. Прерывание операции
+СББОЛ --> ППРБ.Партнеры: Error 40*/50*
+ППРБ.Партнеры --> Клиент: Error 40*/50*
+end
+ППРБ.Партнеры --> Клиент: 204
+else Есть запись партнера в таблице partner и partner.type = "renter"
+ППРБ.Партнеры -> ППРБ.Партнеры: Удаление данных в таблице account и bank, bank_account и версии в таблице partner
+ППРБ.Партнеры --> Клиент: 204
+end
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Поиск партнера и счета
+ППРБ.Партнеры -> ППРБ.Партнеры: Проверка наличия записи в таблице replication_history с переданным account_uuid
+alt#gold Есть запись в таблице account
+alt#gold Есть запись в таблице partner и partner.type = "partner" or "beneficiary"
+ППРБ.Партнеры -> ППРБ.Партнеры: Обновление записи в таблице partner, email, phone
+par#Gold
+ППРБ.Партнеры --> Клиент: 200
+ППРБ.Партнеры -> СББОЛ: /delete/{digitalId}/{pprbGuid} (удалить партнера c pprb_guid = replication_history.uuid)
+end
+СББОЛ -> ППРБ.Партнеры: 200
+group#Gold #pink negative
+СББОЛ --> ППРБ.Партнеры: Error 40*/50*
+ППРБ.Партнеры -> ФП.Журналирование: Отправка месседжа в СББОЛ через кафку
+ППРБ.Партнеры -> Мониторинг: Оповещение об ошибке
+Мониторинг -> BRAIN_TEAM: Разбор ошибки и подготовка исправлений
+СББОЛ ->> ФП.Журналирование: Считывание очереди
+СББОЛ -> СББОЛ: Создание записи
+end
+else Есть запись в таблице partner и partner.type = "renter"
+ППРБ.Партнеры -> ППРБ.Партнеры: Обновление записи в таблице partner, email, phone
+ППРБ.Партнеры --> Клиент: 200
+else Нет записи в partner
+break#Gold #pink Нет записи, прерывание операции
+ППРБ.Партнеры --> Клиент: 40* ошибка
+end
+end
+else Нет записи в account
+break#Gold #pink Нет записи, прерывание операции
+ППРБ.Партнеры --> Клиент: 40* ошибка
+end
+end
+end
+@enduml

@@ -22,6 +22,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 
+import java.util.Collections;
 import java.util.List;
 
 import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.FOREIGNPASSPORT;
@@ -33,7 +34,10 @@ import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.SERVICEMANID
 import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.SERVICEPASSPORTOFRUSSIA;
 
 
-@Deprecated
+/**
+ * @deprecated {@link ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper}
+ */
+@Deprecated(forRemoval = true)
 @Mapper(
     componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
@@ -47,8 +51,8 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "type", constant = "RENTER")
     @Mapping(target = "orgName", source = "legalName")
     @Mapping(target = "secondName", source = "lastName")
-    @Mapping(target = "phones", expression ="java(toPhones(renter.getPhoneNumbers(), renter.getDigitalId()))")
-    @Mapping(target = "emails", expression ="java(toEmails(renter.getEmails(), renter.getDigitalId()))")
+    @Mapping(target = "phones", expression = "java(toPhones(renter.getPhoneNumbers(), renter.getDigitalId()))")
+    @Mapping(target = "emails", expression = "java(toEmails(renter.getEmails(), renter.getDigitalId()))")
     @Mapping(target = "legalType", source = "type", qualifiedByName = "toLegalType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "comment", ignore = true)
@@ -60,7 +64,7 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Named("toPhones")
     default List<PartnerPhoneEntity> toPhones(String phone, String digitalId) {
         if (phone == null) {
-            return null;
+            return Collections.emptyList();
         }
         var phoneEntity = new PartnerPhoneEntity();
         phoneEntity.setPhone(phone);
@@ -71,7 +75,7 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Named("toEmails")
     default List<PartnerEmailEntity> toEmails(String email, String digitalId) {
         if (email == null) {
-            return null;
+            return Collections.emptyList();
         }
         var emailEntity = new PartnerEmailEntity();
         emailEntity.setEmail(email);
@@ -102,11 +106,12 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "state", constant = "NOT_SIGNED")
-    @Mapping(target = "banks", source = "renter", qualifiedByName = "toBanks")
+    @Mapping(target = "bank", source = "renter", qualifiedByName = "toBank")
+    @Mapping(target = "priorityAccount", ignore = true)
     AccountEntity toAccount(Renter renter);
 
-    @Named("toBanks")
-    static List<BankEntity> toBanks(Renter renter) {
+    @Named("toBank")
+    static BankEntity toBank(Renter renter) {
         if (renter == null) {
             return null;
         }
@@ -117,22 +122,21 @@ public interface RenterPartnerMapper extends BaseMapper {
             var bankAccountEntity = new BankAccountEntity();
             bankAccountEntity.setAccount(renter.getBankAccount());
             bankAccountEntity.setBank(bank);
-            bank.setBankAccounts(
-                List.of(bankAccountEntity)
+            bank.setBankAccount(
+                bankAccountEntity
             );
         }
-        return List.of(bank);
+        return bank;
     }
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var banks = account.getBanks();
-        if (banks != null) {
-            for (var bank : banks) {
-                bank.setAccount(account);
-                for (BankAccountEntity bankAccount : bank.getBankAccounts()) {
-                    bankAccount.setBank(bank);
-                }
+        var bank = account.getBank();
+        if (bank != null) {
+            bank.setAccount(account);
+            var bankAccount = bank.getBankAccount();
+            if (bankAccount != null) {
+                bankAccount.setBank(bank);
             }
         }
     }
@@ -235,9 +239,11 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "legalAddress", ignore = true)
     @Mapping(target = "physicalAddress", ignore = true)
     @Mapping(target = "checkResults", ignore = true)
-    @Mapping(target = "bankBic", expression = "java(CollectionUtils.isEmpty(accountEntity.getBanks()) ? null : accountEntity.getBanks().get(0).getBic())")
-    @Mapping(target = "bankName", expression = "java(CollectionUtils.isEmpty(accountEntity.getBanks()) ? null : accountEntity.getBanks().get(0).getName())")
-    @Mapping(target = "bankAccount", expression = "java(CollectionUtils.isEmpty(accountEntity.getBanks()) ? null : CollectionUtils.isEmpty(accountEntity.getBanks().get(0).getBankAccounts()) ? null : accountEntity.getBanks().get(0).getBankAccounts().get(0).getAccount())")
+    @Mapping(target = "bankBic", expression = "java(accountEntity.getBank() == null ? null : accountEntity.getBank().getBic())")
+    @Mapping(target = "bankName", expression = "java(accountEntity.getBank() == null ? null : accountEntity.getBank().getName())")
+    @Mapping(
+        target = "bankAccount",
+        expression = "java(accountEntity.getBank() == null ? null : accountEntity.getBank().getBankAccount() == null ? null : accountEntity.getBank().getBankAccount().getAccount())")
     void addRenterAccount(AccountEntity accountEntity, @MappingTarget Renter renter);
 
     @Mapping(target = "locality", source = "location")
@@ -386,7 +392,7 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "intermediary", ignore = true)
-    @Mapping(target = "bankAccounts", ignore = true)
+    @Mapping(target = "bankAccount", ignore = true)
     @Mapping(target = "bic", source = "bankBic")
     @Mapping(target = "name", source = "bankName")
     void updateBank(Renter renter, @MappingTarget BankEntity bank);

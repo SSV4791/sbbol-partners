@@ -57,10 +57,10 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     public void deleteBudgetMask(String id) {
         var uuid = UUID.fromString(id);
         var foundMask = budgetMaskDictionaryRepository.getByUuid(uuid);
-        if (foundMask == null) {
+        if (foundMask.isEmpty()) {
             throw new EntryNotFoundException("budget_mask", id);
         }
-        budgetMaskDictionaryRepository.delete(foundMask);
+        budgetMaskDictionaryRepository.delete(foundMask.get());
     }
 
     @Override

@@ -2,151 +2,101 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithSbbolTest;
-import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Bank;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createNotValidAccount;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.getValidAccount;
 
 class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
-
-    @MockBean
-    private BudgetMaskService budgetMaskService;
 
     public static final String baseRoutePath = "/partner";
 
     @Test
     @AllureId("34208")
     void testGetAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var executeAccount = counterpartyMapper.toAccount(counterparty, partner.getDigitalId(), UUID.fromString(account.getId()), budgetMaskService);
-        var actualAccount =
-            get(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                AccountResponse.class,
-                account.getDigitalId(), account.getId()
-            );
-        assertThat(actualAccount)
+        var response = getNotFound(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            Error.class,
+            randomAlphabetic(10), UUID.randomUUID()
+        );
+        assertThat(response)
             .isNotNull();
-        assertThat(actualAccount.getAccount())
-            .isNotNull()
-            .isEqualTo(executeAccount);
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34111")
     void testViewAccount() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-
         var filter = new AccountsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerIds(List.of(partner.getId(), counterpartyView.getPprbGuid()))
+            .digitalId(randomAlphabetic(10))
+            .partnerIds(List.of(UUID.randomUUID().toString()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
-        var response = post(
-            baseRoutePath + "/accounts/view",
-            filter,
-            AccountsResponse.class
-        );
+
+        var response = postNotFound(baseRoutePath + "/accounts/view", filter);
         assertThat(response)
             .isNotNull();
-        assertThat(response.getAccounts().size())
-            .isEqualTo(1);
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34122")
     void testCreateAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        assertThat(account)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "uuid",
-                "banks.uuid",
-                "banks.accountUuid",
-                "banks.bankAccounts.uuid",
-                "banks.bankAccounts.bankUuid")
-            .isEqualTo(account);
-    }
-
-    @Test
-    @AllureId("34179")
-    void testCreateNotValidAccount() {
-        var partner = createValidPartner();
-        var error = createNotValidAccount(partner.getId(), partner.getDigitalId());
-        assertThat(error)
+        var account = getValidAccount(randomAlphabetic(10), randomAlphabetic(10));
+        var response = postNotFound(baseRoutePath + "/account", account);
+        assertThat(response)
             .isNotNull();
-        assertThat(error.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34152")
     void testUpdateAccount() {
-        var partner = createValidPartner();
-        var executeAccount = counterpartyMapper.toAccount(updatedCounterparty, partner.getDigitalId(), UUID.randomUUID(), budgetMaskService);
-        var newUpdateAccount = put(baseRoutePath + "/account", executeAccount, AccountResponse.class);
-        assertThat(newUpdateAccount)
+        var account = new AccountChange()
+            .id(UUID.randomUUID().toString())
+            .digitalId(randomAlphabetic(10))
+            .partnerId(UUID.randomUUID().toString())
+            .name("111111")
+            .account("40802810500490014206")
+            .bank(new Bank()
+                .bic("044525411")
+                .name("222222")
+                .bankAccount(
+                    new BankAccount()
+                        .account("30101810145250000411"))
+            );
+        var response = putNotFound(baseRoutePath + "/account", account);
+        assertThat(response)
             .isNotNull();
-        assertThat(newUpdateAccount.getAccount().getAccount())
-            .isEqualTo(newAcc);
-        assertThat(newUpdateAccount.getErrors())
-            .isNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
     @Test
     @AllureId("34159")
     void testDeleteAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var executeAccount = counterpartyMapper.toAccount(counterparty, partner.getDigitalId(), UUID.fromString(account.getId()), budgetMaskService);
-        var actualAccount =
-            get(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                AccountResponse.class,
-                account.getDigitalId(), account.getId()
-            );
-        assertThat(actualAccount)
+        var response = deleteNotFound(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            randomAlphabetic(10), randomAlphabetic(10)
+        );
+        assertThat(response)
             .isNotNull();
-        assertThat(actualAccount.getAccount())
-            .isNotNull()
-            .isEqualTo(executeAccount);
-
-        var deleteAccount =
-            delete(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                actualAccount.getAccount().getDigitalId(), actualAccount.getAccount().getId()
-            );
-        assertThat(deleteAccount)
-            .isNotNull();
-
-        var searchAccount =
-            getNotFound(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                Error.class,
-                account.getDigitalId(), account.getId()
-            );
-        assertThat(searchAccount)
-            .isNotNull();
-        assertThat(searchAccount.getCode())
+        assertThat(response.getCode())
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 }

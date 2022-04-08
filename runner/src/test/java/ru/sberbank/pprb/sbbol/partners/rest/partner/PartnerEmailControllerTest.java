@@ -58,12 +58,15 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     @AllureId("34133")
     void testCreatePartnerEmail() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var email = createEmail(partner.getId(), partner.getDigitalId());
+        var expected = getEmail(partner.getId(), partner.getDigitalId());
+        var email = createEmail(expected);
         assertThat(email)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid")
-            .isEqualTo(email);
+                "id",
+                "version"
+            )
+            .isEqualTo(expected);
     }
 
     @Test
@@ -138,6 +141,15 @@ public class PartnerEmailControllerTest extends AbstractIntegrationWithOutSbbolT
 
     private static Email createEmail(String partnerUuid, String digitalId) {
         var emailResponse = createPost(baseRoutePath, getEmail(partnerUuid, digitalId), EmailResponse.class);
+        assertThat(emailResponse)
+            .isNotNull();
+        assertThat(emailResponse.getErrors())
+            .isNull();
+        return emailResponse.getEmail();
+    }
+
+    private static Email createEmail(EmailCreate email) {
+        var emailResponse = createPost(baseRoutePath, email, EmailResponse.class);
         assertThat(emailResponse)
             .isNotNull();
         assertThat(emailResponse.getErrors())

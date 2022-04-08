@@ -60,12 +60,15 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     void testCreateContactPhone() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var phone = createPhone(contact.getId(), contact.getDigitalId());
+        var expected = getPhone(contact.getId(), contact.getDigitalId());
+        var phone = createPhone(expected);
         assertThat(phone)
             .usingRecursiveComparison()
             .ignoringFields(
-                "uuid")
-            .isEqualTo(phone);
+                "id",
+                "version"
+            )
+            .isEqualTo(expected);
     }
 
     @Test
@@ -142,6 +145,15 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
 
     private static Phone createPhone(String partnerUuid, String digitalId) {
         var phoneResponse = createPost(baseRoutePath, getPhone(partnerUuid, digitalId), PhoneResponse.class);
+        assertThat(phoneResponse)
+            .isNotNull();
+        assertThat(phoneResponse.getErrors())
+            .isNull();
+        return phoneResponse.getPhone();
+    }
+
+    private static Phone createPhone(PhoneCreate phone) {
+        var phoneResponse = createPost(baseRoutePath, phone, PhoneResponse.class);
         assertThat(phoneResponse)
             .isNotNull();
         assertThat(phoneResponse.getErrors())

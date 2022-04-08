@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -16,7 +17,7 @@ public interface DocumentDictionaryRepository extends CrudRepository<DocumentTyp
      * @param uuid идентификатор документа
      * @return Тип документа
      */
-    DocumentTypeEntity getByUuid(UUID uuid);
+    Optional<DocumentTypeEntity> getByUuid(UUID uuid);
 
     /**
      * Получение типа документа по системному наименованию
@@ -24,7 +25,7 @@ public interface DocumentDictionaryRepository extends CrudRepository<DocumentTyp
      * @param systemName Системное имя документа
      * @return Тип документа
      */
-    DocumentTypeEntity getBySystemName(String systemName);
+    Optional<DocumentTypeEntity> getBySystemName(String systemName);
 
     /**
      * Получение типов документов по фильтру

@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountSignView
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountViewRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -22,7 +23,16 @@ public interface AccountRepository
      * @param uuid      Идентификатор счёта
      * @return счёт Партнер
      */
-    AccountEntity getByDigitalIdAndUuid(String digitalId, UUID uuid);
+    Optional<AccountEntity> getByDigitalIdAndUuid(String digitalId, UUID uuid);
+
+    /**
+     * Получение счетов Партнера
+     *
+     * @param digitalId   Идентификатор личного кабинета
+     * @param partnerUuid Идентификатор партнера
+     * @return счетов Партнера
+     */
+    List<AccountEntity> findByDigitalIdAndPartnerUuid(String digitalId, UUID partnerUuid);
 
     /**
      * Поиск счетов Партнеров

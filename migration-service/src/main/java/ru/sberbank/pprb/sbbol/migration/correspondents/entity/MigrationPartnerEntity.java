@@ -212,6 +212,6 @@ public class MigrationPartnerEntity extends MigrationBaseEntity {
 
     @Override
     public String getHashKey() {
-        return getUuid().toString();
+        return getDigitalId();
     }
 }

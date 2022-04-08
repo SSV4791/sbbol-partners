@@ -39,12 +39,9 @@
       "title": "Избранный счёт",
       "default": false
     },
-    "banks": {
-      "type": "array",
-      "items": {
-        "$ref": "../../model/bank/bank.json"
-      },
-      "title": "Банки"
+    "bank": {
+      "title": "Банк",
+      "$ref": "../../model/bank/bank.json"
     },
     "state": {
       "type": "string",

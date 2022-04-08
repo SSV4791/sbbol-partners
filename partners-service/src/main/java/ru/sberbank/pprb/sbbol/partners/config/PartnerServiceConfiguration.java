@@ -45,10 +45,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.MergeHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.ReplicationHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
@@ -78,9 +76,8 @@ import ru.sberbank.pprb.sbbol.partners.service.renter.PartnerServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
-import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationHistoryService;
-import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationHistoryServiceImpl;
-import ru.sberbank.pprb.sbbol.partners.service.utils.PartnerUtils;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceImpl;
 
 @Configuration
 public class PartnerServiceConfiguration {
@@ -166,41 +163,35 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
-    ReplicationHistoryService replicationHistoryService(
+    ReplicationService replicationHistoryService(
+        PartnerRepository partnerRepository,
         AccountRepository accountRepository,
-        ReplicationHistoryRepository replicationHistoryRepository,
-        LegacySbbolAdapter legacySbbolAdapter,
-        PartnerUtils partnerUtils
+        LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new ReplicationHistoryServiceImpl(
+        return new ReplicationServiceImpl(
+            partnerRepository,
             accountRepository,
-            replicationHistoryRepository,
             legacySbbolAdapter,
-            partnerUtils,
-            counterpartyMapper(),
-            accountMapper());
+            accountMapper(),
+            counterpartyMapper()
+        );
     }
 
     @Bean
     AccountService accountService(
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
-        ReplicationHistoryRepository replicationHistoryRepository,
-        ReplicationHistoryService replicationHistoryService,
+        ReplicationService replicationService,
         LegacySbbolAdapter legacySbbolAdapter,
-        BudgetMaskService budgetMaskService,
-        PartnerUtils partnerUtils
+        BudgetMaskService budgetMaskService
     ) {
         return new AccountServiceImpl(
             partnerRepository,
             accountRepository,
-            replicationHistoryRepository,
-            replicationHistoryService,
+            replicationService,
             legacySbbolAdapter,
             budgetMaskService,
-            partnerUtils,
-            accountMapper(),
-            counterpartyMapper());
+            accountMapper());
     }
 
     @Bean
@@ -209,7 +200,7 @@ public class PartnerServiceConfiguration {
         AccountSignRepository accountSignRepository,
         LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new AccountSignServiceImpl(accountRepository, accountSignRepository, accountSingMapper(), counterpartyMapper(), legacySbbolAdapter);
+        return new AccountSignServiceImpl(accountRepository, accountSignRepository, accountSingMapper(), legacySbbolAdapter);
     }
 
     @Bean
@@ -220,26 +211,35 @@ public class PartnerServiceConfiguration {
     @Bean
     AddressService contactAddressService(
         ContactRepository contactRepository,
-        AddressRepository addressRepository
+        AddressRepository addressRepository,
+        LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new ContactAddressServiceImpl(contactRepository, addressRepository, addressMapper());
+        return new ContactAddressServiceImpl(contactRepository, addressRepository, addressMapper(), legacySbbolAdapter);
     }
 
     @Bean
     DocumentService contactDocumentService(
         ContactRepository contactRepository,
         DocumentRepository documentRepository,
-        DocumentDictionaryRepository documentDictionaryRepository
+        DocumentDictionaryRepository documentDictionaryRepository,
+        LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new ContactDocumentServiceImpl(contactRepository, documentRepository, documentDictionaryRepository, documentMapper());
+        return new ContactDocumentServiceImpl(
+            contactRepository,
+            documentRepository,
+            documentDictionaryRepository,
+            documentMapper(),
+            legacySbbolAdapter
+        );
     }
 
     @Bean
     ContactService contactService(
         PartnerRepository partnerRepository,
-        ContactRepository contactRepository
+        ContactRepository contactRepository,
+        LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new ContactServiceImpl(partnerRepository, contactRepository, contactMapper());
+        return new ContactServiceImpl(partnerRepository, contactRepository, contactMapper(), legacySbbolAdapter);
     }
 
     @Bean
@@ -250,56 +250,69 @@ public class PartnerServiceConfiguration {
     @Bean
     AddressService partnerAddressService(
         PartnerRepository partnerRepository,
-        AddressRepository addressRepository
+        AddressRepository addressRepository,
+        LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new PartnerAddressServiceImpl(partnerRepository, addressRepository, addressMapper());
+        return new PartnerAddressServiceImpl(partnerRepository, addressRepository, addressMapper(), legacySbbolAdapter);
     }
 
     @Bean
     DocumentService partnerDocumentService(
         PartnerRepository partnerRepository,
         DocumentRepository documentRepository,
-        DocumentDictionaryRepository documentDictionaryRepository
+        DocumentDictionaryRepository documentDictionaryRepository,
+        LegacySbbolAdapter legacySbbolAdapter
     ) {
-        return new PartnerDocumentServiceImpl(partnerRepository, documentRepository, documentDictionaryRepository, documentMapper());
+        return new PartnerDocumentServiceImpl(
+            partnerRepository,
+            documentRepository,
+            documentDictionaryRepository,
+            documentMapper(),
+            legacySbbolAdapter
+        );
     }
 
     @Bean
-    PhoneService partnerPhoneService(PartnerRepository partnerRepository, PhoneRepository phoneRepository) {
-        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper());
+    PhoneService partnerPhoneService(PartnerRepository partnerRepository, PhoneRepository phoneRepository, LegacySbbolAdapter legacySbbolAdapter) {
+        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper(), legacySbbolAdapter);
     }
 
     @Bean
-    PhoneService contactPhoneService(ContactRepository contactRepository, PhoneRepository phoneRepository) {
-        return new ContactPhoneServiceImpl(contactRepository, phoneRepository, phoneMapper());
+    PhoneService contactPhoneService(ContactRepository contactRepository, PhoneRepository phoneRepository, LegacySbbolAdapter legacySbbolAdapter) {
+        return new ContactPhoneServiceImpl(contactRepository, phoneRepository, phoneMapper(), legacySbbolAdapter);
     }
 
     @Bean
-    EmailService partnerEmailService(PartnerRepository partnerRepository, EmailRepository emailRepository) {
-        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper());
+    EmailService partnerEmailService(PartnerRepository partnerRepository, EmailRepository emailRepository, LegacySbbolAdapter legacySbbolAdapter) {
+        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper(), legacySbbolAdapter);
     }
 
     @Bean
-    EmailService contactEmailService(ContactRepository contactRepository, EmailRepository emailRepository) {
-        return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper());
+    EmailService contactEmailService(ContactRepository contactRepository, EmailRepository emailRepository, LegacySbbolAdapter legacySbbolAdapter) {
+        return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper(), legacySbbolAdapter);
     }
 
     @Bean
     PartnerService partnerService(
+        AccountRepository accountRepository,
+        DocumentRepository documentRepository,
+        ContactRepository contactRepository,
+        PhoneRepository phoneRepository,
+        EmailRepository emailRepository,
         PartnerRepository partnerRepository,
-        ReplicationHistoryRepository replicationHistoryRepository,
-        ReplicationHistoryService replicationHistoryService,
         LegacySbbolAdapter legacySbbolAdapter,
-        PartnerUtils partnerUtils
+        ReplicationService replicationService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
+            accountRepository,
+            documentRepository,
+            contactRepository,
+            phoneRepository,
+            emailRepository,
             partnerRepository,
-            replicationHistoryRepository,
-            replicationHistoryService,
             legacySbbolAdapter,
-            partnerUtils,
-            partnerMapper(),
-            counterpartyMapper()
+            replicationService,
+            partnerMapper()
         );
     }
 
@@ -331,22 +344,5 @@ public class PartnerServiceConfiguration {
             validationService,
             renterPartnerMapper()
         );
-    }
-
-    @Bean
-    PartnerUtils partnerUtils(AccountRepository accountRepository,
-                              PartnerRepository partnerRepository,
-                              MergeHistoryRepository mergeHistoryRepository,
-                              ReplicationHistoryRepository replicationHistoryRepository,
-                              LegacySbbolAdapter legacySbbolAdapter) {
-        return new PartnerUtils(
-            accountRepository,
-            partnerRepository,
-            mergeHistoryRepository,
-            replicationHistoryRepository,
-            legacySbbolAdapter,
-            partnerMapper(),
-            counterpartyMapper(),
-            accountMapper());
     }
 }

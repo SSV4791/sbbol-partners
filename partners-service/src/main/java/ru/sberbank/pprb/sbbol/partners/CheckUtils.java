@@ -10,10 +10,6 @@ import java.util.regex.Pattern;
 @Deprecated
 public class CheckUtils {
 
-    private CheckUtils() {
-        throw new IllegalStateException("Утилитарный класс");
-    }
-
     public static final String DIGIT_CHAR = "1234567890";
     public static final String LEGAL_NAME_PATTERN = "^[A-Za-zА-Яа-я0-9Ёё!\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+$";
     private static final String WHITESPACE = " ";
@@ -44,6 +40,10 @@ public class CheckUtils {
     private static final Pattern ESCAPE_CHARS_EMAIL_PATTERN = Pattern.compile("[\\\\\\/\\`\"\\']");
 
     private static final int[] koeff = new int[]{7, 1, 3};
+
+    private CheckUtils() {
+        throw new IllegalStateException("Утилитарный класс");
+    }
 
     /**
      * Отфильтровывает из строки недопустимые символы.

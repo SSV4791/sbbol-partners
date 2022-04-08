@@ -15,7 +15,7 @@ public class ContactEmailMapperTest extends BaseConfiguration {
     private static final ContactEmailMapper mapper = Mappers.getMapper(ContactEmailMapper.class);
 
     @Test
-    @AllureId("34070")
+    @AllureId("34087")
     void testToEmail() {
         Email expected = factory.manufacturePojo(Email.class);
         ContactEmailEntity actual = mapper.toEmail(expected);
