@@ -4,10 +4,10 @@ import ru.sbrf.ufs.pipeline.docker.DockerRunBuilder
 @Library(['ufs-jobs@master']) _
 
 def pullRequest = null
-def latestCommitHash = ""
-def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
-def bitbucketCredential = Const.BITBUCKET_DBO_KEY_SECMAN
+def settings = [:]
 def network = UUID.randomUUID()
+def bitbucketCredential = null
+def bitbucketSshCredential = null
 
 pipeline {
     agent {
@@ -15,8 +15,8 @@ pipeline {
     }
 
     options {
-        timeout(time: 15, unit: 'MINUTES')
         timestamps()
+        skipDefaultCheckout()
     }
 
     parameters {
@@ -25,30 +25,32 @@ pipeline {
 
     environment {
         PR_CHECK_LABEL = 'liquibase'
-        POSTGRES_DOCKER_IMAGE = 'registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/postgres:13-alpine'
         NETWORK_ALIAS = 'postgres'
         POSTGRES_DB_NAME = 'db'
         POSTGRES_DB_USER = 'user'
         POSTGRES_DB_PASSWORD = 'pass'
-        LIQUIBASE_DOWNLOAD_URI = 'https://nexus.sigma.sbrf.ru/nexus/service/local/repositories/SBT_CI_distr_repo/content/SBBOL_UFS/liquibase/3.7.0-postgres/liquibase-3.7.0-postgres-bin.tar.gz'
     }
 
     stages {
-        /**
-         * Чтение переменных окружения из файла
-         */
-        stage('Read env properties') {
+        stage('Read jenkins folder configuration') {
             steps {
-                load "./jenkins/env.groovy"
+                script {
+                    configFileProvider([configFile(fileId: 'common', variable: 'CONFIG')]) {
+                        def config = readYaml(file: CONFIG)
+                        config.each { k, v -> env."${k}" = v }
+                        bitbucketCredential = secman.makeCredMapWithEnvs(BITBUCKET_REST_CREDENTIALS_ID)
+                        bitbucketSshCredential = env.BITBUCKET_SSH_CREDENTIALS_ID ? secman.makeCredMapWithEnvs(env.BITBUCKET_SSH_CREDENTIALS_ID) : Const.BITBUCKET_DBO_KEY_SECMAN
+                    }
+                }
             }
         }
         stage('Preparing job') {
             steps {
                 script {
-                    pullRequest = bitbucket.getPullRequest(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
+                    pullRequest = bitbucket.getPullRequest(bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId.toInteger())
                     setJobPullRequestLink(pullRequest)
-                    bitbucket.setJenkinsLabelInfo(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
-                    bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")
+                    bitbucket.setJenkinsLabelInfo(bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL)
+                    bitbucket.updateBitbucketHistoryBuild(bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, stage_name, "running")
                 }
             }
         }
@@ -56,8 +58,10 @@ pipeline {
         stage('Prepare project') {
             steps {
                 script {
-                    latestCommitHash = git.checkoutRef bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, "${pullRequest.fromRef.displayId}:${pullRequest.fromRef.displayId} ${pullRequest.toRef.displayId}:${pullRequest.toRef.displayId} "
-                    sh "git merge ${pullRequest.toRef.displayId}"
+                    git.checkoutRef bitbucketSshCredential, GIT_PROJECT, GIT_REPOSITORY, "${pullRequest.toRef.displayId} ${pullRequest.fromRef.displayId}:${pullRequest.fromRef.displayId}"
+                    sh "git merge ${pullRequest.fromRef.displayId}"
+                    settings = readYaml(file: "jenkins/settings.yml")
+                    settings.credentials = settings.credentials.collectEntries { key, value -> [key, secman.makeCredMapWithEnvs(value)] }
                 }
             }
         }
@@ -67,16 +71,17 @@ pipeline {
                 script {
                     sh("docker network create ${network}")
                     new DockerRunBuilder(this)
-                            .registry(Const.OPENSHIFT_REGISTRY, credential)
-                            .env("POSTGRES_USER", "${POSTGRES_DB_USER}")
-                            .env("POSTGRES_PASSWORD", "${POSTGRES_DB_PASSWORD}")
-                            .env("POSTGRES_DB", "${POSTGRES_DB_NAME}")
-                            .extra("--network=${network} --network-alias ${NETWORK_ALIAS}")
-                            .detached()
-                            .cpu(1)
-                            .memory("1g")
-                            .image(POSTGRES_DOCKER_IMAGE)
-                            .run()
+                        .registry(Const.OPENSHIFT_REGISTRY, bitbucketCredential)
+                        .env("POSTGRES_USER", "${POSTGRES_DB_USER}")
+                        .env("POSTGRES_PASSWORD", "${POSTGRES_DB_PASSWORD}")
+                        .env("POSTGRES_DB", "${POSTGRES_DB_NAME}")
+                        .extra("--network=${network}")
+                        .extra("--network-alias ${NETWORK_ALIAS}")
+                        .detached()
+                        .cpu(1)
+                        .memory("1g")
+                        .image(settings.docker.images.postgres)
+                        .run()
                 }
             }
         }
@@ -84,27 +89,28 @@ pipeline {
         stage('Check sql script') {
             steps {
                 script {
-                    vault.withUserPass([path: credential.path, userVar: "NEXUS_USER", passVar: "NEXUS_PASSWORD"]) {
-                        sh "curl -u ${NEXUS_USER}:${NEXUS_PASSWORD} -kL ${LIQUIBASE_DOWNLOAD_URI} | tar -xz"
+                    vault.withUserPass([path: settings.credentials.nexus.path, userVar: 'NEXUS_USR', passVar: 'NEXUS_PWD']) {
+                        sh "curl -u '${NEXUS_USR}:${NEXUS_PWD}' -kL ${settings.pr_check.liquibase.executable.download_uri} | tar -xz"
                     }
+
                     new DockerRunBuilder(this)
-                            .registry(Const.OPENSHIFT_REGISTRY, credential)
-                            .volume("${WORKSPACE}", "/build")
-                            .extra("-w /build")
-                            .extra("--network=${network}")
-                            .cpu(1)
-                            .memory("1g")
-                            .image(BUILD_JAVA_DOCKER_IMAGE)
-                            .cmd('sh liquibase ' +
-                                    "--url=jdbc:postgresql://${NETWORK_ALIAS}/${POSTGRES_DB_NAME} " +
-                                    "--username=${POSTGRES_DB_USER} " +
-                                    "--password=${POSTGRES_DB_PASSWORD} " +
-                                    "--changeLogFile=runner/src/main/resources/db/changelog/changelog.yaml " +
-                                    "--defaultsFile=jenkins/resources/liquibase/liquibase.properties " +
-                                    "--driver=org.postgresql.Driver " +
-                                    'update'
-                            )
-                            .run()
+                        .registry(Const.OPENSHIFT_REGISTRY, bitbucketCredential)
+                        .volume("${WORKSPACE}", "/build")
+                        .extra("-w /build")
+                        .extra("--network=${network}")
+                        .cpu(1)
+                        .memory("1g")
+                        .image(settings.docker.images.java)
+                        .cmd('sh liquibase ' +
+                            "--url=jdbc:postgresql://${NETWORK_ALIAS}/${POSTGRES_DB_NAME} " +
+                            "--username=${POSTGRES_DB_USER} " +
+                            "--password=${POSTGRES_DB_PASSWORD} " +
+                            "--changeLogFile=${settings.pr_check.liquibase.changelog.path} " +
+                            "--defaultsFile=${settings.pr_check.liquibase.defaults_file.path} " +
+                            "--driver=org.postgresql.Driver " +
+                            'update'
+                        )
+                        .run()
                 }
             }
         }
@@ -114,18 +120,18 @@ pipeline {
     post {
         success {
             script {
-                bitbucket.setJenkinsLabelStatus(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
-                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
+                bitbucket.setJenkinsLabelStatus(bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, true)
+                bitbucket.updateBitbucketHistoryBuild(bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "success", "successful")
             }
         }
         failure {
             script {
-                bitbucket.updateBitbucketHistoryBuild(credential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
+                bitbucket.updateBitbucketHistoryBuild(bitbucketCredential, GIT_PROJECT, GIT_REPOSITORY, params.pullRequestId, PR_CHECK_LABEL, "failure", "failed")
             }
         }
         cleanup {
             script {
-                sh "docker stop \$(docker ps --filter \"network=${network}\") || true"
+                sh "docker stop \$(docker ps -q --filter \"network=${network}\") || true"
                 sh "docker network rm ${network} || true"
                 cleanWs()
             }

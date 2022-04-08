@@ -19,6 +19,20 @@ tasks {
     clean {
         delete("target")
     }
+    test {
+        if (project.hasProperty("spring.datasource.url"))
+            systemProperty("spring.datasource.url", project.properties["spring.datasource.url"] as String)
+        if (project.hasProperty("spring.datasource.username"))
+            systemProperty("spring.datasource.username", project.properties["spring.datasource.username"] as String)
+        if (project.hasProperty("spring.datasource.password"))
+            systemProperty("spring.datasource.password", project.properties["spring.datasource.password"] as String)
+        if (project.hasProperty("standin.datasource.url"))
+            systemProperty("standin.datasource.url", project.properties["standin.datasource.url"] as String)
+        if (project.hasProperty("standin.datasource.username"))
+            systemProperty("standin.datasource.username", project.properties["standin.datasource.username"] as String)
+        if (project.hasProperty("standin.datasource.password"))
+            systemProperty("standin.datasource.password", project.properties["standin.datasource.password"] as String)
+    }
 }
 
 val pactVersion: String by rootProject
@@ -42,8 +56,6 @@ dependencies {
 
     // реализация кэша
     runtimeOnly("org.ehcache:ehcache:3.9.7")
-    // in-memory БД для локальных запусков
-    runtimeOnly("com.h2database:h2:1.4.200")
     // postgres для prod-сборки
     runtimeOnly("org.postgresql:postgresql:42.3.1")
 

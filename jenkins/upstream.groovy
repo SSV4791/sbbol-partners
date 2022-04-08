@@ -5,6 +5,7 @@ import ru.sbrf.ufs.pipeline.Const
 def pullRequest = null
 def upstreamBranchName = ''
 def credential = secman.makeCredMap('DS_CAB-SA-CI000825')
+def bitbucketCredential = secman.makeCredMap('bitbucket-dbo-key') // Если используете централизованный кред, укажите Const.BITBUCKET_DBO_KEY_SECMAN
 
 pipeline {
     agent {
@@ -42,11 +43,11 @@ pipeline {
                     echo "Upstream commits:"
                     commits.each { echo "${it.id}:${it.message}" }
                     upstreamBranchName = params.sourcePullRequestId + "-upstream"
-                    def commitHash = git.checkoutRef 'bitbucket-dbo-key', params.projectKey, params.repoSlug, "${params.targetBranch}:${params.targetBranch} ${pullRequest.toRef.displayId}:${pullRequest.toRef.displayId}"
+                    def commitHash = git.checkoutRef bitbucketCredential, params.projectKey, params.repoSlug, "${params.targetBranch}:${params.targetBranch} ${pullRequest.toRef.displayId}:${pullRequest.toRef.displayId}"
                     sh "git checkout -b ${upstreamBranchName} ${params.targetBranch}"
                     try {
                         sh "git cherry-pick ${commits.collect { it.id }.join(' ')} "
-                        git.push 'bitbucket-dbo-key', Const.BITBUCKET_SERVER_URL, params.projectKey, params.repoSlug, upstreamBranchName
+                        git.push bitbucketCredential, Const.BITBUCKET_SERVER_URL, params.projectKey, params.repoSlug, upstreamBranchName
                     } finally {
                         sh "git cherry-pick --abort || true"
                         // если черрипик свалился то надо вернуть в нормальное состояние ветку

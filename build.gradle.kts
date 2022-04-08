@@ -14,7 +14,26 @@ plugins {
 }
 
 val coverageExclusions = listOf(
-    "**/partners-api/**/*"
+    // Классы с конфигурациями
+    "ru/sbrf/ufs/sbbol/Application*",
+    //POJO
+    "**/model/**",
+    "**/enums/**",
+    "**/entity/**",
+    //Классы с контроллерами и вызовами сервисов без логики, в которых происходит только вызов соответствующего сервиса
+    "**/*Controller*",
+    "**/*Adapter*",
+    "**/*Api*",
+    //Классы с заглушками для локальной разработки
+    "**/*Stub*",
+    //Сериализаторы/десериализаторы
+    "**/handler/*Handler*",
+    //Классы с exception
+    "**/exception/**",
+    //Инфраструктура
+    "**/swagger/**",
+    "**/*Aspect*",
+    "**/*Config*"
 )
 
 jacoco {
@@ -23,30 +42,14 @@ jacoco {
 
 tasks {
 
-    val coverageFile = "${rootProject.buildDir}/jacoco/test.exec"
-    val coverageReportXml = "${rootProject.buildDir}/jacoco/report/report.xml"
-    val coverageReportHtml = "${rootProject.buildDir}/jacoco/report/html"
-
-    // таска на основе общего exec файла генерирует отчет
-    val jacocoRootReport by registering(JacocoReport::class) {
-        group = "verification"
-        reports {
-            xml.required.set(true)
-            xml.outputLocation.set(file(coverageReportXml))
-            html.required.set(true)
-            html.outputLocation.set(file(coverageReportHtml))
-        }
-        sourceDirectories.setFrom(sourceSets["main"].allSource.srcDirs)
-        classDirectories.setFrom(sourceSets["main"].output)
-        executionData.setFrom(files(coverageFile))
-    }
-
-    val sonarqube by getting {
-        dependsOn(jacocoRootReport)
-    }
-
     clean {
         delete(buildDir)
+    }
+
+    register("sonarCoverage", DefaultTask::class) {
+        group = "verification"
+        dependsOn(jacocoTestReport)
+        finalizedBy(sonarqube)
     }
 
     qaReporterUpload {
@@ -66,7 +69,7 @@ sonarqube {
         property("sonar.coverage.exclusions", coverageExclusions)
         property(
             "sonar.cpd.exclusions", """
-                    src/main/java/ru/sberbank/pprb/sbbol/partners/entity/**,
+                    partners-service/src/main/java/ru/sberbank/pprb/sbbol/partners/entity/**,
                 """.trimIndent()
         )
 

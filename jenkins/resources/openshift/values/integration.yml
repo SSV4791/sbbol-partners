@@ -24,6 +24,16 @@ int:
           protocol: TCP
     #         resolution: STATIC
 
+    dog900:
+      v1_0:
+        name: dog900
+        host: dog.sbtatlas.sigma.sbrf.ru
+        port: '9086'
+        ott: false
+        mtls: true
+        protocol: TLS
+        url: http://dog.sbtatlas.sigma.sbrf.ru
+
     db_si:
       v1_0:
         - name: db-si
@@ -40,6 +50,27 @@ int:
       v1_0:
         - name: audit-ott
           host: audit-ott.ru
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: true
+
+    #удалить после проверки проливки бд
+    fluent_bit_ott:
+      v1_0:
+        - name: fluent-bit-ott
+          host: sbtatlas.sigma.sbrf.ru
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: true
+
+    fluentbit_ott:
+      v1_0:
+        - name: fluent-bit-ott
+          host: sbtatlas.sigma.sbrf.ru
           port: '443'
           istio_mesh_port: '80'
           protocol: TLS
@@ -111,17 +142,49 @@ int:
           protocol: TCP
           url: dummy
           resolution: STATIC
+
+    audit:
+      v1_0:
+        - name: audit-ott
+          host: demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru
+          ip: 10.36.252.102
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
+          mtls: true
+          ott: true
+
+    CI02745214_digitalapi:
+      v1_0:
+        name: pprb-digital-api
+        host: ingress-ci02745214-digitalapi-ott.apps.dev-gen2.sigma.sbrf.ru
+        ip: 10.36.252.127
+        port: '443'
+        ott: true
+        mtls: true
+        protocol: TLS
+        url: https://ingress-ci02745214-digitalapi-ott.apps.dev-gen2.sigma.sbrf.ru
+
   ott:
-    hosts:
-      - 10.53.99.178
-      - 10.53.96.30
-    port: 8443
-    protocol: https
-    v1_0:
-      - host: 10.53.99.178
+    v2_0:
+      - name: ott-1
+        protocol: TCP
+        resolution: STATIC
+        ott: false
+        mtls: false
+        host: se-sbbol.dev.draft.ott1
+        ip: 10.53.99.178
         port: 8443
-      - host: 10.53.96.30
+        via_egress: false
+      - name: ott-2
+        protocol: TCP
+        resolution: STATIC
+        ott: false
+        mtls: false
+        host: se-sbbol.dev.draft.ott2
+        ip: 10.53.96.30
         port: 8443
+        via_egress: false
   dynatrace:
     latest:
       servers:
