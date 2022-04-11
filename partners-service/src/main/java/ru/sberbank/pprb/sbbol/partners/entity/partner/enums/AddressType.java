@@ -7,6 +7,8 @@ public enum AddressType {
 
     LEGAL_ADDRESS("Юридический адрес"),
     PHYSICAL_ADDRESS("Физический адрес"),
+    REGISTRATION_ADDRESS("Адрес регистрации ФЛ"),
+    RESIDENTIAL_ADDRESS("Адрес проживания")
     ;
 
     private final String desc;

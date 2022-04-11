@@ -18,8 +18,12 @@ CREATE TABLE ADDRESS
     building_block VARCHAR(20),
     flat           VARCHAR(10),
     CONSTRAINT CK_ADDRESS_TYPE CHECK
-        (TYPE = 'LEGAL_ADDRESS' OR
-         TYPE = 'PHYSICAL_ADDRESS')
+        (
+                TYPE = 'LEGAL_ADDRESS' OR
+                TYPE = 'PHYSICAL_ADDRESS' OR
+                TYPE = 'REGISTRATION_ADDRESS' OR
+                TYPE = 'RESIDENTIAL_ADDRESS'
+        )
 );
 
 COMMENT ON TABLE ADDRESS IS 'Адреса';
