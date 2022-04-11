@@ -50,3 +50,12 @@ databaseChangeLog:
   - include:
       file: 1644490063755_create_dictionary_structure_gku.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1648723867900_create_funcion_generate_uuid.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1648723867913_migrate_renter_to_partner.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1649170752324_drop_funcion_generate_uuid.sql
+      relativeToChangelogFile: true
