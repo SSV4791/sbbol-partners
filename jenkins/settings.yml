@@ -6,6 +6,7 @@ docker:
 credentials:
   sonar: DS_CAB-SA-CI000825-sonar-token
   nexus: DS_CAB-SA-CI000825
+  checkmarx: DS_CAB-SA-CI000825-checkmarx
 
 allure_project_id: '154'
 
@@ -60,26 +61,26 @@ pr_check:
     memory: '2g'
     command: >-
       ./gradlew
-       -PnexusLogin=${env.NEXUS_USR}
-       -PnexusPassword='${env.NEXUS_PWD}
-       -Dsonar.login=${env.SONAR_TOKEN}
-       -Dsonar.projectVersion=${pullRequest.fromRef.displayId}
-       -Dsonar.pullrequest.key=${params.pullRequestId}
-       -Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}
-       -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}
-       -Dtest.results.enabled=true
-       -Dtest-layer=unit,api,configuration,cdcConsumer
-       -Dpactbroker.url=${Const.PACT_BROKER_URL}
-       -Dbuild.link=${env.BUILD_URL}
-       -Dbuild.type=prCheck
-       -Dallure.jobrunId=${launch.jobRunId}
-       -Pspring.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_MAIN}/${env.POSTGRES_DB_NAME}
-       -Pspring.datasource.username=${env.POSTGRES_DB_USER}
-       -Pspring.datasource.password=${env.POSTGRES_DB_PASSWORD}
-       -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
-       -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
-       -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
-       qaReporterUpload sonarCoverage --info
+      -PnexusLogin=${env.NEXUS_USR}
+      -PnexusPassword='${env.NEXUS_PWD}'
+      -Dsonar.login=${env.SONAR_TOKEN}
+      -Dsonar.projectVersion=${pullRequest.fromRef.displayId}
+      -Dsonar.pullrequest.key=${params.pullRequestId}
+      -Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}
+      -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}
+      -Dtest.results.enabled=true
+      -Dtest-layer=unit,api,configuration,cdcConsumer
+      -Dpactbroker.url=${Const.PACT_BROKER_URL}
+      -Dbuild.link=${env.BUILD_URL}
+      -Dbuild.type=prCheck
+      -Dallure.jobrunId=${launch.jobRunId}
+      -Pspring.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_MAIN}/${env.POSTGRES_DB_NAME}
+      -Pspring.datasource.username=${env.POSTGRES_DB_USER}
+      -Pspring.datasource.password=${env.POSTGRES_DB_PASSWORD}
+      -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
+      -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
+      -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
+      qaReporterUpload sonarCoverage --info
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
