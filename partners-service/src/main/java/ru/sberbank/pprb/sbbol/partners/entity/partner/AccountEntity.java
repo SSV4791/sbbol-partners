@@ -58,7 +58,7 @@ public class AccountEntity extends BaseEntity {
     private String account;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "state", length = 10, columnDefinition = "varchar(10) default 'NOT_SIGN'")
+    @Column(name = "state", length = 10)
     private AccountStateType state;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
