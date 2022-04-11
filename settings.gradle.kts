@@ -20,7 +20,7 @@ plugins {
 
 gradleEnterprise {
     buildScan {
-        server = "http://sbtatlas.sigma.sbrf.ru:8801"
+        server = "http://dev-sbbol2.sigma.sbrf.ru:8801"
         allowUntrustedServer = true
         isCaptureTaskInputFiles = true
         gradle.taskGraph.whenReady {

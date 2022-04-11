@@ -124,30 +124,6 @@ pipeline {
                                         .memory(settings.pr_check.test.memory ?: '2g')
                                         .image(settings.docker.images.java)
                                         .cmd(format.interpolate(settings.pr_check.test.command, [pullRequest: pullRequest, launch: launch]))
-                                        .cmd(format.interpolate(
-                                            "./gradlew" +
-                                            " -PnexusLogin=${env.NEXUS_USR}" +
-                                            " -PnexusPassword='${env.NEXUS_PWD}'" +
-                                            " -Dsonar.login=${env.SONAR_TOKEN}" +
-                                            " -Dsonar.projectVersion=${pullRequest.fromRef.displayId}" +
-                                            " -Dsonar.pullrequest.key=${params.pullRequestId}" +
-                                            " -Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}" +
-                                            " -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}" +
-                                            " -Dtest.results.enabled=true" +
-                                            " -Dtest-layer=unit,api,configuration,cdcConsumer" +
-                                            " -Dpactbroker.url=${Const.PACT_BROKER_URL}" +
-                                            " -Dbuild.link=${env.BUILD_URL}" +
-                                            " -Dbuild.type=prCheck" +
-                                            " -Dallure.jobrunId=${launch.jobRunId}" +
-                                            " -Dallure.jobrunId=${launch.jobRunId}" +
-                                            " -Pspring.datasource.url=jdbc:postgresql://${NETWORK_ALIAS_MAIN}/${POSTGRES_DB_NAME} " +
-                                            " -Pspring.datasource.username=${POSTGRES_DB_USER}" +
-                                            " -Pspring.datasource.password=${POSTGRES_DB_PASSWORD}" +
-                                            " -Pstandin.datasource.url=jdbc:postgresql://${NETWORK_ALIAS_SI}/${POSTGRES_DB_NAME} " +
-                                            " -Pstandin.datasource.username=${POSTGRES_DB_USER}" +
-                                            " -Pstandin.datasource.password=${POSTGRES_DB_PASSWORD}" +
-                                            " clean build qaReporterUpload"
-                                            , [pullRequest: pullRequest, launch: launch]))
                                         .run()
                                 }
                             }
