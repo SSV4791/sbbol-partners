@@ -37,14 +37,6 @@
     "bank": {
       "title": "Банк",
       "$ref": "../../model/bank/bank.json"
-    },
-    "state": {
-      "type": "string",
-      "title": "Признак 'Подписан'",
-      "enum": [
-        "SIGNED",
-        "NOT_SIGNED"
-      ]
     }
   }
 }
