@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.validation.common;
 public final class BasePartnerValidation {
 
     public static final int KPP_VALID_LENGTH = 9;
+    private static final int INN_5_VALID_LENGTH = 5;
     private static final int INN_10_VALID_LENGTH = 10;
     private static final int INN_12_VALID_LENGTH = 12;
     private static final int OGRN_13_VALID_LENGTH = 13;
@@ -34,6 +35,8 @@ public final class BasePartnerValidation {
               7. Контрольное число(1) проверяется с одиннадцатым знаком ИНН и контрольное число(2) проверяется с двенадцатым знаком ИНН.
              */
             case INN_12_VALID_LENGTH -> checkInn(inn, INN_12_SYMBOL_CONTROL_KEY_ONE) && checkInn(inn, INN_12_SYMBOL_CONTROL_KEY_TWO);
+            // Валидация для КИО
+            case INN_5_VALID_LENGTH -> true;
             default -> false;
         };
     }
@@ -44,7 +47,10 @@ public final class BasePartnerValidation {
             var checkSymbol = inn.substring(i, i + 1);
             checkSum += Integer.parseInt(checkSymbol) * control[i];
         }
-        return checkSum % 11 == Integer.parseInt(inn.substring(control.length, control.length + 1));
+            /**
+             * В связи с тем что checkSum % 11 = может быть от 1 до 10 и при безусловном делении на 10 будет по остатку соблюдены все условия;
+             */
+        return checkSum % 11 % 10 == Integer.parseInt(inn.substring(control.length, control.length + 1));
     }
 
     public static boolean checkOgrn(String ogrn) {

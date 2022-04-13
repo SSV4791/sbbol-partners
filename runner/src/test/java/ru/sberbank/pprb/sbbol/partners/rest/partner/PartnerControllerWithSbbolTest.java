@@ -81,6 +81,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
             .kpp("123456789")
             .ogrn("1035006110083")
             .okpo("444444")
+            .version(0L)
             .comment("555555");
         partner.setDigitalId(RandomStringUtils.randomAlphabetic(10));
         var response = put(baseRoutePath, HttpStatus.NOT_FOUND, partner, Error.class);

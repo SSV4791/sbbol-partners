@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.AllureId;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
@@ -16,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -26,7 +26,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34164")
     void testGetContact() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
@@ -45,7 +45,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34144")
     void testViewContact() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var partner = createValidPartner(randomAlphabetic(10));
         var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
         var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
         var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
@@ -119,7 +119,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34143")
     void testCreateContact() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var partner = createValidPartner(randomAlphabetic(10));
         var expected = getValidContact(partner.getId(), partner.getDigitalId());
         var contact = createValidContact(expected);
         assertThat(contact)
@@ -137,29 +137,72 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @Test
     @AllureId("34170")
     void testUpdateContact() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        String newName = "Новое наименование";
-        var updateContact = new Contact();
-        updateContact.id(contact.getId());
-        updateContact.digitalId(contact.getDigitalId());
-        updateContact.partnerId(contact.getPartnerId());
-        updateContact.orgName(newName);
-        updateContact.setVersion(contact.getVersion() + 1);
-        var newUpdateContact = put(baseRoutePath + "/contact", HttpStatus.OK, updateContact, ContactResponse.class);
-
+        var newUpdateContact = put(
+            baseRoutePath + "/contact",
+            HttpStatus.OK,
+            updateContact(contact),
+            ContactResponse.class
+        );
         assertThat(newUpdateContact)
             .isNotNull();
-        assertThat(newUpdateContact.getContact().getOrgName())
-            .isEqualTo(newName);
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isEqualTo(newUpdateContact.getContact().getFirstName());
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isNotEqualTo(contact.getFirstName());
         assertThat(newUpdateContact.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("36932")
+    void negativeTestUpdateContactVersion() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        Long version = contact.getVersion() + 1;
+        contact.setVersion(version);
+        var contactError = put(
+            baseRoutePath + "/contact",
+            HttpStatus.BAD_REQUEST,
+            updateContact(contact),
+            Error.class
+        );
+        assertThat(contactError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(contactError.getText())
+            .contains("Версия записи в базе данных " + (contact.getVersion() - 1) +
+                " не равна версии записи в запросе version=" + version);
+    }
+
+    @Test
+    @AllureId("36934")
+    void positiveTestUpdateContactVersion() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var contactUpdate = put(
+            baseRoutePath + "/contact",
+            HttpStatus.OK,
+            updateContact(contact),
+            ContactResponse.class
+        );
+        var checkContact = get(
+            baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            ContactResponse.class,
+            contactUpdate.getContact().getDigitalId(), contactUpdate.getContact().getId());
+        assertThat(checkContact)
+            .isNotNull();
+        assertThat(checkContact.getContact().getVersion())
+            .isEqualTo(contact.getVersion() + 1);
+        assertThat(checkContact.getErrors())
             .isNull();
     }
 
     @Test
     @AllureId("34201")
     void testDeleteContact() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
@@ -196,10 +239,6 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
         assertThat(searchContact.getCode())
             .isEqualTo(HttpStatus.NOT_FOUND.name());
-    }
-
-    public static ContactCreate getValidContact(String partnerUuid) {
-        return getValidContact(partnerUuid, "111111");
     }
 
     public static ContactCreate getValidContact(String partnerUuid, String digitalId) {
@@ -249,5 +288,21 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         assertThat(createContact.getErrors())
             .isNull();
         return createContact.getContact();
+    }
+
+    public static Contact updateContact(Contact contact) {
+        return new Contact()
+            .partnerId(contact.getPartnerId())
+            .digitalId(contact.getDigitalId())
+            .legalForm(contact.getLegalForm())
+            .orgName(contact.getOrgName())
+            .secondName(contact.getSecondName())
+            .middleName(contact.getMiddleName())
+            .position(contact.getPosition())
+            .phones(contact.getPhones())
+            .emails(contact.getEmails())
+            .firstName(randomAlphabetic(10))
+            .version(contact.getVersion())
+            .id(contact.getId());
     }
 }

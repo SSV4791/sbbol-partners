@@ -15,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -110,24 +111,63 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
     void testUpdatePartnerAddress() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var address = createValidAddress(partner.getId(), partner.getDigitalId());
-        String newName = "Новое наименование";
-        var updateAddress = new Address();
-        updateAddress.id(address.getId());
-        updateAddress.digitalId(address.getDigitalId());
-        updateAddress.unifiedId(address.getUnifiedId());
-        updateAddress.city(newName);
-        updateAddress.setVersion(address.getVersion() + 1);
         var newUpdateAddress = put(
             baseRoutePath + "/address",
             HttpStatus.OK,
-            updateAddress,
+            updateAddress(address),
             AddressResponse.class
         );
         assertThat(newUpdateAddress)
             .isNotNull();
-        assertThat(newUpdateAddress.getAddress().getCity())
-            .isEqualTo(newName);
+        assertThat(newUpdateAddress.getAddress().getStreet())
+            .isEqualTo(newUpdateAddress.getAddress().getStreet());
+        assertThat(newUpdateAddress.getAddress().getStreet())
+            .isNotEqualTo(address.getStreet());
         assertThat(newUpdateAddress.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("36941")
+    void negativeTestUpdateAddressVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var address = createValidAddress(partner.getId(), partner.getDigitalId());
+        Long version = address.getVersion() + 1;
+        address.setVersion(version);
+        var addressError = put(
+            baseRoutePath + "/address",
+            HttpStatus.BAD_REQUEST,
+            updateAddress(address),
+            Error.class
+        );
+        assertThat(addressError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(addressError.getText())
+            .contains("Версия записи в базе данных " + (address.getVersion() - 1) +
+                " не равна версии записи в запросе version=" + version);
+    }
+
+    @Test
+    @AllureId("36942")
+    void positiveTestUpdateAddressVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var address = createValidAddress(partner.getId(), partner.getDigitalId());
+        var addressUpdate = put(
+            baseRoutePath + "/address",
+            HttpStatus.OK,
+            updateAddress(address),
+            AddressResponse.class
+        );
+        var checkAddress = get(
+            baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AddressResponse.class,
+            addressUpdate.getAddress().getDigitalId(), addressUpdate.getAddress().getId());
+        assertThat(checkAddress)
+            .isNotNull();
+        assertThat(checkAddress.getAddress().getVersion())
+            .isEqualTo(address.getVersion() + 1);
+        assertThat(checkAddress.getErrors())
             .isNull();
     }
 
@@ -217,5 +257,23 @@ public class PartnerAddressControllerTest extends AbstractIntegrationWithOutSbbo
             .type(AddressCreate.TypeEnum.LEGAL_ADDRESS)
             .zipCode("9")
             ;
+    }
+
+    public static Address updateAddress(Address address) {
+        return new Address()
+            .id(address.getId())
+            .version(address.getVersion())
+            .unifiedId(address.getUnifiedId())
+            .digitalId(address.getDigitalId())
+            .building(address.getBuilding())
+            .buildingBlock(address.getBuildingBlock())
+            .city(address.getCity())
+            .flat(address.getFlat())
+            .location(address.getLocation())
+            .region(address.getRegion())
+            .regionCode(address.getRegionCode())
+            .street(randomAlphabetic(10))
+            .type(address.getType())
+            .zipCode(address.getZipCode());
     }
 }

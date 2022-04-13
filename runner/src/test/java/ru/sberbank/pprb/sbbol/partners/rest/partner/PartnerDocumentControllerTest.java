@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -118,7 +119,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         updateDocument.digitalId(document.getDigitalId());
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
-        updateDocument.setVersion(document.getVersion() + 1);
+        updateDocument.setVersion(document.getVersion());
         DocumentResponse newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, DocumentResponse.class);
 
         assertThat(newUpdateDocument)
@@ -126,6 +127,50 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         assertThat(newUpdateDocument.getDocument().getNumber())
             .isEqualTo(newName);
         assertThat(newUpdateDocument.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("36945")
+    void negativeTestUpdateDocumentVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        Long version = document.getVersion() + 1;
+        document.setVersion(version);
+        var documentError = put(
+            baseRoutePath + "/document",
+            HttpStatus.BAD_REQUEST,
+            updateDocument(document),
+            Error.class
+        );
+        assertThat(documentError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(documentError.getText())
+            .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
+                " не равна версии записи в запросе version=" + version);
+    }
+
+    @Test
+    @AllureId("36946")
+    void positiveTestUpdateDocumentVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        var documentUpdate = put(
+            baseRoutePath + "/document",
+            HttpStatus.OK,
+            updateDocument(document),
+            DocumentResponse.class
+        );
+        var checkDocument = get(
+            baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            DocumentResponse.class,
+            documentUpdate.getDocument().getDigitalId(), documentUpdate.getDocument().getId());
+        assertThat(checkDocument)
+            .isNotNull();
+        assertThat(checkDocument.getDocument().getVersion())
+            .isEqualTo(document.getVersion() + 1);
+        assertThat(checkDocument.getErrors())
             .isNull();
     }
 
@@ -204,5 +249,19 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
             .positionCertifier("12345")
             .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2")
             ;
+    }
+
+    public static Document updateDocument(Document document) {
+        return new Document()
+            .number(randomAlphanumeric(5))
+            .id(document.getId())
+            .version(document.getVersion())
+            .unifiedId(document.getUnifiedId())
+            .digitalId(document.getDigitalId())
+            .certifierName(document.getCertifierName())
+            .certifierType(document.getCertifierType())
+            .dateIssue(document.getDateIssue())
+            .divisionCode(document.getDivisionCode())
+            .documentType(document.getDocumentType());
     }
 }

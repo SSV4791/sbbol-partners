@@ -101,9 +101,9 @@ public class ContactServiceImpl implements ContactService {
         }
         var foundContact = contactRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, contact.getDigitalId(), contact.getId()));
-        if (contact.getVersion() <= foundContact.getVersion()) {
-            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundContact.getVersion() +
-                " больше или равна версии документа в запросе version=" + contact.getVersion());
+        if (!contact.getVersion().equals(foundContact.getVersion())) {
+            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundContact.getVersion() +
+                " не равна версии записи в запросе version=" + contact.getVersion());
         }
         contactMapper.updateContact(contact, foundContact);
         var saveContact = contactRepository.save(foundContact);

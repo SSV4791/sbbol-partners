@@ -91,9 +91,9 @@ abstract class AddressServiceImpl implements AddressService {
         }
         var foundAddress = addressRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, address.getDigitalId(), address.getId()));
-        if (address.getVersion() <= foundAddress.getVersion()) {
-            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundAddress.getVersion() +
-                " больше или равна версии документа в запросе version=" + address.getVersion());
+        if (!address.getVersion().equals(foundAddress.getVersion())) {
+            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundAddress.getVersion() +
+                " не равна версии записи в запросе version=" + address.getVersion());
         }
         addressMapper.updateAddress(address, foundAddress);
         var saveContact = addressRepository.save(foundAddress);

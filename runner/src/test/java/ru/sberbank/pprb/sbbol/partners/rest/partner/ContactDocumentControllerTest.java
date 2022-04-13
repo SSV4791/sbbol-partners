@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -123,20 +124,60 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
-        String newName = "Новое номер";
-        var updateDocument = new Document();
-        updateDocument.id(document.getId());
-        updateDocument.digitalId(document.getDigitalId());
-        updateDocument.unifiedId(document.getUnifiedId());
-        updateDocument.number(newName);
-        updateDocument.setVersion(document.getVersion() + 1);
-        var newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, DocumentResponse.class);
-
+        var newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument(document), DocumentResponse.class);
         assertThat(newUpdateDocument)
             .isNotNull();
         assertThat(newUpdateDocument.getDocument().getNumber())
-            .isEqualTo(newName);
+            .isEqualTo(newUpdateDocument.getDocument().getNumber());
+        assertThat(newUpdateDocument.getDocument().getNumber())
+            .isNotEqualTo(document.getNumber());
         assertThat(newUpdateDocument.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("36937")
+    void negativeTestUpdateDocumentVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
+        Long version = document.getVersion() + 1;
+        document.setVersion(version);
+        var documentError = put(
+            baseRoutePath + "/document",
+            HttpStatus.BAD_REQUEST,
+            updateDocument(document),
+            Error.class
+        );
+        assertThat(documentError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(documentError.getText())
+            .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
+                " не равна версии записи в запросе version=" + version);
+    }
+
+    @Test
+    @AllureId("36935")
+    void positiveTestUpdateDocumentVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
+        var documentUpdate = put(
+            baseRoutePath + "/document",
+            HttpStatus.OK,
+            updateDocument(document),
+            DocumentResponse.class
+        );
+        var checkDocument = get(
+            baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            DocumentResponse.class,
+            documentUpdate.getDocument().getDigitalId(), documentUpdate.getDocument().getId());
+        assertThat(checkDocument)
+            .isNotNull();
+        assertThat(checkDocument.getDocument().getVersion())
+            .isEqualTo(document.getVersion() + 1);
+        assertThat(checkDocument.getErrors())
             .isNull();
     }
 
@@ -223,5 +264,19 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         assertThat(documentResponse.getErrors())
             .isNull();
         return documentResponse.getDocument();
+    }
+
+    public static Document updateDocument(Document document) {
+        return new Document()
+            .number(randomAlphanumeric(5))
+            .id(document.getId())
+            .version(document.getVersion())
+            .unifiedId(document.getUnifiedId())
+            .digitalId(document.getDigitalId())
+            .certifierName(document.getCertifierName())
+            .certifierType(document.getCertifierType())
+            .dateIssue(document.getDateIssue())
+            .divisionCode(document.getDivisionCode())
+            .documentType(document.getDocumentType());
     }
 }

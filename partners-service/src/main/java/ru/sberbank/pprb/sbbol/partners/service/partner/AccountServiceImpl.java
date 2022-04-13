@@ -116,12 +116,12 @@ public class AccountServiceImpl implements AccountService {
         }
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
-        if (account.getVersion() <= foundAccount.getVersion()) {
-            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundAccount.getVersion() +
-                " больше или равна версии документа в запросе version=" + account.getVersion());
+        if (!account.getVersion().equals(foundAccount.getVersion())) {
+            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundAccount.getVersion() +
+                " не равна версии записи в запросе version=" + account.getVersion());
         }
         if (AccountStateType.SIGNED.equals(foundAccount.getState())) {
-            throw new SignAccountException(Collections.singletonList("Ошибка обновления счёта клиента, нельзя обновлять подписанные счёта"));
+            throw new SignAccountException(Collections.singletonList("Ошибка обновления счёта клиента " + account.getAccount() + " id " + account.getId() + " нельзя обновлять подписанные счёта"));
         }
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
         if (foundPartner.isEmpty()) {

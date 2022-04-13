@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
@@ -133,6 +134,10 @@ public class PartnerServiceImpl implements PartnerService {
         }
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
+        if (!partner.getVersion().equals(foundPartner.getVersion())) {
+            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundPartner.getVersion() +
+                " не равна версии записи в запросе version=" + partner.getVersion());
+        }
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
         var response = partnerMapper.toPartner(savePartner);

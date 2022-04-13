@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -34,6 +35,26 @@ public class EmailEntity extends EmailBaseEntity {
 
     public void setUnifiedUuid(UUID unifiedUuid) {
         this.unifiedUuid = unifiedUuid;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        EmailEntity that = (EmailEntity) obj;
+        if (getUuid() == null || that.getUuid() == null) {
+            return false;
+        }
+        return Objects.equals(getUuid(), that.getUuid());
+    }
+
+    @Override
+    public int hashCode() {
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
     }
 
     @Override

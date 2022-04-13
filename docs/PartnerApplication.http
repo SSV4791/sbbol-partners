@@ -2,6 +2,24 @@
 GET http://127.0.0.1:8080/partners/11111/1633bdab-fb11-40c2-8363-9075ca8b139e
 Content-Type: application/json
 
+### Обновление счета
+PUT http://127.0.0.1:8080/partner/account
+Content-Type: application/json
+
+{
+    "id": "e066be99-dc1d-48f4-b66e-be5c03100045",
+    "partnerId": "4865ce07-4e81-4c4b-8c0c-708535f8fe84",
+    "digitalId": "12345",
+    "name": "Ололошечdка",
+    "account": "40702810138170109674",
+    "bank": {
+      "name": "ого какой вбанк123",
+      "bic": "044525225",
+      "bankAccount": {
+        "account": "30101810400000000212"
+      }
+    }
+}
 
 ### Создание Партнера
 POST http://127.0.0.1:8080/partner
@@ -9,12 +27,30 @@ Content-Type: application/json
 
 {
     "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
-    "digitalId": "11111",
+    "digitalId": "12345",
     "version": 0,
     "partnerType": "PARTNER",
-    "legalForm": "LEGAL_ENTITY",
-    "orgName": "Малохито",
-    "inn": "4139314257"
+    "legalForm": "ENTREPRENEUR",
+    "orgName": "Ололоа",
+    "firstName": "Малохито",
+    "inn": "8753645468"
+}
+
+### Создание Счета
+POST http://127.0.0.1:8080/partner/account
+Content-Type: application/json
+
+{
+    "partnerId": "b7654d86-3701-412a-8582-efe5e020dc1d",
+    "digitalId": "12345",
+    "account": "40702810138170109674",
+    "bank": {
+        "name": "Ого какой банк",
+        "bic": "044525225",
+        "bankAccount": {
+            "account": "30101810400000000225"
+        }
+    }
 }
 
 
@@ -23,23 +59,24 @@ PUT http://127.0.0.1:8080/partner
 Content-Type: application/json
 
 {
-    "id": "a5422c7d-cea3-4b57-9a28-bda3e2ca92ca",
-    "digitalId": "11111",
-    "version": 0,
+    "id": "41f3213d-5cce-4465-882f-a1a9cc68d764",
+    "digitalId": "12345",
     "legalForm": "LEGAL_ENTITY",
-    "orgName": "Малохито",
+    "orgName": "Малоха",
     "inn": "4139314257",
-    "contacts": [
-        {
-            "name": "Рик и Морти"
-        }
-    ]
+    "version": "1"
 }
 
 
 ### Удаление Партнера
-DELETE http://127.0.0.1:8080/partners/11111/ccc854a0-ed10-4773-8063-ed6ddd389851
+DELETE http://127.0.0.1:8080/partner/12345/f0cd55bb-88fd-47c5-b9f0-1ba2dfe07a12
 Content-Type: application/json
+
+
+### Удаление Счета
+DELETE http://127.0.0.1:8080/partner/account/12345/130638c6-a02a-439b-80b4-2813a3eb5a16
+Content-Type: application/json
+//При удалении счета подписанного не возвращается полное описание
 
 ### Создание Контакта
 POST http://127.0.0.1:8080/partner/contact
@@ -84,17 +121,15 @@ POST http://ci02281165-sbbol-partners.apps.dev-gen2.sigma.sbrf.ru/partner/contac
 Content-Type: application/json
 
 {
-
-"type": "LEGAL_ADDRESS",
-"digitalId": "6933363154490000000",
-
-"zipCode": "112344",
-"region": "Регион",
-"regionCode": "0332",
-"city": "МоскоуСити",
-"location": "РусиаЛокатион",
-"street": "КутузСтрит",
-"building": "32Билдин",
-"buildingBlock": "1Строение",
-"flat": "ФлатХз что"
+    "type": "LEGAL_ADDRESS",
+    "digitalId": "6933363154490000000",
+    "zipCode": "112344",
+    "region": "Регион",
+    "regionCode": "0332",
+    "city": "МоскоуСити",
+    "location": "РусиаЛокатион",
+    "street": "КутузСтрит",
+    "building": "32Билдин",
+    "buildingBlock": "1Строение",
+    "flat": "ФлатХз что"
 }

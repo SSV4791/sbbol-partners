@@ -81,9 +81,9 @@ abstract class PhoneServiceImpl implements PhoneService {
         var uuid = UUID.fromString(phone.getId());
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
-        if (phone.getVersion() <= foundPhone.getVersion()) {
-            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundPhone.getVersion() +
-                " больше или равна версии документа в запросе version=" + phone.getVersion());
+        if (!phone.getVersion().equals(foundPhone.getVersion())) {
+            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundPhone.getVersion() +
+                " не равна версии записи в запросе version=" + phone.getVersion());
         }
         phoneMapper.updatePhone(phone, foundPhone);
         var savedPhone = phoneRepository.save(foundPhone);
