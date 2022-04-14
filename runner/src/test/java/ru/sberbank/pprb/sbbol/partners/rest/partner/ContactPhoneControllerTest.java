@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -44,6 +45,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
                 .offset(0));
         var response = post(
             baseRoutePath + "/view",
+            HttpStatus.OK,
             filter1,
             PhonesResponse.class
         );
@@ -85,7 +87,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
         updatePhone.digitalId(phone.getDigitalId());
         updatePhone.phone(newPhone);
         updatePhone.setVersion(phone.getVersion() + 1);
-        var newUpdatePhone = put(baseRoutePath, updatePhone, PhoneResponse.class);
+        var newUpdatePhone = put(baseRoutePath, HttpStatus.OK, updatePhone, PhoneResponse.class);
 
         assertThat(newUpdatePhone)
             .isNotNull();
@@ -113,6 +115,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
                 .offset(0));
         var actualPhone = post(
             baseRoutePath + "/view",
+            HttpStatus.OK,
             filter1,
             PhonesResponse.class
         );
@@ -122,13 +125,15 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
         var deletePhone =
             delete(
                 baseRoutePath + "/{digitalId}" + "/{id}",
+                HttpStatus.NO_CONTENT,
                 contact.getDigitalId(), actualPhone.getPhones().get(0).getId()
-            );
+            ).getBody();
         assertThat(deletePhone)
             .isNotNull();
 
         var searchPhone = post(
             baseRoutePath + "/view",
+            HttpStatus.OK,
             filter1,
             PhonesResponse.class
         );
@@ -144,7 +149,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     private static Phone createPhone(String partnerUuid, String digitalId) {
-        var phoneResponse = createPost(baseRoutePath, getPhone(partnerUuid, digitalId), PhoneResponse.class);
+        var phoneResponse = post(baseRoutePath, HttpStatus.CREATED, getPhone(partnerUuid, digitalId), PhoneResponse.class);
         assertThat(phoneResponse)
             .isNotNull();
         assertThat(phoneResponse.getErrors())
@@ -153,7 +158,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     private static Phone createPhone(PhoneCreate phone) {
-        var phoneResponse = createPost(baseRoutePath, phone, PhoneResponse.class);
+        var phoneResponse = post(baseRoutePath, HttpStatus.CREATED, phone, PhoneResponse.class);
         assertThat(phoneResponse)
             .isNotNull();
         assertThat(phoneResponse.getErrors())

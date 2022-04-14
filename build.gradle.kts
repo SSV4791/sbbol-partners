@@ -1,7 +1,7 @@
 plugins {
-    id("io.qameta.allure") version "2.9.6"
     id("create-liquibase-path-conventions")
     id("dependency-locking-conventions")
+    id("io.qameta.allure") version "2.9.6"
     id("jacoco-conventions")
     id("java-conventions")
     id("meta-conventions")

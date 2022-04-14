@@ -5,14 +5,8 @@ plugins {
     id("org.springframework.boot") apply false
 }
 
-apply(plugin = "io.spring.dependency-management")
 apply(plugin = "jacoco")
 apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
-the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
-    imports {
-        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    }
-}
 
 val rentersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/renters/renter.yaml"
 val partnersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners"
@@ -119,11 +113,11 @@ sourceSets {
 }
 
 dependencies {
-    implementation("io.swagger:swagger-annotations:1.6.3")
-    implementation("javax.annotation:javax.annotation-api:1.3.2")
-    implementation("javax.validation:validation-api:2.0.1.Final")
-    implementation("org.openapitools:jackson-databind-nullable:0.2.2")
-    implementation("org.springframework:spring-context:5.3.12")
+    implementation(liveLibs.jackson.databind.nullable)
+    implementation(liveLibs.javax.annotation.api)
+    implementation(liveLibs.javax.validation.api)
+    implementation(liveLibs.spring.context.core)
+    implementation(liveLibs.swagger.annotations.core)
 }
 
 description = "Api ППРБ.Digital.Партнеры"

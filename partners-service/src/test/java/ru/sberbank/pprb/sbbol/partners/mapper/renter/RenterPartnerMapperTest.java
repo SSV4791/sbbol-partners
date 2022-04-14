@@ -4,13 +4,13 @@ import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
+import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RenterPartnerMapperTest extends BaseConfiguration {
+class RenterPartnerMapperTest extends BaseUnitConfiguration {
 
     private static final RenterPartnerMapper mapper = Mappers.getMapper(RenterPartnerMapper.class);
 

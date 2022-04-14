@@ -23,8 +23,9 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @Test
     @AllureId("34191")
     void testGetPartner() {
-        var response = getNotFound(
+        var response = get(
             baseRoutePath + "/{digitalId}" + "/{id}",
+            HttpStatus.NOT_FOUND,
             Error.class,
             RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)
         );
@@ -44,7 +45,12 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
                 .offset(1)
                 .count(1)
         );
-        var response = postNotFound("/partners/view", filter);
+        var response = post(
+            "/partners/view",
+            HttpStatus.NOT_FOUND,
+            filter,
+            Error.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
@@ -54,7 +60,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @Test
     @AllureId("34156")
     void testCreatePartner() {
-        var response = postNotFound(baseRoutePath, PartnerControllerTest.getValidPartner());
+        var response = post(baseRoutePath, HttpStatus.NOT_FOUND, PartnerControllerTest.getValidPartner(), Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
@@ -77,7 +83,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
             .okpo("444444")
             .comment("555555");
         partner.setDigitalId(RandomStringUtils.randomAlphabetic(10));
-        var response = putNotFound(baseRoutePath, partner);
+        var response = put(baseRoutePath, HttpStatus.NOT_FOUND, partner, Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
@@ -87,10 +93,11 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @Test
     @AllureId("34114")
     void testDeletePartner() {
-        var response = deleteNotFound(
+        var response = delete(
             baseRoutePath + "/{digitalId}" + "/{id}",
+            HttpStatus.NOT_FOUND,
             RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)
-        );
+        ).as(Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())

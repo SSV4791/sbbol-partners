@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
-import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
@@ -21,7 +21,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-class ContactMapperTest extends BaseConfiguration {
+class ContactMapperTest extends BaseUnitConfiguration {
 
     private ContactMapper mapper;
 
@@ -58,6 +58,7 @@ class ContactMapperTest extends BaseConfiguration {
 
     @Test
     @AllureId("34384")
+    @SuppressWarnings("unchecked")
     void testToContactPhoneString() {
         List<String> phones = factory.manufacturePojo(ArrayList.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);
@@ -72,6 +73,7 @@ class ContactMapperTest extends BaseConfiguration {
 
     @Test
     @AllureId("34379")
+    @SuppressWarnings("unchecked")
     void testToContactEmailString() {
         List<String> emails = factory.manufacturePojo(ArrayList.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);

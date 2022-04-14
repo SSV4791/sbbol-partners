@@ -3,14 +3,14 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
-import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ContactEmailMapperTest extends BaseConfiguration {
+public class ContactEmailMapperTest extends BaseUnitConfiguration {
 
     private static final ContactEmailMapper mapper = Mappers.getMapper(ContactEmailMapper.class);
 

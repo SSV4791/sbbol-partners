@@ -1,0 +1,24 @@
+[versions]
+assured = "4.4.0"
+mockserver = "5.11.2"
+pact = "4.1.31"
+
+[libraries]
+dcb-allure-annotations = { module = "ru.dcbqa.allureee.annotations:dcb-allure-annotations", version = "1.2.+" }
+junit5-allure = { module = "io.qameta.allure:allure-junit5", version = "2.16.1" }
+junit5-consumer = { module = "au.com.dius.pact.consumer:junit5", version.ref = "pact" }
+junit5-provider = { module = "au.com.dius.pact.provider:junit5", version.ref = "pact" }
+mockserver-client-java = { module = "org.mock-server:mockserver-client-java", version.ref = "mockserver" }
+mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = "mockserver" }
+mockserver-spring-test-listener = { module = "org.mock-server:mockserver-spring-test-listener", version.ref = "mockserver" }
+orm-tests-common = { module = "sbp.integration.orm:orm-tests-common", version = "4.1.14" }
+podam-core = { module = "uk.co.jemos.podam:podam", version = "7.2.7.RELEASE" }
+rest-assured = { module = "io.rest-assured:rest-assured", version.ref = "assured" }
+rest-assured-common = { module = "io.rest-assured:rest-assured-common", version.ref = "assured" }
+swagger-coverage-reporter = { module = "ru.dcbqa.swagger.coverage.reporter:swagger-coverage-reporter", version = "2.3.+" }
+
+[bundles]
+mockserver = ["mockserver-client-java", "mockserver-netty", "mockserver-spring-test-listener"]
+pact = ["junit5-consumer", "junit5-provider"]
+
+[plugins]

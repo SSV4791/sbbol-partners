@@ -188,8 +188,8 @@ class LegacySbbolAdapterTest {
      */
     @Test
     @AllureId("34038")
-    @SuppressWarnings("unchecked")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка по ППРБ гуиду")
+    @SuppressWarnings("unchecked")
     void listTest() {
         List<CounterpartyView> response = factory.manufacturePojo(ArrayList.class, CounterpartyView.class);
         mockServerClient.when(HttpRequest.request(COUNTERPARTY_BY_DIGITAL_ID).withMethod(HttpMethod.GET.name()).withHeaders(headers))
