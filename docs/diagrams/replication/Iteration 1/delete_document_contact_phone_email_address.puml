@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+autonumber
+==Удаление==
+Клиент -> ППРБ.Партнеры: DELETE /partner/.../{digitalId}/{id}
+ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
+alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
+СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
+break#Gold #Pink Ошибка. Прерывание операции
+ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+end
+else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
+СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
+ППРБ.Партнеры -> ППРБ.Партнеры: Поиск записи
+alt#Gold Есть запись партнера в таблице partner
+ППРБ.Партнеры -> ППРБ.Партнеры: Удаление в таблицах
+ППРБ.Партнеры --> Клиент: 204
+else Нет записи в таблице
+break#gold #pink
+ППРБ.Партнеры --> Клиент: 404
+end
+end
+end
+@enduml
