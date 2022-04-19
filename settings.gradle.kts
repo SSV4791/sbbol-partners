@@ -8,6 +8,16 @@ pluginManagement {
             url = uri("https://nexus.sigma.sbrf.ru/nexus/content/repositories/thirdparty")
         }
     }
+    dependencyResolutionManagement {
+        versionCatalogs {
+            create("liveLibs") {
+                from(files("gradle/libs.versions.toml"))
+            }
+            create("testLibs") {
+                from(files("gradle/test-libs.versions.toml"))
+            }
+        }
+    }
     plugins {
         id("org.openapi.generator") version "5.3.1"
         id("org.springframework.boot") version "2.5.5"

@@ -31,6 +31,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         var address = createValidAddress(contact.getId(), partner.getDigitalId());
         var actualAddress = get(
             baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
             AddressResponse.class,
             address.getDigitalId(), address.getId()
         );
@@ -60,6 +61,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
                 .offset(0));
         var response1 = post(
             baseRoutePath + "/address/view",
+            HttpStatus.OK,
             filter1,
             AddressesResponse.class
         );
@@ -77,6 +79,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
                 .offset(0));
         var response2 = post(
             baseRoutePath + "/address/view",
+            HttpStatus.OK,
             filter2,
             AddressesResponse.class
         );
@@ -117,7 +120,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         updateAddress.unifiedId(address.getUnifiedId());
         updateAddress.city(newName);
         updateAddress.setVersion(address.getVersion() + 1);
-        var newUpdateAddress = put(baseRoutePath + "/address", updateAddress, AddressResponse.class);
+        var newUpdateAddress = put(baseRoutePath + "/address", HttpStatus.OK, updateAddress, AddressResponse.class);
 
         assertThat(newUpdateAddress)
             .isNotNull();
@@ -136,6 +139,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         var actualAddress =
             get(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
                 AddressResponse.class,
                 address.getDigitalId(), address.getId()
             );
@@ -149,14 +153,16 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
         var deleteAddress =
             delete(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+                HttpStatus.NO_CONTENT,
                 actualAddress.getAddress().getDigitalId(), actualAddress.getAddress().getId()
-            );
+            ).getBody();
         assertThat(deleteAddress)
             .isNotNull();
 
         var searchAddress =
-            getNotFound(
+            get(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+                HttpStatus.NOT_FOUND,
                 Error.class,
                 address.getDigitalId(), address.getId()
             );
@@ -169,7 +175,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
     }
 
     private static Address createValidAddress(String partnerUuid, String digitalId) {
-        var response = createPost(baseRoutePath + "/address", getValidPartnerAddress(partnerUuid, digitalId), AddressResponse.class);
+        var response = post(baseRoutePath + "/address", HttpStatus.CREATED, getValidPartnerAddress(partnerUuid, digitalId), AddressResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getErrors())
@@ -178,7 +184,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationWithOutSbbo
     }
 
     private static Address createValidAddress(AddressCreate address) {
-        var response = createPost(baseRoutePath + "/address", address, AddressResponse.class);
+        var response = post(baseRoutePath + "/address", HttpStatus.CREATED, address, AddressResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getErrors())

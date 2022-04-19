@@ -5,14 +5,8 @@ plugins {
     id("test-conventions")
 }
 
-apply(plugin = "io.spring.dependency-management")
 apply(plugin = "jacoco")
 apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
-the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
-    imports {
-        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    }
-}
 
 tasks {
     clean {
@@ -20,19 +14,19 @@ tasks {
     }
 }
 
-val pactVersion: String by rootProject
-
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
-    implementation("net.sf.ehcache:ehcache:2.10.4")
+    implementation(platform(liveLibs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework:spring-context-support:4.3.8.RELEASE")
+    implementation(liveLibs.ehcache.net.core)
+    implementation(liveLibs.jackson.databind)
+    implementation(liveLibs.spring.context.support)
 
-    testImplementation("io.qameta.allure:allure-junit5:2.16.1")
-    testImplementation("ru.dcbqa.allureee.annotations:dcb-allure-annotations:1.2.+")
-    testImplementation("ru.dcbqa.swagger.coverage.reporter:swagger-coverage-reporter:2.3.+")
-    testImplementation(group = "au.com.dius.pact.consumer", name = "junit5", version = pactVersion)
-    testImplementation(group = "au.com.dius.pact.provider", name = "junit5", version = pactVersion)
+    testImplementation(testLibs.bundles.mockserver)
+    testImplementation(testLibs.bundles.pact)
+    testImplementation(testLibs.dcb.allure.annotations)
+    testImplementation(testLibs.junit5.allure)
+    testImplementation(testLibs.podam.core)
+    testImplementation(testLibs.swagger.coverage.reporter)
 }
 
 description = "Adapter ППРБ.Digital.Партнеры"

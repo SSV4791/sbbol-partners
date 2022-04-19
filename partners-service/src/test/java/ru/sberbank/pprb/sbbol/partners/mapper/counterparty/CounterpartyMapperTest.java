@@ -5,19 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
+import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
-import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisites;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @UnitTestLayer
-class CounterpartyMapperTest extends BaseConfiguration {
+class CounterpartyMapperTest extends BaseUnitConfiguration {
 
     private static final CounterpartyMapper mapper = Mappers.getMapper(CounterpartyMapper.class);
 

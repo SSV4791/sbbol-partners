@@ -32,12 +32,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     void testGetAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var actualAccount =
-            get(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                AccountResponse.class,
-                account.getDigitalId(), account.getId()
-            );
+        var actualAccount = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AccountResponse.class,
+            account.getDigitalId(), account.getId()
+        );
         assertThat(actualAccount)
             .isNotNull();
         assertThat(actualAccount.getAccount())
@@ -63,6 +63,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .offset(0));
         var response = post(
             baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
             filter,
             AccountsResponse.class
         );
@@ -92,6 +93,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .offset(0));
         var response = post(
             baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
             filter,
             AccountsResponse.class
         );
@@ -119,6 +121,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .offset(0));
         var response1 = post(
             baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
             filter,
             AccountsResponse.class
         );
@@ -171,7 +174,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             .name(newName)
             .account(account.getAccount())
             .bank(account.getBank());
-        var newUpdateAccount = put(baseRoutePath + "/account", updatedAccount, AccountResponse.class);
+        var newUpdateAccount = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            updatedAccount,
+            AccountResponse.class
+        );
         assertThat(newUpdateAccount)
             .isNotNull();
         assertThat(newUpdateAccount.getAccount().getName())
@@ -185,12 +193,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     void testDeleteAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var actualAccount =
-            get(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                AccountResponse.class,
-                account.getDigitalId(), account.getId()
-            );
+        var actualAccount = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AccountResponse.class,
+            account.getDigitalId(), account.getId()
+        );
         assertThat(actualAccount)
             .isNotNull();
         assertThat(actualAccount.getAccount())
@@ -200,17 +208,18 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var deleteAccount =
             delete(
                 baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+                HttpStatus.NO_CONTENT,
                 actualAccount.getAccount().getDigitalId(), actualAccount.getAccount().getId()
-            );
+            ).getBody();
         assertThat(deleteAccount)
             .isNotNull();
 
-        var searchAccount =
-            getNotFound(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                Error.class,
-                account.getDigitalId(), account.getId()
-            );
+        var searchAccount = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.NOT_FOUND,
+            Error.class,
+            account.getDigitalId(), account.getId()
+        );
         assertThat(searchAccount)
             .isNotNull();
         assertThat(searchAccount.getCode())
@@ -222,12 +231,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     void testPriorityAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var foundAccount =
-            get(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                AccountResponse.class,
-                account.getDigitalId(), account.getId()
-            );
+        var foundAccount = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AccountResponse.class,
+            account.getDigitalId(), account.getId()
+        );
         assertThat(foundAccount)
             .isNotNull();
         assertThat(foundAccount.getAccount())
@@ -238,12 +247,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
         createValidPriorityAccount(account.getId(), account.getDigitalId());
 
-        var actualAccount =
-            get(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
-                AccountResponse.class,
-                account.getDigitalId(), account.getId()
-            );
+        var actualAccount = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AccountResponse.class,
+            account.getDigitalId(), account.getId()
+        );
         assertThat(actualAccount)
             .isNotNull();
         assertThat(actualAccount.getAccount().getPriorityAccount())
@@ -286,7 +295,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     public static void createValidBudgetAccount(String partnerUuid, String digitalId) {
-        var createAccount = createPost(baseRoutePath + "/account", getValidBudgetAccount(partnerUuid, digitalId), AccountResponse.class);
+        var createAccount = post(
+            baseRoutePath + "/account",
+            HttpStatus.CREATED,
+            getValidBudgetAccount(partnerUuid, digitalId),
+            AccountResponse.class
+        );
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())
@@ -294,7 +308,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     public static Account createValidAccount(String partnerUuid, String digitalId) {
-        var createAccount = createPost(baseRoutePath + "/account", getValidAccount(partnerUuid, digitalId), AccountResponse.class);
+        var createAccount = post(
+            baseRoutePath + "/account",
+            HttpStatus.CREATED,
+            getValidAccount(partnerUuid, digitalId),
+            AccountResponse.class
+        );
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())
@@ -303,7 +322,12 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     public static Account createValidAccount(AccountCreate account) {
-        var createAccount = createPost(baseRoutePath + "/account", account, AccountResponse.class);
+        var createAccount = post(
+            baseRoutePath + "/account",
+            HttpStatus.CREATED,
+            account,
+            AccountResponse.class
+        );
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())
@@ -315,7 +339,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var account = getValidAccount(partnerUuid, digitalId);
         account.setAccount("222222");
         account.getBank().setBic("44444");
-        return createBadRequestPost(baseRoutePath + "/account", account);
+        return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
     }
 
     private static AccountPriority getValidPriorityAccount(String accountId, String digitalId) {
@@ -326,7 +350,11 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     public static void createValidPriorityAccount(String accountId, String digitalId) {
-        var createAccount = put(baseRoutePath + "/account/priority", getValidPriorityAccount(accountId, digitalId), AccountResponse.class);
+        var createAccount = put(
+            baseRoutePath + "/account/priority",
+            HttpStatus.OK,
+            getValidPriorityAccount(accountId, digitalId),
+            AccountResponse.class);
         assertThat(createAccount)
             .isNotNull();
         assertThat(createAccount.getErrors())
@@ -334,6 +362,11 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     public static Error notCreatePriorityAccount(String accountId, String digitalId) {
-        return createBadRequestPut(baseRoutePath + "/account/priority", getValidPriorityAccount(accountId, digitalId));
+        return put(
+            baseRoutePath + "/account/priority",
+            HttpStatus.BAD_REQUEST,
+            getValidPriorityAccount(accountId, digitalId),
+            Error.class
+        );
     }
 }

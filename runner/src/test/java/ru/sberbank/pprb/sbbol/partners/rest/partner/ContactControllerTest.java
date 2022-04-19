@@ -31,6 +31,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var actualContact =
             get(
                 baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
                 ContactResponse.class,
                 contact.getDigitalId(), contact.getId()
             );
@@ -59,6 +60,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .offset(0));
         var response1 = post(
             baseRoutePath + "/contacts/view",
+            HttpStatus.OK,
             filter1,
             ContactsResponse.class
         );
@@ -76,6 +78,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .offset(0));
         var response2 = post(
             baseRoutePath + "/contacts/view",
+            HttpStatus.OK,
             filter2,
             ContactsResponse.class
         );
@@ -101,6 +104,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .offset(0));
         var response3 = post(
             baseRoutePath + "/contacts/view",
+            HttpStatus.OK,
             filter3,
             ContactsResponse.class
         );
@@ -142,7 +146,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         updateContact.partnerId(contact.getPartnerId());
         updateContact.orgName(newName);
         updateContact.setVersion(contact.getVersion() + 1);
-        var newUpdateContact = put(baseRoutePath + "/contact", updateContact, ContactResponse.class);
+        var newUpdateContact = put(baseRoutePath + "/contact", HttpStatus.OK, updateContact, ContactResponse.class);
 
         assertThat(newUpdateContact)
             .isNotNull();
@@ -160,6 +164,7 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var actualContact =
             get(
                 baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
                 ContactResponse.class,
                 contact.getDigitalId(), contact.getId()
             );
@@ -172,15 +177,17 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
         var deleteContact =
             delete(
                 baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                HttpStatus.NO_CONTENT,
                 actualContact.getContact().getDigitalId(), actualContact.getContact().getId()
-            );
+            ).getBody();
 
         assertThat(deleteContact)
             .isNotNull();
 
         var searchContact =
-            getNotFound(
+            get(
                 baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                HttpStatus.NOT_FOUND,
                 Error.class,
                 contact.getDigitalId(), contact.getId()
             );
@@ -217,7 +224,12 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     protected static Contact createValidContact(String partnerUuid, String digitalId) {
-        var createContact = createPost(baseRoutePath + "/contact", getValidContact(partnerUuid, digitalId), ContactResponse.class);
+        var createContact = post(
+            baseRoutePath + "/contact",
+            HttpStatus.CREATED,
+            getValidContact(partnerUuid, digitalId),
+            ContactResponse.class
+        );
         assertThat(createContact)
             .isNotNull();
         assertThat(createContact.getErrors())
@@ -226,7 +238,12 @@ public class ContactControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     protected static Contact createValidContact(ContactCreate contact) {
-        var createContact = createPost(baseRoutePath + "/contact", contact, ContactResponse.class);
+        var createContact = post(
+            baseRoutePath + "/contact",
+            HttpStatus.CREATED,
+            contact,
+            ContactResponse.class
+        );
         assertThat(createContact)
             .isNotNull();
         assertThat(createContact.getErrors())

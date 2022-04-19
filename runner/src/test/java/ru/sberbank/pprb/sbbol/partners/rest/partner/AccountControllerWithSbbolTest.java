@@ -25,8 +25,9 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @Test
     @AllureId("34208")
     void testGetAccount() {
-        var response = getNotFound(
+        var response = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.NOT_FOUND,
             Error.class,
             randomAlphabetic(10), UUID.randomUUID()
         );
@@ -46,7 +47,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
                 .count(4)
                 .offset(0));
 
-        var response = postNotFound(baseRoutePath + "/accounts/view", filter);
+        var response = post(baseRoutePath + "/accounts/view", HttpStatus.NOT_FOUND, filter, Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
@@ -57,7 +58,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @AllureId("34122")
     void testCreateAccount() {
         var account = getValidAccount(randomAlphabetic(10), randomAlphabetic(10));
-        var response = postNotFound(baseRoutePath + "/account", account);
+        var response = post(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
@@ -80,7 +81,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
                     new BankAccount()
                         .account("30101810145250000411"))
             );
-        var response = putNotFound(baseRoutePath + "/account", account);
+        var response = put(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
@@ -90,10 +91,11 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
     @Test
     @AllureId("34159")
     void testDeleteAccount() {
-        var response = deleteNotFound(
+        var response = delete(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.NOT_FOUND,
             randomAlphabetic(10), randomAlphabetic(10)
-        );
+        ).as(Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())

@@ -169,6 +169,9 @@ public class PartnerServiceImpl implements PartnerService {
      * @return признак принадлежит инн ЖКУ true - да, false - нет
      */
     private Boolean getGku(String digitalId, String inn) {
+        if (digitalId == null || inn == null) {
+            return Boolean.FALSE;
+        }
         var housingInn = legacySbbolAdapter.getHousingInn(digitalId, Set.of(inn));
         if (!CollectionUtils.isEmpty(housingInn)) {
             return Boolean.TRUE;

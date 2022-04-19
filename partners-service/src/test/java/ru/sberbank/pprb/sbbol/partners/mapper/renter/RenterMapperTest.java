@@ -3,15 +3,15 @@ package ru.sberbank.pprb.sbbol.partners.mapper.renter;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.renter.LegalAddress;
 import ru.sberbank.pprb.sbbol.partners.entity.renter.PhysicalAddress;
-import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated(forRemoval = true)
-public class RenterMapperTest extends BaseConfiguration {
+public class RenterMapperTest extends BaseUnitConfiguration {
 
     private static final RenterMapper mapper = Mappers.getMapper(RenterMapper.class);
 

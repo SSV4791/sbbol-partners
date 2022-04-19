@@ -5,14 +5,8 @@ plugins {
     id("org.springframework.boot") apply false
 }
 
-apply(plugin = "io.spring.dependency-management")
 apply(plugin = "jacoco")
 apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
-the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
-    imports {
-        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    }
-}
 
 val rentersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/renters/renter.yaml"
 val partnersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners"
@@ -125,10 +119,11 @@ dependencies {
     implementation(project(":partners-api"))
     implementation(project(":partners-service"))
 
-    implementation("io.springfox:springfox-boot-starter:3.0.0")
-    implementation("javax.validation:validation-api:2.0.1.Final")
+    implementation(platform(liveLibs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(liveLibs.javax.validation.api)
+    implementation(liveLibs.springfox.boot.starter)
 }
 
 description = "REST Controllers ППРБ.Digital.Партнеры"

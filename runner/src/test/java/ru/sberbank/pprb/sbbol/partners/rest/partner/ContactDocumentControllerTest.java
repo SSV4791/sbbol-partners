@@ -36,6 +36,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var actualDocument =
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -69,6 +70,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
                 .offset(0));
         var response1 = post(
             baseRoutePath + "/documents/view",
+            HttpStatus.OK,
             filter1,
             DocumentsResponse.class
         );
@@ -86,6 +88,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
                 .offset(0));
         var response2 = post(
             baseRoutePath + "/documents/view",
+            HttpStatus.OK,
             filter2,
             DocumentsResponse.class
         );
@@ -127,7 +130,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
         updateDocument.setVersion(document.getVersion() + 1);
-        var newUpdateDocument = put(baseRoutePath + "/document", updateDocument, DocumentResponse.class);
+        var newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, DocumentResponse.class);
 
         assertThat(newUpdateDocument)
             .isNotNull();
@@ -146,6 +149,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var actualDocument =
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -159,14 +163,16 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var deleteDocument =
             delete(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.NO_CONTENT,
                 actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getId()
-            );
+            ).getBody();
         assertThat(deleteDocument)
             .isNotNull();
 
         var searchDocument =
-            getNotFound(
+            get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.NOT_FOUND,
                 Error.class,
                 document.getDigitalId(), document.getId()
             );
@@ -192,7 +198,12 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
     }
 
     private static Document createValidContactDocument(String contactUuid, String digitalId) {
-        var documentResponse = createPost(baseRoutePath + "/document", getValidContactDocument(contactUuid, digitalId), DocumentResponse.class);
+        var documentResponse = post(
+            baseRoutePath + "/document",
+            HttpStatus.CREATED,
+            getValidContactDocument(contactUuid, digitalId),
+            DocumentResponse.class
+        );
         assertThat(documentResponse)
             .isNotNull();
         assertThat(documentResponse.getErrors())
@@ -201,7 +212,12 @@ public class ContactDocumentControllerTest extends AbstractIntegrationWithOutSbb
     }
 
     private static Document createValidContactDocument(DocumentCreate document) {
-        var documentResponse = createPost(baseRoutePath + "/document", document, DocumentResponse.class);
+        var documentResponse = post(
+            baseRoutePath + "/document",
+            HttpStatus.CREATED,
+            document,
+            DocumentResponse.class
+        );
         assertThat(documentResponse)
             .isNotNull();
         assertThat(documentResponse.getErrors())

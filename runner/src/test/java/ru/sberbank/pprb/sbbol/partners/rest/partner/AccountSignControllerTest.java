@@ -52,6 +52,7 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
                 .offset(0));
         var response = post(
             baseRoutePath + "/view",
+            HttpStatus.OK,
             filter1,
             AccountsSignResponse.class
         );
@@ -79,16 +80,18 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
     void testGetSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        getNotFound(
+        get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
+            HttpStatus.NOT_FOUND,
             Error.class,
             account.getDigitalId(), account.getId()
         );
-        var savedSign = post(baseRoutePath, getValidAccountSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
+        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
         assertThat(savedSign)
             .isNotNull();
         var signInfo = get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
+            HttpStatus.OK,
             AccountSignInfo.class,
             account.getDigitalId(), account.getId()
         );
@@ -108,6 +111,7 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
         var actualAccountSign =
             get(
                 baseRoutePath + "/{digitalId}" + "/{accountId}",
+                HttpStatus.OK,
                 AccountSignInfo.class,
                 savedSign.getDigitalId(), accountSignDetail.getAccountId()
             );
@@ -122,14 +126,16 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
         var deleteAccountSign =
             delete(
                 baseRoutePath + "/{digitalId}" + "/{accountId}",
+                HttpStatus.NO_CONTENT,
                 savedSign.getDigitalId(), accountSignDetail.getAccountId()
-            );
+            ).getBody();
         assertThat(deleteAccountSign)
             .isNotNull();
 
         var searchAccountSign =
-            getNotFound(
+            get(
                 baseRoutePath + "/{digitalId}" + "/{accountId}",
+                HttpStatus.NOT_FOUND,
                 Error.class,
                 savedSign.getDigitalId(), accountSignDetail.getAccountId()
             );
@@ -140,7 +146,12 @@ public class AccountSignControllerTest extends AbstractIntegrationWithOutSbbolTe
     }
 
     public static AccountsSignInfoResponse createValidAccountSign(String digitalId, String accountId) {
-        var createAccountSign = post(baseRoutePath, getValidAccountSign(digitalId, accountId), AccountsSignInfoResponse.class);
+        var createAccountSign = post(
+            baseRoutePath,
+            HttpStatus.OK,
+            getValidAccountSign(digitalId, accountId),
+            AccountsSignInfoResponse.class
+        );
         assertThat(createAccountSign)
             .isNotNull();
         return createAccountSign;

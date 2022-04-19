@@ -5,14 +5,8 @@ plugins {
     id("test-conventions")
 }
 
-apply(plugin = "io.spring.dependency-management")
 apply(plugin = "jacoco")
 apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
-the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
-    imports {
-        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    }
-}
 
 tasks {
     clean {
@@ -20,35 +14,30 @@ tasks {
     }
 }
 
-val pactVersion: String by rootProject
-
 dependencies {
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.4.2.Final")
+    annotationProcessor(liveLibs.mapstruct.processor)
 
     implementation(project(":partners-adapter"))
     implementation(project(":partners-api"))
 
-    implementation("io.micrometer:micrometer-core:1.7.5")
-    implementation("io.micrometer:micrometer-registry-jmx:1.7.5")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.7.5")
-    implementation("org.hibernate:hibernate-jcache:5.6.1.Final")
-    implementation("org.mapstruct:mapstruct:1.4.2.Final")
+    implementation(platform(liveLibs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("sbp.integration.orm:sbp-hibernate-standin:4.1.14")
+    implementation(liveLibs.bundles.micrometer)
+    implementation(liveLibs.hibernate.jcache)
+    implementation(liveLibs.mapstruct.core)
+    implementation(liveLibs.sbp.hibernate.standin)
     //Поддержка генераторов ID на время перехода.
-    implementation("sbp.com.sbt.dataspace:jpa-model-support:4.3.34")
+    implementation(liveLibs.sbp.jpa.model.support)
 
-    runtimeOnly("org.ehcache:ehcache:3.9.7")
-    runtimeOnly("org.aspectj:aspectjweaver:1.9.7")
+    runtimeOnly(liveLibs.aspectjweaver.core)
+    runtimeOnly(liveLibs.ehcache.org.core)
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("uk.co.jemos.podam:podam:7.2.7.RELEASE")
-
-    testImplementation("io.qameta.allure:allure-junit5:2.16.1")
-    testImplementation("ru.dcbqa.allureee.annotations:dcb-allure-annotations:1.2.+")
-    testImplementation("ru.dcbqa.swagger.coverage.reporter:swagger-coverage-reporter:2.3.+")
-    testImplementation(group = "au.com.dius.pact.consumer", name = "junit5", version = pactVersion)
-    testImplementation(group = "au.com.dius.pact.provider", name = "junit5", version = pactVersion)
+    testImplementation(testLibs.dcb.allure.annotations)
+    testImplementation(testLibs.junit5.allure)
+    testImplementation(testLibs.bundles.pact)
+    testImplementation(testLibs.podam.core)
+    testImplementation(testLibs.swagger.coverage.reporter)
 }
 
 description = "Service ППРБ.Digital.Партнеры"

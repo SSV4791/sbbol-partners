@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
@@ -43,6 +44,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
                 .offset(0));
         var response = post(
             baseRoutePath + "/view",
+            HttpStatus.OK,
             filter1,
             EmailsResponse.class
         );
@@ -85,7 +87,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
         updateEmail.digitalId(email.getDigitalId());
         updateEmail.email(newEmail);
         updateEmail.setVersion(email.getVersion() + 1);
-        var newUpdateEmail = put(baseRoutePath, updateEmail, EmailResponse.class);
+        var newUpdateEmail = put(baseRoutePath, HttpStatus.OK, updateEmail, EmailResponse.class);
 
         assertThat(newUpdateEmail)
             .isNotNull();
@@ -113,6 +115,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
                 .offset(0));
         var actualEmail = post(
             baseRoutePath + "/view",
+            HttpStatus.OK,
             filter1,
             EmailsResponse.class
         );
@@ -122,13 +125,15 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
         var deleteEmail =
             delete(
                 baseRoutePath + "/{digitalId}" + "/{id}",
+                HttpStatus.NO_CONTENT,
                 contact.getDigitalId(), actualEmail.getEmails().get(0).getId()
-            );
+            ).getBody();
         assertThat(deleteEmail)
             .isNotNull();
 
         var searchEmail = post(
             baseRoutePath + "/view",
+            HttpStatus.OK,
             filter1,
             EmailsResponse.class
         );
@@ -144,7 +149,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     private static Email createEmail(String contactUuid, String digitalId) {
-        var emailResponse = createPost(baseRoutePath, getEmail(contactUuid, digitalId), EmailResponse.class);
+        var emailResponse = post(baseRoutePath, HttpStatus.CREATED, getEmail(contactUuid, digitalId), EmailResponse.class);
         assertThat(emailResponse)
             .isNotNull();
         assertThat(emailResponse.getErrors())
@@ -153,7 +158,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolT
     }
 
     private static Email createEmail(EmailCreate email) {
-        var emailResponse = createPost(baseRoutePath, email, EmailResponse.class);
+        var emailResponse = post(baseRoutePath, HttpStatus.CREATED, email, EmailResponse.class);
         assertThat(emailResponse)
             .isNotNull();
         assertThat(emailResponse.getErrors())

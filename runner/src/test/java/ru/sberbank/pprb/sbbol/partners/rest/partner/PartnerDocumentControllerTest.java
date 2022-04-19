@@ -33,6 +33,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var actualDocument =
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -61,6 +62,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
                 .offset(0));
         var response1 = post(
             baseRoutePath + "/documents/view",
+            HttpStatus.OK,
             filter1,
             DocumentsResponse.class
         );
@@ -77,6 +79,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
                 .offset(0));
         var response2 = post(
             baseRoutePath + "/documents/view",
+            HttpStatus.OK,
             filter2,
             DocumentsResponse.class
         );
@@ -116,7 +119,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
         updateDocument.setVersion(document.getVersion() + 1);
-        DocumentResponse newUpdateDocument = put(baseRoutePath + "/document", updateDocument, DocumentResponse.class);
+        DocumentResponse newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, DocumentResponse.class);
 
         assertThat(newUpdateDocument)
             .isNotNull();
@@ -134,6 +137,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var actualDocument =
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
                 DocumentResponse.class,
                 document.getDigitalId(), document.getId()
             );
@@ -147,14 +151,16 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
         var deleteDocument =
             delete(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.NO_CONTENT,
                 actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getId()
-            );
+            ).getBody();
         assertThat(deleteDocument)
             .isNotNull();
 
         var searchDocument =
-            getNotFound(
+            get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                HttpStatus.NOT_FOUND,
                 Error.class,
                 document.getDigitalId(), document.getId()
             );
@@ -167,7 +173,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
     }
 
     private static Document createValidPartnerDocument(String partnerUuid, String digitalId) {
-        var response = createPost(baseRoutePath + "/document", getValidPartnerDocument(partnerUuid, digitalId), DocumentResponse.class);
+        var response = post(baseRoutePath + "/document", HttpStatus.CREATED, getValidPartnerDocument(partnerUuid, digitalId), DocumentResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getErrors())
@@ -176,7 +182,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationWithOutSbb
     }
 
     private static Document createValidPartnerDocument(DocumentCreate document) {
-        var response = createPost(baseRoutePath + "/document", document, DocumentResponse.class);
+        var response = post(baseRoutePath + "/document", HttpStatus.CREATED, document, DocumentResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getErrors())

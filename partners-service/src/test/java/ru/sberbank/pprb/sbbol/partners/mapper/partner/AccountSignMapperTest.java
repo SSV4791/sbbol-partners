@@ -4,16 +4,16 @@ import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
-import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AccountSignMapperTest extends BaseConfiguration {
+public class AccountSignMapperTest extends BaseUnitConfiguration {
 
     private static final AccountSingMapper mapper = Mappers.getMapper(AccountSingMapper.class);
 

@@ -6,7 +6,7 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
-import io.restassured.response.ResponseBody;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,11 +18,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.sberbank.pprb.sbbol.partners.Runner;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -106,72 +105,25 @@ public abstract class AbstractIntegrationTest {
     protected void initTest() {
     }
 
-    protected static <T> T get(String url, Class<T> response, Object... params) {
+    protected static <T> T get(String url, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
         return given()
             .spec(requestSpec)
             .when()
             .get(url, params)
             .then()
-            .spec(responseSpec)
+            .spec(specResponseHandler(responseHttpStatus))
             .extract()
             .as(response);
     }
 
-    protected static <T> T getNotFound(String url, Class<T> response, Object... params) {
-        return given()
-            .spec(requestSpec)
-            .when()
-            .get(url, params)
-            .then()
-            .spec(notFoundResponseSpec)
-            .extract()
-            .as(response);
-    }
-
-    protected static <T, BODY> T createPost(String url, BODY body, Class<T> response) {
+    protected static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
         return given()
             .spec(requestSpec)
             .body(body)
             .when()
             .post(url)
             .then()
-            .spec(createResponseSpec)
-            .extract()
-            .as(response);
-    }
-
-    protected static <BODY> Error postNotFound(String url, BODY body) {
-        return given()
-            .spec(requestSpec)
-            .body(body)
-            .when()
-            .post(url)
-            .then()
-            .spec(notFoundResponseSpec)
-            .extract()
-            .as(Error.class);
-    }
-
-    protected static <BODY> Error createBadRequestPost(String url, BODY body) {
-        return given()
-            .spec(requestSpec)
-            .body(body)
-            .when()
-            .post(url)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-    }
-
-    protected static <T, BODY> T post(String url, BODY body, Class<T> response) {
-        return given()
-            .spec(requestSpec)
-            .body(body)
-            .when()
-            .post(url)
-            .then()
-            .spec(responseSpec)
+            .spec(specResponseHandler(responseHttpStatus))
             .extract()
             .as(response);
     }
@@ -199,61 +151,38 @@ public abstract class AbstractIntegrationTest {
             .extract();
     }
 
-    protected static <T, BODY> T put(String url, BODY body, Class<T> response) {
+    protected static <T, BODY> T put(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
         return given()
             .spec(requestSpec)
             .body(body)
             .when()
             .put(url)
             .then()
-            .spec(responseSpec)
+            .spec(specResponseHandler(responseHttpStatus))
             .extract()
             .as(response);
     }
 
-    protected static <BODY> Error putNotFound(String url, BODY body) {
-        return given()
-            .spec(requestSpec)
-            .body(body)
-            .when()
-            .put(url)
-            .then()
-            .spec(notFoundResponseSpec)
-            .extract()
-            .as(Error.class);
-    }
-
-    protected static <BODY> Error createBadRequestPut(String url, BODY body) {
-        return given()
-            .spec(requestSpec)
-            .body(body)
-            .when()
-            .put(url)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-    }
-
-    protected static ResponseBody<?> delete(String url, Object... params) {
+    protected static Response delete(String url, HttpStatus responseHttpStatus, Object... params) {
         return given()
             .spec(requestSpec)
             .when()
             .delete(url, params)
             .then()
-            .spec(notContentResponseSpec)
+            .spec(specResponseHandler(responseHttpStatus))
             .extract()
-            .response().getBody();
+            .response();
     }
 
-    protected static Error deleteNotFound(String url, Object... params) {
-        return given()
-            .spec(requestSpec)
-            .when()
-            .delete(url, params)
-            .then()
-            .spec(notFoundResponseSpec)
-            .extract()
-            .as(Error.class);
+    private static ResponseSpecification specResponseHandler(HttpStatus httpStatus) {
+        return switch (httpStatus) {
+            case OK -> responseSpec;
+            case CREATED -> createResponseSpec;
+            case BAD_REQUEST -> createBadRequestResponseSpec;
+            case NO_CONTENT -> notContentResponseSpec;
+            case NOT_FOUND -> notFoundResponseSpec;
+            case INTERNAL_SERVER_ERROR -> internalServerErrorResponseSpec;
+            default -> throw new IllegalStateException("Unexpected value: " + httpStatus);
+        };
     }
 }

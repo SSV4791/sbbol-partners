@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
@@ -21,7 +22,12 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     void testViewBudgetMasks() {
         var filter1 = new BudgetMaskFilter()
             .maskType(BudgetMaskForm.BUDGET_ACCOUNT);
-        var response = post(baseRoutePath + "/view", filter1, BudgetMasksResponse.class);
+        var response = post(
+            baseRoutePath + "/view",
+            HttpStatus.OK,
+            filter1,
+            BudgetMasksResponse.class
+        );
         assertThat(response)
             .isNotNull();
     }
@@ -35,14 +41,19 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
             .mask(mask)
             .condition(mask)
             .maskType(BudgetMaskForm.BIC);
-        var saveDocument = createPost(baseRoutePath, budgetMask, BudgetMask.class);
+        var saveDocument = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            budgetMask,
+            BudgetMask.class
+        );
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getMask())
             .isEqualTo(mask);
         var filter1 = new BudgetMaskFilter()
             .maskType(BudgetMaskForm.BIC);
-        var searchDocument = post(baseRoutePath + "/view", filter1, BudgetMasksResponse.class);
+        var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, filter1, BudgetMasksResponse.class);
         assertThat(searchDocument.getMasks())
             .contains(saveDocument);
     }
@@ -55,21 +66,26 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
             .mask("Рик и Морти")
             .condition("%Рик и Морти%")
             .maskType(BudgetMaskForm.BUDGET_CORR_ACCOUNT);
-        var saveDocument = createPost(baseRoutePath, budgetMask, BudgetMask.class);
+        var saveDocument = post(baseRoutePath, HttpStatus.CREATED, budgetMask, BudgetMask.class);
         assertThat(saveDocument)
             .isNotNull();
 
         var filter1 = new BudgetMaskFilter()
             .maskType(BudgetMaskForm.BUDGET_CORR_ACCOUNT);
-        var searchDocument = post(baseRoutePath + "/view", filter1, BudgetMasksResponse.class);
+        var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, filter1, BudgetMasksResponse.class);
         assertThat(searchDocument.getMasks())
             .contains(saveDocument);
 
-        var deleteBudgetMask = delete(baseRoutePath + "/{id}", saveDocument.getId());
+        var deleteBudgetMask =
+            delete(
+                baseRoutePath + "/{id}",
+                HttpStatus.NO_CONTENT,
+                saveDocument.getId()
+            ).getBody();
         assertThat(deleteBudgetMask)
             .isNotNull();
 
-        var newSearchDocument = post(baseRoutePath + "/view", filter1, BudgetMasksResponse.class);
+        var newSearchDocument = post(baseRoutePath + "/view", HttpStatus.OK, filter1, BudgetMasksResponse.class);
         assertThat(newSearchDocument.getMasks())
             .doesNotContain(saveDocument);
     }

@@ -57,6 +57,7 @@ pr_check:
         - 'gradle.properties'
         - 'settings.gradle.kts'
         - 'jenkins/settings.yml'
+        - 'jenkins/test.groovy'
     cpu: 1
     memory: '2g'
     command: >-

@@ -6,16 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentCertifierType;
-import ru.sberbank.pprb.sbbol.partners.mapper.config.BaseConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-class DocumentMapperTest extends BaseConfiguration {
+class DocumentMapperTest extends BaseUnitConfiguration {
 
     private DocumentMapper mapper;
 
