@@ -1,8 +1,8 @@
 @startuml
 'https://plantuml.com/sequence-diagram
 autonumber
-==Изменение счетов==
-Клиент -> ППРБ.Партнеры: PUT /partners/account
+==Создание подписи==
+Клиент -> ППРБ.Партнеры: POST /partner/accounts/sign
 ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
 alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
 СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
@@ -16,22 +16,14 @@ alt#gold Есть запись в таблице account
 ППРБ.Партнеры -> ППРБ.Партнеры: Проверка на наличие у аккаунта значения SIGN
 alt#gold state.SIGNED
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 403 [аккаунт подписан]
+ППРБ.Партнеры --> Клиент: Error 400 [аккаунт подписан]
 end
-END
-alt#gold state.NOT_SIGNED
-ППРБ.Партнеры -> ППРБ.Партнеры: Поиск партнера в partner
-alt#gold Есть запись в таблице partner
-ППРБ.Партнеры -> ППРБ.Партнеры: Обновление данных в таблицах account, bank, bank_account
+Else state.NOT_SIGNED
+ППРБ.Партнеры -> ППРБ.Партнеры: Обновление данных в таблицах account.sign и создание записи в таблице sign
 ППРБ.Партнеры --> Клиент: 200
 ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid}
-alt#gold Если 200
 ППРБ.Партнеры -> СББОЛ: /update/{digitalId} (изменение контрагента по account.uuid = correspondent.pprb_guid)
 СББОЛ -> ППРБ.Партнеры: 200
-else 404
-ППРБ.Партнеры -> СББОЛ: /create/{digitalId}
-СББОЛ -> ППРБ.Партнеры: 200
-end
 group#Gold #pink negative
 СББОЛ --> ППРБ.Партнеры: Error 40*/50*
 ППРБ.Партнеры -> ФП.Журналирование: Отправка месседжа в СББОЛ через кафку
@@ -39,11 +31,6 @@ group#Gold #pink negative
 Мониторинг -> BRAIN_TEAM: Разбор ошибки и подготовка исправлений
 СББОЛ ->> ФП.Журналирование: Считывание очереди
 СББОЛ -> СББОЛ: Создание записи
-end
-else Нет записи в partner
-break#Gold #pink Нет записи, прерывание операции
-ППРБ.Партнеры --> Клиент: 404 ошибка
-end
 end
 end
 else Нет записи в account
