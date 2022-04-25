@@ -5,31 +5,31 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Table(
-    name = "document_type_dictionary",
+    name = "legal_form_document_type",
     indexes = {
-        @Index(name = "i_document_type_dictionary_system_name", columnList = "system_name")
+        @Index(name = "legal_form_document_type_pkey", columnList = "uuid"),
+        @Index(name = "i_document_type_uuid", columnList = "document_type_uuid")
     }
 )
 @DynamicUpdate
 @DynamicInsert
 @Entity
-public class DocumentTypeEntity implements Serializable, HashKeyProvider {
+public class DocumentTypeLegalFormEntity implements Serializable, HashKeyProvider {
 
     @Serial
     private static final long serialVersionUID = 1;
@@ -40,17 +40,12 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID uuid;
 
-    @Column(name = "system_name", nullable = false, length = 50)
-    private String systemName;
+    @Column(name = "legal_form", nullable = false, length = 100)
+    private String legalForm;
 
-    @Column(name = "description", length = 100)
-    private String description;
-
-    @Column(name = "deleted")
-    private Boolean deleted;
-
-    @OneToMany(mappedBy = "documentType", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DocumentTypeLegalFormEntity> legalForms;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_type_uuid")
+    private DocumentTypeEntity documentType;
 
     public UUID getUuid() {
         return uuid;
@@ -60,39 +55,20 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
         this.uuid = uuid;
     }
 
-    public Boolean getDeleted() {
-        return deleted;
+    public String getLegalForm() {
+        return legalForm;
     }
 
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
+    public void setLegalForm(String legalForm) {
+        this.legalForm = legalForm;
     }
 
-    public String getDescription() {
-        return description;
+    public DocumentTypeEntity getDocumentType() {
+        return documentType;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getSystemName() {
-        return systemName;
-    }
-
-    public void setSystemName(String systemName) {
-        this.systemName = systemName;
-    }
-
-    public List<DocumentTypeLegalFormEntity> getLegalForms() {
-        if (legalForms == null) {
-            return new ArrayList<>();
-        }
-        return legalForms;
-    }
-
-    public void setLegalForms(List<DocumentTypeLegalFormEntity> legalForms) {
-        this.legalForms = legalForms;
+    public void setDocumentType(DocumentTypeEntity documentType) {
+        this.documentType = documentType;
     }
 
     @Override
@@ -108,7 +84,7 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        DocumentTypeEntity that = (DocumentTypeEntity) obj;
+        DocumentTypeLegalFormEntity that = (DocumentTypeLegalFormEntity) obj;
         if (getUuid() == null || that.getUuid() == null) {
             return false;
         }
@@ -117,6 +93,6 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
 
     @Override
     public String getHashKey() {
-        return getUuid().toString();
+        return getDocumentType().getHashKey();
     }
 }

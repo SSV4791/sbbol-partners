@@ -16,10 +16,6 @@
       "type": "string",
       "title": "Описание Типа удостоверяющего документа"
     },
-    "deleted": {
-      "type": "boolean",
-      "title": "Признак 'удалён' если в 'true'"
-    },
     "legalForms": {
       "type": "array",
       "title": "Тип субъекта документа",

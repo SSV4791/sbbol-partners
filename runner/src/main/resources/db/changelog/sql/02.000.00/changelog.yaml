@@ -30,7 +30,16 @@ databaseChangeLog:
       file: 1640011241325_create_partners_structure_document_type_dictionary.sql
       relativeToChangelogFile: true
   - include:
+      file: 1640011241335_create_legal_form_document_type_links_document_type_dictionary.sql
+      relativeToChangelogFile: true
+  - include:
       file: 1640012868071_create_partners_structure_fill_document_type.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1640012868072_create_funcion_generate_uuid.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1640012868073_create_table_filling_script_subject_document_type.sql
       relativeToChangelogFile: true
   - include:
       file: 1640097483333_delete_dataspace_structure.sql
@@ -51,11 +60,8 @@ databaseChangeLog:
       file: 1644490063755_create_dictionary_structure_gku.sql
       relativeToChangelogFile: true
   - include:
-      file: 1648723867900_create_funcion_generate_uuid.sql
-      relativeToChangelogFile: true
-  - include:
       file: 1648723867913_migrate_renter_to_partner.sql
       relativeToChangelogFile: true
   - include:
-      file: 1649170752324_drop_funcion_generate_uuid.sql
+      file: 1648723867914_drop_funcion_generate_uuid.sql
       relativeToChangelogFile: true
