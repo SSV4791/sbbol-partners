@@ -5,13 +5,13 @@ info:
   description: OpenAPI Specification for renter
 
 paths:
-  /renter/create:
+  /sbbol-partners/renter/create:
     $ref: create.yaml
-  /renter/get:
+  /sbbol-partners/renter/get:
     $ref: get.yaml
-  /renter/update:
+  /sbbol-partners/renter/update:
     $ref: update.yaml
-  /renter/view:
+  /sbbol-partners/renter/view:
     $ref: view.yaml
-  /renter/version:
+  /sbbol-partners/renter/version:
     $ref: version.yaml
