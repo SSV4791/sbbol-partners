@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.renter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
-import ru.sberbank.pprb.sbbol.renter.RenterApi;
+import ru.sberbank.pprb.sbbol.renter.SbbolPartnersApi;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterIdentifier;
@@ -13,7 +13,7 @@ import ru.sberbank.pprb.sbbol.renter.model.Version;
 import javax.validation.Valid;
 
 @RestController
-public class RenterController implements RenterApi {
+public class RenterController implements SbbolPartnersApi {
 
     private final RenterService renterService;
 
