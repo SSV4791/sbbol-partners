@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
+import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
@@ -13,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,21 +77,77 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
     void testUpdatePartnerPhone() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var phone = createPhone(partner.getId(), partner.getDigitalId());
-        String newPhone = "bbbb@sber.ru";
-
-        var updatePhone = new Phone();
-        updatePhone.id(phone.getId());
-        updatePhone.unifiedId(phone.getUnifiedId());
-        updatePhone.digitalId(phone.getDigitalId());
-        updatePhone.phone(newPhone);
-        updatePhone.setVersion(phone.getVersion() + 1);
-        var newUpdatePhone = put(baseRoutePath, HttpStatus.OK, updatePhone, PhoneResponse.class);
-
+        var newUpdatePhone = put(
+            baseRoutePath,
+            HttpStatus.OK,
+            updatePhone(phone),
+            PhoneResponse.class
+        );
         assertThat(newUpdatePhone)
             .isNotNull();
         assertThat(newUpdatePhone.getPhone().getPhone())
-            .isEqualTo(newPhone);
+            .isEqualTo(newUpdatePhone.getPhone().getPhone());
+        assertThat(phone.getPhone())
+            .isNotEqualTo(newUpdatePhone.getPhone().getPhone());
         assertThat(newUpdatePhone.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("36950")
+    void negativeTestUpdatePhoneVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var phone = createPhone(partner.getId(), partner.getDigitalId());
+        Long version = phone.getVersion() + 1;
+        phone.setVersion(version);
+        var phoneError = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            updatePhone(phone),
+            Error.class
+        );
+        assertThat(phoneError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(phoneError.getText())
+            .contains("Версия записи в базе данных " + (phone.getVersion() - 1) +
+                " не равна версии записи в запросе version=" + version);
+    }
+
+    @Test
+    @AllureId("36949")
+    void positiveTestUpdatePhoneVersion() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var phone = createPhone(partner.getId(), partner.getDigitalId());
+        var updatePhone = put(
+            baseRoutePath,
+            HttpStatus.OK,
+            updatePhone(phone),
+            PhoneResponse.class
+        );
+        var checkPhone = new PhonesFilter();
+        checkPhone.digitalId(updatePhone.getPhone().getDigitalId());
+        checkPhone.unifiedIds(Collections.singletonList(updatePhone.getPhone().getUnifiedId()));
+        checkPhone.pagination(new Pagination()
+            .count(4)
+            .offset(0));
+        var response = post(
+            baseRoutePath + "/view",
+            HttpStatus.OK,
+            checkPhone,
+            PhonesResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPhones())
+            .isNotNull();
+        assertThat(response.getPhones()
+            .stream()
+            .filter(curPhone -> curPhone.getId()
+                .equals(phone.getId()))
+            .map(Phone::getVersion)
+            .findAny()
+            .orElse(null))
+            .isEqualTo(phone.getVersion() + 1);
+        assertThat(response.getErrors())
             .isNull();
     }
 
@@ -159,5 +217,14 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationWithOutSbbolT
         assertThat(phoneResponse.getErrors())
             .isNull();
         return phoneResponse.getPhone();
+    }
+
+    public static Phone updatePhone(Phone phone) {
+        return new Phone()
+            .phone(RandomStringUtils.randomNumeric(12))
+            .id(phone.getId())
+            .version(phone.getVersion())
+            .unifiedId(phone.getUnifiedId())
+            .digitalId(phone.getDigitalId());
     }
 }

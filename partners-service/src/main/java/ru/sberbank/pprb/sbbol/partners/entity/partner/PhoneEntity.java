@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -39,5 +40,25 @@ public class PhoneEntity extends PhoneBaseEntity {
     @Override
     public String getHashKey() {
         return getUnifiedUuid().toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        PhoneEntity that = (PhoneEntity) obj;
+        if (getUuid() == null || that.getUuid() == null) {
+            return false;
+        }
+        return Objects.equals(getUuid(), that.getUuid());
+    }
+
+    @Override
+    public int hashCode() {
+        return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
     }
 }

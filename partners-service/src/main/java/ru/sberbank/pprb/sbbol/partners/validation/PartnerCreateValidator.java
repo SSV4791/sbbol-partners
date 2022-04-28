@@ -16,6 +16,7 @@ public class PartnerCreateValidator implements Validator<PartnerCreate> {
     public static final String DEFAULT_MESSAGE_FIELD_IS_NULL = "default.field.is_null";
     public static final String DEFAULT_MESSAGE_FIELDS_IS_NULL = "default.fields.is_null";
     public static final String DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER = "default.field.control_number";
+    public static final String DEFAULT_MESSAGE_INN_LENGTH = "partner.inn_length";
 
     public static final String LEGAL_FORM_LEGAL_ENTITY = "legalForm.LEGAL_ENTITY";
     public static final String LEGAL_FORM_ENTREPRENEUR = "legalForm.ENTREPRENEUR";
@@ -38,9 +39,7 @@ public class PartnerCreateValidator implements Validator<PartnerCreate> {
             if (entity.getOrgName() == null) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "orgName", LEGAL_FORM_LEGAL_ENTITY));
             }
-            if (entity.getInn() == null) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "inn", LEGAL_FORM_LEGAL_ENTITY));
-            } else if (!checkInn(entity.getInn())) {
+            if (entity.getInn() != null && !checkInn(entity.getInn())) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
             }
             if (entity.getKpp() != null && entity.getKpp().length() != BasePartnerValidation.KPP_VALID_LENGTH) {
@@ -53,8 +52,8 @@ public class PartnerCreateValidator implements Validator<PartnerCreate> {
             if (entity.getOrgName() == null) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "orgName", LEGAL_FORM_ENTREPRENEUR));
             }
-            if (entity.getInn() == null) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "inn", LEGAL_FORM_ENTREPRENEUR));
+            if (entity.getInn() != null && !checkInn(entity.getInn())) {
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
             }
             if (entity.getOgrn() != null && !checkOgrn(entity.getOgrn())) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ogrn"));
@@ -63,8 +62,11 @@ public class PartnerCreateValidator implements Validator<PartnerCreate> {
             if (entity.getFirstName() == null) {
                 errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "firstName", LEGAL_FORM_PHYSICAL_PERSON));
             }
-            if (entity.getSecondName() == null) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "secondName", LEGAL_FORM_PHYSICAL_PERSON));
+            if (entity.getInn() != null && entity.getInn().length() != 12) {
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_INN_LENGTH, "inn", LEGAL_FORM_PHYSICAL_PERSON));
+            }
+            if (entity.getInn() != null && !checkInn(entity.getInn())) {
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
             }
         }
     }

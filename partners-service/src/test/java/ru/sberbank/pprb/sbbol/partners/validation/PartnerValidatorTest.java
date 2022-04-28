@@ -40,6 +40,20 @@ class PartnerValidatorTest {
     }
 
     @Test
+    @AllureId("37096")
+    void testCheckKio5SymbolValid() {
+        assertThat(Boolean.TRUE)
+            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerValidation.class, "checkInn", "12345"));
+    }
+
+    @Test
+    @AllureId("37097")
+    void testCheckKio5SymbolNotValid() {
+        assertThat(Boolean.FALSE)
+            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerValidation.class, "checkInn", "123456"));
+    }
+
+    @Test
     @AllureId("34108")
     void testCheckOgrn13Symbol() {
         assertThat(Boolean.TRUE)

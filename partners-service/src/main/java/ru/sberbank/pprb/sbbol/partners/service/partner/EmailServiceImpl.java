@@ -81,9 +81,9 @@ abstract class EmailServiceImpl implements EmailService {
         var uuid = UUID.fromString(email.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
-        if (email.getVersion() <= foundEmail.getVersion()) {
-            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundEmail.getVersion() +
-                " больше или равна версии документа в запросе version=" + email.getVersion());
+        if (!email.getVersion().equals(foundEmail.getVersion())) {
+            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundEmail.getVersion() +
+                " не равна версии записи в запросе version=" + email.getVersion());
         }
         emailMapper.updateEmail(email, foundEmail);
         var savedEmail = emailRepository.save(foundEmail);

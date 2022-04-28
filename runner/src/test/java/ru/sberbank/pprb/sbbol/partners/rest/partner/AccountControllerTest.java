@@ -20,6 +20,7 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -164,27 +165,63 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
     void testUpdateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        String newName = "Новое наименование";
-        var updatedAccount = new AccountChange()
-            .id(account.getId())
-            .partnerId(account.getPartnerId())
-            .digitalId(account.getDigitalId())
-            .version(account.getVersion() + 1)
-            .budget(account.getBudget())
-            .name(newName)
-            .account(account.getAccount())
-            .bank(account.getBank());
-        var newUpdateAccount = put(
+        var updateAccount = put(
             baseRoutePath + "/account",
             HttpStatus.OK,
-            updatedAccount,
+            updateAccount(account),
             AccountResponse.class
         );
-        assertThat(newUpdateAccount)
+        assertThat(updateAccount)
             .isNotNull();
-        assertThat(newUpdateAccount.getAccount().getName())
-            .isEqualTo(newName);
-        assertThat(newUpdateAccount.getErrors())
+        assertThat(updateAccount.getAccount().getName())
+            .isNotEqualTo(account.getName());
+        assertThat(updateAccount.getAccount().getName())
+            .isEqualTo(updateAccount.getAccount().getName());
+        assertThat(updateAccount.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("36930")
+    void negativeTestUpdateAccountVersion() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        Long version = account.getVersion() + 1;
+        account.setVersion(version);
+        var accountError = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccount(account),
+            Error.class
+        );
+        assertThat(accountError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(accountError.getText())
+            .contains("Версия записи в базе данных " + (account.getVersion() - 1) +
+                " не равна версии записи в запросе version=" + version);
+    }
+
+    @Test
+    @AllureId("36929")
+    void positiveTestUpdateAccountVersion() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var accountVersion = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            updateAccount(account),
+            AccountResponse.class
+        );
+        var checkAccount = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AccountResponse.class,
+            accountVersion.getAccount().getDigitalId(), accountVersion.getAccount().getId());
+        assertThat(checkAccount)
+            .isNotNull();
+        assertThat(checkAccount.getAccount().getVersion())
+            .isEqualTo(account.getVersion() + 1);
+        assertThat(checkAccount.getErrors())
             .isNull();
     }
 
@@ -368,5 +405,20 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
             getValidPriorityAccount(accountId, digitalId),
             Error.class
         );
+    }
+
+    public static AccountChange updateAccount(Account account) {
+        return new AccountChange()
+            .name(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account(account.getAccount())
+            .bank(account.getBank()
+                .bic(account.getBank().getBic())
+                .name(account.getBank().getName())
+                .bankAccount(account.getBank().getBankAccount()
+                    .account(account.getBank().getBankAccount().getAccount())));
     }
 }

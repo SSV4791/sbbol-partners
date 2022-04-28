@@ -30,7 +30,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34209")
     void testGetPartner() {
         var partner = getValidPartner();
-        var createdPartner = post(baseRoutePath, HttpStatus.CREATED, partner, PartnerResponse.class);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            PartnerResponse.class
+        );
         assertThat(createdPartner)
             .isNotNull();
 
@@ -38,7 +43,8 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             PartnerResponse.class,
-            createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getId()
+            createdPartner.getPartner().getDigitalId(),
+            createdPartner.getPartner().getId()
         );
         assertThat(actualPartner)
             .isNotNull();
@@ -51,11 +57,21 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34174")
     void testGetOnePartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -67,7 +83,11 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -78,11 +98,21 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34151")
     void testGetSearchInnPartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -98,7 +128,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -109,12 +144,22 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34141")
     void testGetSearchBudgetPartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
         createValidBudgetAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -127,7 +172,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -138,11 +188,21 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34124")
     void testGetSearchOrgNamePartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -158,7 +218,11 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -169,11 +233,21 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34186")
     void testGetSearchFIOPartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -189,7 +263,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -200,11 +279,22 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34127")
     void testGetSearchLegalPersonPartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+
+            getValidPhysicalPersonPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -217,7 +307,11 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -228,11 +322,21 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34128")
     void testGetSearchPhysicalPersonPartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPhysicalPersonPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -245,7 +349,11 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -256,11 +364,21 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34199")
     void testGetSearchEntrepreneurPersonPartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidEntrepreneurPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidEntrepreneurPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -273,7 +391,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -284,12 +407,22 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34209")
     void testGetPartnersNotSignedAccount() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
         createValidAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidEntrepreneurPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidEntrepreneurPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -302,7 +435,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -313,13 +451,23 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34132")
     void testGetPartnersSignedAccount() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
         var validAccount = createValidAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
         createValidAccountSign(createdPartner1.getPartner().getDigitalId(), validAccount.getId());
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidEntrepreneurPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidEntrepreneurPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
@@ -332,7 +480,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(1)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -344,15 +497,30 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34148")
     void testGetAllPartners() {
         var digitalId = randomAlphabetic(10);
-        var createdPartner1 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner1)
             .isNotNull();
 
-        var createdPartner2 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner2)
             .isNotNull();
 
-        var createdPartner3 = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createdPartner3 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class
+        );
         assertThat(createdPartner3)
             .isNotNull();
 
@@ -364,7 +532,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
                 .count(2)
         );
 
-        var response = post("/partners/view", HttpStatus.OK, filter, PartnersResponse.class);
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
         assertThat(response)
             .isNotNull();
         assertThat(response.getPartners().size())
@@ -403,11 +576,21 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     @AllureId("34207")
     void testUpdatePartner() {
         var partner = getValidPartner();
-        var createdPartner = post(baseRoutePath, HttpStatus.CREATED, partner, PartnerResponse.class);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            PartnerResponse.class
+        );
         String newKpp = "999999999";
         var updatePartner = createdPartner.getPartner();
         updatePartner.kpp(newKpp);
-        PartnerResponse newUpdatePartner = put(baseRoutePath, HttpStatus.OK, updatePartner, PartnerResponse.class);
+        PartnerResponse newUpdatePartner = put(
+            baseRoutePath,
+            HttpStatus.OK,
+            updatePartner,
+            PartnerResponse.class
+        );
 
         assertThat(updatePartner)
             .isNotNull();
@@ -418,13 +601,59 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     @Test
+    @AllureId("36943")
+    void negativeTestUpdatePartnerVersion() {
+        var partner = createValidPartner();
+        Long version = partner.getVersion() + 1;
+        partner.setVersion(version);
+        var partnerError = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            updatePartner(partner),
+            Error.class
+        );
+        assertThat(partnerError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(partnerError.getText())
+            .contains("Версия записи в базе данных " + (partner.getVersion() - 1) +
+                " не равна версии записи в запросе version=" + version);
+    }
+
+    @Test
+    @AllureId("36944")
+    void positiveTestUpdatePartnerVersion() {
+        var partner = createValidPartner();
+        var updatePartner = put(
+            baseRoutePath,
+            HttpStatus.OK,
+            updatePartner(partner),
+            PartnerResponse.class
+        );
+        var checkPartner = get(
+            baseRoutePath + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            PartnerResponse.class,
+            updatePartner.getPartner().getDigitalId(), updatePartner.getPartner().getId());
+        assertThat(checkPartner)
+            .isNotNull();
+        assertThat(checkPartner.getPartner().getVersion())
+            .isEqualTo(partner.getVersion() + 1);
+        assertThat(checkPartner.getErrors())
+            .isNull();
+    }
+
+    @Test
     @AllureId("34197")
     void testDeletePartner() {
-        var createdPartner = post(baseRoutePath, HttpStatus.CREATED, getValidPartner(), PartnerResponse.class);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(),
+            PartnerResponse.class
+        );
         assertThat(createdPartner)
             .isNotNull();
-        var actualPartner =
-            get(
+        var actualPartner = get(
                 baseRoutePath + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 PartnerResponse.class,
@@ -487,6 +716,7 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {
         var partner = getValidPartner(digitalId);
         partner.setLegalForm(LegalForm.PHYSICAL_PERSON);
+        partner.setInn("521031961500");
         return partner;
     }
 
@@ -497,14 +727,23 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     }
 
     protected static Partner createValidPartner() {
-        var createPartner = post("/partner", HttpStatus.CREATED, getValidPartner(), PartnerResponse.class);
+        var createPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(),
+            PartnerResponse.class
+        );
         assertThat(createPartner)
             .isNotNull();
         return createPartner.getPartner();
     }
 
     protected static Partner createValidPartner(String digitalId) {
-        var createPartner = post("/partner", HttpStatus.CREATED, getValidPartner(digitalId), PartnerResponse.class);
+        var createPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            PartnerResponse.class);
         assertThat(createPartner)
             .isNotNull();
         return createPartner.getPartner();
@@ -513,6 +752,20 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
     private static Error createNotValidPartner() {
         var partner = getValidPartner();
         partner.setInn("222222");
-        return post("/partner", HttpStatus.BAD_REQUEST, partner, Error.class);
+        return post(baseRoutePath, HttpStatus.BAD_REQUEST, partner, Error.class);
+    }
+
+    public static Partner updatePartner(Partner partner) {
+        return new Partner()
+            .id(partner.getId())
+            .digitalId(partner.getDigitalId())
+            .legalForm(partner.getLegalForm())
+            .orgName(partner.getOrgName())
+            .secondName(partner.getSecondName())
+            .middleName(partner.getMiddleName())
+            .phones(partner.getPhones())
+            .emails(partner.getEmails())
+            .firstName(randomAlphabetic(10))
+            .version(partner.getVersion());
     }
 }

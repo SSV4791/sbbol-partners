@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
+import ru.sberbank.pprb.sbbol.partners.exception.SignAccountException;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 import javax.persistence.EntityNotFoundException;
@@ -58,6 +59,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleObjectBadRequestException(Exception ex, HttpServletRequest httpRequest) {
         LOG.error("Ошибка заполнения объекта", ex);
         return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), httpRequest.getRequestURL());
+    }
+
+    @ExceptionHandler({SignAccountException.class})
+    protected ResponseEntity<Object> handleSignAccountException(SignAccountException ex, HttpServletRequest httpRequest) {
+        LOG.error("Ошибка заполнения объекта", ex);
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrors(), httpRequest.getRequestURL());
     }
 
     @ExceptionHandler(Exception.class)

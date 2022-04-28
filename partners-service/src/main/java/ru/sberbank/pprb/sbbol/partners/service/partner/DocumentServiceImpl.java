@@ -99,9 +99,9 @@ abstract class DocumentServiceImpl implements DocumentService {
         }
         var foundDocument = documentRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId()));
-        if (document.getVersion() <= foundDocument.getVersion()) {
-            throw new OptimisticLockingFailureException("Версия документа в базе данных " + foundDocument.getVersion() +
-                " больше или равна версии документа в запросе version=" + document.getVersion());
+        if (!document.getVersion().equals(foundDocument.getVersion())) {
+            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundDocument.getVersion() +
+                " не равна версии записи в запросе version=" + document.getVersion());
         }
         documentMapper.updateDocument(document, foundDocument);
         var saveContact = documentRepository.save(foundDocument);

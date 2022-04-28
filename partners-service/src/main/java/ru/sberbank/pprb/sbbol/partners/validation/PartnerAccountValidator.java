@@ -26,6 +26,9 @@ public class PartnerAccountValidator implements Validator<AccountChange> {
         if (entity.getDigitalId() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "digitalId"));
         }
+        if (entity.getVersion() == null) {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "version"));
+        }
         if (entity.getAccount() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "account"));
         }
