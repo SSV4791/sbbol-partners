@@ -1,7 +1,79 @@
 ==	Интеграции
 
 === Интеграции с внешними АС-потребителями
++++ </div>
+</details> +++
++++ <details><summary> +++
+`ППРБ ЮЛ DigitalApi`
++++ </summary><div> +++
 
+----
+Протокол: `HTTPS`
+OTT: да
+Формат сообщений: JSON
+----
+
++++ </div>
+</details> +++
++++ <details><summary> +++
+`ЕФС.ЮЛ СберБизнес ЭДО. Web`
++++ </summary><div> +++
+
+----
+Протокол: `HTTPS`
+OTT: да
+Формат сообщений: JSON
+----
++++ </div>
+</details> +++
++++ <details><summary> +++
+`ЕФС.ЮЛ СберБизнес ЭДО. Mobile`
++++ </summary><div> +++
+
+----
+Протокол: `HTTPS`
+OTT: да
+Формат сообщений: JSON
+----
+
++++ </div>
+</details> +++
++++ <details><summary> +++
+`SBBOL`
++++ </summary><div> +++
+
+----
+Протокол: `HTTPS`
+OTT: да
+Формат сообщений: JSON
+----
+
++++ </div>
+</details> +++
++++ <details><summary> +++
+`ЕФС.ЮЛ.СберБизнес.Контрагенты MOBILE`
++++ </summary><div> +++
+
+----
+Протокол: `HTTPS`
+OTT: да
+Формат сообщений: JSON
+----
+
++++ </div>
+</details> +++
++++ <details><summary> +++
+`ЕФС.ЮЛ.СберБизнес.Контрагенты WEB`
++++ </summary><div> +++
+
+----
+Протокол: `HTTPS`
+OTT: да
+Формат сообщений: JSON
+----
+
++++ </div>
+</details> +++
 +++ <details><summary> +++
 `ЕФС.ЮЛ.СберБизнес.Аренда недвижимости`
 +++ </summary><div> +++
@@ -44,6 +116,18 @@ OTT: да
 Нет
 
 ===	Интеграции с платформенными сервисами
+
++++ <details><summary> +++
+`Аудит`
++++ </summary><div> +++
+----
+Аудит ППРБ ЮЛ Платформа.SYS604.10.01 Аудит используется для сбора событий аудита
+Транспорт: REST
+Протокол: HTTP
+Компоненты: sbbol-partners
+Мануал: https://confluence.sberbank.ru/pages/viewpage.action?pageId=1239420806
+----
++++ </div></details> +++
 
 +++ <details><summary> +++
 `Прикладной журнал`
