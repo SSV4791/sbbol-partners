@@ -4,11 +4,13 @@ import io.qameta.allure.AllureId;
 import io.restassured.common.mapper.TypeRef;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
-import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuRequest;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
+import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuRequest;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collection;
 
@@ -16,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class GkuMigrationServiceTest extends AbstractIntegrationWithOutSbbolTest {
+
+    @Autowired
+    private PodamFactory podamFactory;
 
     private static final String JSON_RPC_REQUEST_ID = RandomStringUtils.randomAlphanumeric(10);
     private static final String JSON_RPC_VERSION = "2.0";
@@ -33,7 +38,7 @@ public class GkuMigrationServiceTest extends AbstractIntegrationWithOutSbbolTest
     @AllureId("34430")
     void migrateFewCorrespondentsTest() {
         @SuppressWarnings("unchecked")
-        Collection<MigrationGkuCandidate> collection = factory.manufacturePojo(Collection.class, MigrationGkuCandidate.class);
+        Collection<MigrationGkuCandidate> collection = podamFactory.manufacturePojo(Collection.class, MigrationGkuCandidate.class);
         request.setParams(new MigrateGkuRequest(collection));
         JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {});
         assertNotNull(response);

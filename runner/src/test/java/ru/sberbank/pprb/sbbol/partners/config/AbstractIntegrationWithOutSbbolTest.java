@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.config;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

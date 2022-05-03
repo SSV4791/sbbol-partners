@@ -22,8 +22,9 @@ COMMENT ON COLUMN SIGN.ENTITY_UUID IS 'Глобальный уникальный
 COMMENT ON COLUMN SIGN.DIGEST IS 'Дайджест';
 COMMENT ON COLUMN SIGN.SIGN IS 'Подпись';
 COMMENT ON COLUMN SIGN.PARTNER_UUID IS 'Уникальный идентификатор Партнера';
-COMMENT ON COLUMN SIGN.ACCOUNT_UUID IS 'Уникальный идентификатор акаунта';
+COMMENT ON COLUMN SIGN.ACCOUNT_UUID IS 'Уникальный идентификатор счёта';
 COMMENT ON COLUMN SIGN.EXTERNAL_DATA_FILE_ID IS 'Идентификатор созданного документа в ЕСМ';
 COMMENT ON COLUMN SIGN.EXTERNAL_DATA_SIGN_FILE_ID IS 'Идентификатор созданного файла клиентской подписи документа в ЕСМ';
+COMMENT ON COLUMN SIGN.DATE_TIME_OF_SIGN IS 'Дата подписания документа';
 
 CREATE UNIQUE INDEX I_SIGN_ACCOUNT_UUID ON SIGN (ACCOUNT_UUID);

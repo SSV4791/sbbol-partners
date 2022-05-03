@@ -1,13 +1,17 @@
 ---
 integration_entries:
+  - "{{ int.dynatrace.latest.servers }}"
+  - "{{ int.ott.v2_0 }}"
   - "{{ int.pprb.appjournal.v1_0 }}"
+  - "{{ int.pprb.audit.v1_0 }}"
   - "{{ int.pprb.db_main.v1_0 }}"
   - "{{ int.pprb.db_si.v1_0 }}"
-  - "{{ int.sbbol.rest_in.latest }}"
   - "{{ int.pprb.fluentbit.v1_0 }}"
+  - "{{ int.sbbol.rest_in.latest }}"
 
 int_entry:
   pprb:
+    audit: "{{ int.pprb.audit.v1_0 }}"
     db_main: "{{ int.pprb.db_main.v1_0 }}"
     db_si: "{{ int.pprb.db_si.v1_0 }}"
   sbbol:

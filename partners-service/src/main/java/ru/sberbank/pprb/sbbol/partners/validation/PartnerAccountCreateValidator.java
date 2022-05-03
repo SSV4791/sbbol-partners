@@ -5,10 +5,11 @@ import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
-import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation;
 
 import java.util.List;
 
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation.ACCOUNT_VALID_LENGTH;
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation.BIC_VALID_LENGTH;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation.bankAccountValid;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation.userAccountValid;
 
@@ -27,7 +28,7 @@ public class PartnerAccountCreateValidator implements Validator<AccountCreate> {
         if (entity.getAccount() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "account"));
         }
-        if (entity.getAccount().length() != BasePartnerAccountValidation.ACCOUNT_VALID_LENGTH) {
+        if (entity.getAccount().length() != ACCOUNT_VALID_LENGTH) {
             errors.add(MessagesTranslator.toLocale("account.account.length"));
         }
         if (entity.getBank() == null) {
@@ -42,7 +43,7 @@ public class PartnerAccountCreateValidator implements Validator<AccountCreate> {
         if (bank.getBic() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bic"));
         }
-        if (bank.getBic().length() != BasePartnerAccountValidation.BIC_VALID_LENGTH) {
+        if (bank.getBic().length() != BIC_VALID_LENGTH) {
             errors.add("account.bic.length");
         }
         if (bank.getName() == null) {

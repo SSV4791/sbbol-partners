@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -51,6 +51,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
@@ -190,7 +191,8 @@ public class PartnerServiceConfiguration {
         AccountRepository accountRepository,
         ReplicationService replicationService,
         LegacySbbolAdapter legacySbbolAdapter,
-        BudgetMaskService budgetMaskService
+        BudgetMaskService budgetMaskService,
+        AuditAdapter auditAdapter
     ) {
         return new AccountServiceImpl(
             partnerRepository,
@@ -198,6 +200,7 @@ public class PartnerServiceConfiguration {
             replicationService,
             legacySbbolAdapter,
             budgetMaskService,
+            auditAdapter,
             accountMapper());
     }
 
@@ -205,9 +208,17 @@ public class PartnerServiceConfiguration {
     AccountSignService accountSignService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        LegacySbbolAdapter legacySbbolAdapter,
+        AuditAdapter auditAdapter
     ) {
-        return new AccountSignServiceImpl(accountRepository, accountSignRepository, accountSingMapper(), legacySbbolAdapter);
+        return new AccountSignServiceImpl(
+            accountRepository,
+            accountSignRepository,
+            legacySbbolAdapter,
+            auditAdapter,
+            accountMapper(),
+            accountSingMapper()
+        );
     }
 
     @Bean

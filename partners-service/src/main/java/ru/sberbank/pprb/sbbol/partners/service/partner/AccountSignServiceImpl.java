@@ -1,11 +1,15 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
+import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
+import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
@@ -16,6 +20,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -26,19 +31,25 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
-    private final AccountSingMapper accountSingMapper;
     private final LegacySbbolAdapter legacySbbolAdapter;
+    private final AuditAdapter auditAdapter;
+    private final AccountSingMapper accountSingMapper;
+    private final AccountMapper accountMapper;
 
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        AccountSingMapper accountSingMapper,
-        LegacySbbolAdapter legacySbbolAdapter
+        LegacySbbolAdapter legacySbbolAdapter,
+        AuditAdapter auditAdapter,
+        AccountMapper accountMapper,
+        AccountSingMapper accountSingMapper
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
-        this.accountSingMapper = accountSingMapper;
         this.legacySbbolAdapter = legacySbbolAdapter;
+        this.auditAdapter = auditAdapter;
+        this.accountMapper = accountMapper;
+        this.accountSingMapper = accountSingMapper;
     }
 
     @Override
@@ -86,10 +97,34 @@ public class AccountSignServiceImpl implements AccountSignService {
                 continue;
             }
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid());
-            var savedSign = accountSignRepository.save(sign);
-            account.setState(AccountStateType.SIGNED);
-            accountRepository.save(account);
-            response.addAccountsSignDetailItem(accountSingMapper.toSignAccount(savedSign));
+            try {
+                var savedSign = accountSignRepository.save(sign);
+                auditAdapter.sand(new Event()
+                    .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
+                    .eventParams(accountSingMapper.toEventParams(savedSign))
+                );
+                response.addAccountsSignDetailItem(accountSingMapper.toSignAccount(savedSign));
+            } catch (RuntimeException e) {
+                auditAdapter.sand(new Event()
+                    .eventType(EventType.SIGN_ACCOUNT_CREATE_ERROR)
+                    .eventParams(accountSingMapper.toEventParams(sign))
+                );
+                throw new EntrySaveException(DOCUMENT_NAME, e);
+            }
+            try {
+                account.setState(AccountStateType.SIGNED);
+                var saveAccount = accountRepository.save(account);
+                auditAdapter.sand(new Event()
+                    .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
+                    .eventParams(accountMapper.toEventParams(saveAccount))
+                );
+            } catch (RuntimeException e) {
+                auditAdapter.sand(new Event()
+                    .eventType(EventType.ACCOUNT_UPDATE_ERROR)
+                    .eventParams(accountMapper.toEventParams(account))
+                );
+                throw new EntrySaveException(DOCUMENT_NAME, e);
+            }
         }
         return response;
     }
@@ -101,15 +136,37 @@ public class AccountSignServiceImpl implements AccountSignService {
             throw new PartnerMigrationException();
         }
         var uuid = UUID.fromString(accountId);
-        var account = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
-        if (account.isEmpty()) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId);
-        }
+        var account = accountRepository.getByDigitalIdAndUuid(digitalId, uuid)
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
         var sign = accountSignRepository.getByAccountUuid(uuid)
             .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
-        accountSignRepository.delete(sign);
-        account.get().setState(AccountStateType.NOT_SIGNED);
-        accountRepository.save(account.get());
+        try {
+            accountSignRepository.delete(sign);
+            auditAdapter.sand(new Event()
+                .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
+                .eventParams(accountSingMapper.toEventParams(sign))
+            );
+            account.setState(AccountStateType.NOT_SIGNED);
+        } catch (RuntimeException e) {
+            auditAdapter.sand(new Event()
+                .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
+                .eventParams(accountSingMapper.toEventParams(sign))
+            );
+            throw new EntrySaveException(DOCUMENT_NAME, e);
+        }
+        try {
+            var saveAccount = accountRepository.save(account);
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
+                .eventParams(accountMapper.toEventParams(saveAccount))
+            );
+        } catch (RuntimeException e) {
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_UPDATE_ERROR)
+                .eventParams(accountMapper.toEventParams(account))
+            );
+            throw new EntrySaveException(DOCUMENT_NAME, e);
+        }
     }
 
     @Override

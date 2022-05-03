@@ -3,11 +3,14 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
+import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
+import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.exception.SignAccountException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -20,9 +23,9 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
-import java.util.Collections;
 import java.util.UUID;
 
 @Logged(printRequestResponse = true)
@@ -35,6 +38,7 @@ public class AccountServiceImpl implements AccountService {
     private final ReplicationService replicationService;
     private final LegacySbbolAdapter legacySbbolAdapter;
     private final BudgetMaskService budgetMaskService;
+    private final AuditAdapter auditAdapter;
     private final AccountMapper accountMapper;
 
     public AccountServiceImpl(
@@ -43,6 +47,7 @@ public class AccountServiceImpl implements AccountService {
         ReplicationService replicationService,
         LegacySbbolAdapter legacySbbolAdapter,
         BudgetMaskService budgetMaskService,
+        AuditAdapter auditAdapter,
         AccountMapper accountMapper
     ) {
         this.partnerRepository = partnerRepository;
@@ -50,6 +55,7 @@ public class AccountServiceImpl implements AccountService {
         this.replicationService = replicationService;
         this.legacySbbolAdapter = legacySbbolAdapter;
         this.budgetMaskService = budgetMaskService;
+        this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
     }
 
@@ -102,10 +108,22 @@ public class AccountServiceImpl implements AccountService {
             throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
         }
         var requestAccount = accountMapper.toAccount(account);
-        var savedAccount = accountRepository.save(requestAccount);
-        var response = accountMapper.toAccount(savedAccount, budgetMaskService);
-        replicationService.saveCounterparty(response);
-        return new AccountResponse().account(response);
+        try {
+            var savedAccount = accountRepository.save(requestAccount);
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_CREATE_SUCCESS)
+                .eventParams(accountMapper.toEventParams(savedAccount))
+            );
+            var response = accountMapper.toAccount(savedAccount, budgetMaskService);
+            replicationService.saveCounterparty(response);
+            return new AccountResponse().account(response);
+        } catch (RuntimeException e) {
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_CREATE_ERROR)
+                .eventParams(accountMapper.toEventParams(requestAccount))
+            );
+            throw new EntrySaveException(DOCUMENT_NAME, e);
+        }
     }
 
     @Override
@@ -121,17 +139,31 @@ public class AccountServiceImpl implements AccountService {
                 " не равна версии записи в запросе version=" + account.getVersion());
         }
         if (AccountStateType.SIGNED.equals(foundAccount.getState())) {
-            throw new SignAccountException(Collections.singletonList("Ошибка обновления счёта клиента " + account.getAccount() + " id " + account.getId() + " нельзя обновлять подписанные счёта"));
+            throw new SignAccountException(
+                "Ошибка обновления счёта клиента " + account.getAccount() + " id " + account.getId() + " нельзя обновлять подписанные счёта"
+            );
         }
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
         if (foundPartner.isEmpty()) {
             throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
         }
         accountMapper.updateAccount(account, foundAccount);
-        var savedAccount = accountRepository.save(foundAccount);
-        var response = accountMapper.toAccount(savedAccount, budgetMaskService);
-        replicationService.saveCounterparty(response);
-        return new AccountResponse().account(response);
+        try {
+            var savedAccount = accountRepository.save(foundAccount);
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
+                .eventParams(accountMapper.toEventParams(foundAccount))
+            );
+            var response = accountMapper.toAccount(savedAccount, budgetMaskService);
+            replicationService.saveCounterparty(response);
+            return new AccountResponse().account(response);
+        } catch (RuntimeException e) {
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_UPDATE_ERROR)
+                .eventParams(accountMapper.toEventParams(foundAccount))
+            );
+            throw new EntrySaveException(DOCUMENT_NAME, e);
+        }
     }
 
     @Override
@@ -142,8 +174,20 @@ public class AccountServiceImpl implements AccountService {
         }
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        accountRepository.delete(foundAccount);
-        replicationService.deleteCounterparty(foundAccount);
+        try {
+            accountRepository.delete(foundAccount);
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_DELETE_SUCCESS)
+                .eventParams(accountMapper.toEventParams(foundAccount))
+            );
+            replicationService.deleteCounterparty(foundAccount);
+        } catch (RuntimeException e) {
+            auditAdapter.sand(new Event()
+                .eventType(EventType.ACCOUNT_DELETE_ERROR)
+                .eventParams(accountMapper.toEventParams(foundAccount))
+            );
+            throw new EntrySaveException(DOCUMENT_NAME, e);
+        }
     }
 
     @Override

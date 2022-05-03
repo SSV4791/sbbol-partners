@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
@@ -14,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import java.util.UUID;
 

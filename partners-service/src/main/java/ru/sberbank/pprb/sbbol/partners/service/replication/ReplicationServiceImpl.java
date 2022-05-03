@@ -1,12 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.service.replication;
 
-import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
-import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AddressViewRepository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,12 +20,4 @@ public interface AddressRepository extends CrudRepository<AddressEntity, UUID>, 
      */
     Optional<AddressEntity> getByDigitalIdAndUuid(String digitalId, UUID uuid);
 
-    /**
-     * Получение списка адресов Партнера
-     *
-     * @param digitalId   Идентификатор личного кабинета
-     * @param unifiedUuid Идентификатор Партнера/Контакта
-     * @return адрес Партнера
-     */
-    List<AddressEntity> findByDigitalIdAndUnifiedUuid(String digitalId, UUID unifiedUuid);
 }

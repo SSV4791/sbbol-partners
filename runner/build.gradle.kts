@@ -59,8 +59,9 @@ dependencies {
     // postgres для prod-сборки
     runtimeOnly(liveLibs.postgresql.core)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(project(":partners-service"))
 
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(liveLibs.mapstruct.core)
     testImplementation(testLibs.bundles.pact)
     testImplementation(testLibs.dcb.allure.annotations)
@@ -70,8 +71,6 @@ dependencies {
     testImplementation(testLibs.rest.assured)
     testImplementation(testLibs.rest.assured.common)
     testImplementation(testLibs.swagger.coverage.reporter)
-
-    testImplementation(project(":partners-service"))
 }
 
 description = "ППРБ.Digital.Партнеры"
