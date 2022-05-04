@@ -46,6 +46,7 @@ pr_check:
       -PnexusPassword=${env.NEXUS_PWD}
       clean build -x test
   test:
+    postgres: true
     match:
       files:
         - 'partners-adapter/'
@@ -81,7 +82,7 @@ pr_check:
       -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
       -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
       -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
-      qaReporterUpload sonarCoverage --info
+      qaReporterUpload sonarCoverage
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
@@ -93,6 +94,8 @@ release:
   docker_dev: 'pprb-dev/ci00908578/ci02792425_sbbol-partners_dev'
   doc_path: 'docs/build/docs/'
   build_gradle:
+    cpu: 1
+    mem: '2g'
     command: >-
       ./gradlew
       -PnexusLogin=${env.NEXUS_USR}
@@ -112,3 +115,15 @@ release:
       -Dsonar.login=${env.SONAR_TOKEN}
       -Dsonar.branch.name=${params.branch}
       build qaReporterUpload sonarCoverage --parallel --info
+  skip_istio: false
+  default_values:
+    params_branch: master
+    istio_tag: 1.4
+    commit_or_tag: 01.002.00_0053
+    release_key:
+    checkmarx: false
+    reverse_and_publish: false
+    type:
+      - develop
+      - release
+    params_folder: develop
