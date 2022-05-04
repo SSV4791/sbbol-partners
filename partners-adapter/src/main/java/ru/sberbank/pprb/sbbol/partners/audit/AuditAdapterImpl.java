@@ -67,7 +67,7 @@ public class AuditAdapterImpl implements AuditAdapter {
     }
 
     @Override
-    public void sand(Event auditEvent) {
+    public void send(Event auditEvent) {
         if (!auditEnabled) {
             LOGGER.warn("Интеграция c сервисом Audit отключена");
             return;

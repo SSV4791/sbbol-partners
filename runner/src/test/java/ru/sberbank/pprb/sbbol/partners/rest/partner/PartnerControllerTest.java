@@ -3,7 +3,8 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
+import org.springframework.test.context.ContextConfiguration;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -13,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
+import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.List;
 
@@ -22,7 +24,8 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountSign;
 
-class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
+@ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
+class PartnerControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner";
 
@@ -633,7 +636,9 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             PartnerResponse.class,
-            updatePartner.getPartner().getDigitalId(), updatePartner.getPartner().getId());
+            updatePartner.getPartner().getDigitalId(),
+            updatePartner.getPartner().getId()
+        );
         assertThat(checkPartner)
             .isNotNull();
         assertThat(checkPartner.getPartner().getVersion())
@@ -654,11 +659,12 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
-                baseRoutePath + "/{digitalId}" + "/{id}",
-                HttpStatus.OK,
-                PartnerResponse.class,
-                createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getId()
-            );
+            baseRoutePath + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            PartnerResponse.class,
+            createdPartner.getPartner().getDigitalId(),
+            createdPartner.getPartner().getId()
+        );
         assertThat(actualPartner)
             .isNotNull();
         assertThat(actualPartner.getPartner())
@@ -668,16 +674,17 @@ class PartnerControllerTest extends AbstractIntegrationWithOutSbbolTest {
         delete(
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.NO_CONTENT,
-            actualPartner.getPartner().getDigitalId(), actualPartner.getPartner().getId()
+            actualPartner.getPartner().getDigitalId(),
+            actualPartner.getPartner().getId()
         ).getBody();
 
-        var searchPartner =
-            get(
-                baseRoutePath + "/{digitalId}" + "/{id}",
-                HttpStatus.NOT_FOUND,
-                Error.class,
-                createdPartner.getPartner().getDigitalId(), createdPartner.getPartner().getId()
-            );
+        var searchPartner = get(
+            baseRoutePath + "/{digitalId}" + "/{id}",
+            HttpStatus.NOT_FOUND,
+            Error.class,
+            createdPartner.getPartner().getDigitalId(),
+            createdPartner.getPartner().getId()
+        );
         assertThat(searchPartner)
             .isNotNull();
 

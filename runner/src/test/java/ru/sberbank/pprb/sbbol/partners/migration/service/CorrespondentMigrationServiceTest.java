@@ -4,22 +4,25 @@ import io.qameta.allure.AllureId;
 import io.restassured.common.mapper.TypeRef;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateCorrespondentRequest;
+import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithSbbolConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// TODO DCBBRAIN-2268 Перенести тесты и модели для migration-service из модуля Runner в свой модуль
-public class CorrespondentMigrationServiceTest extends AbstractIntegrationWithOutSbbolTest {
+@ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
+class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
 
     private static final String DIGITAL_ID = RandomStringUtils.randomAlphanumeric(20);
     private static final String JSON_RPC_REQUEST_ID = RandomStringUtils.randomAlphanumeric(10);
@@ -74,6 +77,7 @@ public class CorrespondentMigrationServiceTest extends AbstractIntegrationWithOu
     }
 
     @Test
+    @AllureId("35873")
     void migrateAndUpdateCorrespondentTest() {
         MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondent();
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));

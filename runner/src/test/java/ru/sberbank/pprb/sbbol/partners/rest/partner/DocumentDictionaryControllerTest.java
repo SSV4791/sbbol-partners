@@ -48,7 +48,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34140")
+    @AllureId("36482")
     void testCreateDocuments() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON);
         var documentTypeCreate = new DocumentTypeCreate()
@@ -70,7 +70,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36482")
+    @AllureId("34140")
     void testCreateDocumentsWhenLegalFormIsDuplicated() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON, ENTREPRENEUR);
         var documentTypeCreate = new DocumentTypeCreate()

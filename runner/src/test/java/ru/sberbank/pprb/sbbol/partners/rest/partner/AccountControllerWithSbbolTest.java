@@ -3,13 +3,15 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithSbbolTest;
+import org.springframework.test.context.ContextConfiguration;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithSbbolConfiguration;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +20,8 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.getValidAccount;
 
-class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
+@ContextConfiguration(classes = SbbolIntegrationWithSbbolConfiguration.class)
+class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner";
 

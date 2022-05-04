@@ -11,8 +11,8 @@ public class SbbolException extends RuntimeException {
 
     private final String code;
 
-    public SbbolException(HttpStatus code, String message) {
-        super("Error execute http-request to SBBOL: StatusCode: " + code + " , Message: " + message);
+    public SbbolException(HttpStatus code, String message, Throwable cause) {
+        super("Error execute http-request to SBBOL: StatusCode: " + code + " , Message: " + message, cause);
         this.code = EXCEPTION;
     }
 

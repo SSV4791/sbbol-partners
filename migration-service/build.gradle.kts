@@ -27,14 +27,6 @@ dependencies {
     implementation(liveLibs.jsonrpc4j.client)
     implementation(liveLibs.mapstruct.core)
     implementation(liveLibs.sbp.hibernate.standin)
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    testImplementation(testLibs.bundles.pact)
-    testImplementation(testLibs.dcb.allure.annotations)
-    testImplementation(testLibs.junit5.allure)
-    testImplementation(testLibs.podam.core)
-    testImplementation(testLibs.swagger.coverage.reporter)
 }
 
 description = "Сервис для миграции данных из Legacy СББОЛ"

@@ -31,13 +31,6 @@ dependencies {
 
     runtimeOnly(liveLibs.aspectjweaver.core)
     runtimeOnly(liveLibs.ehcache.org.core)
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(testLibs.dcb.allure.annotations)
-    testImplementation(testLibs.junit5.allure)
-    testImplementation(testLibs.bundles.pact)
-    testImplementation(testLibs.podam.core)
-    testImplementation(testLibs.swagger.coverage.reporter)
 }
 
 description = "Service ППРБ.Digital.Партнеры"
