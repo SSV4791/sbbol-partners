@@ -53,8 +53,7 @@ os_project:
 
   audit:
     enabled: false
-    node_id: dev
-    module_id: sbbol-pprb-draft
+    time_out: 5000
 
 registry_area: registry.sigma.sbrf.ru
 nexus_area: Nexus_PROD/CI00405008_SBBOL/FP/OS_SBBOL_PPRB

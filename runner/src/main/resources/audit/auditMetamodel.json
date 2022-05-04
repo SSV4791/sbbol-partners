@@ -1,0 +1,526 @@
+{
+  "metamodelVersion": "1",
+  "module": "pprb4-digital-partners",
+  "events": [
+    {
+      "name": "account_create_success",
+      "description": "Успешное создание счёта Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "createDate",
+          "description": "Время создания записи"
+        },
+        {
+          "name": "lastModifiedDate",
+          "description": "Время изменения записи"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор партнера"
+        },
+        {
+          "name": "name",
+          "description": "Наименование счёта"
+        },
+        {
+          "name": "account",
+          "description": "Счёт"
+        },
+        {
+          "name": "state",
+          "description": "Состояние \"Подписан\""
+        },
+        {
+          "name": "bankName",
+          "description": "Наименование банка"
+        },
+        {
+          "name": "bankBic",
+          "description": "БИК банка"
+        },
+        {
+          "name": "bankAccount",
+          "description": "Кор. счёт банка"
+        }
+      ]
+    },
+    {
+      "name": "account_create_error",
+      "description": "Не успешное создание счёта Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "createDate",
+          "description": "Время создания записи"
+        },
+        {
+          "name": "lastModifiedDate",
+          "description": "Время изменения записи"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор партнера"
+        },
+        {
+          "name": "name",
+          "description": "Наименование счёта"
+        },
+        {
+          "name": "account",
+          "description": "Счёт"
+        },
+        {
+          "name": "state",
+          "description": "Состояние \"Подписан\""
+        },
+        {
+          "name": "bankName",
+          "description": "Наименование банка"
+        },
+        {
+          "name": "bankBic",
+          "description": "БИК банка"
+        },
+        {
+          "name": "bankAccount",
+          "description": "Кор. счёт банка"
+        }
+      ]
+    },
+    {
+      "name": "account_update_success",
+      "description": "Успешное изменение счёта Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "createDate",
+          "description": "Время создания записи"
+        },
+        {
+          "name": "lastModifiedDate",
+          "description": "Время изменения записи"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор партнера"
+        },
+        {
+          "name": "name",
+          "description": "Наименование счёта"
+        },
+        {
+          "name": "account",
+          "description": "Счёт"
+        },
+        {
+          "name": "state",
+          "description": "Состояние \"Подписан\""
+        },
+        {
+          "name": "bankName",
+          "description": "Наименование банка"
+        },
+        {
+          "name": "bankBic",
+          "description": "БИК банка"
+        },
+        {
+          "name": "bankAccount",
+          "description": "Кор. счёт банка"
+        }
+      ]
+    },
+    {
+      "name": "account_update_error",
+      "description": "Не успешное изменение  счёта Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "createDate",
+          "description": "Время создания записи"
+        },
+        {
+          "name": "lastModifiedDate",
+          "description": "Время изменения записи"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор партнера"
+        },
+        {
+          "name": "name",
+          "description": "Наименование счёта"
+        },
+        {
+          "name": "account",
+          "description": "Счёт"
+        },
+        {
+          "name": "state",
+          "description": "Состояние \"Подписан\""
+        },
+        {
+          "name": "bankName",
+          "description": "Наименование банка"
+        },
+        {
+          "name": "bankBic",
+          "description": "БИК банка"
+        },
+        {
+          "name": "bankAccount",
+          "description": "Кор. счёт банка"
+        }
+      ]
+    },
+    {
+      "name": "account_delete_success",
+      "description": "Успешное удаление счёта Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "createDate",
+          "description": "Время создания записи"
+        },
+        {
+          "name": "lastModifiedDate",
+          "description": "Время изменения записи"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор партнера"
+        },
+        {
+          "name": "name",
+          "description": "Наименование счёта"
+        },
+        {
+          "name": "account",
+          "description": "Счёт"
+        },
+        {
+          "name": "state",
+          "description": "Состояние \"Подписан\""
+        },
+        {
+          "name": "bankName",
+          "description": "Наименование банка"
+        },
+        {
+          "name": "bankBic",
+          "description": "БИК банка"
+        },
+        {
+          "name": "bankAccount",
+          "description": "Кор. счёт банка"
+        }
+      ]
+    },
+    {
+      "name": "account_delete_error",
+      "description": "Не успешное удаление счёта Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "createDate",
+          "description": "Время создания записи"
+        },
+        {
+          "name": "lastModifiedDate",
+          "description": "Время изменения записи"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор партнера"
+        },
+        {
+          "name": "name",
+          "description": "Наименование счёта"
+        },
+        {
+          "name": "account",
+          "description": "Счёт"
+        },
+        {
+          "name": "state",
+          "description": "Состояние \"Подписан\""
+        },
+        {
+          "name": "bankName",
+          "description": "Наименование банка"
+        },
+        {
+          "name": "bankBic",
+          "description": "БИК банка"
+        },
+        {
+          "name": "bankAccount",
+          "description": "Кор. счёт банка"
+        }
+      ]
+    },
+    {
+      "name": "sign_account_create_success",
+      "description": "Успешное подписание счёта Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "entityUuid",
+          "description": "Глобальный уникальный идентификатор объекта"
+        },
+        {
+          "name": "digest",
+          "description": "Дайджест"
+        },
+        {
+          "name": "sign",
+          "description": "Подпись"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "accountUuid",
+          "description": "Уникальный идентификатор счёта"
+        },
+        {
+          "name": "externalDataFileId",
+          "description": "Идентификатор созданного документа в ЕСМ"
+        },
+        {
+          "name": "externalDataSignFileId",
+          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
+        },
+        {
+          "name": "dateTimeOfSign",
+          "description": "Дата подписания документа"
+        }
+      ]
+    },
+    {
+      "name": "sign_account_create_error",
+      "description": "Не успешное подписание счёта Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "entityUuid",
+          "description": "Глобальный уникальный идентификатор объекта"
+        },
+        {
+          "name": "digest",
+          "description": "Дайджест"
+        },
+        {
+          "name": "sign",
+          "description": "Подпись"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "accountUuid",
+          "description": "Уникальный идентификатор счёта"
+        },
+        {
+          "name": "externalDataFileId",
+          "description": "Идентификатор созданного документа в ЕСМ"
+        },
+        {
+          "name": "externalDataSignFileId",
+          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
+        },
+        {
+          "name": "dateTimeOfSign",
+          "description": "Дата подписания документа"
+        }
+      ]
+    },
+    {
+      "name": "sign_account_delete_success",
+      "description": "Успешное снятие подписи счёта Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "entityUuid",
+          "description": "Глобальный уникальный идентификатор объекта"
+        },
+        {
+          "name": "digest",
+          "description": "Дайджест"
+        },
+        {
+          "name": "sign",
+          "description": "Подпись"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "accountUuid",
+          "description": "Уникальный идентификатор счёта"
+        },
+        {
+          "name": "externalDataFileId",
+          "description": "Идентификатор созданного документа в ЕСМ"
+        },
+        {
+          "name": "externalDataSignFileId",
+          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
+        },
+        {
+          "name": "dateTimeOfSign",
+          "description": "Дата подписания документа"
+        }
+      ]
+    },
+    {
+      "name": "sign_account_delete_error",
+      "description": "Не успешное снятие подписи счёта Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "uuid",
+          "description": "Идентификатор сущности"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "entityUuid",
+          "description": "Глобальный уникальный идентификатор объекта"
+        },
+        {
+          "name": "digest",
+          "description": "Дайджест"
+        },
+        {
+          "name": "sign",
+          "description": "Подпись"
+        },
+        {
+          "name": "partnerUuid",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "accountUuid",
+          "description": "Уникальный идентификатор счёта"
+        },
+        {
+          "name": "externalDataFileId",
+          "description": "Идентификатор созданного документа в ЕСМ"
+        },
+        {
+          "name": "externalDataSignFileId",
+          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
+        },
+        {
+          "name": "dateTimeOfSign",
+          "description": "Дата подписания документа"
+        }
+      ]
+    }
+  ]
+}

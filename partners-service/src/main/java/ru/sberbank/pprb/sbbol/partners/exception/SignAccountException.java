@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.exception;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,6 +14,11 @@ public class SignAccountException extends RuntimeException {
 
     private final List<String> errors;
 
+    public SignAccountException(String error) {
+        super("Ошибка сохранения счёта");
+        this.code = EXCEPTION;
+        this.errors = Collections.singletonList(error);
+    }
     public SignAccountException(List<String> errors) {
         super("Ошибка сохранения счёта");
         this.code = EXCEPTION;

@@ -4,13 +4,15 @@ import org.apache.commons.lang.SerializationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.sberbank.pprb.sbbol.partners.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
-import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
-import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyView;
-import ru.sberbank.pprb.sbbol.partners.model.sbbol.ListResponse;
-import ru.sberbank.pprb.sbbol.partners.model.sbbol.Pagination;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyView;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.ListResponse;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.Pagination;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -26,6 +28,9 @@ public abstract class AbstractIntegrationWithSbbolTest extends AbstractIntegrati
     @Mock
     protected CounterpartyMapper counterpartyMapper;
 
+    @Autowired
+    private PodamFactory podamFactory;
+
     protected static final String newAcc = "40702840876545678702";
     protected static final String newKpp = "999999999";
     protected Counterparty counterparty;
@@ -34,8 +39,8 @@ public abstract class AbstractIntegrationWithSbbolTest extends AbstractIntegrati
 
     @BeforeEach
     void init() {
-        counterparty = factory.manufacturePojo(Counterparty.class);
-        counterpartyView = factory.manufacturePojo(CounterpartyView.class);
+        counterparty = podamFactory.manufacturePojo(Counterparty.class);
+        counterpartyView = podamFactory.manufacturePojo(CounterpartyView.class);
         counterparty.setPprbGuid(UUID.randomUUID().toString());
         counterparty.setAccount("40802810500490014206");
         counterparty.setBankBic("044525411");
@@ -49,7 +54,7 @@ public abstract class AbstractIntegrationWithSbbolTest extends AbstractIntegrati
             .thenReturn((Counterparty) SerializationUtils.clone(counterparty));
         ListResponse<CounterpartyView> viewResponse = new ListResponse<>();
         viewResponse.setItems(Collections.singletonList(counterpartyView));
-        viewResponse.setPagination(factory.manufacturePojo(Pagination.class));
+        viewResponse.setPagination(podamFactory.manufacturePojo(Pagination.class));
         when(legacySbbolAdapter.viewRequest(any(), any())).thenReturn(viewResponse);
         updatedCounterparty = (Counterparty) SerializationUtils.clone(counterparty);
         updatedCounterparty.setAccount(newAcc);

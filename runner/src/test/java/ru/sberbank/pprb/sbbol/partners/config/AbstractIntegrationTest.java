@@ -14,16 +14,14 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
 import ru.sberbank.pprb.sbbol.partners.Runner;
-import uk.co.jemos.podam.api.PodamFactory;
-import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import static io.restassured.RestAssured.given;
 
@@ -35,13 +33,16 @@ import static io.restassured.RestAssured.given;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
 @ActiveProfiles("test")
-@Import({TestReplicationConfiguration.class})
-@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes =
+    {
+        TestReplicationConfiguration.class,
+        PodamConfiguration.class
+    }
+)
+@ExtendWith({SpringExtension.class})
 public abstract class AbstractIntegrationTest {
 
     private static final String BASE_URI = "http://localhost";
-
-    protected static final PodamFactory factory = new PodamFactoryImpl();
 
     @LocalServerPort
     protected int port;

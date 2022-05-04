@@ -11,8 +11,8 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
-import ru.sberbank.pprb.sbbol.partners.model.sbbol.Counterparty;
-import ru.sberbank.pprb.sbbol.partners.model.sbbol.CounterpartyCheckRequisites;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisites;
 
 import java.util.StringJoiner;
 

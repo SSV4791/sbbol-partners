@@ -14,6 +14,7 @@ javax-annotation-api = { module = "javax.annotation:javax.annotation-api", versi
 javax-validation-api = { module = "javax.validation:validation-api", version = "2.0.1.Final" }
 jaxws = { module = "com.sun.xml.ws:jaxws-rt", version = "2.3.3" }
 jsonrpc4j-client = { module = "com.github.briandilley.jsonrpc4j:jsonrpc4j", version = "1.6" }
+jsr305 = { module = "com.google.code.findbugs:jsr305", version = "3.0.2" }
 liquibase-core = { module = "org.liquibase:liquibase-core", version = "4.8.0" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version = "6.6" }
 mapstruct-core = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }

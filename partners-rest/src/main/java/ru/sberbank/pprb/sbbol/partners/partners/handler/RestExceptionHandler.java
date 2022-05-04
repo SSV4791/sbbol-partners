@@ -16,6 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.exception.SignAccountException;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
+    private static final String FILL_OBJECT_MESSAGE_EXCEPTION = "Ошибка заполнения объекта";
 
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest httpRequest) {
@@ -51,19 +53,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({ModelValidationException.class})
     protected ResponseEntity<Object> handleObjectModelValidationException(ModelValidationException ex, HttpServletRequest httpRequest) {
-        LOG.error("Ошибка заполнения объекта", ex);
+        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrors(), httpRequest.getRequestURL());
     }
 
-    @ExceptionHandler({BadRequestException.class, OptimisticLockingFailureException.class})
+    @ExceptionHandler({BadRequestException.class, OptimisticLockingFailureException.class, EntrySaveException.class})
     protected ResponseEntity<Object> handleObjectBadRequestException(Exception ex, HttpServletRequest httpRequest) {
-        LOG.error("Ошибка заполнения объекта", ex);
+        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), httpRequest.getRequestURL());
     }
 
     @ExceptionHandler({SignAccountException.class})
     protected ResponseEntity<Object> handleSignAccountException(SignAccountException ex, HttpServletRequest httpRequest) {
-        LOG.error("Ошибка заполнения объекта", ex);
+        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponseEntity(HttpStatus.BAD_REQUEST, ex.getErrors(), httpRequest.getRequestURL());
     }
 
