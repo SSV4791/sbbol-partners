@@ -18,14 +18,17 @@ public interface EmailMapper extends BaseMapper {
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
     EmailEntity toEmail(EmailCreate email);
 
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
     EmailEntity toEmail(Email email);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
+    @Mapping(target = "lastModifiedDate", ignore = true)
     void updateEmail(Email email, @MappingTarget() EmailEntity foundEmail);
 }

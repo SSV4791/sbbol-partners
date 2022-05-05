@@ -16,5 +16,6 @@ public interface ContactPhoneMapper extends BaseMapper {
 
     @Mapping(target = "uuid", expression = "java(mapUuid(phone.getId()))")
     @Mapping(target = "contact", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     ContactPhoneEntity toPhone(Phone phone);
 }

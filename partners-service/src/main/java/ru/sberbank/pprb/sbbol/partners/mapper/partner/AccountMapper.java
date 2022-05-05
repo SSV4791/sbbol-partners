@@ -16,6 +16,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.Collections;
@@ -53,16 +55,32 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     AccountEntity toAccount(AccountCreate account);
+
+    @Mapping(target = "intermediary", source = "mediary")
+    @Mapping(target = "account", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    BankEntity toBank(BankCreate bank);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
     @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "account", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     BankEntity toBank(Bank bank);
+
+    @Mapping(target = "bank", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    BankAccountEntity toBankAccount(BankAccountCreate bankAccount);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bankAccount.getId()))")
     @Mapping(target = "bank", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     BankAccountEntity toBankAccount(BankAccount bankAccount);
 
     @Named("updateAccount")
@@ -71,6 +89,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
+    @Mapping(target = "state", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget() AccountEntity accountEntity);
 
     @AfterMapping

@@ -43,7 +43,7 @@ insert into partner (uuid,
               OGRN,
               OKPO,
               create_date,
-              last_modified_date)
+              sys_lastchangedate)
 select UUID::UUID,
        DIGITALID,
        'RENTER',
@@ -72,7 +72,7 @@ SET digital_id = excluded.digital_id,
     OGRN = excluded.kpp,
     OKPO = excluded.okpo,
     create_date = excluded.create_date,
-    last_modified_date = excluded.last_modified_date
+    sys_lastchangedate = excluded.sys_lastchangedate
     returning partner.uuid PARTNER_UUID
     ),
 -- T_RENTER -> ACCOUNT
@@ -83,7 +83,7 @@ insert into ACCOUNT (UUID,
               account,
               STATE,
               create_date,
-              last_modified_date,
+              sys_lastchangedate,
               priority_account)
 select generate_uuid(),
     UUID::UUID,

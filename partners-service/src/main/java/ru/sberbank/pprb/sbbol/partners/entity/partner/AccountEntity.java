@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.UpdateTimestamp;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 
 import javax.persistence.CascadeType;
@@ -40,10 +39,6 @@ public class AccountEntity extends BaseEntity {
     @CreationTimestamp
     @Column(name = "create_date", nullable = false)
     private OffsetDateTime createDate;
-
-    @UpdateTimestamp
-    @Column(name = "last_modified_date", nullable = false)
-    private OffsetDateTime lastModifiedDate;
 
     @Column(name = "partner_uuid", nullable = false)
     private UUID partnerUuid;
@@ -84,14 +79,6 @@ public class AccountEntity extends BaseEntity {
 
     public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
-    }
-
-    public OffsetDateTime getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getDigitalId() {

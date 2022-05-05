@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.UpdateTimestamp;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
@@ -39,10 +38,6 @@ public class PartnerEntity extends BaseEntity {
     @CreationTimestamp
     @Column(name = "create_date", nullable = false)
     private OffsetDateTime createDate;
-
-    @UpdateTimestamp
-    @Column(name = "last_modified_date", nullable = false)
-    private OffsetDateTime lastModifiedDate;
 
     @Column(name = "digital_id")
     private String digitalId;
@@ -98,14 +93,6 @@ public class PartnerEntity extends BaseEntity {
 
     public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
-    }
-
-    public OffsetDateTime getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getDigitalId() {
