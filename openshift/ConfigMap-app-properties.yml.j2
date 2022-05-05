@@ -42,12 +42,12 @@ data:
 
     # Audit
     audit.enabled={{ os_project.audit.enabled | default('false')}}
-    audit.url={{ os_project.audit.url }}
+    audit.url={{ int_entry.pprb.audit[0].host }}
     audit.time_out={{ os_project.audit.time_out | default('5000')}}
     audit.x-node-id={{ openshift.env }}
 
     # Sbbol connect
-    sbbol.url.root={{ int_entry.sbbol.rest_in.host }}
+    sbbol.url={{ int_entry.sbbol.rest_in.host }}
     sbbol.url.synapse.system.session=/ss-rest/api
 
     # StandIn plugin

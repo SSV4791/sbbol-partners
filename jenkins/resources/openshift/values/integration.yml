@@ -5,10 +5,10 @@ int:
       latest:
         name: sbbol-rest-in
         host: sbbol-dev-rest-in-ci02281165.apps.dev-gen2.sigma.sbrf.ru
-        port: '443'
+        port: 443
         ott: false
         mtls: true
-        protocol: TLS
+        protocol: HTTP
 
   pprb:
     db_main:
@@ -148,9 +148,9 @@ int:
         - name: audit-ott
           host: demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru
           ip: 10.36.252.102
-          port: '443'
-          istio_mesh_port: '80'
-          protocol: TLS
+          port: 443
+          istio_mesh_port: 80
+          protocol: HTTP
           mtls: true
           ott: true
 

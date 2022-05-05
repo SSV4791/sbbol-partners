@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -12,8 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapterImpl;
-
-import java.util.Collections;
 
 @Configuration
 public class PartnerAdapterConfiguration {
@@ -35,13 +34,14 @@ public class PartnerAdapterConfiguration {
 
     @Bean
     RestTemplate restTemplate(
-        @Value("${sbbol.url.root}") String rootLegacyUrl,
-        @Value("${sbbol.url.synapse.system.session}") String synapseSystemSession
+        @Value("${sbbol.url}") String rootLegacyUrl,
+        @Value("${sbbol.url.synapse.system.session}") String synapseSystemSession,
+        RestTemplateBuilder restTemplateBuilder
     ) {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setMessageConverters(Collections.singletonList(mappingJacksonHttpMessageConverter()));
-        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(rootLegacyUrl + synapseSystemSession));
-        return restTemplate;
+        return restTemplateBuilder
+            .messageConverters(mappingJacksonHttpMessageConverter())
+            .uriTemplateHandler(new DefaultUriBuilderFactory("http://" + rootLegacyUrl + synapseSystemSession))
+            .build();
     }
 
     @Bean
