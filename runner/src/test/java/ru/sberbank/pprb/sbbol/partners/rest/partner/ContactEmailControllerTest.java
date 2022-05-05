@@ -3,7 +3,8 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
+import org.springframework.test.context.ContextConfiguration;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
@@ -11,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
-public class ContactEmailControllerTest extends AbstractIntegrationWithOutSbbolTest {
+@ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
+public class ContactEmailControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner/contact/email";
 

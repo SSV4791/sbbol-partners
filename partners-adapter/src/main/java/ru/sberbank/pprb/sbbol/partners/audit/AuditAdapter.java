@@ -12,5 +12,5 @@ public interface AuditAdapter {
      * Отправка событий Аудита
      * @param auditEvent событие аудита
      */
-    void sand(Event auditEvent);
+    void send(Event auditEvent);
 }

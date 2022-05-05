@@ -99,13 +99,13 @@ public class AccountSignServiceImpl implements AccountSignService {
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid());
             try {
                 var savedSign = accountSignRepository.save(sign);
-                auditAdapter.sand(new Event()
+                auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(savedSign))
                 );
                 response.addAccountsSignDetailItem(accountSingMapper.toSignAccount(savedSign));
             } catch (RuntimeException e) {
-                auditAdapter.sand(new Event()
+                auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_ERROR)
                     .eventParams(accountSingMapper.toEventParams(sign))
                 );
@@ -114,12 +114,12 @@ public class AccountSignServiceImpl implements AccountSignService {
             try {
                 account.setState(AccountStateType.SIGNED);
                 var saveAccount = accountRepository.save(account);
-                auditAdapter.sand(new Event()
+                auditAdapter.send(new Event()
                     .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
                     .eventParams(accountMapper.toEventParams(saveAccount))
                 );
             } catch (RuntimeException e) {
-                auditAdapter.sand(new Event()
+                auditAdapter.send(new Event()
                     .eventType(EventType.ACCOUNT_UPDATE_ERROR)
                     .eventParams(accountMapper.toEventParams(account))
                 );
@@ -142,13 +142,13 @@ public class AccountSignServiceImpl implements AccountSignService {
             .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
         try {
             accountSignRepository.delete(sign);
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                 .eventParams(accountSingMapper.toEventParams(sign))
             );
             account.setState(AccountStateType.NOT_SIGNED);
         } catch (RuntimeException e) {
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
                 .eventParams(accountSingMapper.toEventParams(sign))
             );
@@ -156,12 +156,12 @@ public class AccountSignServiceImpl implements AccountSignService {
         }
         try {
             var saveAccount = accountRepository.save(account);
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
                 .eventParams(accountMapper.toEventParams(saveAccount))
             );
         } catch (RuntimeException e) {
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_UPDATE_ERROR)
                 .eventParams(accountMapper.toEventParams(account))
             );

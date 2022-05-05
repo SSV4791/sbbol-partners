@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class RenterControllerTest extends AbstractIntegrationTest {
 
-    public static final String baseRoutePath = "/sbbol-partners/renter";
+    private static final String baseRoutePath = "/sbbol-partners/renter";
 
     @Test
     @AllureId("34155")

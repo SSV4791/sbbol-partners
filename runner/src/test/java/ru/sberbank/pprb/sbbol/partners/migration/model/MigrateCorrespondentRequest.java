@@ -5,7 +5,6 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespond
 import java.io.Serializable;
 import java.util.Collection;
 
-// TODO DCBBRAIN-2268 Перенести тесты и модели для migration-service из модуля Runner в свой модуль
 /**
  * Запрос для миграции контрагентов
  */

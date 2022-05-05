@@ -6,7 +6,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithOutSbbolTest;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuRequest;
@@ -17,7 +17,7 @@ import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class GkuMigrationServiceTest extends AbstractIntegrationWithOutSbbolTest {
+public class GkuMigrationServiceTest extends AbstractIntegrationTest {
 
     @Autowired
     private PodamFactory podamFactory;

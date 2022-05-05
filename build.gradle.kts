@@ -23,6 +23,7 @@ val coverageExclusions = listOf(
     "**/*Controller*",
     "**/*Adapter*",
     "**/*Api*",
+    "**/*Client*",
     //Классы с заглушками для локальной разработки
     "**/*Stub*",
     //Сериализаторы/десериализаторы

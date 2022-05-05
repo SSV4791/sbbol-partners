@@ -65,14 +65,6 @@ dependencies {
     implementation(liveLibs.mapstruct.core)
     implementation(liveLibs.spring.context.support)
     implementation(liveLibs.swagger.annotations.core)
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation(testLibs.bundles.mockserver)
-    testImplementation(testLibs.bundles.pact)
-    testImplementation(testLibs.dcb.allure.annotations)
-    testImplementation(testLibs.junit5.allure)
-    testImplementation(testLibs.podam.core)
-    testImplementation(testLibs.swagger.coverage.reporter)
 }
 
 description = "Adapter ППРБ.Digital.Партнеры"

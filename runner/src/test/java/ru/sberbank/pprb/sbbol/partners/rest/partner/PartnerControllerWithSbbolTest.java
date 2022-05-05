@@ -4,19 +4,21 @@ import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationWithSbbolTest;
+import org.springframework.test.context.ContextConfiguration;
+import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
+import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithSbbolConfiguration;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-class PartnerControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
+@ContextConfiguration(classes = SbbolIntegrationWithSbbolConfiguration.class)
+class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner";
 

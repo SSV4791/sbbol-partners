@@ -59,8 +59,8 @@ pr_check:
         - 'settings.gradle.kts'
         - 'jenkins/settings.yml'
         - 'jenkins/test.groovy'
-    cpu: 1
-    memory: '2g'
+    cpu: 2
+    memory: '4g'
     command: >-
       ./gradlew
       -PnexusLogin=${env.NEXUS_USR}
@@ -118,12 +118,10 @@ release:
   skip_istio: false
   default_values:
     params_branch: master
-    istio_tag: 1.4
-    commit_or_tag: 01.002.00_0053
+    istio_tag: '1.4'
+    commit_or_tag: '01.002.00_0053'
     release_key:
     checkmarx: false
     reverse_and_publish: false
-    type:
-      - develop
-      - release
+    type: develop
     params_folder: develop

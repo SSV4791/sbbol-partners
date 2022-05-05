@@ -20,26 +20,26 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
+import ru.dcbqa.coverage.swagger.reporter.junit.jupiter.RestAssuredCoverageExtension;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
-import ru.sberbank.pprb.sbbol.partners.Runner;
+import ru.sberbank.pprb.sbbol.partners.adapter.audit.config.AuditAdapterConfiguration;
 
 import static io.restassured.RestAssured.given;
 
 @ApiTestLayer
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
-    classes = {Runner.class}
+    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
 @ActiveProfiles("test")
 @ContextConfiguration(classes =
     {
-        TestReplicationConfiguration.class,
-        PodamConfiguration.class
+        PodamConfiguration.class,
+        TestReplicationConfiguration.class
     }
 )
-@ExtendWith({SpringExtension.class})
+@ExtendWith({SpringExtension.class, RestAssuredCoverageExtension.class})
 public abstract class AbstractIntegrationTest {
 
     private static final String BASE_URI = "http://localhost";

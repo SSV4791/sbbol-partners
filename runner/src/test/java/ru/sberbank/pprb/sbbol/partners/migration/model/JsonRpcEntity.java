@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.migration.model;
 
 import java.io.Serializable;
 
-// TODO DCBBRAIN-2268 Перенести тесты и модели для migration-service из модуля Runner в свой модуль
 /**
  * Сущность для формирования запроса/ответа при json-rpc взаимодействии
  */

@@ -110,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
         var requestAccount = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(requestAccount);
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_CREATE_SUCCESS)
                 .eventParams(accountMapper.toEventParams(savedAccount))
             );
@@ -118,7 +118,7 @@ public class AccountServiceImpl implements AccountService {
             replicationService.saveCounterparty(response);
             return new AccountResponse().account(response);
         } catch (RuntimeException e) {
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_CREATE_ERROR)
                 .eventParams(accountMapper.toEventParams(requestAccount))
             );
@@ -150,7 +150,7 @@ public class AccountServiceImpl implements AccountService {
         accountMapper.updateAccount(account, foundAccount);
         try {
             var savedAccount = accountRepository.save(foundAccount);
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
                 .eventParams(accountMapper.toEventParams(foundAccount))
             );
@@ -158,7 +158,7 @@ public class AccountServiceImpl implements AccountService {
             replicationService.saveCounterparty(response);
             return new AccountResponse().account(response);
         } catch (RuntimeException e) {
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_UPDATE_ERROR)
                 .eventParams(accountMapper.toEventParams(foundAccount))
             );
@@ -176,13 +176,13 @@ public class AccountServiceImpl implements AccountService {
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         try {
             accountRepository.delete(foundAccount);
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_DELETE_SUCCESS)
                 .eventParams(accountMapper.toEventParams(foundAccount))
             );
             replicationService.deleteCounterparty(foundAccount);
         } catch (RuntimeException e) {
-            auditAdapter.sand(new Event()
+            auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_DELETE_ERROR)
                 .eventParams(accountMapper.toEventParams(foundAccount))
             );
