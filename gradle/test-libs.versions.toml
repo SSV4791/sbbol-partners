@@ -4,7 +4,7 @@ mockserver = "5.11.2"
 pact = "4.1.31"
 
 [libraries]
-dcb-allure-annotations = { module = "ru.dcbqa.allureee.annotations:dcb-allure-annotations", version = "1.2.+" }
+dcb-allure-annotations = { module = "ru.dcbqa.allureee.annotations:dcb-allure-annotations", version = "1.3.+" }
 junit5-allure = { module = "io.qameta.allure:allure-junit5", version = "2.16.1" }
 junit5-consumer = { module = "au.com.dius.pact.consumer:junit5", version.ref = "pact" }
 junit5-provider = { module = "au.com.dius.pact.provider:junit5", version.ref = "pact" }

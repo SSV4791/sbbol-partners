@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Logged(printRequestResponse = true)
 public class DocumentTypeServiceImpl implements DocumentTypeService {
-    private static String DOCUMENT_TYPE = "document_type";
+    private static final String DOCUMENT_TYPE = "document_type";
 
     private final DocumentDictionaryRepository dictionaryRepository;
     private final DocumentTypeMapper documentTypeMapper;
@@ -57,7 +57,7 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     public void deleteDocument(String id) {
         DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, id));
-        foundDocument.setDeleted(true);
-        dictionaryRepository.save(foundDocument);;
+        foundDocument.setDeleted(Boolean.TRUE);
+        dictionaryRepository.save(foundDocument);
     }
 }

@@ -5,11 +5,11 @@ plugins {
     id("jacoco-conventions")
     id("java-conventions")
     id("meta-conventions")
-    id("org.sonarqube") version "3.3"
+    id("org.sonarqube") version "3.2.0"
     id("publish-develop-conventions")
     id("publish-release-conventions")
     id("publish-snapshot-conventions")
-    id("ru.sbrf.build.gradle.qa.reporter") version "3.2.+"
+    id("ru.sbrf.build.gradle.qa.reporter") version "3.2.14"
 }
 
 val coverageExclusions = listOf(

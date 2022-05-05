@@ -22,7 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
 import ru.dcbqa.coverage.swagger.reporter.junit.jupiter.RestAssuredCoverageExtension;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
-import ru.sberbank.pprb.sbbol.partners.adapter.audit.config.AuditAdapterConfiguration;
 
 import static io.restassured.RestAssured.given;
 

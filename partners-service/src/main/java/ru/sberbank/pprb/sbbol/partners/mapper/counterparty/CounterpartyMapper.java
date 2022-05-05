@@ -60,7 +60,7 @@ public interface CounterpartyMapper extends BaseMapper {
 
     @Named("toName")
     static String toName(PartnerEntity partner) {
-        if (LegalType.PHYSICAL_PERSON.equals(partner.getLegalType())) {
+        if (LegalType.PHYSICAL_PERSON == partner.getLegalType()) {
             StringJoiner fioJoiner = new StringJoiner(" ");
             if (partner.getFirstName() != null) {
                 fioJoiner.add(partner.getFirstName());

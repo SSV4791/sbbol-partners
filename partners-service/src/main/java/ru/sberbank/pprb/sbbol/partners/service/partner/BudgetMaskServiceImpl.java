@@ -126,9 +126,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
                 maskFormatter.valueToString(param);
                 return true;
             } catch (ParseException e) {
-                throw new ModelValidationException(List.of(
-                    e.getLocalizedMessage()
-                ));
+                throw new ModelValidationException(e.getLocalizedMessage());
             }
         }
         return false;

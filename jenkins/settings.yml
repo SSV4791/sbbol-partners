@@ -43,7 +43,7 @@ pr_check:
         - 'gradle.properties'
         - 'settings.gradle.kts'
     cpu: 1
-    memory: '1g'
+    memory: '2g'
     command: >-
       ./gradlew
       -PnexusLogin=${env.NEXUS_USR}
@@ -76,17 +76,16 @@ pr_check:
       -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}
       -Dtest.results.enabled=true
       -Dtest-layer=unit,api,configuration,cdcConsumer
-      -Dpactbroker.url=${Const.PACT_BROKER_URL}
+      -Dallure.link=${Const.ALLURE_ENTRYPOINT_URL}jobrun/${launch.jobRunId}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=prCheck
-      -Dallure.jobrunId=${launch.jobRunId}
       -Pspring.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_MAIN}/${env.POSTGRES_DB_NAME}
       -Pspring.datasource.username=${env.POSTGRES_DB_USER}
       -Pspring.datasource.password=${env.POSTGRES_DB_PASSWORD}
       -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
       -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
       -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
-      qaReporterUpload sonarCoverage
+      qaReporterUpload sonarCoverage --info
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
@@ -98,15 +97,15 @@ release:
   docker_dev: 'pprb-dev/ci00908578/ci02792425_sbbol-partners_dev'
   doc_path: 'docs/build/docs/'
   build_gradle:
-    cpu: 1
-    mem: '2g'
+    cpu: 2
+    mem: '4g'
     command: >-
       ./gradlew
       -PnexusLogin=${env.NEXUS_USR}
       -PnexusPassword=${env.NEXUS_PWD}
       -Pversion=${env.VERSION}
-      -Dtest-layer=cdcConsumer,cdcProvider
-      -Dpactbroker.url=${env.PACT_BROKER_URL}
+      -Dtest-layer=unit,configuration,cdcConsumer,cdcProvider
+      -Dpact.url=${env.PACT_BROKER_URL}
       -Dpactbroker.auth.username=${env.PACT_USER}
       -Dpactbroker.auth.password='${env.PACT_PASSWORD}'
       -Dpact.pacticipant.version=${env.VERSION}
@@ -115,7 +114,6 @@ release:
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=release
       -Dallure.link=${Const.ALLURE_ENTRYPOINT_URL}jobrun/${launch.jobRunId}
-      -Dallure.jobrunId=${launch.jobRunId}
       -Dsonar.login=${env.SONAR_TOKEN}
       -Dsonar.branch.name=${params.branch}
       build qaReporterUpload sonarCoverage --parallel --info
