@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.audit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
+import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import ru.sberbank.pprb.sbbol.audit.api.DefaultApi;
@@ -24,6 +24,7 @@ public class AuditAdapterImpl implements AuditAdapter {
     private final DefaultApi auditApi;
     private final AuditMapper auditMapper;
     private final boolean auditEnabled;
+    private final Resource metaModel;
     private final String defaultXNodeId;
 
     private String moduleName;
@@ -31,11 +32,13 @@ public class AuditAdapterImpl implements AuditAdapter {
 
     public AuditAdapterImpl(
         boolean auditEnabled,
+        Resource metaModel,
         String defaultXNodeId,
         DefaultApi auditApi,
         AuditMapper auditMapper
     ) {
         this.auditEnabled = auditEnabled;
+        this.metaModel = metaModel;
         this.defaultXNodeId = defaultXNodeId;
         this.auditApi = auditApi;
         this.auditMapper = auditMapper;
@@ -48,8 +51,7 @@ public class AuditAdapterImpl implements AuditAdapter {
             return;
         }
         try {
-            var metaModel = ResourceUtils.getFile(ResourceUtils.CLASSPATH_URL_PREFIX + "audit/auditMetamodel.json");
-            var auditMetamodel = new ObjectMapper().readValue(metaModel, AuditMetamodel.class);
+            var auditMetamodel = new ObjectMapper().readValue(metaModel.getInputStream(), AuditMetamodel.class);
             moduleName = auditMetamodel.getModule();
             metamodelVersion = auditMetamodel.getMetamodelVersion();
             var response = auditApi.uploadMetamodelWithHttpInfo(auditMetamodel);

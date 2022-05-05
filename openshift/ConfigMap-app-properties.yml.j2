@@ -42,7 +42,7 @@ data:
 
     # Audit
     audit.enabled={{ os_project.audit.enabled | default('false')}}
-    audit.url={{ int_entry.pprb.audit[0].host }}
+    audit.url={{ os_project.audit.url }}
     audit.time_out={{ os_project.audit.time_out | default('5000')}}
     audit.x-node-id={{ openshift.env }}
 

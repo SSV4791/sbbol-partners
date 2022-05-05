@@ -7,6 +7,7 @@ credentials:
   sonar: DS_CAB-SA-CI000825-sonar-token
   nexus: DS_CAB-SA-CI000825
   checkmarx: DS_CAB-SA-CI000825-checkmarx
+  openshift: DS_CAB-SA-CI000825-openshift
 
 allure_project_id: '154'
 
@@ -23,10 +24,13 @@ pr_check:
       path: jenkins/resources/liquibase/liquibase.properties
   openshift:
     workdir: openshift
+
     match:
       files:
         - 'openshift/'
         - 'jenkins/resources/openshift/'
+    server: dev-gen2
+    namespace: ci02281165-edevgen2-efs-kib-sbbol-dev-test6
   build_gradle:
     match:
       files:

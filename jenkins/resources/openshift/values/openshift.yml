@@ -53,6 +53,7 @@ os_project:
 
   audit:
     enabled: false
+    url: "http:localhost:8080"
     time_out: 5000
 
 registry_area: registry.sigma.sbrf.ru
