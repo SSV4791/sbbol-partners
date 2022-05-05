@@ -26,10 +26,6 @@
       "title": "Признак бюджетности",
       "default": false
     },
-    "name": {
-      "type": "string",
-      "title": "Наименование счёта"
-    },
     "account": {
       "type": "string",
       "title": "Счёт"
@@ -50,6 +46,10 @@
         "SIGNED",
         "NOT_SIGNED"
       ]
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий счета"
     }
   }
 }

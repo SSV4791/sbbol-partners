@@ -101,7 +101,7 @@ public interface RenterPartnerMapper extends BaseMapper {
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(renter.getUuid()))")
-    @Mapping(target = "name", ignore = true)
+    @Mapping(target = "comment", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)

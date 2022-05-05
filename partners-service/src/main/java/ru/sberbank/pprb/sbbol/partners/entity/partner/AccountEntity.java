@@ -51,9 +51,6 @@ public class AccountEntity extends BaseEntity {
     @Column(name = "digital_id", nullable = false)
     private String digitalId;
 
-    @Column(name = "name", length = 50)
-    private String name;
-
     @Column(name = "account", length = 20)
     private String account;
 
@@ -66,6 +63,9 @@ public class AccountEntity extends BaseEntity {
 
     @Column(name = "priority_account")
     private Boolean priorityAccount;
+
+    @Column(name = "comment", length = 50)
+    private String comment;
 
     public Boolean getPriorityAccount() {
         if (priorityAccount == null) {
@@ -121,14 +121,6 @@ public class AccountEntity extends BaseEntity {
         this.account = account;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public UUID getPartnerUuid() {
         return partnerUuid;
     }
@@ -143,6 +135,13 @@ public class AccountEntity extends BaseEntity {
 
     public void setBank(BankEntity bank) {
         this.bank = bank;
+    }
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

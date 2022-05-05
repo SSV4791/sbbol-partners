@@ -21,10 +21,6 @@
       "format": "int64",
       "title": "Версия"
     },
-    "name": {
-      "type": "string",
-      "title": "Наименование счёта"
-    },
     "account": {
       "type": "string",
       "title": "Счёт"
@@ -32,6 +28,10 @@
     "bank": {
       "title": "Банк",
       "$ref": "../../model/bank/bank.json"
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий счета"
     }
   }
 }

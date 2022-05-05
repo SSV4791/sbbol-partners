@@ -12,10 +12,6 @@
       "type": "string",
       "title": "Идентификатор личного кабинета клиента"
     },
-    "name": {
-      "type": "string",
-      "title": "Наименование счёта"
-    },
     "account": {
       "type": "string",
       "title": "Счёт"
@@ -23,6 +19,10 @@
     "bank": {
       "title": "Банк",
       "$ref": "../bank/bank_create.json"
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий счета"
     }
   }
 }

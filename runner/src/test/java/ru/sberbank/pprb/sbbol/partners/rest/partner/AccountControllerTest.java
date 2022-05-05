@@ -41,6 +41,8 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         );
         assertThat(actualAccount)
             .isNotNull();
+        assertThat(actualAccount.getAccount().getComment())
+            .isEqualTo("Это тестовый комментарий");
         assertThat(actualAccount.getAccount())
             .isNotNull()
             .isEqualTo(account);
@@ -173,10 +175,10 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         );
         assertThat(updateAccount)
             .isNotNull();
-        assertThat(updateAccount.getAccount().getName())
-            .isNotEqualTo(account.getName());
-        assertThat(updateAccount.getAccount().getName())
-            .isEqualTo(updateAccount.getAccount().getName());
+        assertThat(updateAccount.getAccount().getComment())
+            .isNotEqualTo(account.getComment());
+        assertThat(updateAccount.getAccount().getComment())
+            .isEqualTo(updateAccount.getAccount().getComment());
         assertThat(updateAccount.getErrors())
             .isNull();
     }
@@ -314,8 +316,8 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
         return new AccountCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
-            .name("111111")
             .account("40802810500490014206")
+            .comment("Это тестовый комментарий")
             .bank(new BankCreate()
                 .bic("044525411")
                 .name("222222")
@@ -409,7 +411,7 @@ class AccountControllerTest extends AbstractIntegrationWithOutSbbolTest {
 
     public static AccountChange updateAccount(Account account) {
         return new AccountChange()
-            .name(randomAlphabetic(20))
+            .comment(randomAlphabetic(20))
             .version(account.getVersion())
             .digitalId(account.getDigitalId())
             .id(account.getId())
