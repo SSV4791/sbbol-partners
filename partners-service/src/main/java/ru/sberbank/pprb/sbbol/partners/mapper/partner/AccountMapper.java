@@ -120,17 +120,17 @@ public interface AccountMapper extends BaseMapper {
         if (account.getLastModifiedDate() != null) {
             params.put("lastModifiedDate", account.getLastModifiedDate().toString());
         }
-        if (account.getName() != null) {
-            params.put("partnerUuid", account.getPartnerUuid().toString());
-        }
         if (account.getPartnerUuid() != null) {
-            params.put("name", account.getName());
+            params.put("partnerUuid", account.getPartnerUuid().toString());
         }
         if (account.getAccount() != null) {
             params.put("account", account.getAccount());
         }
         if (account.getState() != null) {
             params.put("state", account.getState().name());
+        }
+        if (account.getComment() != null) {
+            params.put("comment", account.getComment());
         }
         var bank = account.getBank();
         if (bank == null) {

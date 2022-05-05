@@ -72,7 +72,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationWithSbbolTest {
             .id(UUID.randomUUID().toString())
             .digitalId(randomAlphabetic(10))
             .partnerId(UUID.randomUUID().toString())
-            .name("111111")
+            .comment("111111")
             .version(0L)
             .account("40802810500490014206")
             .bank(new Bank()
