@@ -85,8 +85,8 @@
           "description": "Уникальный идентификатор партнера"
         },
         {
-          "name": "name",
-          "description": "Наименование счёта"
+          "name": "comment",
+          "description": "Комментарий счёта"
         },
         {
           "name": "account",
@@ -141,8 +141,8 @@
           "description": "Уникальный идентификатор партнера"
         },
         {
-          "name": "name",
-          "description": "Наименование счёта"
+          "name": "comment",
+          "description": "Комментарий счёта"
         },
         {
           "name": "account",
@@ -197,8 +197,8 @@
           "description": "Уникальный идентификатор партнера"
         },
         {
-          "name": "name",
-          "description": "Наименование счёта"
+          "name": "comment",
+          "description": "Комментарий счёта"
         },
         {
           "name": "account",
@@ -253,8 +253,8 @@
           "description": "Уникальный идентификатор партнера"
         },
         {
-          "name": "name",
-          "description": "Наименование счёта"
+          "name": "comment",
+          "description": "Комментарий счёта"
         },
         {
           "name": "account",
@@ -309,8 +309,8 @@
           "description": "Уникальный идентификатор партнера"
         },
         {
-          "name": "name",
-          "description": "Наименование счёта"
+          "name": "comment",
+          "description": "Комментарий счёта"
         },
         {
           "name": "account",
