@@ -2,12 +2,14 @@ package ru.sberbank.pprb.sbbol.migration.correspondents.entity;
 
 import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @MappedSuperclass
@@ -21,6 +23,10 @@ public abstract class MigrationBaseEntity implements Serializable, HashKeyProvid
 
     @Column(name = "version", nullable = false)
     private Long version;
+
+    @UpdateTimestamp
+    @Column(name = "SYS_LASTCHANGEDATE", nullable = false)
+    private OffsetDateTime lastModifiedDate;
 
     public UUID getUuid() {
         return uuid;
@@ -36,5 +42,13 @@ public abstract class MigrationBaseEntity implements Serializable, HashKeyProvid
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public OffsetDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 }

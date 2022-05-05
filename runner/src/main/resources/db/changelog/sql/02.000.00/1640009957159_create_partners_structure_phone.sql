@@ -3,11 +3,12 @@
 
 CREATE TABLE PHONE
 (
-    uuid         UUID PRIMARY KEY,
-    digital_id   VARCHAR(40)      NOT NULL,
-    unified_uuid UUID             NOT NULL,
-    version      BIGINT default 0 NOT NULL,
-    phone        VARCHAR(12)
+    uuid               UUID PRIMARY KEY,
+    digital_id         VARCHAR(40)      NOT NULL,
+    unified_uuid       UUID             NOT NULL,
+    version            BIGINT default 0 NOT NULL,
+    phone              VARCHAR(12),
+    SYS_LASTCHANGEDATE TIMESTAMP        NOT NULL
 );
 
 COMMENT ON TABLE PHONE IS 'Телефоны';
@@ -15,6 +16,7 @@ COMMENT ON COLUMN PHONE.UUID IS 'Уникальный идентификатор
 COMMENT ON COLUMN CONTACT.DIGITAL_ID IS 'Идентификатор личного кабинета клиента';
 COMMENT ON COLUMN PHONE.UNIFIED_UUID IS 'Уникальный идентификатор связанной записи';
 COMMENT ON COLUMN PHONE.VERSION IS 'Версия (служебное поле Hibernate)';
+COMMENT ON COLUMN PHONE.SYS_LASTCHANGEDATE IS 'Время изменения записи системное поле для сверок в двух контурах с помощью ПЖ';
 COMMENT ON COLUMN PHONE.PHONE IS 'Телефон';
 
 CREATE INDEX I_PHONE_UNIFIED_UUID ON PHONE (UNIFIED_UUID);

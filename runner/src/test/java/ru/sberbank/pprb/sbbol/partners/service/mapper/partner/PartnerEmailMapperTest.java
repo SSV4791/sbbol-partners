@@ -35,7 +35,10 @@ class PartnerEmailMapperTest extends BaseUnitConfiguration {
         Email actual = mapper.toEmail(expected);
         assertThat(expected)
             .usingRecursiveComparison()
-            .ignoringFields("partner")
+            .ignoringFields(
+                "partner",
+                "lastModifiedDate"
+            )
             .isEqualTo(mapper.toEmail(actual));
     }
 }

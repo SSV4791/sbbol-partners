@@ -15,7 +15,8 @@ CREATE TABLE DOCUMENT
     division_code      VARCHAR(50),
     certifier_name     VARCHAR(100),
     position_certifier VARCHAR(100),
-    certifier_type     VARCHAR(10)
+    certifier_type     VARCHAR(10),
+    SYS_LASTCHANGEDATE TIMESTAMP        NOT NULL
 );
 
 COMMENT ON TABLE DOCUMENT IS 'Документы';
@@ -24,6 +25,7 @@ COMMENT ON COLUMN DOCUMENT.UNIFIED_UUID IS 'Уникальный идентиф�
 COMMENT ON COLUMN DOCUMENT.DIGITAL_ID IS 'Идентификатор личного кабинета клиента';
 COMMENT ON COLUMN DOCUMENT.TYPE_UUID IS 'Уникальный идентификатор записи справочника Документы';
 COMMENT ON COLUMN DOCUMENT.VERSION IS 'Версия (служебное поле Hibernate)';
+COMMENT ON COLUMN DOCUMENT.SYS_LASTCHANGEDATE IS 'Время изменения записи системное поле для сверок в двух контурах с помощью ПЖ';
 COMMENT ON COLUMN DOCUMENT.SERIES IS 'Серия документа';
 COMMENT ON COLUMN DOCUMENT.NUMBER IS 'Номер документа';
 COMMENT ON COLUMN DOCUMENT.DATE_ISSUE IS 'Дата выдачи документа';

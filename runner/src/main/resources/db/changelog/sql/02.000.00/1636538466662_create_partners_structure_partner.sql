@@ -5,7 +5,6 @@ CREATE TABLE PARTNER
 (
     uuid               UUID PRIMARY KEY,
     create_date        TIMESTAMP                      NOT NULL,
-    last_modified_date TIMESTAMP                      NOT NULL,
     digital_id         VARCHAR(40)                    NOT NULL,
     version            BIGINT       default 0         NOT NULL,
     type               VARCHAR(254) default 'PARTNER' NOT NULL,
@@ -20,6 +19,7 @@ CREATE TABLE PARTNER
     okpo               VARCHAR(30),
     citizenship        VARCHAR(20),
     comment            VARCHAR(255),
+    SYS_LASTCHANGEDATE TIMESTAMP                      NOT NULL,
     CONSTRAINT CK_PARTNER_CITIZENSHIP CHECK
         (
                 CITIZENSHIP = 'UNKNOWN' OR
@@ -43,7 +43,7 @@ CREATE TABLE PARTNER
 COMMENT ON TABLE PARTNER IS 'Партнеры';
 COMMENT ON COLUMN PARTNER.UUID IS 'Уникальный идентификатор партнера';
 COMMENT ON COLUMN PARTNER.CREATE_DATE IS 'Время создания записи';
-COMMENT ON COLUMN PARTNER.LAST_MODIFIED_DATE IS 'Время изменения записи';
+COMMENT ON COLUMN PARTNER.SYS_LASTCHANGEDATE IS 'Время изменения записи системное поле для сверок в двух контурах с помощью ПЖ';
 COMMENT ON COLUMN PARTNER.DIGITAL_ID IS 'Идентификатор личного кабинета клиента';
 COMMENT ON COLUMN PARTNER.VERSION IS 'Версия (служебное поле Hibernate)';
 COMMENT ON COLUMN PARTNER.TYPE IS 'Тип партнера';

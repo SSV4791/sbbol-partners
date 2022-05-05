@@ -14,6 +14,7 @@ public interface PartnerEmailMapper extends BaseMapper {
     @Mapping(target = "unifiedId", expression = "java(email.getHashKey())")
     Email toEmail(PartnerEmailEntity email);
 
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
     @Mapping(target = "partner", ignore = true)
     PartnerEmailEntity toEmail(Email email);

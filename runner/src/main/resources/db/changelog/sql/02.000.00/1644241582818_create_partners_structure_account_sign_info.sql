@@ -12,12 +12,14 @@ CREATE TABLE SIGN
     account_uuid               UUID             NOT NULL,
     external_data_file_id      VARCHAR(255),
     external_data_sign_file_id VARCHAR(255),
-    date_time_of_sign          TIMESTAMP
+    date_time_of_sign          TIMESTAMP,
+    SYS_LASTCHANGEDATE         TIMESTAMP        NOT NULL
 );
 
 COMMENT ON TABLE SIGN IS 'Подписи';
 COMMENT ON COLUMN SIGN.UUID IS 'Уникальный идентификатор подписи';
 COMMENT ON COLUMN SIGN.VERSION IS 'Версия (служебное поле Hibernate)';
+COMMENT ON COLUMN SIGN.SYS_LASTCHANGEDATE IS 'Время изменения записи системное поле для сверок в двух контурах с помощью ПЖ';
 COMMENT ON COLUMN SIGN.ENTITY_UUID IS 'Глобальный уникальный идентификатор объекта';
 COMMENT ON COLUMN SIGN.DIGEST IS 'Дайджест';
 COMMENT ON COLUMN SIGN.SIGN IS 'Подпись';

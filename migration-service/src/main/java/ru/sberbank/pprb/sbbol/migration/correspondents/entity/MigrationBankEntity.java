@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
@@ -26,7 +25,7 @@ public class MigrationBankEntity extends MigrationBaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_uuid", nullable = false)
     private MigrationPartnerAccountEntity account;
 

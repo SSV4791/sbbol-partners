@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.migration.correspondents.entity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.UpdateTimestamp;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationAccountStateType;
 
 import javax.persistence.CascadeType;
@@ -13,7 +12,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
@@ -33,11 +31,7 @@ public class MigrationPartnerAccountEntity extends MigrationBaseEntity {
     @Column(name = "create_date", nullable = false)
     private OffsetDateTime createDate;
 
-    @UpdateTimestamp
-    @Column(name = "last_modified_date", nullable = false)
-    private OffsetDateTime lastModifiedDate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partner_uuid")
     private MigrationPartnerEntity partner;
 
@@ -60,14 +54,6 @@ public class MigrationPartnerAccountEntity extends MigrationBaseEntity {
 
     public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
-    }
-
-    public OffsetDateTime getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public MigrationPartnerEntity getPartner() {

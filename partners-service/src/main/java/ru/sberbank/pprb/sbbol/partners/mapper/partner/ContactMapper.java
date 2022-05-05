@@ -42,6 +42,7 @@ public interface ContactMapper extends BaseMapper {
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
     @Mapping(target = "emails", expression = "java(toEmail(contact.getEmails(), contact.getDigitalId()))")
     @Mapping(target = "phones", expression = "java(toPhone(contact.getPhones(), contact.getDigitalId()))")
@@ -72,6 +73,7 @@ public interface ContactMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
     @Mapping(target = "type", source = "legalForm", qualifiedByName = "toLegalType")
+    @Mapping(target = "lastModifiedDate", ignore = true)
     ContactEntity toContact(Contact contact);
 
     @Named("toLegalType")
@@ -81,6 +83,7 @@ public interface ContactMapper extends BaseMapper {
 
     @Named("updateContact")
     @Mapping(target = "type", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
     void updateContact(Contact contact, @MappingTarget() ContactEntity contactEntity);

@@ -3,20 +3,21 @@
 
 CREATE TABLE ADDRESS
 (
-    uuid           UUID PRIMARY KEY,
-    unified_uuid   UUID             NOT NULL,
-    digital_id     VARCHAR(40)      NOT NULL,
-    version        BIGINT default 0 NOT NULL,
-    type           VARCHAR(20),
-    zip_code       VARCHAR(6),
-    region_code    VARCHAR(10),
-    region         VARCHAR(50),
-    city           VARCHAR(300),
-    location       VARCHAR(300),
-    street         VARCHAR(300),
-    building       VARCHAR(100),
-    building_block VARCHAR(20),
-    flat           VARCHAR(10),
+    uuid               UUID PRIMARY KEY,
+    unified_uuid       UUID             NOT NULL,
+    digital_id         VARCHAR(40)      NOT NULL,
+    version            BIGINT default 0 NOT NULL,
+    type               VARCHAR(20),
+    zip_code           VARCHAR(6),
+    region_code        VARCHAR(10),
+    region             VARCHAR(50),
+    city               VARCHAR(300),
+    location           VARCHAR(300),
+    street             VARCHAR(300),
+    building           VARCHAR(100),
+    building_block     VARCHAR(20),
+    flat               VARCHAR(10),
+    SYS_LASTCHANGEDATE TIMESTAMP        NOT NULL,
     CONSTRAINT CK_ADDRESS_TYPE CHECK
         (
                 TYPE = 'LEGAL_ADDRESS' OR
@@ -31,6 +32,7 @@ COMMENT ON COLUMN ADDRESS.UUID IS 'Уникальный идентификато
 COMMENT ON COLUMN ADDRESS.UNIFIED_UUID IS 'Уникальный идентификатор связанной записи';
 COMMENT ON COLUMN ADDRESS.DIGITAL_ID IS 'Уникальный идентификатор связанной записи';
 COMMENT ON COLUMN ADDRESS.VERSION IS 'Версия (служебное поле Hibernate)';
+COMMENT ON COLUMN ADDRESS.SYS_LASTCHANGEDATE IS 'Время изменения записи системное поле для сверок в двух контурах с помощью ПЖ';
 COMMENT ON COLUMN ADDRESS.TYPE IS 'Тип адреса';
 COMMENT ON COLUMN ADDRESS.ZIP_CODE IS 'Индекс';
 COMMENT ON COLUMN ADDRESS.REGION_CODE IS 'Код регион';

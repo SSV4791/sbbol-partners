@@ -27,6 +27,7 @@ public interface AddressMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     AddressEntity toAddress(AddressCreate address);
 
@@ -35,6 +36,7 @@ public interface AddressMapper extends BaseMapper {
         return addressType != null ? AddressType.valueOf(addressType.getValue()) : null;
     }
 
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
@@ -46,6 +48,7 @@ public interface AddressMapper extends BaseMapper {
     }
 
     @Named("updateAddress")
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
     void updateAddress(Address address, @MappingTarget() AddressEntity addressEntity);

@@ -36,7 +36,10 @@ class PartnerPhoneMapperTest extends BaseUnitConfiguration {
         Phone actual = mapper.toPhone(expected);
         assertThat(expected)
             .usingRecursiveComparison()
-            .ignoringFields("partner")
+            .ignoringFields(
+                "partner",
+                "lastModifiedDate"
+            )
             .isEqualTo(mapper.toPhone(actual));
     }
 }

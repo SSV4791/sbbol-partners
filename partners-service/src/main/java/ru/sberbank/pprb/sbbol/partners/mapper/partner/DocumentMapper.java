@@ -38,6 +38,7 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
@@ -49,6 +50,8 @@ public interface DocumentMapper extends BaseMapper {
     }
 
     @Named("updateDocument")
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "type", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(document.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")

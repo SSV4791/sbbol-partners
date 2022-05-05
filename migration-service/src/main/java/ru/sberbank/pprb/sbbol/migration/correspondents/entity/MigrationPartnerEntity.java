@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.migration.correspondents.entity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.UpdateTimestamp;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationPartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationPartnerType;
@@ -34,10 +33,6 @@ public class MigrationPartnerEntity extends MigrationBaseEntity {
     @CreationTimestamp
     @Column(name = "create_date", nullable = false)
     private OffsetDateTime createDate;
-
-    @UpdateTimestamp
-    @Column(name = "last_modified_date", nullable = false)
-    private OffsetDateTime lastModifiedDate;
 
     @Column(name = "digital_id")
     private String digitalId;
@@ -84,14 +79,6 @@ public class MigrationPartnerEntity extends MigrationBaseEntity {
 
     public void setCreateDate(OffsetDateTime createDate) {
         this.createDate = createDate;
-    }
-
-    public OffsetDateTime getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getDigitalId() {

@@ -55,7 +55,8 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .usingRecursiveComparison()
             .ignoringFields(
                 "accountId",
-                "bankAccount.bankId")
+                "bankAccount.bankId"
+            )
             .isEqualTo(mapper.toBank(actual));
     }
 
@@ -69,7 +70,9 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .usingRecursiveComparison()
             .ignoringFields(
                 "account",
-                "bankAccount.bank"
+                "lastModifiedDate",
+                "bankAccount.bank",
+                "bankAccount.lastModifiedDate"
             )
             .isEqualTo(mapper.toBank(actual));
     }
@@ -96,7 +99,10 @@ class AccountMapperTest extends BaseUnitConfiguration {
         var actual = mapper.toBankAccount(expected);
         assertThat(expected)
             .usingRecursiveComparison()
-            .ignoringFields("bank")
+            .ignoringFields(
+                "bank",
+                "lastModifiedDate"
+            )
             .isEqualTo(mapper.toBankAccount(actual));
     }
 }
