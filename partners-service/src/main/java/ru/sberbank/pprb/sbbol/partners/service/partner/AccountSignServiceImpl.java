@@ -88,7 +88,7 @@ public class AccountSignServiceImpl implements AccountSignService {
         for (var accountSign : accountsSign.getAccountsSignDetail()) {
             var account = accountRepository.getByDigitalIdAndUuid(accountsSign.getDigitalId(), UUID.fromString(accountSign.getAccountId()))
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, accountsSign.getDigitalId(), accountSign.getAccountId()));
-            if (AccountStateType.SIGNED.equals(account.getState())) {
+            if (AccountStateType.SIGNED == account.getState()) {
                 response.addErrorsItem(
                     new Error()
                         .code("PPRB:PARTNER:SIGN_ACCOUNT_EXCEPTION")

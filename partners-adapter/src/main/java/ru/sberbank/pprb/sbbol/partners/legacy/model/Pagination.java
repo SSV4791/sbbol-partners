@@ -65,13 +65,11 @@ public class Pagination {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Pagination)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         Pagination that = (Pagination) o;
-        return Objects.equals(offset, that.offset) &&
-            Objects.equals(count, that.count) &&
-            Objects.equals(hasNextPage, that.hasNextPage);
+        return Objects.equals(offset, that.offset) && Objects.equals(count, that.count) && Objects.equals(hasNextPage, that.hasNextPage);
     }
 
     @Override

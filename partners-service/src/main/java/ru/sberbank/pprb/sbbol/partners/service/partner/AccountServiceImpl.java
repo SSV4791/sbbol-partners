@@ -138,7 +138,7 @@ public class AccountServiceImpl implements AccountService {
             throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundAccount.getVersion() +
                 " не равна версии записи в запросе version=" + account.getVersion());
         }
-        if (AccountStateType.SIGNED.equals(foundAccount.getState())) {
+        if (AccountStateType.SIGNED == foundAccount.getState()) {
             throw new SignAccountException(
                 "Ошибка обновления счёта клиента " + account.getAccount() + " id " + account.getId() + " нельзя обновлять подписанные счёта"
             );

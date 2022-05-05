@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.exception;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ModelValidationException extends RuntimeException {
@@ -9,6 +10,12 @@ public class ModelValidationException extends RuntimeException {
     private final String code;
 
     private final List<String> errors;
+
+    public ModelValidationException(String error) {
+        super("Ошибка прохождения валидации");
+        this.code = EXCEPTION;
+        this.errors = Collections.singletonList(error);
+    }
 
     public ModelValidationException(List<String> errors) {
         super("Ошибка прохождения валидации");
