@@ -61,7 +61,7 @@ sonarqube {
         property("sonar.projectKey", "ru.sberbank.pprb.sbbol.partners:partners")
         property("sonar.host.url", "https://sbt-sonarqube.sigma.sbrf.ru")
         property("sonar.login", "$sonarToken")
-        property("sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/jacoco/report/report.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/coverage/jacoco/jacocoTestReport.xml")
         property("sonar.coverage.exclusions", coverageExclusions)
         property(
             "sonar.cpd.exclusions", """
