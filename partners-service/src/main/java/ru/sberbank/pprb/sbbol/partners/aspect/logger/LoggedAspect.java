@@ -6,11 +6,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 /**
  * Аспект, обрабатывающий вызов методов с логированием, отмеченных аннотацией {@link Logged}
@@ -21,28 +19,12 @@ public final class LoggedAspect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggedAspect.class);
 
-    /**
-     * Такое название используется в платформенном логгере для заполнения поля "Запрос" и поиска по нему
-     */
-    private static final String REQUEST_UID = "requestUid";
-
     @Around("within(ru.sberbank.pprb.sbbol.partners..*) && @annotation(logged)")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint, Logged logged) throws Throwable {
-        String uid = MDC.get(REQUEST_UID);
-        boolean existingUid = uid != null;
-        if (!existingUid) {
-            MDC.put(REQUEST_UID, UUID.randomUUID().toString());
-        }
-        try {
-            logInvocation(logged, joinPoint.getSignature(), joinPoint.getArgs());
-            Object result = joinPoint.proceed();
-            logResult(logged, joinPoint.getSignature(), result);
-            return result;
-        } finally {
-            if (!existingUid) {
-                MDC.remove(REQUEST_UID);
-            }
-        }
+        logInvocation(logged, joinPoint.getSignature(), joinPoint.getArgs());
+        Object result = joinPoint.proceed();
+        logResult(logged, joinPoint.getSignature(), result);
+        return result;
     }
 
     private void logInvocation(Logged logged, Signature signature, Object[] args) {
@@ -72,5 +54,4 @@ public final class LoggedAspect {
             return Arrays.toString(args);
         }
     }
-
 }
