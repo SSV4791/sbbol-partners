@@ -18,6 +18,7 @@ tasks {
         enabled = false
     }
     clean {
+        delete("allure-results")
         delete("target")
     }
     test {
@@ -60,13 +61,17 @@ dependencies {
 
     testImplementation(project(":partners-service"))
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude("com.vaadin.external.google", "android-json")
+    }
     testImplementation(liveLibs.mapstruct.core)
     testImplementation(testLibs.bundles.pact)
     testImplementation(testLibs.dcb.allure.annotations)
     testImplementation(testLibs.junit5.allure)
     // заглушка для тестирования репликации между БД
-    testImplementation(testLibs.orm.tests.common)
+    testImplementation(testLibs.orm.tests.common) {
+        exclude("com.vaadin.external.google", "android-json")
+    }
     testImplementation(testLibs.rest.assured)
     testImplementation(testLibs.rest.assured.common)
     testImplementation(testLibs.swagger.coverage.reporter)

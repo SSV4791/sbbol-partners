@@ -11,7 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
-import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.exception.SignAccountException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -23,7 +22,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.UUID;
@@ -36,7 +34,6 @@ public class AccountServiceImpl implements AccountService {
     private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
     private final ReplicationService replicationService;
-    private final LegacySbbolAdapter legacySbbolAdapter;
     private final BudgetMaskService budgetMaskService;
     private final AuditAdapter auditAdapter;
     private final AccountMapper accountMapper;
@@ -45,7 +42,6 @@ public class AccountServiceImpl implements AccountService {
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
         ReplicationService replicationService,
-        LegacySbbolAdapter legacySbbolAdapter,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper
@@ -53,7 +49,6 @@ public class AccountServiceImpl implements AccountService {
         this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
         this.replicationService = replicationService;
-        this.legacySbbolAdapter = legacySbbolAdapter;
         this.budgetMaskService = budgetMaskService;
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
@@ -62,9 +57,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(readOnly = true)
     public AccountResponse getAccount(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = accountMapper.toAccount(account, budgetMaskService);
@@ -74,9 +66,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(readOnly = true)
     public AccountsResponse getAccounts(AccountsFilter accountsFilter) {
-        if (legacySbbolAdapter.checkNotMigration(accountsFilter.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var accountsResponse = new AccountsResponse();
         var response = accountRepository.findByFilter(accountsFilter);
         for (var entity : response) {
@@ -100,9 +89,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountResponse saveAccount(AccountCreate account) {
-        if (legacySbbolAdapter.checkNotMigration(account.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
         if (foundPartner.isEmpty()) {
             throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
@@ -129,9 +115,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public AccountResponse updateAccount(AccountChange account) {
-        if (legacySbbolAdapter.checkNotMigration(account.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
         if (!account.getVersion().equals(foundAccount.getVersion())) {
@@ -169,9 +152,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void deleteAccount(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         try {

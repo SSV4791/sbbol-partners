@@ -6,7 +6,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
@@ -14,7 +13,6 @@ import java.util.Arrays;
  * Аспект, обрабатывающий вызов методов с логированием, отмеченных аннотацией {@link Logged}
  */
 @Aspect
-@Component
 public final class LoggedAspect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggedAspect.class);

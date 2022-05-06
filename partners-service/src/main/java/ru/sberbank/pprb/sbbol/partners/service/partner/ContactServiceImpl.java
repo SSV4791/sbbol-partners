@@ -4,7 +4,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
@@ -14,7 +13,6 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import java.util.UUID;
 
@@ -26,26 +24,20 @@ public class ContactServiceImpl implements ContactService {
     private final PartnerRepository partnerRepository;
     private final ContactRepository contactRepository;
     private final ContactMapper contactMapper;
-    private final LegacySbbolAdapter legacySbbolAdapter;
 
     public ContactServiceImpl(
         PartnerRepository partnerRepository,
         ContactRepository contactRepository,
-        ContactMapper contactMapper,
-        LegacySbbolAdapter legacySbbolAdapter
+        ContactMapper contactMapper
     ) {
         this.partnerRepository = partnerRepository;
         this.contactRepository = contactRepository;
         this.contactMapper = contactMapper;
-        this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional(readOnly = true)
     public ContactResponse getContact(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var contact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = contactMapper.toContact(contact);
@@ -55,9 +47,6 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional(readOnly = true)
     public ContactsResponse getContacts(ContactsFilter contactsFilter) {
-        if (legacySbbolAdapter.checkNotMigration(contactsFilter.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var response = contactRepository.findByFilter(contactsFilter);
         var contactResponse = new ContactsResponse();
         for (var entity : response) {
@@ -80,9 +69,6 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public ContactResponse saveContact(ContactCreate contact) {
-        if (legacySbbolAdapter.checkNotMigration(contact.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var partner = partnerRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getPartnerId()));
         if (partner.isEmpty()) {
             throw new EntryNotFoundException("partner", contact.getDigitalId());
@@ -96,9 +82,6 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public ContactResponse updateContact(Contact contact) {
-        if (legacySbbolAdapter.checkNotMigration(contact.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var foundContact = contactRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, contact.getDigitalId(), contact.getId()));
         if (!contact.getVersion().equals(foundContact.getVersion())) {
@@ -114,9 +97,6 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public void deleteContact(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundContact.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);

@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
-import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
@@ -20,7 +19,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -31,7 +29,6 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
-    private final LegacySbbolAdapter legacySbbolAdapter;
     private final AuditAdapter auditAdapter;
     private final AccountSingMapper accountSingMapper;
     private final AccountMapper accountMapper;
@@ -39,14 +36,12 @@ public class AccountSignServiceImpl implements AccountSignService {
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        LegacySbbolAdapter legacySbbolAdapter,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         AccountSingMapper accountSingMapper
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
-        this.legacySbbolAdapter = legacySbbolAdapter;
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
         this.accountSingMapper = accountSingMapper;
@@ -55,9 +50,6 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Override
     @Transactional(readOnly = true)
     public AccountsSignResponse getAccountsSign(AccountsSignFilter filter) {
-        if (legacySbbolAdapter.checkNotMigration(filter.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var foundSignedAccounts = accountRepository.findByFilter(filter);
         var accountsSignResponse = new AccountsSignResponse();
         for (AccountEntity account : foundSignedAccounts) {
@@ -80,9 +72,6 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Override
     @Transactional
     public AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign) {
-        if (legacySbbolAdapter.checkNotMigration(accountsSign.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var response = new AccountsSignInfoResponse();
         response.setDigitalId(accountsSign.getDigitalId());
         for (var accountSign : accountsSign.getAccountsSignDetail()) {
@@ -132,9 +121,6 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Override
     @Transactional
     public void deleteAccountSign(String digitalId, String accountId) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var uuid = UUID.fromString(accountId);
         var account = accountRepository.getByDigitalIdAndUuid(digitalId, uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
@@ -172,9 +158,6 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Override
     @Transactional(readOnly = true)
     public AccountSignInfo getAccountSign(String digitalId, String accountId) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var uuid = UUID.fromString(accountId);
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
         if (foundAccount.isEmpty()) {

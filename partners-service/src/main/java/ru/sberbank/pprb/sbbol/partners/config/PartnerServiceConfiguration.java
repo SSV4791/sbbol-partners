@@ -1,9 +1,15 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
+import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggedAspect;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.ValidationAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -47,11 +53,11 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
@@ -82,8 +88,29 @@ import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceImpl;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Configuration
+@EnableAspectJAutoProxy
 public class PartnerServiceConfiguration {
+
+    @Bean
+    LoggedAspect loggedAspect() {
+        return new LoggedAspect();
+    }
+
+    @Bean
+    ValidationAspect validationAspect(ApplicationContext applicationContext) {
+        return new ValidationAspect(applicationContext);
+    }
+
+    @Bean
+    LegacyCheckAspect legacyCheckAspect(
+        @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") HttpServletRequest servletRequest,
+        LegacySbbolAdapter legacySbbolAdapter
+    ) {
+        return new LegacyCheckAspect(servletRequest, legacySbbolAdapter);
+    }
 
     @Bean
     AccountMapper accountMapper() {
@@ -190,7 +217,6 @@ public class PartnerServiceConfiguration {
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
         ReplicationService replicationService,
-        LegacySbbolAdapter legacySbbolAdapter,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter
     ) {
@@ -198,7 +224,6 @@ public class PartnerServiceConfiguration {
             partnerRepository,
             accountRepository,
             replicationService,
-            legacySbbolAdapter,
             budgetMaskService,
             auditAdapter,
             accountMapper());
@@ -208,13 +233,11 @@ public class PartnerServiceConfiguration {
     AccountSignService accountSignService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        LegacySbbolAdapter legacySbbolAdapter,
         AuditAdapter auditAdapter
     ) {
         return new AccountSignServiceImpl(
             accountRepository,
             accountSignRepository,
-            legacySbbolAdapter,
             auditAdapter,
             accountMapper(),
             accountSingMapper()
@@ -229,35 +252,31 @@ public class PartnerServiceConfiguration {
     @Bean
     AddressService contactAddressService(
         ContactRepository contactRepository,
-        AddressRepository addressRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        AddressRepository addressRepository
     ) {
-        return new ContactAddressServiceImpl(contactRepository, addressRepository, addressMapper(), legacySbbolAdapter);
+        return new ContactAddressServiceImpl(contactRepository, addressRepository, addressMapper());
     }
 
     @Bean
     DocumentService contactDocumentService(
         ContactRepository contactRepository,
         DocumentRepository documentRepository,
-        DocumentDictionaryRepository documentDictionaryRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        DocumentDictionaryRepository documentDictionaryRepository
     ) {
         return new ContactDocumentServiceImpl(
             contactRepository,
             documentRepository,
             documentDictionaryRepository,
-            documentMapper(),
-            legacySbbolAdapter
+            documentMapper()
         );
     }
 
     @Bean
     ContactService contactService(
         PartnerRepository partnerRepository,
-        ContactRepository contactRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        ContactRepository contactRepository
     ) {
-        return new ContactServiceImpl(partnerRepository, contactRepository, contactMapper(), legacySbbolAdapter);
+        return new ContactServiceImpl(partnerRepository, contactRepository, contactMapper());
     }
 
     @Bean
@@ -268,46 +287,43 @@ public class PartnerServiceConfiguration {
     @Bean
     AddressService partnerAddressService(
         PartnerRepository partnerRepository,
-        AddressRepository addressRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        AddressRepository addressRepository
     ) {
-        return new PartnerAddressServiceImpl(partnerRepository, addressRepository, addressMapper(), legacySbbolAdapter);
+        return new PartnerAddressServiceImpl(partnerRepository, addressRepository, addressMapper());
     }
 
     @Bean
     DocumentService partnerDocumentService(
         PartnerRepository partnerRepository,
         DocumentRepository documentRepository,
-        DocumentDictionaryRepository documentDictionaryRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        DocumentDictionaryRepository documentDictionaryRepository
     ) {
         return new PartnerDocumentServiceImpl(
             partnerRepository,
             documentRepository,
             documentDictionaryRepository,
-            documentMapper(),
-            legacySbbolAdapter
+            documentMapper()
         );
     }
 
     @Bean
-    PhoneService partnerPhoneService(PartnerRepository partnerRepository, PhoneRepository phoneRepository, LegacySbbolAdapter legacySbbolAdapter) {
-        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper(), legacySbbolAdapter);
+    PhoneService partnerPhoneService(PartnerRepository partnerRepository, PhoneRepository phoneRepository) {
+        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper());
     }
 
     @Bean
-    PhoneService contactPhoneService(ContactRepository contactRepository, PhoneRepository phoneRepository, LegacySbbolAdapter legacySbbolAdapter) {
-        return new ContactPhoneServiceImpl(contactRepository, phoneRepository, phoneMapper(), legacySbbolAdapter);
+    PhoneService contactPhoneService(ContactRepository contactRepository, PhoneRepository phoneRepository) {
+        return new ContactPhoneServiceImpl(contactRepository, phoneRepository, phoneMapper());
     }
 
     @Bean
-    EmailService partnerEmailService(PartnerRepository partnerRepository, EmailRepository emailRepository, LegacySbbolAdapter legacySbbolAdapter) {
-        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper(), legacySbbolAdapter);
+    EmailService partnerEmailService(PartnerRepository partnerRepository, EmailRepository emailRepository) {
+        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper());
     }
 
     @Bean
-    EmailService contactEmailService(ContactRepository contactRepository, EmailRepository emailRepository, LegacySbbolAdapter legacySbbolAdapter) {
-        return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper(), legacySbbolAdapter);
+    EmailService contactEmailService(ContactRepository contactRepository, EmailRepository emailRepository) {
+        return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper());
     }
 
     @Bean
@@ -318,7 +334,7 @@ public class PartnerServiceConfiguration {
         PhoneRepository phoneRepository,
         EmailRepository emailRepository,
         PartnerRepository partnerRepository,
-        LegacySbbolAdapter legacySbbolAdapter,
+        GkuInnDictionaryRepository gkuInnDictionaryRepository,
         ReplicationService replicationService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
@@ -328,7 +344,7 @@ public class PartnerServiceConfiguration {
             phoneRepository,
             emailRepository,
             partnerRepository,
-            legacySbbolAdapter,
+            gkuInnDictionaryRepository,
             replicationService,
             partnerMapper()
         );
