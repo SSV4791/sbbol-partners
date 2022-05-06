@@ -35,7 +35,7 @@ public class PartnerAuditConfiguration {
         RestTemplate auditRestTemplate
     ) {
         var client = new ApiClient(auditRestTemplate);
-        client.setBasePath(baseUrl);
+        client.setBasePath("http://" + baseUrl);
         return client;
     }
 
