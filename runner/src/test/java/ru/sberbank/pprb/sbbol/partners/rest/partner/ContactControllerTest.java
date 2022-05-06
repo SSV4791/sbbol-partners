@@ -16,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -255,11 +256,11 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             .middleName("Отчество клиента")
             .position("Должность")
             .phones(
-                List.of(
-                    "+79241111111"
+                Set.of(
+                    "79241111111"
                 ))
             .emails(
-                List.of(
+                Set.of(
                     "a.a.a@sberbank.ru"
                 ))
             ;

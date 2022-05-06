@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.Account",
+  "type": "object",
+  "title": "Счёт партнера",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор счёта",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "partnerId": {
+      "type": "string",
+      "title": "Идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "budget": {
+      "type": "boolean",
+      "title": "Признак бюджетности",
+      "default": false
+    },
+    "account": {
+      "type": "string",
+      "title": "Счёт"
+    },
+    "priority_account": {
+      "type": "boolean",
+      "title": "Избранный счёт",
+      "default": false
+    },
+    "bank": {
+      "title": "Банк",
+      "$ref": "../../model/bank/bank.json"
+    },
+    "state": {
+      "type": "string",
+      "title": "Признак 'Подписан'",
+      "enum": [
+        "SIGNED",
+        "NOT_SIGNED"
+      ]
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий счета",
+      "minLength": 1,
+      "maxLength": 50
+    }
+  },
+  "required": [
+    "version",
+    "bank",
+    "digitalId",
+    "partnerId",
+    "id"
+  ]
+}
+

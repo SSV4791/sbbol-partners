@@ -61,11 +61,11 @@ public class PartnerAccountCreateValidator implements Validator<AccountCreate> {
 
     private void checkBankAccount(BankCreate bank, List<String> errors) {
         var bankAccount = bank.getBankAccount();
-        if (bankAccount.getAccount() == null) {
+        if (bankAccount.getBankAccount() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_FIELD_IS_NULL, "bank.bankAccount.account"));
         }
-        if (!bankAccountValid(bankAccount.getAccount(), bank.getBic())) {
-            errors.add(MessagesTranslator.toLocale("account.bank_account.control_number", bankAccount.getAccount()));
+        if (!bankAccountValid(bankAccount.getBankAccount(), bank.getBic())) {
+            errors.add(MessagesTranslator.toLocale("account.bank_account.control_number", bankAccount.getBankAccount()));
         }
     }
 }

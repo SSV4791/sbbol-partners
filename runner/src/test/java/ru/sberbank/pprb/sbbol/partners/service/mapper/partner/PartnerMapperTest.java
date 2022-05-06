@@ -20,8 +20,9 @@ import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,7 +60,7 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     @AllureId("34102")
     @SuppressWarnings("unchecked")
     void testToPartnerPhoneString() {
-        List<String> phones = factory.manufacturePojo(ArrayList.class, String.class);
+        Set<String> phones = factory.manufacturePojo(HashSet.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);
         List<PartnerPhoneEntity> actual = mapper.toPhone(phones, digitalId);
         for (PartnerPhoneEntity partnerPhone : actual) {
@@ -74,7 +75,7 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     @AllureId("34382")
     @SuppressWarnings("unchecked")
     void testToPartnerEmailString() {
-        List<String> emails = factory.manufacturePojo(ArrayList.class, String.class);
+        Set<String> emails = factory.manufacturePojo(HashSet.class, String.class);
         var digitalId = RandomStringUtils.randomAlphanumeric(10);
         List<PartnerEmailEntity> actual = mapper.toEmail(emails, digitalId);
         for (PartnerEmailEntity partnerEmail : actual) {

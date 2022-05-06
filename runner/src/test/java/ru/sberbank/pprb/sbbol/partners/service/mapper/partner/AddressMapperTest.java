@@ -28,7 +28,7 @@ class AddressMapperTest extends BaseUnitConfiguration {
     @Test
     @AllureId("34079")
     void testToAddressType() {
-        Address.TypeEnum typeEnum = factory.manufacturePojo(Address.TypeEnum.class);
+        ru.sberbank.pprb.sbbol.partners.model.AddressType typeEnum = factory.manufacturePojo(ru.sberbank.pprb.sbbol.partners.model.AddressType.class);
         AddressType addressType = AddressMapper.toAddressType(typeEnum);
         assertThat(typeEnum)
             .isEqualTo(AddressMapper.toAddressType(addressType));

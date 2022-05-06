@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.AddressResponse",
+  "type": "object",
+  "title": "Ответ на запрос адреса партнера/контакта",
+  "properties": {
+    "address": {
+      "$ref": "address.json",
+      "title": "Адрес партнера/контакта"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  },
+  "required": [
+    "address"
+  ]
+}

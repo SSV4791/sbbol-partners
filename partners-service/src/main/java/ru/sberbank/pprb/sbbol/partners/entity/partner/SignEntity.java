@@ -48,6 +48,9 @@ public class SignEntity extends BaseEntity {
     @Column(name = "external_data_sign_file_id")
     private String externalDataSignFileId;
 
+    @Column(name = "sign_profile_Id")
+    private String signProfileId;
+
     @Column(name = "date_time_of_sign")
     private OffsetDateTime dateTimeOfSign;
 
@@ -113,6 +116,14 @@ public class SignEntity extends BaseEntity {
 
     public void setEntityUuid(UUID entityUuid) {
         this.entityUuid = entityUuid;
+    }
+
+    public String getSignProfileId() {
+        return signProfileId;
+    }
+
+    public void setSignProfileId(String signProfileId) {
+        this.signProfileId = signProfileId;
     }
 
     @Override

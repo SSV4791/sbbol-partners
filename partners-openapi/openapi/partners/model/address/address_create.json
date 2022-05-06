@@ -13,14 +13,7 @@
       "title": "Идентификатор личного кабинета клиента"
     },
     "type": {
-      "type": "string",
-      "enum": [
-        "LEGAL_ADDRESS",
-        "PHYSICAL_ADDRESS",
-        "REGISTRATION_ADDRESS",
-        "RESIDENTIAL_ADDRESS"
-      ],
-      "title": "Тип адреса"
+      "$ref": "../common/address_type.json"
     },
     "zipCode": {
       "type": "string",

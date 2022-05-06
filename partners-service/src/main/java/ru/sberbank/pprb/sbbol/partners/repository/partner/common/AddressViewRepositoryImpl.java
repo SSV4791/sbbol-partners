@@ -33,7 +33,7 @@ public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, Add
             predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
         if (filter.getType() != null) {
-            predicates.add(builder.equal(root.get("type"), AddressType.valueOf(filter.getType())));
+            predicates.add(builder.equal(root.get("type"), AddressType.valueOf(filter.getType().getValue())));
         }
     }
 

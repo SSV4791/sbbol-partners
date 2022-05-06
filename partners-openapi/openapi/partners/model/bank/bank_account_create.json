@@ -4,7 +4,7 @@
   "type": "object",
   "title": "Корреспондентский счёт банка",
   "properties": {
-    "account": {
+    "bankAccount": {
       "type": "string",
       "title": "Корреспондентский счёт"
     }

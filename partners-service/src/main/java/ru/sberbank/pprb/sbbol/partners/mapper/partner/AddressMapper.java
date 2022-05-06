@@ -20,8 +20,8 @@ public interface AddressMapper extends BaseMapper {
     Address toAddress(AddressEntity address);
 
     @Named("toAddressType")
-    static Address.TypeEnum toAddressType(AddressType addressType) {
-        return addressType != null ? Address.TypeEnum.valueOf(addressType.name()) : null;
+    static ru.sberbank.pprb.sbbol.partners.model.AddressType toAddressType(AddressType addressType) {
+        return addressType != null ? ru.sberbank.pprb.sbbol.partners.model.AddressType.valueOf(addressType.name()) : null;
     }
 
     @Mapping(target = "uuid", ignore = true)
@@ -32,7 +32,7 @@ public interface AddressMapper extends BaseMapper {
     AddressEntity toAddress(AddressCreate address);
 
     @Named("toAddressType")
-    static AddressType toAddressType(AddressCreate.TypeEnum addressType) {
+    static AddressType toAddressType(ru.sberbank.pprb.sbbol.partners.model.AddressType addressType) {
         return addressType != null ? AddressType.valueOf(addressType.getValue()) : null;
     }
 
@@ -42,10 +42,6 @@ public interface AddressMapper extends BaseMapper {
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     AddressEntity toAddress(Address address);
 
-    @Named("toAddressType")
-    static AddressType toAddressType(Address.TypeEnum addressType) {
-        return addressType != null ? AddressType.valueOf(addressType.getValue()) : null;
-    }
 
     @Named("updateAddress")
     @Mapping(target = "lastModifiedDate", ignore = true)

@@ -11,16 +11,12 @@ Content-Type: application/json
 }
 
 ### Поиск Арендатора по digitalID
-POST http://127.0.0.1:8080/renter/view
+POST http://127.0.0.1:8080/sbbol-partners/renter/view
 Content-Type: application/json
 
 {
-    "digitalId": "123456789",
-    "pagination": {
-        "offset": "1",
-        "count": "6",
-        "hasNextPage": "false"
-    }
+    "digitalId": "999",
+    "pagination": null
 }
 
 ### Создание Арендатора

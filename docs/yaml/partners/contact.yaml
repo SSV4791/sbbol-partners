@@ -1,0 +1,158 @@
+openapi: "3.0.3"
+info:
+  title: Request for partners
+  version: 1.0.0
+  description: OpenAPI Specification for contact
+
+servers:
+  - url: /
+
+paths:
+  /partner/contact/{digitalId}/{id}:
+    get:
+      tags:
+        - Partner Contacts
+      description: Получение Контактов по его идентификатору
+      operationId: get-by-id
+      parameters:
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор личного кабинета
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор контакта
+      responses:
+        200:
+          description: Успешинй ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/contact/contact_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+    delete:
+      tags:
+        - Partner Contacts
+      description: Удаление контакта
+      operationId: delete
+      parameters:
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор личного кабинета
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентефикатор контакта
+      responses:
+        204:
+          description: Успешный ответ
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partner/contact:
+    post:
+      tags:
+        - Partner Contacts
+      description: Создание контактов
+      operationId: create
+      requestBody:
+        description: Контакты
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/contact/contact_create.json'
+      responses:
+        201:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/contact/contact_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+    put:
+      tags:
+        - Partner Contacts
+      description: Обновление Контактов
+      operationId: update
+      requestBody:
+        description: Контакты
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/contact/contact.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/contact/contact_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partner/contacts/view:
+    post:
+      tags:
+        - Partner Contacts
+      description: Получение контактов
+      operationId: list
+      requestBody:
+        description: Фильтр для запроса контактов
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/contact/contacts_filter.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/contact/contacts_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden

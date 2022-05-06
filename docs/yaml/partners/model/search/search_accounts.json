@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.SearchAccounts",
+  "type": "object",
+  "title": "Поиск счета партнера",
+  "properties": {
+    "search": {
+      "type": "string",
+      "title": "Поиск по номеру счета"
+    }
+  }
+}

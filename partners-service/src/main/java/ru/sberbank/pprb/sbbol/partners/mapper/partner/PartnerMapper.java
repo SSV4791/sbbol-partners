@@ -21,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(
@@ -62,7 +63,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "version", ignore = true)
     PartnerEntity toPartner(PartnerCreate partner);
 
-    default List<PartnerEmailEntity> toEmail(List<String> emails, String digitalId) {
+    default List<PartnerEmailEntity> toEmail(Set<String> emails, String digitalId) {
         if (CollectionUtils.isEmpty(emails)) {
             return Collections.emptyList();
         }
@@ -75,7 +76,7 @@ public interface PartnerMapper extends BaseMapper {
             }).collect(Collectors.toList());
     }
 
-    default List<PartnerPhoneEntity> toPhone(List<String> phones, String digitalId) {
+    default List<PartnerPhoneEntity> toPhone(Set<String> phones, String digitalId) {
         if (CollectionUtils.isEmpty(phones)) {
             return Collections.emptyList();
         }

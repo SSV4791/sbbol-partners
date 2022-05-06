@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountsSignDetail",
+  "type": "object",
+  "title": "Подпись счетов",
+  "properties": {
+    "entityId": {
+      "type": "string",
+      "title": "Глобальный уникальный идентификатор подписи из БПС Подтверждения"
+    },
+    "accountId": {
+      "type": "string",
+      "title": "Идентификатор счёта или контрагента",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "digest": {
+      "type": "string",
+      "title": "Дайджест",
+      "maxLength": 4000
+    },
+    "sign": {
+      "type": "string",
+      "title": "Подпись",
+      "maxLength": 4000
+    },
+    "signProfileId": {
+      "type": "string",
+      "title": "Идентификатор криптопрофиля",
+      "maxLength": 255
+    },
+    "externalDataFileId": {
+      "type": "string",
+      "title": "Идентификатор созданного документа в ЕСМ",
+      "maxLength": 255
+    },
+    "externalDataSignFileId": {
+      "type": "string",
+      "title": "Идентификатор созданного файла клиентской подписи документа в ЕСМ",
+      "maxLength": 255
+    },
+    "dateTimeOfSign": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Время подписи"
+    }
+  },
+  "required": [
+    "entityId",
+    "sign",
+    "digest"
+  ]
+}

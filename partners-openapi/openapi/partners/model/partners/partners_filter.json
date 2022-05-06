@@ -13,16 +13,8 @@
       "type": "object",
       "$ref": "../search/search_partners.json"
     },
-    "partnersType": {
-      "title": "Фильтр по видам партнеров и правовой формы ЮЛ",
-      "type": "string",
-      "enum": [
-        "LEGAL_ENTITY",
-        "ENTREPRENEUR",
-        "PHYSICAL_PERSON",
-        "GKU",
-        "BUDGET"
-      ]
+    "partnersFilter": {
+      "$ref": "../common/partner_filter.json"
     },
     "accountSignType": {
       "type": "string",

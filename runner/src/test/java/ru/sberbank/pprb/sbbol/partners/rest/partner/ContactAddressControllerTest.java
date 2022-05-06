@@ -8,6 +8,7 @@ import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
+import ru.sberbank.pprb.sbbol.partners.model.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -76,7 +77,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
         var filter2 = new AddressesFilter()
             .digitalId(contact.getDigitalId())
             .unifiedIds(List.of(contact.getId()))
-            .type("LEGAL_ADDRESS")
+            .type(AddressType.LEGAL_ADDRESS)
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -252,7 +253,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             .region("6")
             .regionCode("7")
             .street("8")
-            .type(AddressCreate.TypeEnum.LEGAL_ADDRESS)
+            .type(AddressType.LEGAL_ADDRESS)
             .zipCode("9");
     }
 

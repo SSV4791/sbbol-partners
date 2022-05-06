@@ -1,0 +1,10 @@
+{
+  "type": "string",
+  "title": "Тип адреса",
+  "enum": [
+    "LEGAL_ADDRESS",
+    "PHYSICAL_ADDRESS",
+    "REGISTRATION_ADDRESS",
+    "RESIDENTIAL_ADDRESS"
+  ]
+}

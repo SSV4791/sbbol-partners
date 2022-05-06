@@ -57,14 +57,16 @@
       "title": "Номера телефонов партнера",
       "items": {
         "$ref": "../phone/phone.json"
-      }
+      },
+      "uniqueItems": true
     },
     "emails": {
       "type": "array",
       "title": "Адреса электронной почты партнера",
       "items": {
         "$ref": "../email/email.json"
-      }
+      },
+      "uniqueItems": true
     },
     "comment": {
       "type": "string",

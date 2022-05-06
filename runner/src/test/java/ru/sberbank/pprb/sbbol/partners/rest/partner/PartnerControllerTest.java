@@ -10,13 +10,14 @@ import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,7 +169,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         var filter = new PartnersFilter();
         filter.setDigitalId(digitalId);
-        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.BUDGET);
+        filter.setPartnersFilter(PartnerFilter.BUDGET);
         filter.setPagination(
             new Pagination()
                 .offset(0)
@@ -303,7 +304,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         var filter = new PartnersFilter();
         filter.setDigitalId(digitalId);
-        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.LEGAL_ENTITY);
+        filter.setPartnersFilter(PartnerFilter.LEGAL_ENTITY);
         filter.setPagination(
             new Pagination()
                 .offset(0)
@@ -345,7 +346,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         var filter = new PartnersFilter();
         filter.setDigitalId(digitalId);
-        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.PHYSICAL_PERSON);
+        filter.setPartnersFilter(PartnerFilter.PHYSICAL_PERSON);
         filter.setPagination(
             new Pagination()
                 .offset(0)
@@ -387,7 +388,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         var filter = new PartnersFilter();
         filter.setDigitalId(digitalId);
-        filter.setPartnersType(PartnersFilter.PartnersTypeEnum.ENTREPRENEUR);
+        filter.setPartnersFilter(PartnerFilter.ENTREPRENEUR);
         filter.setPagination(
             new Pagination()
                 .offset(0)
@@ -706,13 +707,13 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .inn("4139314257")
             .kpp("123456789")
             .ogrn("1035006110083")
-            .okpo("444444")
+            .okpo("12345678")
             .phones(
-                List.of(
-                    "+79241111111"
+                Set.of(
+                    "79241111111"
                 ))
             .emails(
-                List.of(
+                Set.of(
                     "a.a.a@sberbank.ru"
                 ))
             .comment("555555");

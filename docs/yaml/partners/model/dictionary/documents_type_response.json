@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.DocumentsTypeResponse",
+  "type": "object",
+  "title": "Ответ на запрос видов документа",
+  "properties": {
+    "documentType": {
+      "type": "array",
+      "title": "Виды документов",
+      "items": {
+        "$ref": "document_type.json"
+      },
+      "minItems": 0
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}
+

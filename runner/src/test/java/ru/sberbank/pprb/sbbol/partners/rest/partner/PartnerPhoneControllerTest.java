@@ -201,7 +201,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         return new PhoneCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
-            .phone(RandomStringUtils.randomAlphabetic(10));
+            .phone(RandomStringUtils.randomNumeric(10));
     }
 
     private static Phone createPhone(String partnerUuid, String digitalId) {
@@ -224,7 +224,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
 
     public static Phone updatePhone(Phone phone) {
         return new Phone()
-            .phone(RandomStringUtils.randomNumeric(12))
+            .phone(RandomStringUtils.randomNumeric(10))
             .id(phone.getId())
             .version(phone.getVersion())
             .unifiedId(phone.getUnifiedId())
