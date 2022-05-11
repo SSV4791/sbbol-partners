@@ -170,6 +170,7 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
                         .accountId(accountId)
                         .digest(RandomStringUtils.randomAlphabetic(10))
                         .sign(RandomStringUtils.randomAlphabetic(10))
+                        .signProfileId(RandomStringUtils.randomAlphabetic(10))
                         .externalDataFileId(RandomStringUtils.randomAlphabetic(10))
                         .externalDataSignFileId(RandomStringUtils.randomAlphabetic(10))
                         .dateTimeOfSign(OffsetDateTime.now())

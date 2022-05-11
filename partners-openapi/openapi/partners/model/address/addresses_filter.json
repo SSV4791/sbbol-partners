@@ -16,16 +16,11 @@
       "title": "Идентификаторы партнеров/контактов"
     },
     "type": {
-      "type": "string",
-      "title": "Тип адреса"
+      "$ref": "../common/address_type.json"
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
       "title": "Параметры запроса Адресов"
     }
-  },
-  "required": [
-    "unifiedIds",
-    "digitalId"
-  ]
+  }
 }

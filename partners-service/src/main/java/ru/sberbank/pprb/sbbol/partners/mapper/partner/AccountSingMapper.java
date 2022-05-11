@@ -33,7 +33,7 @@ public interface AccountSingMapper extends BaseMapper {
     @Mapping(target = "externalDataFileId", source = "externalDataFileId")
     @Mapping(target = "externalDataSignFileId", source = "externalDataSignFileId")
     @Mapping(target = "dateTimeOfSign", source = "dateTimeOfSign")
-    @Mapping(target = "signProfileId", ignore = true)
+    @Mapping(target = "signProfileId", source = "signProfileId")
     AccountSignDetail toSignAccount(SignEntity sign);
 
     @Mapping(target = "digitalId", source = "digitalId")

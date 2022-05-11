@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.Contact",
+  "type": "object",
+  "title": "Контакт",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации",
+      "maxLength": 350
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "partnerId": {
+      "type": "string",
+      "title": "Идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя контакта",
+      "maxLength": 50
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия контакта",
+      "maxLength": 50
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество контакта",
+      "maxLength": 50
+    },
+    "position": {
+      "type": "string",
+      "title": "Должность",
+      "maxLength": 100
+    },
+    "phones": {
+      "type": "array",
+      "title": "Номера телефона контакта",
+      "items": {
+        "$ref": "../phone/phone.json"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "emails": {
+      "type": "array",
+      "title": "Адреса электронной почты контакта",
+      "items": {
+        "$ref": "../email/email.json"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    }
+  },
+  "required": [
+    "id",
+    "digitalId",
+    "partnerId",
+    "version",
+    "legalForm"
+  ]
+}

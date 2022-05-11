@@ -17,7 +17,7 @@
       "format": "int64",
       "title": "Версия"
     },
-    "account": {
+    "bankAccount": {
       "type": "string",
       "title": "Корреспондентский счёт"
     }

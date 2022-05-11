@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(
@@ -49,7 +50,7 @@ public interface ContactMapper extends BaseMapper {
     @Mapping(target = "type", source = "legalForm", qualifiedByName = "toLegalType")
     ContactEntity toContact(ContactCreate contact);
 
-    default List<ContactEmailEntity> toEmail(List<String> emails, String digitalId) {
+    default List<ContactEmailEntity> toEmail(Set<String> emails, String digitalId) {
         return emails.stream()
             .map(value -> {
                 var contactEmail = new ContactEmailEntity();
@@ -60,7 +61,7 @@ public interface ContactMapper extends BaseMapper {
     }
 
 
-    default List<ContactPhoneEntity> toPhone(List<String> phones, String digitalId) {
+    default List<ContactPhoneEntity> toPhone(Set<String> phones, String digitalId) {
         return phones.stream()
             .map(value -> {
                 var contactPhone = new ContactPhoneEntity();

@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.util.Collections;
 import java.util.List;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -208,7 +209,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         return new PhoneCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
-            .phone(RandomStringUtils.randomAlphabetic(10));
+            .phone(randomNumeric(10));
     }
 
     private static Phone createPhone(String partnerUuid, String digitalId) {
@@ -231,7 +232,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
 
     public static Phone updatePhone(Phone phone) {
         return new Phone()
-            .phone(RandomStringUtils.randomNumeric(12))
+            .phone(randomNumeric(12))
             .id(phone.getId())
             .version(phone.getVersion())
             .unifiedId(phone.getUnifiedId())

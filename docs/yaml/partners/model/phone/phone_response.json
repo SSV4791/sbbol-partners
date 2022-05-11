@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.PhoneResponse",
+  "type": "object",
+  "title": "Ответ на запрос Телефонов",
+  "properties": {
+    "phone": {
+      "$ref": "phone.json"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error.json"
+      },
+      "title": "Ошибки"
+    }
+  }
+}

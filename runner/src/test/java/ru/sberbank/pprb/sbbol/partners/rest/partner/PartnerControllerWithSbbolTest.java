@@ -82,7 +82,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
             .inn("4139314257")
             .kpp("123456789")
             .ogrn("1035006110083")
-            .okpo("444444")
+            .okpo("12345678")
             .version(0L)
             .comment("555555");
         partner.setDigitalId(RandomStringUtils.randomAlphabetic(10));

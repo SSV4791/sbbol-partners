@@ -13,9 +13,5 @@
       "$ref": "account_sign_detail.json",
       "title": "Информация о подписи"
     }
-  },
-  "required": [
-    "accountSignDetail",
-    "digitalId"
-  ]
+  }
 }

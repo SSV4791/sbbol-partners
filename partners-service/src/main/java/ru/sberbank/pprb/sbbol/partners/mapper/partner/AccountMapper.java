@@ -48,6 +48,7 @@ public interface AccountMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(bankAccount.getUuid() == null ? null : bankAccount.getUuid().toString())")
     @Mapping(target = "bankId", expression = "java(bankAccount.getBank().getUuid() ==null ? null : bankAccount.getBank().getUuid().toString())")
+    @Mapping(target = "bankAccount", source = "account")
     BankAccount toBankAccount(BankAccountEntity bankAccount);
 
     @Mapping(target = "uuid", ignore = true)
@@ -73,14 +74,14 @@ public interface AccountMapper extends BaseMapper {
     BankEntity toBank(Bank bank);
 
     @Mapping(target = "bank", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "account", source = "bankAccount")
     BankAccountEntity toBankAccount(BankAccountCreate bankAccount);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bankAccount.getId()))")
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "account", source = "bankAccount")
     BankAccountEntity toBankAccount(BankAccount bankAccount);
 
     @Named("updateAccount")
@@ -114,7 +115,7 @@ public interface AccountMapper extends BaseMapper {
         if (bank != null) {
             var bankAccount = bank.getBankAccount();
             if (bankAccount != null) {
-                account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getAccount()));
+                account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getBankAccount()));
             }
         }
     }

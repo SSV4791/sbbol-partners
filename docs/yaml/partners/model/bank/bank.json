@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.Bank",
+  "type": "object",
+  "title": "Банк",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "accountId": {
+      "type": "string",
+      "title": "Идентификатор счёта партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "bic": {
+      "type": "string",
+      "title": "БИК",
+      "minLength": 9,
+      "maxLength": 9
+    },
+    "name": {
+      "type": "string",
+      "title": "Наименование",
+      "maxLength": 50
+    },
+    "mediary": {
+      "type": "boolean",
+      "title": "Является транзитным банком",
+      "default": false
+    },
+    "bankAccount": {
+      "$ref": "bank_account.json",
+      "title": "Корреспондентский счёт",
+      "x-constrains": "@ValidbankAccount"
+    }
+  },
+  "required": [
+    "id",
+    "accountId",
+    "bankAccount"
+  ]
+}

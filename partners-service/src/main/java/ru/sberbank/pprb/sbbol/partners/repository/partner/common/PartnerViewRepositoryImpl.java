@@ -73,8 +73,8 @@ public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, Par
             };
             predicates.add(root.get("uuid").in(accounts.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
         }
-        if (filter.getPartnersType() != null) {
-            switch (filter.getPartnersType()) {
+        if (filter.getPartnersFilter() != null) {
+            switch (filter.getPartnersFilter()) {
                 case GKU -> {
                     Join<PartnerEntity, GkuInnEntity> join = root.join("inn", JoinType.LEFT);
                     predicates.add(builder.equal(root.get("inn"), join.get("inn")));

@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountPriority",
+  "type": "object",
+  "title": "Счёт партнера",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор счета",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "priority_account": {
+      "type": "boolean",
+      "default": false,
+      "title": "Избранный счёт"
+    }
+  },
+  "required": [
+    "id",
+    "digitalId"
+  ]
+}

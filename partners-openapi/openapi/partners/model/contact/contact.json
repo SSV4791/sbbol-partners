@@ -46,14 +46,16 @@
       "title": "Номера телефона контакта",
       "items": {
         "$ref": "../phone/phone.json"
-      }
+      },
+      "uniqueItems": true
     },
     "emails": {
       "type": "array",
       "title": "Адреса электронной почты контакта",
       "items": {
         "$ref": "../email/email.json"
-      }
+      },
+      "uniqueItems": true
     },
     "legalForm": {
       "$ref": "../common/legal_form.json"

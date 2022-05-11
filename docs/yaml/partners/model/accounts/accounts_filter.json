@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountFilter",
+  "type": "object",
+  "title": "Фильтр счетов Партнеров",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "partnerIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 36,
+        "maxLength": 36,
+        "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+      },
+      "title": "Идентификаторы партнеров"
+    },
+    "isBudget": {
+      "title": "Фильтр для отображения счетов бюджетных организаций",
+      "type": "boolean",
+      "default": false
+    },
+    "search": {
+      "title": "Поиск счета по номеру",
+      "type": "object",
+      "$ref": "../search/search_accounts.json"
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса Счетов"
+    }
+  },
+  "required": [
+    "digitalId",
+    "pagination"
+  ]
+}

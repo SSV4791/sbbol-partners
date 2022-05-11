@@ -5,7 +5,6 @@
   "title": "Ответ на запрос адреса партнера/контакта",
   "properties": {
     "address": {
-      "type": "object",
       "$ref": "address.json",
       "title": "Адрес партнера/контакта"
     },

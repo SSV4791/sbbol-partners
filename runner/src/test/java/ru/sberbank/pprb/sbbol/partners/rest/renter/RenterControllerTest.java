@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.renter.model.Version;
 import java.time.LocalDate;
 
 import static io.restassured.RestAssured.given;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RenterControllerTest extends AbstractIntegrationTest {
@@ -154,7 +155,7 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .as(Renter.class);
         Renter testRenter = given()
             .spec(requestSpec)
-            .body(new RenterIdentifier().digitalId("1").uuid(createdRenter.getUuid()))
+            .body(new RenterIdentifier().digitalId(createdRenter.getDigitalId()).uuid(createdRenter.getUuid()))
             .when()
             .post(baseRoutePath + "/get")
             .then()
@@ -170,7 +171,7 @@ class RenterControllerTest extends AbstractIntegrationTest {
     @Test
     @AllureId("34129")
     void getGetRentersList() {
-        RenterFilter filter = new RenterFilter().digitalId("999");
+        RenterFilter filter = new RenterFilter().digitalId(randomAlphabetic(10));
         RenterListResponse response = given()
             .spec(requestSpec)
             .body(filter)
@@ -185,7 +186,7 @@ class RenterControllerTest extends AbstractIntegrationTest {
         assertThat(response.getItems().size()).isZero();
 
         Renter renter = getValidRenter();
-        renter.setDigitalId("999");
+        renter.setDigitalId(filter.getDigitalId());
         given()
             .spec(requestSpec)
             .body(renter)
@@ -209,7 +210,7 @@ class RenterControllerTest extends AbstractIntegrationTest {
         assertThat(response.getItems().size()).isEqualTo(1);
 
         Renter renter2 = getValidRenter();
-        renter2.setDigitalId("999");
+        renter2.setDigitalId(filter.getDigitalId());
         given()
             .spec(requestSpec)
             .body(renter2)
@@ -244,7 +245,7 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .flat("55");
 
         return new Renter()
-            .digitalId("1")
+            .digitalId(randomAlphabetic(10))
             .type(Renter.TypeEnum.LEGAL_ENTITY)
             .legalName("ОАО Рога и копыта")
             .inn("132456789132")

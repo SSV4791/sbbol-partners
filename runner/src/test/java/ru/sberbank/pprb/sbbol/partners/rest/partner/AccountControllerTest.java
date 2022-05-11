@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
@@ -19,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
+import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.List;
 
@@ -326,7 +326,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
                 .name("222222")
                 .bankAccount(
                     new BankAccountCreate()
-                        .account("30101810145250000411"))
+                    .bankAccount("30101810145250000411"))
             );
     }
 
@@ -419,11 +419,11 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account(account.getAccount())
+            .account("40702810600000009222")
             .bank(account.getBank()
-                .bic(account.getBank().getBic())
+                .bic("044525700")
                 .name(account.getBank().getName())
                 .bankAccount(account.getBank().getBankAccount()
-                    .account(account.getBank().getBankAccount().getAccount())));
+                    .bankAccount("30101810200000000700")));
     }
 }

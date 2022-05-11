@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountCreate",
+  "type": "object",
+  "title": "Счёт партнера",
+  "properties": {
+    "partnerId": {
+      "type": "string",
+      "title": "Идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "account": {
+      "type": "string",
+      "title": "Счёт"
+    },
+    "bank": {
+      "title": "Банк",
+      "$ref": "../bank/bank_create.json"
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий счета",
+      "minLength": 1,
+      "maxLength": 50
+    }
+  },
+  "required": [
+    "partnerId",
+    "digitalId",
+    "bank"
+  ]
+}

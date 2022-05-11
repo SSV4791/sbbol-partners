@@ -1,0 +1,11 @@
+{
+  "title": "Фильтр по видам партнеров и правовой формы ЮЛ",
+  "type": "string",
+  "enum": [
+    "LEGAL_ENTITY",
+    "ENTREPRENEUR",
+    "PHYSICAL_PERSON",
+    "GKU",
+    "BUDGET"
+  ]
+}

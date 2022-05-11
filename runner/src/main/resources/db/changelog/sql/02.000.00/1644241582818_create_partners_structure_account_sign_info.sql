@@ -12,6 +12,7 @@ CREATE TABLE SIGN
     account_uuid               UUID             NOT NULL,
     external_data_file_id      VARCHAR(255),
     external_data_sign_file_id VARCHAR(255),
+    sign_profile_Id            VARCHAR(255),
     date_time_of_sign          TIMESTAMP,
     SYS_LASTCHANGEDATE         TIMESTAMP        NOT NULL
 );
@@ -27,6 +28,7 @@ COMMENT ON COLUMN SIGN.PARTNER_UUID IS 'Уникальный идентифик�
 COMMENT ON COLUMN SIGN.ACCOUNT_UUID IS 'Уникальный идентификатор счёта';
 COMMENT ON COLUMN SIGN.EXTERNAL_DATA_FILE_ID IS 'Идентификатор созданного документа в ЕСМ';
 COMMENT ON COLUMN SIGN.EXTERNAL_DATA_SIGN_FILE_ID IS 'Идентификатор созданного файла клиентской подписи документа в ЕСМ';
+COMMENT ON COLUMN SIGN.SIGN_PROFILE_ID IS 'Идентификатор криптопрофиля';
 COMMENT ON COLUMN SIGN.DATE_TIME_OF_SIGN IS 'Дата подписания документа';
 
 CREATE UNIQUE INDEX I_SIGN_ACCOUNT_UUID ON SIGN (ACCOUNT_UUID);

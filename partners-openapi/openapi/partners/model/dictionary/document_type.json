@@ -18,7 +18,8 @@
     },
     "deleted": {
       "type": "boolean",
-      "title": "Признак 'удалён' если в 'true'"
+      "title": "Признак 'удалён' если в 'true'",
+      "default": false
     },
     "legalForms": {
       "type": "array",

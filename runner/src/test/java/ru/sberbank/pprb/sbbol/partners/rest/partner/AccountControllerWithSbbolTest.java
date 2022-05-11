@@ -60,7 +60,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     @Test
     @AllureId("34122")
     void testCreateAccount() {
-        var account = getValidAccount(randomAlphabetic(10), randomAlphabetic(10));
+        var account = getValidAccount(randomAlphabetic(36), randomAlphabetic(10));
         var response = post(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
             .isNotNull();
@@ -83,7 +83,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
                 .name("222222")
                 .bankAccount(
                     new BankAccount()
-                        .account("30101810145250000411"))
+                        .bankAccount("30101810145250000411"))
             );
         var response = put(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
