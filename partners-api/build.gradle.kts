@@ -6,7 +6,6 @@ plugins {
 }
 
 apply(plugin = "jacoco")
-apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
 
 val rentersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/renters/renter.yaml"
 val partnersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners"
