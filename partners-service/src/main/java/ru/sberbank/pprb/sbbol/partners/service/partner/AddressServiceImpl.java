@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
@@ -12,7 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import java.util.UUID;
 
@@ -22,24 +20,18 @@ abstract class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
-    private final LegacySbbolAdapter legacySbbolAdapter;
 
     public AddressServiceImpl(
         AddressRepository addressRepository,
-        AddressMapper addressMapper,
-        LegacySbbolAdapter legacySbbolAdapter
+        AddressMapper addressMapper
     ) {
         this.addressRepository = addressRepository;
         this.addressMapper = addressMapper;
-        this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional(readOnly = true)
     public AddressResponse getAddress(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var address = addressRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = addressMapper.toAddress(address);
@@ -49,9 +41,6 @@ abstract class AddressServiceImpl implements AddressService {
     @Override
     @Transactional(readOnly = true)
     public AddressesResponse getAddresses(AddressesFilter addressesFilter) {
-        if (legacySbbolAdapter.checkNotMigration(addressesFilter.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var response = addressRepository.findByFilter(addressesFilter);
         var addressesResponse = new AddressesResponse();
         for (var entity : response) {
@@ -74,9 +63,6 @@ abstract class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressResponse saveAddress(AddressCreate address) {
-        if (legacySbbolAdapter.checkNotMigration(address.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var requestAddress = addressMapper.toAddress(address);
         var saveAddress = addressRepository.save(requestAddress);
         var response = addressMapper.toAddress(saveAddress);
@@ -86,9 +72,6 @@ abstract class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressResponse updateAddress(Address address) {
-        if (legacySbbolAdapter.checkNotMigration(address.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var foundAddress = addressRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, address.getDigitalId(), address.getId()));
         if (!address.getVersion().equals(foundAddress.getVersion())) {
@@ -104,9 +87,6 @@ abstract class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public void deleteAddress(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         addressRepository.delete(foundAddress);

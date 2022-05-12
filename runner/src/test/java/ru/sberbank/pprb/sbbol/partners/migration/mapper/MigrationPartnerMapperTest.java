@@ -92,6 +92,7 @@ public class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
+    @AllureId("37973")
     void toUpdateEmptyMigrationPartnerEntityTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         var migrationPartnerEntity = new MigrationPartnerEntity();

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.core.annotation.Order;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * Аспект, обрабатывающий вызов методов с валидацией, отмеченных аннотацией {@link Validation}
  */
 @Aspect
-@Component
+@Order(10)
 public class ValidationAspect {
 
     private final ApplicationContext applicationContext;

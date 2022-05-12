@@ -6,7 +6,6 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -18,14 +17,12 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Logged(printRequestResponse = true)
 public class PartnerServiceImpl implements PartnerService {
@@ -38,7 +35,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final PhoneRepository phoneRepository;
     private final EmailRepository emailRepository;
     private final PartnerRepository partnerRepository;
-    private final LegacySbbolAdapter legacySbbolAdapter;
+    private final GkuInnDictionaryRepository gkuInnDictionaryRepository;
     private final ReplicationService replicationService;
     private final PartnerMapper partnerMapper;
 
@@ -49,7 +46,7 @@ public class PartnerServiceImpl implements PartnerService {
         PhoneRepository phoneRepository,
         EmailRepository emailRepository,
         PartnerRepository partnerRepository,
-        LegacySbbolAdapter legacySbbolAdapter,
+        GkuInnDictionaryRepository gkuInnDictionaryRepository,
         ReplicationService replicationService,
         PartnerMapper partnerMapper
     ) {
@@ -59,7 +56,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.phoneRepository = phoneRepository;
         this.emailRepository = emailRepository;
         this.partnerRepository = partnerRepository;
-        this.legacySbbolAdapter = legacySbbolAdapter;
+        this.gkuInnDictionaryRepository = gkuInnDictionaryRepository;
         this.replicationService = replicationService;
         this.partnerMapper = partnerMapper;
     }
@@ -67,22 +64,16 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional(readOnly = true)
     public PartnerResponse getPartner(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = partnerMapper.toPartner(partner);
-        response.setGku(getGku(response.getDigitalId(), response.getInn()));
+        response.setGku(getGku(response.getInn()));
         return new PartnerResponse().partner(response);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PartnersResponse getPartners(PartnersFilter partnersFilter) {
-        if (legacySbbolAdapter.checkNotMigration(partnersFilter.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         PartnersResponse partnersResponse = new PartnersResponse();
         var response = partnerRepository.findByFilter(partnersFilter);
         for (PartnerEntity entity : response) {
@@ -103,12 +94,8 @@ public class PartnerServiceImpl implements PartnerService {
         if (CollectionUtils.isEmpty(partners)) {
             return partnersResponse;
         }
-        var inns = partners.stream().map(Partner::getInn).collect(Collectors.toSet());
-        var housingInn = legacySbbolAdapter.getHousingInn(partnersFilter.getDigitalId(), inns);
         for (Partner partner : partners) {
-            if (housingInn.contains(partner.getInn())) {
-                partner.setGku(Boolean.TRUE);
-            }
+            getGku(partner.getInn());
         }
         return partnersResponse.partners(partners);
     }
@@ -116,22 +103,16 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     public PartnerResponse savePartner(PartnerCreate partner) {
-        if (legacySbbolAdapter.checkNotMigration(partner.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
         var response = partnerMapper.toPartner(savePartner);
-        response.setGku(getGku(response.getDigitalId(), response.getInn()));
+        response.setGku(getGku(response.getInn()));
         return new PartnerResponse().partner(response);
     }
 
     @Override
     @Transactional
     public PartnerResponse updatePartner(Partner partner) {
-        if (legacySbbolAdapter.checkNotMigration(partner.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
         if (!partner.getVersion().equals(foundPartner.getVersion())) {
@@ -141,16 +122,13 @@ public class PartnerServiceImpl implements PartnerService {
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
         var response = partnerMapper.toPartner(savePartner);
-        response.setGku(getGku(response.getDigitalId(), response.getInn()));
+        response.setGku(getGku(response.getInn()));
         return new PartnerResponse().partner(response);
     }
 
     @Override
     @Transactional
     public void deletePartner(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var partnerUuid = UUID.fromString(id);
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
@@ -169,18 +147,14 @@ public class PartnerServiceImpl implements PartnerService {
     /**
      * Получение признака ЖКУ
      *
-     * @param digitalId Идентификатор личного кабинета
-     * @param inn       ИНН
+     * @param inn ИНН
      * @return признак принадлежит инн ЖКУ true - да, false - нет
      */
-    private Boolean getGku(String digitalId, String inn) {
-        if (digitalId == null || inn == null) {
-            return Boolean.FALSE;
+    private boolean getGku(String inn) {
+        if (inn == null) {
+            return false;
         }
-        var housingInn = legacySbbolAdapter.getHousingInn(digitalId, Set.of(inn));
-        if (!CollectionUtils.isEmpty(housingInn)) {
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
+        var housingInn = gkuInnDictionaryRepository.getByInn(inn);
+        return housingInn != null;
     }
 }

@@ -6,6 +6,7 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.http.Header;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -20,17 +21,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
-import ru.dcbqa.coverage.swagger.reporter.junit.jupiter.RestAssuredCoverageExtension;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
 
 import static io.restassured.RestAssured.given;
 
 @ApiTestLayer
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DirtiesContext
 @ActiveProfiles("test")
 @ContextConfiguration(classes =
     {
@@ -38,7 +37,7 @@ import static io.restassured.RestAssured.given;
         TestReplicationConfiguration.class
     }
 )
-@ExtendWith({SpringExtension.class, RestAssuredCoverageExtension.class})
+@ExtendWith({SpringExtension.class})
 public abstract class AbstractIntegrationTest {
 
     private static final String BASE_URI = "http://localhost";
@@ -106,14 +105,23 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected static <T> T get(String url, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
-        return given()
+        return get(url, null, responseHttpStatus, response, params);
+    }
+
+    protected static <T> T get(String url, Header header, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
+        var specification = given()
             .spec(requestSpec)
-            .when()
-            .get(url, params)
+            .when();
+        if (header != null) {
+            specification
+                .header(header);
+        }
+        return specification.get(url, params)
             .then()
             .spec(specResponseHandler(responseHttpStatus))
             .extract()
-            .as(response);
+            .as(response)
+            ;
     }
 
     protected static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {

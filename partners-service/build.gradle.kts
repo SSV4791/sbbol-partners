@@ -20,15 +20,16 @@ dependencies {
     implementation(project(":partners-api"))
 
     implementation(platform(liveLibs.spring.boot.dependencies))
+    implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation(liveLibs.bundles.micrometer)
     implementation(liveLibs.hibernate.jcache)
+    implementation(liveLibs.javax.servlet.api)
     implementation(liveLibs.mapstruct.core)
     implementation(liveLibs.sbp.hibernate.standin)
     //Поддержка генераторов ID на время перехода.
     implementation(liveLibs.sbp.jpa.model.support)
 
-    runtimeOnly(liveLibs.aspectjweaver.core)
     runtimeOnly(liveLibs.ehcache.org.core)
 }
 

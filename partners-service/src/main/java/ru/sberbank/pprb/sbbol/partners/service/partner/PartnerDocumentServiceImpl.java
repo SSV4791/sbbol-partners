@@ -3,14 +3,12 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import java.util.UUID;
 
@@ -18,26 +16,20 @@ import java.util.UUID;
 public class PartnerDocumentServiceImpl extends DocumentServiceImpl {
 
     private final PartnerRepository partnerRepository;
-    private final LegacySbbolAdapter legacySbbolAdapter;
 
     public PartnerDocumentServiceImpl(
         PartnerRepository partnerRepository,
         DocumentRepository documentRepository,
         DocumentDictionaryRepository documentDictionaryRepository,
-        DocumentMapper documentMapper,
-        LegacySbbolAdapter legacySbbolAdapter
+        DocumentMapper documentMapper
     ) {
-        super(documentRepository, documentDictionaryRepository, documentMapper, legacySbbolAdapter);
+        super(documentRepository, documentDictionaryRepository, documentMapper);
         this.partnerRepository = partnerRepository;
-        this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional
     public DocumentResponse saveDocument(DocumentCreate document) {
-        if (legacySbbolAdapter.checkNotMigration(document.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var partner = partnerRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getUnifiedId()));
         if (partner.isEmpty()) {
             throw new EntryNotFoundException("partner", document.getDigitalId());

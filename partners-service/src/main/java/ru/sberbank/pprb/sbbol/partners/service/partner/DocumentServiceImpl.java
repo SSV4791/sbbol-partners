@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
@@ -13,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 
 import java.util.UUID;
 
@@ -24,26 +22,20 @@ abstract class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentDictionaryRepository documentDictionaryRepository;
     private final DocumentMapper documentMapper;
-    private final LegacySbbolAdapter legacySbbolAdapter;
 
     public DocumentServiceImpl(
         DocumentRepository documentRepository,
         DocumentDictionaryRepository documentDictionaryRepository,
-        DocumentMapper documentMapper,
-        LegacySbbolAdapter legacySbbolAdapter
+        DocumentMapper documentMapper
     ) {
         this.documentRepository = documentRepository;
         this.documentDictionaryRepository = documentDictionaryRepository;
         this.documentMapper = documentMapper;
-        this.legacySbbolAdapter = legacySbbolAdapter;
     }
 
     @Override
     @Transactional(readOnly = true)
     public DocumentResponse getDocument(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var document = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = documentMapper.toDocument(document);
@@ -53,9 +45,6 @@ abstract class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional(readOnly = true)
     public DocumentsResponse getDocuments(DocumentsFilter documentsFilter) {
-        if (legacySbbolAdapter.checkNotMigration(documentsFilter.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var response = documentRepository.findByFilter(documentsFilter);
         var documentsResponse = new DocumentsResponse();
         for (var entity : response) {
@@ -78,9 +67,6 @@ abstract class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public DocumentResponse saveDocument(DocumentCreate document) {
-        if (legacySbbolAdapter.checkNotMigration(document.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var requestDocument = documentMapper.toDocument(document);
         if (requestDocument.getTypeUuid() != null) {
             var documentType = documentDictionaryRepository.getByUuid(requestDocument.getTypeUuid());
@@ -94,9 +80,6 @@ abstract class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public DocumentResponse updateDocument(DocumentChange document) {
-        if (legacySbbolAdapter.checkNotMigration(document.getDigitalId())) {
-            throw new PartnerMigrationException();
-        }
         var foundDocument = documentRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId()));
         if (!document.getVersion().equals(foundDocument.getVersion())) {
@@ -112,9 +95,6 @@ abstract class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public void deleteDocument(String digitalId, String id) {
-        if (legacySbbolAdapter.checkNotMigration(digitalId)) {
-            throw new PartnerMigrationException();
-        }
         var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
         if (foundDocument.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
