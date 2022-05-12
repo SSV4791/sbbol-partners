@@ -6,7 +6,6 @@ plugins {
 }
 
 apply(plugin = "jacoco")
-apply(plugin = "ru.sbrf.build.gradle.qa.reporter")
 
 tasks {
     clean {

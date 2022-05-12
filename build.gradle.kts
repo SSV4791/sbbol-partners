@@ -9,7 +9,7 @@ plugins {
     id("publish-develop-conventions")
     id("publish-release-conventions")
     id("publish-snapshot-conventions")
-    id("ru.sbrf.build.gradle.qa.reporter") version "3.2.14"
+    id("ru.sbrf.build.gradle.qa.reporter") version "3.3.+"
 }
 
 val coverageExclusions = listOf(
