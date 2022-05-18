@@ -6,7 +6,7 @@ CREATE TABLE BANK
     uuid               UUID PRIMARY KEY,
     account_uuid       UUID             NOT NULL,
     version            BIGINT default 0 NOT NULL,
-    name               VARCHAR(50),
+    name               VARCHAR(160),
     bic                VARCHAR(9),
     intermediary       BOOLEAN,
     SYS_LASTCHANGEDATE TIMESTAMP        NOT NULL

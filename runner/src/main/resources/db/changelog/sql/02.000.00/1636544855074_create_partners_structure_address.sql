@@ -16,7 +16,7 @@ CREATE TABLE ADDRESS
     street             VARCHAR(300),
     building           VARCHAR(100),
     building_block     VARCHAR(20),
-    flat               VARCHAR(10),
+    flat               VARCHAR(20),
     SYS_LASTCHANGEDATE TIMESTAMP        NOT NULL,
     CONSTRAINT CK_ADDRESS_TYPE CHECK
         (
