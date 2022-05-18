@@ -7,7 +7,7 @@ CREATE TABLE PHONE
     digital_id         VARCHAR(40)      NOT NULL,
     unified_uuid       UUID             NOT NULL,
     version            BIGINT default 0 NOT NULL,
-    phone              VARCHAR(12),
+    phone              VARCHAR(100),
     SYS_LASTCHANGEDATE TIMESTAMP        NOT NULL
 );
 

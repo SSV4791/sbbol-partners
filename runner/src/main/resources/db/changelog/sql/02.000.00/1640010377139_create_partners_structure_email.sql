@@ -7,7 +7,7 @@ CREATE TABLE EMAIL
     digital_id         VARCHAR(40)      NOT NULL,
     unified_uuid       UUID             NOT NULL,
     version            BIGINT default 0 NOT NULL,
-    email              VARCHAR(100),
+    email              VARCHAR(320),
     SYS_LASTCHANGEDATE TIMESTAMP        NOT NULL
 );
 
