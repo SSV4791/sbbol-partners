@@ -16,6 +16,6 @@ public class EntryNotFoundException extends RuntimeException {
     }
 
     public EntryNotFoundException(String entity, String digitalId, String id) {
-        super(String.format("Искомая сущность %s c с id: %s, digitalId: %s не найдена", entity, id, digitalId));
+        super(String.format("Искомая сущность %s с id: %s, digitalId: %s не найдена", entity, id, digitalId));
     }
 }

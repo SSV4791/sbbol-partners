@@ -4,15 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnersApi;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
-import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.PartnerValidator;
 
 @RestController
 public class PartnerController implements PartnersApi {
@@ -40,12 +37,12 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> create(@Validation(type = PartnerCreateValidator.class) PartnerCreate partner) {
+    public ResponseEntity<PartnerResponse> create(PartnerCreate partner) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.savePartner(partner));
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> update(@Validation(type = PartnerValidator.class) Partner partner) {
+    public ResponseEntity<PartnerResponse> update(Partner partner) {
         return ResponseEntity.ok(partnerService.updatePartner(partner));
     }
 }

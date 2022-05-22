@@ -27,7 +27,8 @@
     "email": {
       "type": "string",
       "title": "Электронный адрес",
-      "maxLength": 100,
+      "maxLength": 320,
+      "pattern": "^(.){1,64}@(.){1,255}$",
       "example": "test@sberbank.ru"
     },
     "version": {

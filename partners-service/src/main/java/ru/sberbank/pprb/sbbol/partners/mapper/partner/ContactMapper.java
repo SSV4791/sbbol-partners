@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
@@ -16,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,24 +53,32 @@ public interface ContactMapper extends BaseMapper {
     ContactEntity toContact(ContactCreate contact);
 
     default List<ContactEmailEntity> toEmail(Set<String> emails, String digitalId) {
-        return emails.stream()
-            .map(value -> {
-                var contactEmail = new ContactEmailEntity();
-                contactEmail.setEmail(value);
-                contactEmail.setDigitalId(digitalId);
-                return contactEmail;
-            }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(emails)) {
+            return Collections.emptyList();
+        } else {
+            return emails.stream()
+                .map(value -> {
+                    var contactEmail = new ContactEmailEntity();
+                    contactEmail.setEmail(value);
+                    contactEmail.setDigitalId(digitalId);
+                    return contactEmail;
+                }).collect(Collectors.toList());
+        }
     }
 
 
     default List<ContactPhoneEntity> toPhone(Set<String> phones, String digitalId) {
-        return phones.stream()
-            .map(value -> {
-                var contactPhone = new ContactPhoneEntity();
-                contactPhone.setPhone(value);
-                contactPhone.setDigitalId(digitalId);
-                return contactPhone;
-            }).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(phones)) {
+            return Collections.emptyList();
+        } else {
+            return phones.stream()
+                .map(value -> {
+                    var contactPhone = new ContactPhoneEntity();
+                    contactPhone.setPhone(value);
+                    contactPhone.setDigitalId(digitalId);
+                    return contactPhone;
+                }).collect(Collectors.toList());
+        }
     }
 
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
@@ -82,7 +92,6 @@ public interface ContactMapper extends BaseMapper {
         return legalType != null ? LegalType.valueOf(legalType.getValue()) : null;
     }
 
-    @Named("updateContact")
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")

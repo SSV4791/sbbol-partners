@@ -67,7 +67,7 @@
       "type": "string",
       "title": "ОКПО",
       "minLength": 8,
-      "maxLength": 10
+      "maxLength": 14
     },
     "phones": {
       "type": "array",

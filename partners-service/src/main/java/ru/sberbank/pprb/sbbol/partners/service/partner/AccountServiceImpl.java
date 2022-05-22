@@ -1,17 +1,13 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
-import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
-import ru.sberbank.pprb.sbbol.partners.exception.SignAccountException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
@@ -21,8 +17,11 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
+import ru.sberbank.pprb.sbbol.partners.validation.AccountChangePriorityValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.AccountCreateValidatorImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.AccountUpdateValidatorImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.AccountsFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -31,7 +30,6 @@ public class AccountServiceImpl implements AccountService {
 
     public static final String DOCUMENT_NAME = "account";
 
-    private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
     private final ReplicationService replicationService;
     private final BudgetMaskService budgetMaskService;
@@ -39,14 +37,12 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
 
     public AccountServiceImpl(
-        PartnerRepository partnerRepository,
         AccountRepository accountRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper
     ) {
-        this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
         this.replicationService = replicationService;
         this.budgetMaskService = budgetMaskService;
@@ -65,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional(readOnly = true)
-    public AccountsResponse getAccounts(AccountsFilter accountsFilter) {
+    public AccountsResponse getAccounts(@Validation(type = AccountsFilterValidationImpl.class) AccountsFilter accountsFilter) {
         var accountsResponse = new AccountsResponse();
         var response = accountRepository.findByFilter(accountsFilter);
         for (var entity : response) {
@@ -88,11 +84,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse saveAccount(AccountCreate account) {
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
-        if (foundPartner.isEmpty()) {
-            throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
-        }
+    public AccountResponse saveAccount(@Validation(type = AccountCreateValidatorImpl.class) AccountCreate account) {
         var requestAccount = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(requestAccount);
@@ -114,22 +106,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse updateAccount(AccountChange account) {
+    public AccountResponse updateAccount(@Validation(type = AccountUpdateValidatorImpl.class) AccountChange account) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
-        if (!account.getVersion().equals(foundAccount.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundAccount.getVersion() +
-                " не равна версии записи в запросе version=" + account.getVersion());
-        }
-        if (AccountStateType.SIGNED == foundAccount.getState()) {
-            throw new SignAccountException(
-                "Ошибка обновления счёта клиента " + account.getAccount() + " id " + account.getId() + " нельзя обновлять подписанные счёта"
-            );
-        }
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
-        if (foundPartner.isEmpty()) {
-            throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
-        }
         accountMapper.updateAccount(account, foundAccount);
         try {
             var savedAccount = accountRepository.save(foundAccount);
@@ -172,14 +151,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse changePriority(AccountPriority accountPriority) {
+    public AccountResponse changePriority(@Validation(type = AccountChangePriorityValidationImpl.class) AccountPriority accountPriority) {
         var digitalId = accountPriority.getDigitalId();
-        if (accountPriority.getPriorityAccount()) {
-            var foundAccounts = accountRepository.findByDigitalIdAndPriorityAccountIsTrue(digitalId);
-            if (!CollectionUtils.isEmpty(foundAccounts)) {
-                throw new BadRequestException("У пользователя digitalId: " + digitalId + "Уже есть приоритетные счета");
-            }
-        }
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountPriority.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountPriority.getId()));
         foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());

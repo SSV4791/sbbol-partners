@@ -63,7 +63,7 @@
     "flat": {
       "type": "string",
       "title": "Квартира",
-      "maxLength": 10
+      "maxLength": 20
     }
   },
   "required": [

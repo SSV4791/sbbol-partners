@@ -10,7 +10,7 @@ abstract class PhoneBaseEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-    @Column(name = "phone", length = 50)
+    @Column(name = "phone", length = 100)
     private String phone;
 
     @Column(name = "digital_id")

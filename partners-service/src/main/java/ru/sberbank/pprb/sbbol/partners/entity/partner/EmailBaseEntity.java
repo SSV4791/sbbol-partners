@@ -10,7 +10,7 @@ abstract class EmailBaseEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-    @Column(name = "email", length = 100)
+    @Column(name = "email", length = 320)
     private String email;
 
     @Column(name = "digital_id")

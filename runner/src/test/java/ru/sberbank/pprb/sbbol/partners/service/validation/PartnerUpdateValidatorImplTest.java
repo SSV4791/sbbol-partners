@@ -9,7 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @UnitTestLayer
-class PartnerValidatorTest {
+class PartnerUpdateValidatorImplTest {
 
     @Test
     @AllureId("34100")

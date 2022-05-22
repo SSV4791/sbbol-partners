@@ -80,7 +80,6 @@
     "id",
     "digitalId",
     "partnerId",
-    "version",
-    "legalForm"
+    "version"
   ]
 }

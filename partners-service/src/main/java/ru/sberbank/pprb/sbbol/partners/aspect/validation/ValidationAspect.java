@@ -32,7 +32,7 @@ public class ValidationAspect {
      * Метод для валидации объектов в РЕСТ клиентах.
      */
     @SuppressWarnings("unchecked")
-    @Before("execution(* ru.sberbank.pprb.sbbol.partners..*Controller.*(..))")
+    @Before("execution(* ru.sberbank.pprb.sbbol.partners..*Service.*(..))")
     public void validate(JoinPoint call) {
         var signature = (MethodSignature) call.getSignature();
         var method = signature.getMethod();
@@ -46,7 +46,7 @@ public class ValidationAspect {
                 var type = ((Validation) annotation).type();
                 Validator bean = getBean(type, type.getName());
                 var errors = new ArrayList<String>();
-                bean.validation(errors, args[argIndex]);
+                bean.validator(errors, args[argIndex]);
                 if (CollectionUtils.isEmpty(errors)) {
                     return;
                 }

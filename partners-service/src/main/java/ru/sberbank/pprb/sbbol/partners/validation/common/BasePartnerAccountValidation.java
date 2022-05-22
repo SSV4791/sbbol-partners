@@ -2,6 +2,8 @@ package ru.sberbank.pprb.sbbol.partners.validation.common;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.regex.Pattern;
+
 public final class BasePartnerAccountValidation {
 
     private static final int[] CONTROL_KEY_ACCOUNT = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
@@ -9,6 +11,9 @@ public final class BasePartnerAccountValidation {
     public static final int CONTROL_KEY_BIC = 3;
     public static final int ACCOUNT_VALID_LENGTH = 20;
     public static final int BIC_VALID_LENGTH = 9;
+    public static final Pattern BUDGET_ACCOUNT = Pattern.compile("^0[0-9]{4}643[0-9]{12}$");
+    public static final Pattern CORR_ACCOUNT_EKS = Pattern.compile("^40102[0-9]{15}$");
+    public static final Pattern RKC_BIC = Pattern.compile("^[0-9]{6}00[0-9]$");
 
     private BasePartnerAccountValidation() {
         throw new AssertionError();
@@ -24,11 +29,15 @@ public final class BasePartnerAccountValidation {
      * Контрольное число: 193 mod 10 = 3.
      * Итог: контрольное число отлично от нуля, следовательно счет указан неверно - отсутствует в данном банке (БИК).
      */
-    public static boolean bankAccountValid(String account, String bic) {
+    public static boolean validateBankAccount(String account, String bic) {
         if (bic.length() != BIC_VALID_LENGTH) {
+            return false;
+        }
+        var matchCorrAccEks = CORR_ACCOUNT_EKS.matcher(account);
+        if (matchCorrAccEks.matches()) {
             return true;
         }
-        return accountValid(account, "0" + bic.substring(4, 6));
+        return validateAccount(account, "0" + bic.substring(4, 6));
     }
 
     /**
@@ -41,11 +50,11 @@ public final class BasePartnerAccountValidation {
      * Контрольное число: 193 mod 10 = 3.
      * Итог: контрольное число отлично от нуля, следовательно счет указан неверно - отсутствует в данном банке (БИК).
      */
-    public static boolean userAccountValid(String account, String bic) {
+    public static boolean validateUserAccount(String account, String bic) {
         if (bic.length() != BIC_VALID_LENGTH) {
-            return true;
+            return false;
         }
-        return accountValid(account, StringUtils.right(bic, CONTROL_KEY_BIC));
+        return validateAccount(account, StringUtils.right(bic, CONTROL_KEY_BIC));
     }
 
     /**
@@ -55,9 +64,13 @@ public final class BasePartnerAccountValidation {
      * @param keyBic  ключ БИКа
      * @return Результат проверки
      */
-    public static boolean accountValid(String account, String keyBic) {
+    public static boolean validateAccount(String account, String keyBic) {
         if (account.length() != ACCOUNT_VALID_LENGTH) {
             return false;
+        }
+        var matchAcc = BUDGET_ACCOUNT.matcher(account);
+        if (matchAcc.matches()) {
+            return true;
         }
         var checkAccount = keyBic + account;
         int controlSum = 0;

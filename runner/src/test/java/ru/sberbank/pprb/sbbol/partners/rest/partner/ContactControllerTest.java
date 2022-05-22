@@ -10,14 +10,18 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -44,6 +48,73 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(actualContact.getContact())
             .isNotNull()
             .isEqualTo(contact);
+    }
+
+    @Test
+    @AllureId("")
+    void testNegativeViewContact() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact4 = createValidContact(partner.getId(), partner.getDigitalId());
+        var contact5 = createValidContact(partner.getId(), partner.getDigitalId());
+
+        var filter1 = new ContactsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerId(partner.getId());
+        var response1 = post(
+            baseRoutePath + "/contacts/view",
+            HttpStatus.BAD_REQUEST,
+            filter1,
+            Error.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var filter2 = new ContactsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerId(partner.getId())
+            .ids(List.of(contact4.getId()))
+            .pagination(new Pagination()
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/contacts/view",
+            HttpStatus.BAD_REQUEST,
+            filter2,
+            Error.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var filter3 = new ContactsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerId(partner.getId())
+            .ids(
+                List.of(
+                    contact1.getId(),
+                    contact2.getId(),
+                    contact3.getId(),
+                    contact4.getId(),
+                    contact5.getId()
+                )
+            )
+            .pagination(new Pagination()
+                .count(4));
+        var response3 = post(
+            baseRoutePath + "/contacts/view",
+            HttpStatus.BAD_REQUEST,
+            filter3,
+            Error.class
+        );
+        assertThat(response3)
+            .isNotNull();
+        assertThat(response1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
     }
 
     @Test
@@ -137,6 +208,199 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             .isEqualTo(expected);
     }
 
+    @Test
+    @AllureId("")
+    void testCreateContact2() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var expected = getValidContact(partner.getId(), partner.getDigitalId());
+        expected.setEmails(null);
+        expected.setPhones(null);
+        var contact = createValidContact(expected);
+        assertThat(contact)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "id",
+                "version",
+                "phones",
+                "emails"
+            )
+            .isEqualTo(expected);
+    }
+
+    @Test
+    @AllureId("")
+    void testNegativeUpdateChildContact() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        HashSet<Phone> newPhones = new HashSet<>();
+        if (contact.getPhones() != null) {
+            for (var phone : contact.getPhones()) {
+                var newPhone = new Phone();
+                newPhone.setVersion(phone.getVersion());
+                newPhone.setId(phone.getId());
+                newPhone.setUnifiedId(phone.getUnifiedId());
+                newPhone.setDigitalId(phone.getDigitalId());
+                newPhone.setPhone(randomNumeric(12));
+                newPhones.add(newPhone);
+            }
+        }
+        HashSet<Email> newEmails = new HashSet<>();
+        if (contact.getEmails() != null) {
+            for (var email : contact.getEmails()) {
+                var newEmail = new Email();
+                newEmail.setVersion(email.getVersion());
+                newEmail.setId(email.getId());
+                newEmail.setUnifiedId(email.getUnifiedId());
+                newEmail.setDigitalId(email.getDigitalId());
+                newEmail.setEmail(email.getEmail());
+                newEmails.add(newEmail);
+            }
+        }
+        contact.setPhones(newPhones);
+        contact.setEmails(newEmails);
+        var newUpdateContact = put(
+            baseRoutePath + "/contact",
+            HttpStatus.OK,
+            updateContact(contact),
+            ContactResponse.class
+        );
+        assertThat(newUpdateContact)
+            .isNotNull();
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isEqualTo(newUpdateContact.getContact().getFirstName());
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isNotEqualTo(contact.getFirstName());
+        assertThat(newUpdateContact.getErrors())
+            .isNull();
+
+        HashSet<Phone> newPhones1 = new HashSet<>();
+        if (contact.getPhones() != null) {
+            for (var phone : contact.getPhones()) {
+                var newPhone = new Phone();
+                newPhone.setVersion(phone.getVersion() + 1);
+                newPhone.setId(phone.getId());
+                newPhone.setUnifiedId(phone.getUnifiedId());
+                newPhone.setDigitalId(phone.getDigitalId());
+                newPhone.setPhone(randomNumeric(12));
+                newPhones1.add(newPhone);
+            }
+        }
+        HashSet<Email> newEmails1 = new HashSet<>();
+        if (contact.getEmails() != null) {
+            for (var email : contact.getEmails()) {
+                var newEmail = new Email();
+                newEmail.setVersion(email.getVersion() + 10);
+                newEmail.setId(email.getId());
+                newEmail.setUnifiedId(email.getUnifiedId());
+                newEmail.setDigitalId(email.getDigitalId());
+                newEmail.setEmail(email.getEmail());
+                newEmails1.add(newEmail);
+            }
+        }
+        contact.setPhones(newPhones1);
+        contact.setEmails(newEmails1);
+        contact.setVersion(newUpdateContact.getContact().getVersion() + 1);
+        var newUpdateContact1 = put(
+            baseRoutePath + "/contact",
+            HttpStatus.BAD_REQUEST,
+            updateContact(contact),
+            Error.class
+        );
+        assertThat(newUpdateContact1)
+            .isNotNull();
+        assertThat(newUpdateContact1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    @Test
+    @AllureId("")
+    void testUpdateChildContact() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        HashSet<Phone> newPhones = new HashSet<>();
+        if (contact.getPhones() != null) {
+            for (var phone : contact.getPhones()) {
+                var newPhone = new Phone();
+                newPhone.setVersion(phone.getVersion());
+                newPhone.setId(phone.getId());
+                newPhone.setUnifiedId(phone.getUnifiedId());
+                newPhone.setDigitalId(phone.getDigitalId());
+                newPhone.setPhone(randomNumeric(12));
+                newPhones.add(newPhone);
+            }
+        }
+        HashSet<Email> newEmails = new HashSet<>();
+        if (contact.getEmails() != null) {
+            for (var email : contact.getEmails()) {
+                var newEmail = new Email();
+                newEmail.setVersion(email.getVersion());
+                newEmail.setId(email.getId());
+                newEmail.setUnifiedId(email.getUnifiedId());
+                newEmail.setDigitalId(email.getDigitalId());
+                newEmail.setEmail(email.getEmail());
+                newEmails.add(newEmail);
+            }
+        }
+        contact.setPhones(newPhones);
+        contact.setEmails(newEmails);
+        var newUpdateContact = put(
+            baseRoutePath + "/contact",
+            HttpStatus.OK,
+            updateContact(contact),
+            ContactResponse.class
+        );
+        assertThat(newUpdateContact)
+            .isNotNull();
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isEqualTo(newUpdateContact.getContact().getFirstName());
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isNotEqualTo(contact.getFirstName());
+        assertThat(newUpdateContact.getErrors())
+            .isNull();
+
+
+        HashSet<Phone> newPhones1 = new HashSet<>();
+        if (contact.getPhones() != null) {
+            for (var phone : contact.getPhones()) {
+                var newPhone = new Phone();
+                newPhone.setVersion(phone.getVersion() + 1);
+                newPhone.setId(phone.getId());
+                newPhone.setUnifiedId(phone.getUnifiedId());
+                newPhone.setDigitalId(phone.getDigitalId());
+                newPhone.setPhone(randomNumeric(12));
+                newPhones1.add(newPhone);
+            }
+        }
+        HashSet<Email> newEmails1 = new HashSet<>();
+        if (contact.getEmails() != null) {
+            for (var email : contact.getEmails()) {
+                var newEmail1 = new Email();
+                newEmail1.setVersion(email.getVersion() + 1);
+                newEmail1.setId(email.getId());
+                newEmail1.setUnifiedId(email.getUnifiedId());
+                newEmail1.setDigitalId(email.getDigitalId());
+                newEmail1.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(255));
+                newEmails1.add(newEmail1);
+            }
+        }
+        contact.setPhones(newPhones1);
+        contact.setEmails(newEmails1);
+        contact.setVersion(contact.getVersion() + 1);
+        var newUpdateContact1 = put(
+            baseRoutePath + "/contact",
+            HttpStatus.OK,
+            updateContact(contact),
+            ContactResponse.class
+        );
+        assertThat(newUpdateContact1)
+            .isNotNull();
+        assertThat(newUpdateContact1.getContact().getFirstName())
+            .isEqualTo(newUpdateContact1.getContact().getFirstName());
+        assertThat(newUpdateContact1.getContact().getFirstName())
+            .isNotEqualTo(contact.getFirstName());
+        assertThat(newUpdateContact1.getErrors())
+            .isNull();
+    }
 
     @Test
     @AllureId("34170")
@@ -147,6 +411,30 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
+            ContactResponse.class
+        );
+        assertThat(newUpdateContact)
+            .isNotNull();
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isEqualTo(newUpdateContact.getContact().getFirstName());
+        assertThat(newUpdateContact.getContact().getFirstName())
+            .isNotEqualTo(contact.getFirstName());
+        assertThat(newUpdateContact.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("")
+    void testUpdateContact2() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var contactUpdate = updateContact(contact);
+        contactUpdate.setEmails(null);
+        contactUpdate.setPhones(null);
+        var newUpdateContact = put(
+            baseRoutePath + "/contact",
+            HttpStatus.OK,
+            contactUpdate,
             ContactResponse.class
         );
         assertThat(newUpdateContact)

@@ -34,7 +34,7 @@ public class BankEntity extends BaseEntity {
     @JoinColumn(name = "account_uuid", nullable = false)
     private AccountEntity account;
 
-    @Column(name = "name", length = 50)
+    @Column(name = "name", length = 160)
     private String name;
 
     @Column(name = "bic", length = 9)

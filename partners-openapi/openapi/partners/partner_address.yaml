@@ -8,7 +8,7 @@ servers:
   - url: /
 
 paths:
-  /partner/address/view:
+  /partner/addresses/view:
     post:
       tags:
         - Partner Address

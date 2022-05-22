@@ -11,7 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeService;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeCreateValidation;
+import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeCreateValidationImpl;
 
 @RestController
 public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
@@ -24,7 +24,7 @@ public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
 
     @Override
     public ResponseEntity<DocumentTypeResponse> create(
-        @Validation(type = DocumentTypeCreateValidation.class) DocumentTypeCreate documentTypeCreate) {
+        @Validation(type = DocumentTypeCreateValidationImpl.class) DocumentTypeCreate documentTypeCreate) {
         return ResponseEntity.status(HttpStatus.CREATED).body(documentTypeService.saveDocument(documentTypeCreate));
     }
 

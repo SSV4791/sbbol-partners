@@ -1,9 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
@@ -21,6 +21,9 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryReposi
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateValidatorImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerUpdateValidatorImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnersFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -73,7 +76,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional(readOnly = true)
-    public PartnersResponse getPartners(PartnersFilter partnersFilter) {
+    public PartnersResponse getPartners(@Validation(type = PartnersFilterValidationImpl.class) PartnersFilter partnersFilter) {
         PartnersResponse partnersResponse = new PartnersResponse();
         var response = partnerRepository.findByFilter(partnersFilter);
         for (PartnerEntity entity : response) {
@@ -102,7 +105,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public PartnerResponse savePartner(PartnerCreate partner) {
+    public PartnerResponse savePartner(@Validation(type = PartnerCreateValidatorImpl.class) PartnerCreate partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
         var response = partnerMapper.toPartner(savePartner);
@@ -112,13 +115,9 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public PartnerResponse updatePartner(Partner partner) {
+    public PartnerResponse updatePartner(@Validation(type = PartnerUpdateValidatorImpl.class) Partner partner) {
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
-        if (!partner.getVersion().equals(foundPartner.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundPartner.getVersion() +
-                " не равна версии записи в запросе version=" + partner.getVersion());
-        }
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
         var response = partnerMapper.toPartner(savePartner);

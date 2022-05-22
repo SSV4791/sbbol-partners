@@ -30,6 +30,75 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner/contact/phone";
 
     @Test
+    @AllureId("")
+    void testNegativeViewPartnerPhone() {
+        Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        createPhone(contact.getId(), contact.getDigitalId());
+        createPhone(contact.getId(), contact.getDigitalId());
+        createPhone(contact.getId(), contact.getDigitalId());
+        createPhone(contact.getId(), contact.getDigitalId());
+
+        var filter1 = new PhonesFilter()
+            .digitalId(partner.getDigitalId())
+            .unifiedIds(
+                List.of(
+                    contact.getId()
+                )
+            )
+            .pagination(new Pagination()
+                .count(4));
+        var response = post(
+            baseRoutePath + "/view",
+            HttpStatus.BAD_REQUEST,
+            filter1,
+            Error.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var filter2 = new PhonesFilter()
+            .digitalId(partner.getDigitalId())
+            .unifiedIds(
+                List.of(
+                    contact.getId()
+                )
+            );
+        var response1 = post(
+            baseRoutePath + "/view",
+            HttpStatus.BAD_REQUEST,
+            filter2,
+            Error.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var filter3 = new PhonesFilter()
+            .digitalId(partner.getDigitalId())
+            .unifiedIds(
+                List.of(
+                    contact.getId()
+                )
+            )
+            .pagination(new Pagination()
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/view",
+            HttpStatus.BAD_REQUEST,
+            filter3,
+            Error.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    @Test
     @AllureId("34117")
     void testViewContactPhone() {
         Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
@@ -61,6 +130,85 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
             .isEqualTo(4);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
+    }
+
+    @Test
+    @AllureId("")
+    void testUpdateContactPhoneValidation() {
+        Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var phone = createPhone(contact.getId(), contact.getDigitalId());
+        phone.setPhone("+" + (randomNumeric(11)));
+        var newUpdatePhone = put(
+            baseRoutePath,
+            HttpStatus.OK,
+            updatePhone(phone),
+            PhoneResponse.class
+        );
+        assertThat(newUpdatePhone)
+            .isNotNull();
+        assertThat(newUpdatePhone.getPhone().getPhone())
+            .isEqualTo(newUpdatePhone.getPhone().getPhone());
+        assertThat(phone.getPhone())
+            .isNotEqualTo(newUpdatePhone.getPhone().getPhone());
+        assertThat(newUpdatePhone.getErrors())
+            .isNull();
+
+        var phone1 = createPhone(contact.getId(), contact.getDigitalId());
+        updatePhone(phone1);
+        phone1.setPhone("+" + (randomNumeric(12)));
+        var newUpdatePhone1 = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            phone1,
+            Error.class
+        );
+        assertThat(newUpdatePhone1)
+            .isNotNull();
+        assertThat(newUpdatePhone1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var phone2 = createPhone(contact.getId(), contact.getDigitalId());
+        updatePhone(phone2);
+        phone2.setPhone((randomNumeric(11)) + "+" );
+        var newUpdatePhone2 = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            phone2,
+            Error.class
+        );
+        assertThat(newUpdatePhone2)
+            .isNotNull();
+        assertThat(newUpdatePhone2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var phone3 = createPhone(contact.getId(), contact.getDigitalId());
+        updatePhone(phone3);
+        phone3.setPhone((randomNumeric(6)) + "+" + (randomNumeric(5)));
+        var newUpdatePhone3 = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            phone3,
+            Error.class
+        );
+        assertThat(newUpdatePhone3)
+            .isNotNull();
+        assertThat(newUpdatePhone3.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var phone4 = createPhone(contact.getId(), contact.getDigitalId());
+        updatePhone(phone4);
+        phone4.setPhone((randomNumeric(4)) + "+" + (randomNumeric(5)) + "+");
+        var newUpdatePhone4 = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            phone4,
+            Error.class
+        );
+        assertThat(newUpdatePhone4)
+            .isNotNull();
+        assertThat(newUpdatePhone4.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
     }
 
     @Test
