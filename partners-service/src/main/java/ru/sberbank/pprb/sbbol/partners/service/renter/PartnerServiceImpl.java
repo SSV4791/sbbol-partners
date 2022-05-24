@@ -132,8 +132,11 @@ public class PartnerServiceImpl implements RenterService {
             DocumentTypeEntity documentTypeEntity = null;
             if (renter.getDulType() != null) {
                 var documentType = RenterPartnerMapper.toDocumentType(renter.getDulType());
-                documentTypeEntity = dictionaryRepository.getBySystemName(documentType.name()).get();
-                document.setTypeUuid(documentTypeEntity.getUuid());
+                var foundDocumentType = dictionaryRepository.getBySystemName(documentType.name());
+                if (foundDocumentType.isPresent()) {
+                    documentTypeEntity = foundDocumentType.get();
+                    document.setTypeUuid(documentTypeEntity.getUuid());
+                }
             }
             document.setUnifiedUuid(partner.getUuid());
             var savedDocument = documentRepository.save(document);
@@ -163,12 +166,15 @@ public class PartnerServiceImpl implements RenterService {
             var uuid = UUID.fromString(renter.getUuid());
             var flatRenter = flatRenterRepository.getByPartnerUuid(uuid)
                 .orElseThrow(() -> new RuntimeException(ERROR_MESSAGE));
-            var partner = partnerRepository.getByDigitalIdAndUuid(renter.getDigitalId(), flatRenter.getPartnerUuid())
-                .orElseThrow(() -> new RuntimeException(ERROR_MESSAGE));
-            renterPartnerMapper.updatePartner(renter, partner);
-            var partnerPhoneEntity = updatePhone(flatRenter, renter, partner);
-            var partnerEmailEntity = updateEmail(flatRenter, renter, partner);
-            var savedPartner = partnerRepository.save(partner);
+            var partners = partnerRepository.findAllByUuid(flatRenter.getPartnerUuid());
+            if (partners.size() != 1) {
+                throw new RuntimeException(ERROR_MESSAGE);
+            }
+            var targetRenter = partners.get(0);
+            renterPartnerMapper.updatePartner(renter, targetRenter);
+            var partnerPhoneEntity = updatePhone(flatRenter, renter, targetRenter);
+            var partnerEmailEntity = updateEmail(flatRenter, renter, targetRenter);
+            var savedPartner = partnerRepository.save(targetRenter);
             if (partnerPhoneEntity != null) {
                 flatRenter.setPhoneUuid(partnerPhoneEntity.getUuid());
             }
@@ -178,8 +184,11 @@ public class PartnerServiceImpl implements RenterService {
             AddressEntity savedLegalAddress = null;
             if (renter.getLegalAddress() != null) {
                 if (flatRenter.getLegalAddressUuid() != null) {
-                    savedLegalAddress = addressRepository.getByDigitalIdAndUuid(renter.getDigitalId(), flatRenter.getLegalAddressUuid()).get();
-                    renterPartnerMapper.updateAddress(renter.getLegalAddress(), savedLegalAddress);
+                    var address = addressRepository.getByDigitalIdAndUuid(renter.getDigitalId(), flatRenter.getLegalAddressUuid());
+                    if (address.isPresent()) {
+                        savedLegalAddress = address.get();
+                        renterPartnerMapper.updateAddress(renter.getLegalAddress(), savedLegalAddress);
+                    }
                 } else {
                     var address = renterPartnerMapper.toAddress(renter.getLegalAddress());
                     savedLegalAddress = addressRepository.save(address);
@@ -189,17 +198,20 @@ public class PartnerServiceImpl implements RenterService {
             AddressEntity savedPhysicalAddress = null;
             if (renter.getPhysicalAddress() != null) {
                 if (flatRenter.getPhysicalAddressUuid() != null) {
-                    savedPhysicalAddress = addressRepository.getByDigitalIdAndUuid(renter.getDigitalId(), flatRenter.getPhysicalAddressUuid()).get();
-                    renterPartnerMapper.updateAddress(renter.getPhysicalAddress(), savedPhysicalAddress);
+                    var address = addressRepository.getByDigitalIdAndUuid(renter.getDigitalId(), flatRenter.getPhysicalAddressUuid());
+                    if (address.isPresent()) {
+                        savedPhysicalAddress = address.get();
+                        renterPartnerMapper.updateAddress(renter.getPhysicalAddress(), savedPhysicalAddress);
+                    }
                 } else {
                     var address = renterPartnerMapper.toAddress(renter.getPhysicalAddress());
-                    savedLegalAddress = addressRepository.save(address);
-                    flatRenter.setPhysicalAddressUuid(savedLegalAddress.getUuid());
+                    savedPhysicalAddress = addressRepository.save(address);
+                    flatRenter.setPhysicalAddressUuid(savedPhysicalAddress.getUuid());
                 }
             }
             AccountEntity savedAccount = null;
             if (flatRenter.getAccountUuid() != null) {
-                var account = accountRepository.getByDigitalIdAndUuid(partner.getDigitalId(), flatRenter.getAccountUuid())
+                var account = accountRepository.getByDigitalIdAndUuid(targetRenter.getDigitalId(), flatRenter.getAccountUuid())
                     .orElseThrow(() -> new RuntimeException(ERROR_MESSAGE));
                 var mapBank = new HashMap<UUID, BankEntity>();
                 var mapBankAccount = new HashMap<UUID, BankAccountEntity>();
@@ -234,20 +246,22 @@ public class PartnerServiceImpl implements RenterService {
             DocumentEntity savedDocument = null;
             Optional<DocumentTypeEntity> documentType = Optional.empty();
             if (flatRenter.getDocumentUuid() != null) {
-                var document = documentRepository.getByDigitalIdAndUuid(partner.getDigitalId(), flatRenter.getDocumentUuid());
+                var document = documentRepository.getByDigitalIdAndUuid(targetRenter.getDigitalId(), flatRenter.getDocumentUuid());
                 if (document.isPresent()) {
                     renterPartnerMapper.updateDocument(renter, document.get());
-                    if (document.get().getType() != null && renter.getDulType() != null) {
-                        if (!document.get().getType().getSystemName().equals(renter.getDulType().name())) {
-                            var type = RenterPartnerMapper.toDocumentType(renter.getDulType());
-                            documentType = dictionaryRepository.getBySystemName(type.name());
-                            documentType.ifPresent(documentTypeEntity -> document.get().setTypeUuid(documentTypeEntity.getUuid()));
+                    if (document.get().getType() != null) {
+                        if (renter.getDulType() != null) {
+                            if (!document.get().getType().getSystemName().equals(renter.getDulType().name())) {
+                                var type = RenterPartnerMapper.toDocumentType(renter.getDulType());
+                                documentType = dictionaryRepository.getBySystemName(type.name());
+                                documentType.ifPresent(documentTypeEntity -> document.get().setTypeUuid(documentTypeEntity.getUuid()));
+                            }
+                        } else {
+                            documentType = dictionaryRepository.getBySystemName(renter.getDulType().name());
+                            documentType.ifPresent(documentTypeEntity -> document.get().setType(documentTypeEntity));
                         }
-                    } else {
-                        documentType = dictionaryRepository.getBySystemName(renter.getDulType().name());
-                        documentType.ifPresent(documentTypeEntity -> document.get().setType(documentTypeEntity));
+                        savedDocument = documentRepository.save(document.get());
                     }
-                    savedDocument = documentRepository.save(document.get());
                 }
             } else {
                 var document = renterPartnerMapper.toDocument(renter);
@@ -261,7 +275,7 @@ public class PartnerServiceImpl implements RenterService {
                 savedPhysicalAddress,
                 savedAccount,
                 savedDocument,
-                documentType.get()
+                documentType.orElse(null)
             );
         } else {
             Renter result = new Renter();
@@ -340,6 +354,9 @@ public class PartnerServiceImpl implements RenterService {
     @Override
     @Transactional(readOnly = true)
     public Renter getRenter(@Nonnull RenterIdentifier renterIdentifier) {
+        if (renterIdentifier.getUuid() == null) {
+            return null;
+        }
         var uuid = UUID.fromString(renterIdentifier.getUuid());
         var partner = partnerRepository.getByDigitalIdAndUuid(renterIdentifier.getDigitalId(), uuid)
             .orElseThrow(() -> new RuntimeException(ERROR_MESSAGE));
