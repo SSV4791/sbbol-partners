@@ -38,12 +38,7 @@ val coverageExclusions = listOf(
 
 tasks {
 
-    clean {
-        delete(buildDir)
-    }
-
     register("sonarCoverage", DefaultTask::class) {
-        group = "verification"
         dependsOn(jacocoTestReport)
         finalizedBy(sonarqube)
     }
