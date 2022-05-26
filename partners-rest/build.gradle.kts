@@ -1,17 +1,15 @@
 plugins {
     id("dependency-locking-conventions")
+    id("jacoco-conventions")
     id("java-conventions")
     id("org.openapi.generator")
     id("org.springframework.boot") apply false
 }
 
-apply(plugin = "jacoco")
-
 val rentersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/renters/renter.yaml"
 val partnersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners"
 val counterpartiesApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/counterparties/counterparty.yaml"
 val generateObjectOutputDir = "$buildDir/generated/sources"
-
 
 tasks {
     register("openApiGenerateRenters", org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
@@ -100,9 +98,6 @@ tasks {
             "openApiGenerateRenters",
             "openApiGenerateCounterparties"
         )
-    }
-    clean {
-        delete("target")
     }
 }
 

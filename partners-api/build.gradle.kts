@@ -1,11 +1,10 @@
 plugins {
     id("dependency-locking-conventions")
+    id("jacoco-conventions")
     id("java-conventions")
     id("org.openapi.generator")
     id("org.springframework.boot") apply false
 }
-
-apply(plugin = "jacoco")
 
 val rentersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/renters/renter.yaml"
 val partnersApiSchemaPath = "${project(":partners-openapi").projectDir}/openapi/partners"
@@ -97,9 +96,6 @@ tasks {
             "openApiGenerateCounterparties",
 
             )
-    }
-    clean {
-        delete("target")
     }
 }
 

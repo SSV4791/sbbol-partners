@@ -1,16 +1,9 @@
 plugins {
     id("dependency-locking-conventions")
+    id("jacoco-conventions")
     id("java-conventions")
     id("org.springframework.boot") apply false
     id("test-conventions")
-}
-
-apply(plugin = "jacoco")
-
-tasks {
-    clean {
-        delete("target")
-    }
 }
 
 dependencies {

@@ -1,12 +1,12 @@
 plugins {
     id("dependency-locking-conventions")
+    id("jacoco-conventions")
     id("java-conventions")
     id("org.springframework.boot")
     id("test-conventions")
 }
 
 apply(plugin = "io.spring.dependency-management")
-apply(plugin = "jacoco")
 the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
     imports {
         mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
@@ -19,7 +19,6 @@ tasks {
     }
     clean {
         delete("allure-results")
-        delete("target")
     }
     test {
         if (project.hasProperty("spring.datasource.url"))

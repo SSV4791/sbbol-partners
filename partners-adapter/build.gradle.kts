@@ -1,17 +1,10 @@
 plugins {
     id("dependency-locking-conventions")
+    id("jacoco-conventions")
     id("java-conventions")
     id("org.openapi.generator")
     id("org.springframework.boot") apply false
     id("test-conventions")
-}
-
-apply(plugin = "jacoco")
-
-tasks {
-    clean {
-        delete("target")
-    }
 }
 
 val generateObjectOutputDir = "$buildDir/generated/sources"
