@@ -24,6 +24,7 @@ import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.FOREIGNPASSPORT;
 import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.PASSPORTOFRUSSIA;
@@ -36,6 +37,7 @@ import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.SERVICEPASSP
 
 /**
  * @deprecated {@link ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper}
+ *
  */
 @Deprecated(forRemoval = true)
 @Mapper(
@@ -144,26 +146,35 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "unifiedUuid", ignore = true)
-    @Mapping(target = "digitalId", ignore = true)
+    @Mapping(target = "unifiedUuid", source = "partnerUuid")
+    @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "location", source = "locality")
-    AddressEntity toAddress(RenterAddress address);
+    @Mapping(target = "zipCode", source = "address.zipCode")
+    @Mapping(target = "regionCode", source = "address.regionCode")
+    @Mapping(target = "region", source = "address.region")
+    @Mapping(target = "city", source = "address.city")
+    @Mapping(target = "location", source = "address.locality")
+    @Mapping(target = "street", source = "address.street")
+    @Mapping(target = "building", source = "address.building")
+    @Mapping(target = "buildingBlock", source = "address.buildingBlock")
+    @Mapping(target = "flat", source = "address.flat")
+    AddressEntity toAddress(RenterAddress address, UUID partnerUuid, String digitalId);
 
-    @Mapping(target = "series", source = "dulSerie")
-    @Mapping(target = "number", source = "dulNumber")
-    @Mapping(target = "divisionIssue", source = "dulDivisionIssue")
-    @Mapping(target = "dateIssue", source = "dulDateIssue")
-    @Mapping(target = "divisionCode", source = "dulDivisionCode")
+    @Mapping(target = "digitalId", source = "renter.digitalId")
+    @Mapping(target = "series", source = "renter.dulSerie")
+    @Mapping(target = "number", source = "renter.dulNumber")
+    @Mapping(target = "divisionIssue", source = "renter.dulDivisionIssue")
+    @Mapping(target = "dateIssue", source = "renter.dulDateIssue")
+    @Mapping(target = "divisionCode", source = "renter.dulDivisionCode")
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "unifiedUuid", ignore = true)
+    @Mapping(target = "unifiedUuid", source = "partnerUuid")
     @Mapping(target = "typeUuid", ignore = true)
     @Mapping(target = "certifierName", ignore = true)
     @Mapping(target = "positionCertifier", ignore = true)
     @Mapping(target = "certifierType", ignore = true)
-    DocumentEntity toDocument(Renter renter);
+    DocumentEntity toDocument(Renter renter, UUID partnerUuid);
 
     @Named("toDocumentType")
     static DocumentType toDocumentType(Renter.DulTypeEnum type) {

@@ -112,23 +112,19 @@ public class PartnerServiceImpl implements RenterService {
             }
             AddressEntity savedLegalAddress = null;
             if (renter.getLegalAddress() != null) {
-                var address = renterPartnerMapper.toAddress(renter.getLegalAddress());
+                var address = renterPartnerMapper.toAddress(renter.getLegalAddress(), partner.getUuid(), renter.getDigitalId());
                 address.setType(AddressType.LEGAL_ADDRESS);
-                address.setUnifiedUuid(partner.getUuid());
-                address.setDigitalId(partner.getDigitalId());
                 savedLegalAddress = addressRepository.save(address);
                 flatRenter.setLegalAddressUuid(savedLegalAddress.getUuid());
             }
             AddressEntity savedPhysicalAddress = null;
             if (renter.getPhysicalAddress() != null) {
-                var address = renterPartnerMapper.toAddress(renter.getPhysicalAddress());
+                var address = renterPartnerMapper.toAddress(renter.getPhysicalAddress(), partner.getUuid(), renter.getDigitalId());
                 address.setType(AddressType.PHYSICAL_ADDRESS);
-                address.setUnifiedUuid(partner.getUuid());
-                address.setDigitalId(partner.getDigitalId());
                 savedPhysicalAddress = addressRepository.save(address);
                 flatRenter.setPhysicalAddressUuid(savedPhysicalAddress.getUuid());
             }
-            var document = renterPartnerMapper.toDocument(renter);
+            var document = renterPartnerMapper.toDocument(renter, partner.getUuid());
             DocumentTypeEntity documentTypeEntity = null;
             if (renter.getDulType() != null) {
                 var documentType = RenterPartnerMapper.toDocumentType(renter.getDulType());
@@ -138,7 +134,6 @@ public class PartnerServiceImpl implements RenterService {
                     document.setTypeUuid(documentTypeEntity.getUuid());
                 }
             }
-            document.setUnifiedUuid(partner.getUuid());
             var savedDocument = documentRepository.save(document);
             flatRenter.setDocumentUuid(savedDocument.getUuid());
             return createRenter(
@@ -190,7 +185,7 @@ public class PartnerServiceImpl implements RenterService {
                         renterPartnerMapper.updateAddress(renter.getLegalAddress(), savedLegalAddress);
                     }
                 } else {
-                    var address = renterPartnerMapper.toAddress(renter.getLegalAddress());
+                    var address = renterPartnerMapper.toAddress(renter.getLegalAddress(), flatRenter.getPartnerUuid(), renter.getDigitalId());
                     savedLegalAddress = addressRepository.save(address);
                     flatRenter.setLegalAddressUuid(savedLegalAddress.getUuid());
                 }
@@ -204,7 +199,7 @@ public class PartnerServiceImpl implements RenterService {
                         renterPartnerMapper.updateAddress(renter.getPhysicalAddress(), savedPhysicalAddress);
                     }
                 } else {
-                    var address = renterPartnerMapper.toAddress(renter.getPhysicalAddress());
+                    var address = renterPartnerMapper.toAddress(renter.getPhysicalAddress(), flatRenter.getPartnerUuid(), renter.getDigitalId());
                     savedPhysicalAddress = addressRepository.save(address);
                     flatRenter.setPhysicalAddressUuid(savedPhysicalAddress.getUuid());
                 }
@@ -264,7 +259,7 @@ public class PartnerServiceImpl implements RenterService {
                     }
                 }
             } else {
-                var document = renterPartnerMapper.toDocument(renter);
+                var document = renterPartnerMapper.toDocument(renter, flatRenter.getPartnerUuid());
                 savedDocument = documentRepository.save(document);
                 flatRenter.setDocumentUuid(savedDocument.getUuid());
             }
