@@ -108,7 +108,7 @@ spec:
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: /actuator/health/readiness
+              path: {{ os_project.healthcheck | default('/sbbol-partners/actuator') }}/health/readiness
               port: 8080
               scheme: HTTP
             periodSeconds: 30
@@ -118,7 +118,7 @@ spec:
           livenessProbe:
             failureThreshold: 3
             httpGet:
-              path: /actuator/health/liveness
+              path: {{ os_project.healthcheck | default('/sbbol-partners/actuator') }}/health/liveness
               port: 8080
               scheme: HTTP
             periodSeconds: 30
