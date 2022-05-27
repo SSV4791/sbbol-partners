@@ -73,6 +73,8 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     BankEntity toBank(Bank bank);
 
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "account", source = "bankAccount")

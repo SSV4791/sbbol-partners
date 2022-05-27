@@ -38,13 +38,14 @@ val coverageExclusions = listOf(
 
 tasks {
 
-    register("sonarCoverage", DefaultTask::class) {
-        dependsOn(jacocoTestReport)
-        finalizedBy(sonarqube)
-    }
-
     qaReporterUpload {
         jacocoExcludes.addAll(coverageExclusions)
+    }
+
+    register("sonarCoverage", DefaultTask::class) {
+        group = "verification"
+        dependsOn(jacocoTestReport)
+        finalizedBy(sonarqube)
     }
 }
 

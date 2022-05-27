@@ -9,6 +9,8 @@ import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapper;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RenterPartnerMapperTest extends BaseUnitConfiguration {
@@ -105,8 +107,10 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     @Test
     @AllureId("34065")
     void toAddress() {
+        var partnerUuid = factory.manufacturePojo(UUID.class);
+        var digitalId = factory.manufacturePojo(String.class);
         RenterAddress expected = factory.manufacturePojo(RenterAddress.class);
-        var renter = mapper.toAddress(expected);
+        var renter = mapper.toAddress(expected, partnerUuid, digitalId);
         var actual = mapper.toRenterAddress(renter);
         assertThat(expected)
             .usingRecursiveComparison()
@@ -116,8 +120,9 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     @Test
     @AllureId("34098")
     void toDocument() {
+        var partnerUuid = factory.manufacturePojo(UUID.class);
         Renter expected = factory.manufacturePojo(Renter.class);
-        var document = mapper.toDocument(expected);
+        var document = mapper.toDocument(expected, partnerUuid);
         assertThat(expected.getDulSerie())
             .isEqualTo(document.getSeries());
         assertThat(expected.getDulNumber())
