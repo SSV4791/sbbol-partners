@@ -64,7 +64,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
                 .offset(0));
         var response1 =
             post(
-                baseRoutePath + "/address/view",
+                baseRoutePath + "/addresses/view",
                 HttpStatus.OK,
                 filter1,
                 AddressesResponse.class
@@ -82,7 +82,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
                 .offset(0));
         var response2 =
             post(
-                baseRoutePath + "/address/view",
+                baseRoutePath + "/addresses/view",
                 HttpStatus.OK,
                 filter2,
                 AddressesResponse.class

@@ -42,8 +42,6 @@ public interface AddressMapper extends BaseMapper {
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     AddressEntity toAddress(Address address);
 
-
-    @Named("updateAddress")
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")

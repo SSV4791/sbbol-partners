@@ -5,7 +5,6 @@ import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
@@ -31,7 +30,7 @@ import java.util.Map;
 )
 public interface AccountMapper extends BaseMapper {
 
-    @Mapping(target = "id", expression = "java(accounts.getUuid() == null ? null :accounts.getUuid().toString())")
+    @Mapping(target = "id", expression = "java(accounts.getUuid() == null ? null : accounts.getUuid().toString())")
     @Mapping(target = "partnerId", expression = "java(accounts.getPartnerUuid() == null ? null : accounts.getPartnerUuid().toString())")
     @Mapping(target = "budget", ignore = true)
     List<Account> toAccounts(List<AccountEntity> accounts);
@@ -86,7 +85,6 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "account", source = "bankAccount")
     BankAccountEntity toBankAccount(BankAccount bankAccount);
 
-    @Named("updateAccount")
     @Mapping(target = "uuid", expression = "java(mapUuid(account.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
     @Mapping(target = "createDate", ignore = true)
@@ -94,6 +92,16 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "state", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget() AccountEntity accountEntity);
+
+    @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
+    @Mapping(target = "intermediary", source = "mediary")
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    void updateBank(Bank bank, @MappingTarget() BankEntity bankEntity);
+
+    @Mapping(target = "uuid", expression = "java(mapUuid(bankAccount.getId()))")
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "account", source = "bankAccount")
+    void updateBankAccount(BankAccount bankAccount, @MappingTarget() BankAccountEntity bankAccountEntity);
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {

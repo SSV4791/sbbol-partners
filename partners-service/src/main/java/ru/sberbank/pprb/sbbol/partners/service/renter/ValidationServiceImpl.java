@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.sberbank.pprb.sbbol.partners.CheckFailure;
 import ru.sberbank.pprb.sbbol.partners.CheckUtils;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerUpdateValidatorImpl;
 import ru.sberbank.pprb.sbbol.renter.model.CheckResult;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
@@ -19,7 +20,7 @@ import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.LEGAL_ENTITY;
 import static ru.sberbank.pprb.sbbol.renter.model.Renter.TypeEnum.PHYSICAL_PERSON;
 
 /**
- * @deprecated {@link ru.sberbank.pprb.sbbol.partners.validation.PartnerValidator}
+ * @deprecated {@link PartnerUpdateValidatorImpl}
  */
 @Deprecated(forRemoval = true)
 @Service

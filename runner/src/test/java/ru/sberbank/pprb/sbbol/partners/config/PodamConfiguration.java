@@ -55,7 +55,7 @@ public class PodamConfiguration {
                     "accountId",
                     "bankId",
                     "documentTypeId" -> UUID.randomUUID().toString();
-                case "phone" -> "007" + randomNumeric(PHONE_LENGTH);
+                case "phone" -> "07" + randomNumeric(PHONE_LENGTH);
                 default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
             };
         }

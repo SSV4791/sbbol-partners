@@ -28,6 +28,75 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner/contact/email";
 
     @Test
+    @AllureId("")
+    void testNegativeViewContactEmail() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        createEmail(contact.getId(), contact.getDigitalId());
+        createEmail(contact.getId(), contact.getDigitalId());
+        createEmail(contact.getId(), contact.getDigitalId());
+        createEmail(contact.getId(), contact.getDigitalId());
+
+        var filter1 = new EmailsFilter()
+            .digitalId(contact.getDigitalId())
+            .unifiedIds(
+                List.of(
+                    contact.getId()
+                )
+            )
+            .pagination(new Pagination()
+                .count(4));
+        var response = post(
+            baseRoutePath + "/view",
+            HttpStatus.BAD_REQUEST,
+            filter1,
+            Error.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var filter2 = new EmailsFilter()
+            .digitalId(contact.getDigitalId())
+            .unifiedIds(
+                List.of(
+                    contact.getId()
+                )
+            );
+        var response1 = post(
+            baseRoutePath + "/view",
+            HttpStatus.BAD_REQUEST,
+            filter2,
+            Error.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var filter3 = new EmailsFilter()
+            .digitalId(contact.getDigitalId())
+            .unifiedIds(
+                List.of(
+                    contact.getId()
+                )
+            )
+            .pagination(new Pagination()
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/view",
+            HttpStatus.BAD_REQUEST,
+            filter3,
+            Error.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    @Test
     @AllureId("34150")
     void testViewContactEmail() {
         var partner = createValidPartner(randomAlphabetic(10));
@@ -79,6 +148,40 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @AllureId("")
+    void testNegativeCreateContactEmail() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var expected = getEmail(contact.getId(), contact.getDigitalId());
+        expected.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(256));
+        var emailCreate = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            expected,
+            Error.class);
+        assertThat(emailCreate.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        expected.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(254) + "@");
+        var emailCreate1 = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            expected,
+            Error.class);
+        assertThat(emailCreate1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        expected.setEmail(randomAlphabetic(65) + "@" + randomAlphabetic(250));
+        var emailCreate2 = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            expected,
+            Error.class);
+        assertThat(emailCreate2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    @Test
     @AllureId("34130")
     void testUpdateContactEmail() {
         var partner = createValidPartner(randomAlphabetic(10));
@@ -99,6 +202,48 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             .isNotEqualTo(email.getEmail());
         assertThat(newUpdateEmail.getErrors())
             .isNull();
+    }
+
+    @Test
+    @AllureId("")
+    void testNegativeUpdateContactEmail() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var email = createEmail(contact.getId(), contact.getDigitalId());
+        updateEmail(email);
+        email.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(256));
+        var emailError = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            email,
+            Error.class
+        );
+        assertThat(emailError.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var email1 = createEmail(contact.getId(), contact.getDigitalId());
+        updateEmail(email1);
+        email1.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(254) + "@");
+        var emailError1 = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            email1,
+            Error.class
+        );
+        assertThat(emailError1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var email2 = createEmail(contact.getId(), contact.getDigitalId());
+        updateEmail(email2);
+        email2.setEmail(randomAlphabetic(65) + "@" + randomAlphabetic(250));
+        var emailError2 = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            email2,
+            Error.class
+        );
+        assertThat(emailError2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
     }
 
     @Test
@@ -209,7 +354,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         return new EmailCreate()
             .unifiedId(contactUuid)
             .digitalId(digitalId)
-            .email(randomAlphabetic(10));
+            .email(randomAlphabetic(10) + "@mail.ru");
     }
 
     private static Email createEmail(String contactUuid, String digitalId) {
@@ -232,7 +377,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
 
     public static Email updateEmail(Email email) {
         return new Email()
-            .email(randomAlphabetic(10) + "@.ru")
+            .email(randomAlphabetic(64) + "@" + randomAlphabetic(255))
             .id(email.getId())
             .version(email.getVersion())
             .unifiedId(email.getUnifiedId())

@@ -32,7 +32,7 @@
     "name": {
       "type": "string",
       "title": "Наименование",
-      "maxLength": 50
+      "maxLength": 160
     },
     "mediary": {
       "type": "boolean",
@@ -41,13 +41,11 @@
     },
     "bankAccount": {
       "$ref": "bank_account.json",
-      "title": "Корреспондентский счёт",
-      "x-constrains": "@ValidbankAccount"
+      "title": "Корреспондентский счёт"
     }
   },
   "required": [
     "id",
-    "accountId",
-    "bankAccount"
+    "accountId"
   ]
 }

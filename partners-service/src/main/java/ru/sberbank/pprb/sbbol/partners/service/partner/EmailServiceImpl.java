@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
@@ -12,6 +12,9 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
+import ru.sberbank.pprb.sbbol.partners.validation.EmailCreateValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.EmailUpdateValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.EmailsFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -32,7 +35,7 @@ abstract class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional(readOnly = true)
-    public EmailsResponse getEmails(EmailsFilter emailsFilter) {
+    public EmailsResponse getEmails(@Validation(type = EmailsFilterValidationImpl.class) EmailsFilter emailsFilter) {
         var response = emailRepository.findByFilter(emailsFilter);
         var emailResponse = new EmailsResponse();
         for (var entity : response) {
@@ -54,7 +57,7 @@ abstract class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional
-    public EmailResponse saveEmail(EmailCreate email) {
+    public EmailResponse saveEmail(@Validation(type = EmailCreateValidationImpl.class) EmailCreate email) {
         var emailEntity = emailMapper.toEmail(email);
         EmailEntity savedEmail = emailRepository.save(emailEntity);
         var response = emailMapper.toEmail(savedEmail);
@@ -63,14 +66,10 @@ abstract class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional
-    public EmailResponse updateEmail(Email email) {
+    public EmailResponse updateEmail(@Validation(type = EmailUpdateValidationImpl.class) Email email) {
         var uuid = UUID.fromString(email.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
-        if (!email.getVersion().equals(foundEmail.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundEmail.getVersion() +
-                " не равна версии записи в запросе version=" + email.getVersion());
-        }
         emailMapper.updateEmail(email, foundEmail);
         var savedEmail = emailRepository.save(foundEmail);
         var response = emailMapper.toEmail(savedEmail);

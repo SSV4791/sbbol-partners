@@ -16,7 +16,7 @@
       "$ref": "../search/search_partners.json"
     },
     "partnersFilter": {
-      "$ref": "../common/partner_filter.json"
+      "$ref": "../common/partner_filter_type.json"
     },
     "accountSignType": {
       "type": "string",

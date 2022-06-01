@@ -52,6 +52,63 @@ class AccountControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @AllureId("")
+    void testNegativeViewAccount() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var filter0 = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .pagination(new Pagination()
+                .offset(0));
+        var response0 = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.BAD_REQUEST,
+            filter0,
+            Error.class
+        );
+
+        var filter1 = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .pagination(new Pagination()
+                .count(4));
+        var response1 = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.BAD_REQUEST,
+            filter1,
+            Error.class
+        );
+
+        var filter2 = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()));
+        var response2 = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.BAD_REQUEST,
+            filter2,
+            Error.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response0)
+            .isNotNull();
+        assertThat(response0.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    @Test
     @AllureId("34154")
     void testViewAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
@@ -181,8 +238,189 @@ class AccountControllerTest extends AbstractIntegrationTest {
         assertThat(updateAccount.getAccount().getComment())
             .isNotEqualTo(account.getComment());
         assertThat(updateAccount.getAccount().getComment())
-            .isEqualTo(updateAccount.getAccount().getComment());
+            .isNotNull();
         assertThat(updateAccount.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("")
+    void testNegativeUpdateAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var acc = updateAccount(account)
+            .bank(account.getBank()
+                .bic(""));
+        var updateAccount = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            acc,
+            Error.class
+        );
+        assertThat(updateAccount)
+            .isNotNull();
+        assertThat(updateAccount.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var acc1 = updateAccount(account)
+            .bank(account.getBank()
+                .bankAccount(account.getBank().getBankAccount()
+                    .bankAccount("")));
+        var updateAccount1 = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            acc1,
+            Error.class
+        );
+        assertThat(updateAccount1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var acc2 = updateAccount(account)
+            .account("12345678901234567890");
+        var updateAccount2 = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            acc2,
+            Error.class
+        );
+        assertThat(updateAccount2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var acc3 = updateAccount(account)
+            .bank(account.getBank()
+                .bic("044525002"));
+        var updateAccount3 = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            acc3,
+            Error.class
+        );
+        assertThat(updateAccount3.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        var acc4 = updateAccount(account)
+            .bank(account.getBank()
+                .bic(""));
+        var updateAccount4 = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            acc4,
+            Error.class
+        );
+        assertThat(updateAccount4.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    @Test
+    @AllureId("")
+    void testPositiveUpdateAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var acc = updateAccount(account);
+        var updateAccount = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            acc,
+            AccountResponse.class
+        );
+        assertThat(updateAccount)
+            .isNotNull();
+        assertThat(updateAccount.getErrors())
+            .isNull();
+
+        var acc1 = acc
+            .version(acc.getVersion() + 1)
+            .account("30101810145250000416")
+            .bank(account.getBank()
+                .bic("044525411")
+                .bankAccount(account.getBank().getBankAccount()
+                    .bankAccount("30101810145250000411")));
+        var updateAccount1 = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            acc1,
+            AccountResponse.class
+        );
+        assertThat(updateAccount1)
+            .isNotNull();
+        assertThat(updateAccount1.getErrors())
+            .isNull();
+
+        var acc2 = acc1
+            .version(acc1.getVersion() + 1)
+            .account("30101810145250000429");
+        var updateAccount2 = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            acc2,
+            AccountResponse.class
+        );
+        assertThat(updateAccount2)
+            .isNotNull();
+        assertThat(updateAccount2.getErrors())
+            .isNull();
+
+        var acc3 = acc2
+            .version(acc2.getVersion() + 1)
+            .account("")
+            .bank(account.getBank()
+                .bic("044525000")
+                .bankAccount(account.getBank().getBankAccount()
+                    .bankAccount(null)));
+        var updateAccount3 = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            acc3,
+            AccountResponse.class
+        );
+        assertThat(updateAccount3)
+            .isNotNull();
+        assertThat(updateAccount3.getErrors())
+            .isNull();
+
+        var acc4 = updateAccount(account2)
+            .account("");
+        var updateAccount4 = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            acc4,
+            AccountResponse.class
+        );
+        assertThat(updateAccount4)
+            .isNotNull();
+        assertThat(updateAccount4.getErrors())
+            .isNull();
+
+        var acc5 = acc4
+            .version(acc4.getVersion() + 1)
+            .bank(acc4.getBank()
+                .bic("044525000"));
+        var updateAccount5 = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            acc5,
+            AccountResponse.class
+        );
+        assertThat(updateAccount5)
+            .isNotNull();
+        assertThat(updateAccount5.getErrors())
+            .isNull();
+
+        var acc6 = acc5
+            .version(acc5.getVersion())
+            .account("40101810045250010041");
+        var updateAccount6 = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            acc6,
+            AccountResponse.class
+        );
+        assertThat(updateAccount6)
+            .isNotNull();
+        assertThat(updateAccount6.getErrors())
             .isNull();
     }
 
@@ -227,6 +465,87 @@ class AccountControllerTest extends AbstractIntegrationTest {
         assertThat(checkAccount.getAccount().getVersion())
             .isEqualTo(account.getVersion() + 1);
         assertThat(checkAccount.getErrors())
+            .isNull();
+    }
+
+    @Test
+    @AllureId("")
+    void TestUpdateEKSAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        updateAccount(account);
+        account.setAccount("03214643000000017300");
+        account.getBank().getBankAccount().setBankAccount("40102810545370000003");
+        var accountVersion = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            account,
+            AccountResponse.class
+        );
+        var checkAccount = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AccountResponse.class,
+            accountVersion.getAccount().getDigitalId(), accountVersion.getAccount().getId());
+        assertThat(checkAccount)
+            .isNotNull();
+        assertThat(checkAccount.getAccount().getVersion())
+            .isEqualTo(account.getVersion() + 1);
+        assertThat(checkAccount.getErrors())
+            .isNull();
+
+        updateAccount(account);
+        account.setVersion(accountVersion.getAccount().getVersion() + 1);
+        account.setAccount("40702810600000109222");
+        account.getBank().getBankAccount().setBankAccount("40102810545370000003");
+        var accountVersion1 = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            account,
+            Error.class
+        );
+        assertThat(accountVersion1)
+            .isNotNull();
+        assertThat(accountVersion1.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        updateAccount(account);
+        account.setAccount("40702810600000009222");
+        account.setVersion(accountVersion.getAccount().getVersion() + 1);
+        account.getBank().setBic("048602001");
+        account.getBank().getBankAccount().setBankAccount("40102810945370000073");
+        var accountVersion2 = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            account,
+            Error.class
+        );
+        assertThat(accountVersion2)
+            .isNotNull();
+        assertThat(accountVersion2.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+
+        updateAccount(account);
+        account.setVersion(accountVersion.getAccount().getVersion() + 1);
+        account.setAccount("40101810600000010006");
+        account.getBank().setBic("048602001");
+        account.getBank().getBankAccount().setBankAccount("40102810945370000073");
+        var accountVersion3 = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            account,
+            AccountResponse.class
+        );
+        var checkAccount3 = get(
+            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            AccountResponse.class,
+            accountVersion3.getAccount().getDigitalId(), accountVersion.getAccount().getId());
+        assertThat(checkAccount3)
+            .isNotNull();
+        assertThat(checkAccount3.getAccount().getVersion())
+            .isEqualTo(accountVersion3.getAccount().getVersion() + 1);
+        assertThat(checkAccount3.getErrors())
             .isNull();
     }
 
@@ -326,7 +645,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
                 .name("222222")
                 .bankAccount(
                     new BankAccountCreate()
-                    .bankAccount("30101810145250000411"))
+                        .bankAccount("30101810145250000411"))
             );
     }
 
@@ -419,11 +738,11 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account("40702810600000009222")
+            .account("40802810500490014206")
             .bank(account.getBank()
-                .bic("044525700")
+                .bic("044525411")
                 .name(account.getBank().getName())
                 .bankAccount(account.getBank().getBankAccount()
-                    .bankAccount("30101810200000000700")));
+                    .bankAccount("30101810145250000411")));
     }
 }

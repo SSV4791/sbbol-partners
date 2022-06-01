@@ -8,7 +8,7 @@ servers:
   - url: /
 
 paths:
-  /partner/contact/address/view:
+  /partner/contact/addresses/view:
     post:
       tags:
         - Contact Address

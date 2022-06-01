@@ -66,27 +66,29 @@ public interface PartnerMapper extends BaseMapper {
     default List<PartnerEmailEntity> toEmail(Set<String> emails, String digitalId) {
         if (CollectionUtils.isEmpty(emails)) {
             return Collections.emptyList();
+        } else {
+            return emails.stream()
+                .map(value -> {
+                    var partnerEmail = new PartnerEmailEntity();
+                    partnerEmail.setEmail(value);
+                    partnerEmail.setDigitalId(digitalId);
+                    return partnerEmail;
+                }).collect(Collectors.toList());
         }
-        return emails.stream()
-            .map(value -> {
-                var partnerEmail = new PartnerEmailEntity();
-                partnerEmail.setEmail(value);
-                partnerEmail.setDigitalId(digitalId);
-                return partnerEmail;
-            }).collect(Collectors.toList());
     }
 
     default List<PartnerPhoneEntity> toPhone(Set<String> phones, String digitalId) {
         if (CollectionUtils.isEmpty(phones)) {
             return Collections.emptyList();
+        } else {
+            return phones.stream()
+                .map(value -> {
+                    var partnerPhone = new PartnerPhoneEntity();
+                    partnerPhone.setPhone(value);
+                    partnerPhone.setDigitalId(digitalId);
+                    return partnerPhone;
+                }).collect(Collectors.toList());
         }
-        return phones.stream()
-            .map(value -> {
-                var partnerPhone = new PartnerPhoneEntity();
-                partnerPhone.setPhone(value);
-                partnerPhone.setDigitalId(digitalId);
-                return partnerPhone;
-            }).collect(Collectors.toList());
     }
 
     @Named("toCitizenshipType")

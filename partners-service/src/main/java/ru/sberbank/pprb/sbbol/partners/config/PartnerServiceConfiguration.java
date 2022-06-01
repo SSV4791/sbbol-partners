@@ -214,14 +214,12 @@ public class PartnerServiceConfiguration {
 
     @Bean
     AccountService accountService(
-        PartnerRepository partnerRepository,
         AccountRepository accountRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter
     ) {
         return new AccountServiceImpl(
-            partnerRepository,
             accountRepository,
             replicationService,
             budgetMaskService,
@@ -273,10 +271,9 @@ public class PartnerServiceConfiguration {
 
     @Bean
     ContactService contactService(
-        PartnerRepository partnerRepository,
         ContactRepository contactRepository
     ) {
-        return new ContactServiceImpl(partnerRepository, contactRepository, contactMapper());
+        return new ContactServiceImpl(contactRepository, contactMapper());
     }
 
     @Bean

@@ -31,8 +31,8 @@
     }
   },
   "required": [
+    "bankAccount",
     "bankId",
-    "id",
-    "bankAccount"
+    "id"
   ]
 }

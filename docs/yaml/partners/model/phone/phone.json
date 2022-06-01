@@ -28,8 +28,8 @@
       "type": "string",
       "title": "Номер телефона",
       "maxLength": 12,
-      "pattern": "^[0-9]{1,12}$",
-      "example": "89121112233"
+      "pattern": "^[+]?[0-9]{1,11}$",
+      "example": "+89121112233"
     },
     "version": {
       "type": "integer",

@@ -36,7 +36,7 @@ public class GkuMigrationServiceTest extends AbstractIntegrationTest {
 
     @Test
     @AllureId("34430")
-    void migrateFewCorrespondentsTest() {
+    void migrationGKU() {
         @SuppressWarnings("unchecked")
         Collection<MigrationGkuCandidate> collection = podamFactory.manufacturePojo(Collection.class, MigrationGkuCandidate.class);
         request.setParams(new MigrateGkuRequest(collection));

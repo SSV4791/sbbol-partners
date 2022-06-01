@@ -9,33 +9,33 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValid
 import static org.assertj.core.api.Assertions.assertThat;
 
 @UnitTestLayer
-class PartnerAccountValidatorTest {
+class AccountUpdateValidatorImplTest {
 
     @Test
     @AllureId("34104")
     void testUserAccountValid() {
         assertThat(Boolean.TRUE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "userAccountValid", "40802810500490014206", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "validateUserAccount", "40802810500490014206", "044525411"));
     }
 
     @Test
     @AllureId("34063")
     void testUserAccountNotValid() {
         assertThat(Boolean.FALSE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "userAccountValid", "30101810145250000411", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "validateUserAccount", "30101810145250000411", "044525411"));
     }
 
     @Test
     @AllureId("34044")
     void testBankAccountValid() {
         assertThat(Boolean.TRUE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "bankAccountValid", "30101810145250000411", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "validateBankAccount", "30101810145250000411", "044525411"));
     }
 
     @Test
     @AllureId("34053")
     void testBankAccountNotValid() {
         assertThat(Boolean.FALSE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "bankAccountValid", "40802810500490014206", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(BasePartnerAccountValidation.class, "validateBankAccount", "40802810500490014206", "044525411"));
     }
 }

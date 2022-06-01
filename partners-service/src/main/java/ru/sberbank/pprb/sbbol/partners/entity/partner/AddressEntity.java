@@ -37,7 +37,7 @@ public class AddressEntity extends BaseEntity {
     private String digitalId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", length = 254)
+    @Column(name = "type", length = 20)
     private AddressType type;
 
     @Column(name = "zip_code", length = 6)

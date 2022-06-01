@@ -50,7 +50,7 @@ public class PartnerEntity extends BaseEntity {
     @Column(name = "legal_type", nullable = false, length = 254)
     private LegalType legalType;
 
-    @Column(name = "org_name", length = 50)
+    @Column(name = "org_name", length = 350)
     private String orgName;
 
     @Column(name = "first_name", length = 50)
@@ -78,7 +78,7 @@ public class PartnerEntity extends BaseEntity {
     private String comment;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "citizenship", length = 10)
+    @Column(name = "citizenship", length = 20)
     private PartnerCitizenshipType citizenship;
 
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)

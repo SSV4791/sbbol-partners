@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAccountsApi;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
@@ -12,8 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
-import ru.sberbank.pprb.sbbol.partners.validation.PartnerAccountCreateValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.PartnerAccountValidator;
 
 @RestController
 public class AccountController implements PartnerAccountsApi {
@@ -30,7 +27,7 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> create(@Validation(type = PartnerAccountCreateValidator.class) AccountCreate account) {
+    public ResponseEntity<AccountResponse> create(AccountCreate account) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.saveAccount(account));
     }
 
@@ -51,7 +48,7 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> update(@Validation(type = PartnerAccountValidator.class) AccountChange account) {
+    public ResponseEntity<AccountResponse> update(AccountChange account) {
         return ResponseEntity.ok(accountService.updateAccount(account));
     }
 }
