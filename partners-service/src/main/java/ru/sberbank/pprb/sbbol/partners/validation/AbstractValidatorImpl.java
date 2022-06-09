@@ -2,7 +2,9 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
-import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
+
+import java.util.List;
 
 abstract class AbstractValidatorImpl<T> implements Validator<T> {
 
@@ -45,23 +47,35 @@ abstract class AbstractValidatorImpl<T> implements Validator<T> {
     protected static final String DEFAULT_MESSAGE_FIELD_IS_NULL = "default.field.is_null";
     protected static final String DEFAULT_MESSAGE_FIELDS_IS_NULL = "default.fields.is_null";
     protected static final String DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER = "default.field.control_number";
-    protected static final String DEFAULT_MESSAGE_INN_LENGTH = "partner.inn_length";
     protected static final String DEFAULT_MESSAGE_FIELDS_DUPLICATION = "default.fields.duplication";
+    protected static final String DEFAULT_MESSAGE_VERSION_ERROR = "default.fields.object_version_error";
+    protected static final String DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR = "default.fields.object_not_found";
 
-    protected void commonValidationDigitalId(String digitalId) {
+
+    protected void commonValidationDigitalId(List<String> errors, String digitalId) {
         if (StringUtils.isEmpty(digitalId)) {
-            throw new ModelValidationException("Поля обязательны для заполнения digitalId");
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "digitalId"));
         } else if (StringUtils.isNotEmpty(digitalId) && digitalId.length() > DIGITAL_ID_MAX_LENGTH) {
-            throw new ModelValidationException("digitalId допустимая длина от 1 до 40 символов");
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "digitalId", "1", "40"));
         }
     }
 
-    protected void commonValidationUuid(String... uuid) {
+    protected void commonValidationUuid(List<String> errors, String... uuid) {
         for (String id : uuid) {
             if (StringUtils.isEmpty(id)) {
-                throw new ModelValidationException("Поля обязательны для заполнения id/partnerId/unifiedId/documentTypeId");
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "partnerId/unifiedId/id"));
             } else if (StringUtils.isNotEmpty(id) && id.length() != ID_LENGTH) {
-                throw new ModelValidationException("Ошибка заполнения одного из полей id/partnerId/unifiedId/documentTypeId длина значения не равна 36");
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "partnerId/unifiedId/id", "36", "36"));
+            }
+        }
+    }
+
+    protected void commonValidationUuid(List<String> errors, List<String> uuid) {
+        for (String id : uuid) {
+            if (StringUtils.isEmpty(id)) {
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "partnerId/unifiedId/id"));
+            } else if (StringUtils.isNotEmpty(id) && id.length() != ID_LENGTH) {
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "partnerId/unifiedId/id", "36", "36"));
             }
         }
     }

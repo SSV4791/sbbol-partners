@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
@@ -22,17 +21,16 @@ public class AddressUpdateValidationImpl extends AbstractValidatorImpl<Address> 
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, Address entity) {
-        commonValidationUuid(entity.getId());
-        commonValidationUuid(entity.getUnifiedId());
-        commonValidationDigitalId(entity.getDigitalId());
         var foundAddress = addressRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
-            .orElseThrow(() -> new MissingValueException("Не найден объект " + DOCUMENT_NAME + " " + entity.getDigitalId() + " " + entity.getId()));
+            .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
+        commonValidationUuid(errors,entity.getId());
+        commonValidationUuid(errors,entity.getUnifiedId());
+        commonValidationDigitalId(errors,entity.getDigitalId());
         if (entity.getVersion() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "version"));
         }
         if (!entity.getVersion().equals(foundAddress.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundAddress.getVersion() +
-                " не равна версии записи в запросе version=" + entity.getVersion());
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundAddress.getVersion().toString(), entity.getVersion().toString()));
         }
         if (StringUtils.isNotEmpty(entity.getZipCode()) && entity.getZipCode().length() > ZIP_CODE_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "zipCode", "1", "6"));

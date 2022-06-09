@@ -1,7 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.AllureId;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
@@ -10,10 +12,13 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.model.LegalForm.ENTREPRENEUR;
 import static ru.sberbank.pprb.sbbol.partners.model.LegalForm.PHYSICAL_PERSON;
@@ -23,6 +28,20 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/dictionary/documents";
 
     private static final DocumentTypeFilter defaultFilter = new DocumentTypeFilter().deleted(false);
+
+    @Autowired
+    private DocumentDictionaryRepository documentDictionaryRepository;
+    private DocumentTypeResponse saveDocument;
+
+    @AfterEach
+    void dropEntity() {
+            if (isNotEmpty(saveDocument) && isNotEmpty(saveDocument.getDocumentType())) {
+                documentDictionaryRepository.deleteById(
+                    UUID.fromString(saveDocument.getDocumentType().getId())
+                );
+                saveDocument.setDocumentType(null);
+            }
+    }
 
     @Test
     @AllureId("36481")
@@ -52,10 +71,10 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     void testCreateDocuments() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON);
         var documentTypeCreate = new DocumentTypeCreate()
-            .documentType("NEW_CREATE_TYPE")
+            .documentType("NEW_CREATE_TYPE2")
             .description("Описание для создания")
             .legalForms(legalForms);
-        var saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getDocumentType())
@@ -113,7 +132,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_NOT_CHANGE")
             .description("Описание для обновления")
             .legalForms(legalForms);
-        var saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getDocumentType())
@@ -146,7 +165,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_IS_DELETED")
             .description("Описание для обновления")
             .legalForms(legalForms);
-        var saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getDocumentType())
@@ -180,7 +199,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_IS_EMPTY")
             .description("Описание для обновления")
             .legalForms(legalForms);
-        var saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getDocumentType())
@@ -216,7 +235,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_DELETE_TYPE")
             .description("Описание для удаления")
             .legalForms(legalForms);
-        var saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
         assertThat(saveDocument)
             .isNotNull();
         assertThat(saveDocument.getDocumentType())

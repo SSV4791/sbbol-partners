@@ -1,13 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
-import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -26,6 +24,8 @@ public class PartnerUpdateValidatorImpl extends AbstractValidatorImpl<Partner> {
     private static final String LEGAL_FORM_LEGAL_ENTITY = "legalForm.LEGAL_ENTITY";
     private static final String LEGAL_FORM_ENTREPRENEUR = "legalForm.ENTREPRENEUR";
     private static final String LEGAL_FORM_PHYSICAL_PERSON = "legalForm.PHYSICAL_PERSON";
+    private static final String DEFAULT_MESSAGE_INN_LENGTH = "partner.inn_length";
+    private static final String DEFAULT_MESSAGE_KPP_LENGTH = "partner.kpp.length";
 
     private final PartnerRepository partnerRepository;
     private final PartnerMapper partnerMapper;
@@ -47,9 +47,9 @@ public class PartnerUpdateValidatorImpl extends AbstractValidatorImpl<Partner> {
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, Partner entity) {
-        commonValidationDigitalId(entity.getDigitalId());
-        commonValidationDigitalId(entity.getId());
         checkLegalFormProperty(errors, entity);
+        commonValidationDigitalId(errors, entity.getDigitalId());
+        commonValidationUuid(errors, entity.getId());
         if (StringUtils.isNotEmpty(entity.getComment()) && entity.getComment().length() > COMMENT_PARTNER_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "comment", "1", "255"));
         }
@@ -64,7 +64,7 @@ public class PartnerUpdateValidatorImpl extends AbstractValidatorImpl<Partner> {
             }
         }
         if (StringUtils.isNotEmpty(entity.getKpp()) && entity.getKpp().length() != BasePartnerValidation.KPP_VALID_LENGTH) {
-            errors.add(MessagesTranslator.toLocale("partner.kpp.length"));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_KPP_LENGTH, "9"));
         }
         if (entity.getEmails() != null) {
             for (var emails : entity.getEmails()) {
@@ -83,10 +83,9 @@ public class PartnerUpdateValidatorImpl extends AbstractValidatorImpl<Partner> {
 
     private void checkLegalFormProperty(List<String> errors, Partner entity) {
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
-            .orElseThrow(() -> new MissingValueException(DOCUMENT_NAME + " " + entity.getDigitalId() + " " + entity.getId()));
+            .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
         if (!entity.getVersion().equals(foundPartner.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundPartner.getVersion() +
-                " не равна версии записи в запросе version=" + entity.getVersion());
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPartner.getVersion().toString(), entity.getVersion().toString()));
         }
         partnerMapper.updatePartner(entity, foundPartner);
         if (foundPartner.getLegalType() != null) {
@@ -122,7 +121,7 @@ public class PartnerUpdateValidatorImpl extends AbstractValidatorImpl<Partner> {
                 }
             }
         } else {
-            throw new ModelValidationException("Поле legalForm обязательно для заполнения");
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "legalForm"));
         }
     }
 }

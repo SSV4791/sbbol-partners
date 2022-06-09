@@ -15,6 +15,7 @@ import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePhoneValidat
 
 public class ContactCreateValidationImpl extends AbstractValidatorImpl<ContactCreate> {
 
+    private static final String DOCUMENT_NAME = "partner";
     private final PartnerRepository partnerRepository;
 
     public ContactCreateValidationImpl(PartnerRepository partnerRepository) {
@@ -24,12 +25,12 @@ public class ContactCreateValidationImpl extends AbstractValidatorImpl<ContactCr
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, ContactCreate entity) {
-        commonValidationUuid(entity.getPartnerId());
-        commonValidationDigitalId(entity.getDigitalId());
         var partner = partnerRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getPartnerId()));
         if (partner.isEmpty()) {
-            throw new MissingValueException("Не найден partner" + entity.getPartnerId());
+            throw new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getPartnerId()));
         }
+        commonValidationUuid(errors,entity.getPartnerId());
+        commonValidationDigitalId(errors,entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getFirstName()) && entity.getFirstName().length() > FIRST_NAME_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "fistName", "1", "50"));
         }

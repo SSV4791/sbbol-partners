@@ -112,11 +112,11 @@ class AccountControllerTest extends AbstractIntegrationTest {
     @AllureId("34154")
     void testViewAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
+        var acc1 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var acc2 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var acc3 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var acc4 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var acc5 = createValidAccount(partner.getId(), partner.getDigitalId());
 
         var filter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
@@ -135,6 +135,46 @@ class AccountControllerTest extends AbstractIntegrationTest {
         assertThat(response.getAccounts().size())
             .isEqualTo(4);
         assertThat(response.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
+
+        var filter1 = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(List.of(acc1.getId(), acc3.getId()))
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response1 = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter1,
+            AccountsResponse.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getAccounts().size())
+            .isEqualTo(2);
+        assertThat(response1.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.FALSE);
+        assertThat(response1.getAccounts().stream().map(Account::getId)).contains(acc1.getId(), acc3.getId());
+
+        var filter2 = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .accountIds(List.of(acc1.getId(), acc2.getId(), acc3.getId(), acc4.getId(), acc5.getId()))
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter2,
+            AccountsResponse.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getAccounts().size())
+            .isEqualTo(4);
+        assertThat(response2.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
 
@@ -642,7 +682,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .comment("Это тестовый комментарий")
             .bank(new BankCreate()
                 .bic("044525411")
-                .name("222222")
+                .name(randomAlphabetic(10))
                 .bankAccount(
                     new BankAccountCreate()
                         .bankAccount("30101810145250000411"))
