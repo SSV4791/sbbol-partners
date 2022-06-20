@@ -41,9 +41,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<?> handleConstraintViolationException(
-            ConstraintViolationException ex,
-            HttpServletRequest httpRequest
-        ) {
+        ConstraintViolationException ex,
+        HttpServletRequest httpRequest
+    ) {
         LOG.error("Нарушение ограничений уникальности в БД", ex);
         return buildResponseEntity(
             HttpStatus.BAD_REQUEST,
@@ -60,9 +60,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             PartnerMigrationException.class
         })
     protected ResponseEntity<Object> handleObjectNotFoundException(
-            Exception ex,
-            HttpServletRequest httpRequest
-        ) {
+        Exception ex,
+        HttpServletRequest httpRequest
+    ) {
         LOG.error("Объект не найден", ex);
         return buildResponseEntity(
             HttpStatus.NOT_FOUND,
@@ -73,9 +73,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ModelValidationException.class)
     protected ResponseEntity<Object> handleObjectModelValidationException(
-            ModelValidationException ex,
-            HttpServletRequest httpRequest
-        ) {
+        ModelValidationException ex,
+        HttpServletRequest httpRequest
+    ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponseEntity(
             HttpStatus.BAD_REQUEST,
@@ -86,9 +86,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MissingValueException.class)
     protected ResponseEntity<Object> handleMissingValueException(
-            MissingValueException ex,
-            HttpServletRequest httpRequest
-        ) {
+        MissingValueException ex,
+        HttpServletRequest httpRequest
+    ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponseEntity(
             HttpStatus.BAD_REQUEST,
@@ -119,9 +119,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(
-            Exception ex,
-            HttpServletRequest httpRequest
-        ) {
+        Exception ex,
+        HttpServletRequest httpRequest
+    ) {
         LOG.error("Необработанное исключение", ex);
         return buildResponseEntity(
             HttpStatus.INTERNAL_SERVER_ERROR,
@@ -132,8 +132,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(HibernateOptimisticLockingFailureException.class)
     protected ResponseEntity<Object> handleObjectBadRequestExceptionHibernate(
-            HibernateOptimisticLockingFailureException ex,
-            HttpServletRequest httpRequest) {
+        HibernateOptimisticLockingFailureException ex,
+        HttpServletRequest httpRequest) {
         LOG.error("Версия записи в базе данных не равна версии в запросе", ex);
         return buildResponseEntity(
             HttpStatus.BAD_REQUEST, "Версия записи в базе данных не равна версии в запросе: "
@@ -146,11 +146,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected @NonNull
     ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            @NonNull HttpHeaders headers,
-            @NonNull HttpStatus status,
-            @NonNull WebRequest request
-        ) {
+        MethodArgumentNotValidException ex,
+        @NonNull HttpHeaders headers,
+        @NonNull HttpStatus status,
+        @NonNull WebRequest request
+    ) {
         return buildResponseEntity(status,
             ex.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(". ")),
             ((ServletWebRequest) request).getRequest().getRequestURL()
@@ -161,12 +161,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected @NonNull
     ResponseEntity<Object> handleExceptionInternal(
-            Exception ex,
-            Object body,
-            @NonNull HttpHeaders headers,
-            @NonNull HttpStatus status,
-            @NonNull WebRequest request
-        ) {
+        Exception ex,
+        Object body,
+        @NonNull HttpHeaders headers,
+        @NonNull HttpStatus status,
+        @NonNull WebRequest request
+    ) {
         return buildResponseEntity(
             status,
             ex.getLocalizedMessage(),
@@ -175,10 +175,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponseEntity(
-            HttpStatus status,
-            String errorDesc,
-            StringBuffer requestUrl
-        ) {
+        HttpStatus status,
+        String errorDesc,
+        StringBuffer requestUrl
+    ) {
         return buildResponseEntity(
             status,
             Collections.singletonList(errorDesc),
@@ -187,10 +187,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponseEntity(
-            HttpStatus status,
-            List<String> errorsDesc,
-            StringBuffer requestUrl
-        ) {
+        HttpStatus status,
+        List<String> errorsDesc,
+        StringBuffer requestUrl
+    ) {
         var errorData = new Error().code(status.name()).text(errorsDesc);
         String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
         LOG.error("Ошибка вызова \"{}\": {}", url, errorData);

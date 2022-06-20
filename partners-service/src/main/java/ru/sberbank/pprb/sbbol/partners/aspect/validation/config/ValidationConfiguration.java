@@ -34,10 +34,12 @@ import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountSignViewRepository;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountChangePriorityValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountCreateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountSignValidatorImpl;
@@ -71,10 +73,9 @@ public class ValidationConfiguration {
     @Bean
     Validator<AccountChange> accountUpdateValidator(
         AccountRepository accountRepository,
-        AccountMapper accountMapper,
-        PartnerRepository partnerRepository
+        AccountMapper accountMapper
     ) {
-        return new AccountUpdateValidatorImpl(accountRepository, accountMapper, partnerRepository);
+        return new AccountUpdateValidatorImpl(accountRepository, accountMapper);
     }
 
     @Bean
@@ -100,8 +101,9 @@ public class ValidationConfiguration {
 
     @Bean
     Validator<AccountsSignInfo> accountsSignInfoValidator(
+        AccountSignViewRepository accountRepository
     ) {
-        return new AccountSignValidatorImpl();
+        return new AccountSignValidatorImpl(accountRepository);
     }
 
     @Bean
@@ -141,11 +143,10 @@ public class ValidationConfiguration {
     @Bean
     Validator<Contact> contactUpdateValidator(
         ContactRepository contactRepository,
-        PartnerRepository partnerRepository,
         Validator<Email> emailUpdateValidator,
         Validator<Phone> phoneUpdateValidator
     ) {
-        return new ContactUpdateValidationImpl(contactRepository, partnerRepository, emailUpdateValidator, phoneUpdateValidator);
+        return new ContactUpdateValidationImpl(contactRepository, emailUpdateValidator, phoneUpdateValidator);
     }
 
     @Bean
@@ -157,15 +158,17 @@ public class ValidationConfiguration {
 
     @Bean
     Validator<DocumentChange> documentUpdateValidator(
-        DocumentRepository documentRepository
+        DocumentRepository documentRepository,
+        DocumentDictionaryRepository documentDictionaryRepository
     ) {
-        return new DocumentUpdateValidationImpl(documentRepository);
+        return new DocumentUpdateValidationImpl(documentRepository, documentDictionaryRepository);
     }
 
     @Bean
     Validator<DocumentCreate> documentCreateValidator(
+        DocumentDictionaryRepository documentDictionaryRepository
     ) {
-        return new DocumentCreateValidationImpl();
+        return new DocumentCreateValidationImpl(documentDictionaryRepository);
     }
 
     @Bean

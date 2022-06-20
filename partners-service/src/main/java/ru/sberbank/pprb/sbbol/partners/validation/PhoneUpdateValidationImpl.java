@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
@@ -25,14 +24,12 @@ public class PhoneUpdateValidationImpl extends AbstractValidatorImpl<Phone> {
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, Phone entity) {
-        commonValidationDigitalId(entity.getDigitalId());
-        commonValidationUuid(entity.getUnifiedId(), entity.getId());
-        var uuid = UUID.fromString(entity.getId());
-        var foundPhone = phoneRepository.getByDigitalIdAndUuid(entity.getDigitalId(), uuid)
-            .orElseThrow(() -> new MissingValueException("Не найден объект " + DOCUMENT_NAME + " " + uuid));
+        var foundPhone = phoneRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
+            .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
+        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors,entity.getUnifiedId(), entity.getId());
         if (!entity.getVersion().equals(foundPhone.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundPhone.getVersion() +
-                " не равна версии записи в запросе version=" + entity.getVersion());
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPhone.getVersion().toString(), entity.getVersion().toString()));
         }
         if (entity.getPhone().equals(EMPTY)) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "phone"));

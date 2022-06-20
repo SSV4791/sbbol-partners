@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,23 +34,16 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
     @AllureId("34175")
     void testViewSignAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var account1 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var account3 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var account4 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var account5 = createValidAccount(partner.getId(), partner.getDigitalId());
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        createValidAccountsSign(partner.getDigitalId(), account);
 
         var filter1 = new AccountsSignFilter()
             .digitalId(partner.getDigitalId())
             .partnerId(partner.getId())
-            .accountsId(
-                List.of(
-                    account1.getId(),
-                    account2.getId(),
-                    account3.getId(),
-                    account4.getId(),
-                    account5.getId()
-                ))
+            .accountsId(account)
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -65,6 +59,33 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
             .isEqualTo(4);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
+
+        var partner2 = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account2 = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            account2.add(createValidAccount(partner2.getId(), partner2.getDigitalId()).getId());
+        }
+        createValidAccountsSign(partner2.getDigitalId(), account2);
+        account2.add(createValidAccount(partner2.getId(), partner2.getDigitalId()).getId());
+        var filter2 = new AccountsSignFilter()
+            .digitalId(partner2.getDigitalId())
+            .partnerId(partner2.getId())
+            .accountsId(account2)
+            .pagination(new Pagination()
+                .count(5)
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/view",
+            HttpStatus.OK,
+            filter2,
+            AccountsSignResponse.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getAccountsSign().size())
+            .isEqualTo(4);
+        assertThat(response2.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.FALSE);
     }
 
     @Test
@@ -72,8 +93,7 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
     void testCreateSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        getValidAccountSign(account.getDigitalId(), account.getId());
-        var savedSign = createValidAccountSign(account.getDigitalId(), account.getId());
+        var savedSign = createValidAccountsSign(account.getDigitalId(), account.getId());
         assertThat(savedSign)
             .isNotNull();
     }
@@ -89,7 +109,7 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
             Error.class,
             account.getDigitalId(), account.getId()
         );
-        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
+        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountsSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
         assertThat(savedSign)
             .isNotNull();
         var signInfo = get(
@@ -109,7 +129,7 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
     void testDeleteSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = createValidAccountSign(account.getDigitalId(), account.getId());
+        var savedSign = createValidAccountsSign(account.getDigitalId(), account.getId());
         var accountSignDetail = savedSign.getAccountsSignDetail().get(0);
         var actualAccountSign =
             get(
@@ -148,11 +168,11 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
             .isEqualTo(HttpStatus.NOT_FOUND.name());
     }
 
-    public static AccountsSignInfoResponse createValidAccountSign(String digitalId, String accountId) {
+    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, String accountId) {
         var createAccountSign = post(
             baseRoutePath,
             HttpStatus.OK,
-            getValidAccountSign(digitalId, accountId),
+            getValidAccountsSign(digitalId, accountId),
             AccountsSignInfoResponse.class
         );
         assertThat(createAccountSign)
@@ -160,7 +180,19 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
         return createAccountSign;
     }
 
-    private static AccountsSignInfo getValidAccountSign(String digitalId, String accountId) {
+    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, List<String> accountsId) {
+        var createAccountSign = post(
+            baseRoutePath,
+            HttpStatus.OK,
+            getValidAccountsSign(digitalId, accountsId),
+            AccountsSignInfoResponse.class
+        );
+        assertThat(createAccountSign)
+            .isNotNull();
+        return createAccountSign;
+    }
+
+    private static AccountsSignInfo getValidAccountsSign(String digitalId, String accountId) {
         return new AccountsSignInfo()
             .digitalId(digitalId)
             .accountsSignDetail(
@@ -176,5 +208,25 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
                         .dateTimeOfSign(OffsetDateTime.now())
                 )
             );
+    }
+
+    private static AccountsSignInfo getValidAccountsSign(String digitalId, List<String> accountsId) {
+        List<AccountSignDetail> accountSignDetails = new ArrayList<>();
+        for (var accountId : accountsId) {
+            accountSignDetails.add(
+                new AccountSignDetail()
+                    .entityId(UUID.randomUUID().toString())
+                    .accountId(accountId)
+                    .digest(RandomStringUtils.randomAlphabetic(10))
+                    .sign(RandomStringUtils.randomAlphabetic(10))
+                    .signProfileId(RandomStringUtils.randomAlphabetic(10))
+                    .externalDataFileId(RandomStringUtils.randomAlphabetic(10))
+                    .externalDataSignFileId(RandomStringUtils.randomAlphabetic(10))
+                    .dateTimeOfSign(OffsetDateTime.now())
+            );
+        }
+        return new AccountsSignInfo()
+            .digitalId(digitalId)
+            .accountsSignDetail(accountSignDetails);
     }
 }

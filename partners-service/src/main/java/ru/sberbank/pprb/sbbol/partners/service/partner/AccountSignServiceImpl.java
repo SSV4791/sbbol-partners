@@ -16,14 +16,12 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountSignValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountsSignFilterValidationImpl;
 
-import java.util.Collections;
 import java.util.UUID;
 
 public class AccountSignServiceImpl implements AccountSignService {
@@ -80,14 +78,6 @@ public class AccountSignServiceImpl implements AccountSignService {
         for (var accountSign : accountsSign.getAccountsSignDetail()) {
             var account = accountRepository.getByDigitalIdAndUuid(accountsSign.getDigitalId(), UUID.fromString(accountSign.getAccountId()))
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, accountsSign.getDigitalId(), accountSign.getAccountId()));
-            if (AccountStateType.SIGNED == account.getState()) {
-                response.addErrorsItem(
-                    new Error()
-                        .code("PPRB:PARTNER:SIGN_ACCOUNT_EXCEPTION")
-                        .text(Collections.singletonList("Account " + account.getUuid() + " уже имеет статус " + account.getState()))
-                );
-                continue;
-            }
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid());
             try {
                 var savedSign = accountSignRepository.save(sign);
@@ -135,7 +125,6 @@ public class AccountSignServiceImpl implements AccountSignService {
                 .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                 .eventParams(accountSingMapper.toEventParams(sign))
             );
-            account.setState(AccountStateType.NOT_SIGNED);
         } catch (RuntimeException e) {
             auditAdapter.send(new Event()
                 .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
@@ -144,6 +133,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             throw new EntrySaveException(DOCUMENT_NAME, e);
         }
         try {
+            account.setState(AccountStateType.NOT_SIGNED);
             var saveAccount = accountRepository.save(account);
             auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)

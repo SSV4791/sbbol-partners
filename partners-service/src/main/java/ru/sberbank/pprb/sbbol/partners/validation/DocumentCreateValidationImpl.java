@@ -3,15 +3,35 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 import org.apache.commons.lang.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 
 import java.util.List;
+import java.util.UUID;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class DocumentCreateValidationImpl extends AbstractValidatorImpl<DocumentCreate> {
 
+    private static final String DEFAULT_MESSAGE_ERROR_DOCUMENT_TYPE = "document.documentTypeId_valid";
+
+    private final DocumentDictionaryRepository documentDictionaryRepository;
+
+    public DocumentCreateValidationImpl(DocumentDictionaryRepository documentDictionaryRepository) {
+        this.documentDictionaryRepository = documentDictionaryRepository;
+    }
+
     @Override
     public void validator(List<String> errors, DocumentCreate entity) {
-        commonValidationDigitalId(entity.getDigitalId());
-        commonValidationUuid(entity.getUnifiedId(), entity.getDocumentTypeId());
+        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors,entity.getUnifiedId(), entity.getDocumentTypeId());
+        if (isNotEmpty(entity.getDocumentTypeId())) {
+            var foundDocumentDictionary = documentDictionaryRepository.getByUuid(UUID.fromString(entity.getDocumentTypeId()));
+            if (foundDocumentDictionary.isEmpty()) {
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ERROR_DOCUMENT_TYPE, entity.getDocumentTypeId()));
+            }
+        } else {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "documentTypeId"));
+        }
         if (StringUtils.isNotEmpty(entity.getSeries()) && entity.getSeries().length() > SERIES_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "series", "1", "50"));
         }

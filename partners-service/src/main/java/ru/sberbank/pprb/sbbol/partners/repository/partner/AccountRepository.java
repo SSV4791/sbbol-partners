@@ -47,7 +47,9 @@ public interface AccountRepository
      * Поиск счетов Партнеров c признаком приоритетных
      *
      * @param digitalId Идентификатор личного кабинета
+     * @param partnerUuid Идентификатор партнера
      * @return Счёта партнера
      */
-    List<AccountEntity> findByDigitalIdAndPriorityAccountIsTrue(String digitalId);
+
+    List<AccountEntity> findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(String digitalId, UUID partnerUuid);
 }

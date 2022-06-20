@@ -18,10 +18,12 @@ public class PartnerCreateValidatorImpl extends AbstractValidatorImpl<PartnerCre
     private static final String LEGAL_FORM_LEGAL_ENTITY = "legalForm.LEGAL_ENTITY";
     private static final String LEGAL_FORM_ENTREPRENEUR = "legalForm.ENTREPRENEUR";
     private static final String LEGAL_FORM_PHYSICAL_PERSON = "legalForm.PHYSICAL_PERSON";
+    private static final String DEFAULT_MESSAGE_INN_LENGTH = "partner.inn_length";
+    private static final String DEFAULT_MESSAGE_KPP_LENGTH = "partner.kpp.length";
 
     @Override
     public void validator(List<String> errors, PartnerCreate entity) {
-        commonValidationDigitalId(entity.getDigitalId());
+        commonValidationDigitalId(errors,entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getComment()) && entity.getComment().length() > COMMENT_PARTNER_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "comment", "1", "255"));
         }
@@ -36,7 +38,7 @@ public class PartnerCreateValidatorImpl extends AbstractValidatorImpl<PartnerCre
             }
         }
         if (StringUtils.isNotEmpty(entity.getKpp()) && entity.getKpp().length() != BasePartnerValidation.KPP_VALID_LENGTH) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_KPP_LENGTH, "9"));
         }
         if (entity.getLegalForm() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "legalForm"));

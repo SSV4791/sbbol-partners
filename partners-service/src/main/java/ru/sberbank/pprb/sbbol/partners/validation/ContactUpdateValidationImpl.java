@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
@@ -10,26 +9,23 @@ import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.List;
 import java.util.UUID;
 
 public class ContactUpdateValidationImpl extends AbstractValidatorImpl<Contact> {
     private static final String DOCUMENT_NAME = "contact";
+    private static final String DOCUMENT_NAME_OTHER = "partner";
     private final ContactRepository contactRepository;
-    private final PartnerRepository partnerRepository;
     private final Validator<Email> emailUpdateValidator;
     private final Validator<Phone> phoneUpdateValidator;
 
     public ContactUpdateValidationImpl(
         ContactRepository contactRepository,
-        PartnerRepository partnerRepository,
         Validator<Email> emailUpdateValidator,
         Validator<Phone> phoneUpdateValidator
     ) {
         this.contactRepository = contactRepository;
-        this.partnerRepository = partnerRepository;
         this.emailUpdateValidator = emailUpdateValidator;
         this.phoneUpdateValidator = phoneUpdateValidator;
     }
@@ -37,17 +33,15 @@ public class ContactUpdateValidationImpl extends AbstractValidatorImpl<Contact> 
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, Contact entity) {
-        commonValidationDigitalId(entity.getDigitalId());
-        commonValidationUuid(entity.getPartnerId(), entity.getId());
         var foundContact = contactRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
-            .orElseThrow(() -> new MissingValueException("Не найден объект " + DOCUMENT_NAME + " " + entity.getDigitalId() + " " + entity.getId()));
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getPartnerId()));
-        if (foundPartner.isEmpty()) {
-            throw new MissingValueException("Не найден partner " + entity.getDigitalId() + " " + entity.getPartnerId());
+            .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
+        if(foundContact.getPartnerUuid().toString().equals(entity.getPartnerId())) {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME_OTHER, entity.getDigitalId(), entity.getId()));
         }
+        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors,entity.getPartnerId(), entity.getId());
         if (!entity.getVersion().equals(foundContact.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundContact.getVersion() +
-                " не равна версии записи в запросе version=" + entity.getVersion());
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundContact.getVersion().toString(), entity.getVersion().toString()));
         }
         if (entity.getVersion() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "version"));

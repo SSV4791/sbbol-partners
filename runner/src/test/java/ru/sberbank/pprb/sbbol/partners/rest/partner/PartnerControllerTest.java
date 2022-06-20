@@ -27,7 +27,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountSign;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class PartnerControllerTest extends AbstractIntegrationTest {
@@ -487,7 +487,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner1)
             .isNotNull();
         var validAccount = createValidAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
-        createValidAccountSign(createdPartner1.getPartner().getDigitalId(), validAccount.getId());
+        createValidAccountsSign(createdPartner1.getPartner().getDigitalId(), validAccount.getId());
 
         var createdPartner2 = post(
             baseRoutePath,
@@ -1076,6 +1076,10 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     private static Error createNotValidPartner() {
         var partner = getValidPartner();
         partner.setInn("222222");
+        partner.setKpp("JDujsfdwjinfiwef3224234234");
+        partner.setOkpo("1234123123123213123123123123");
+        partner.setEmails(Set.of
+            ("@@@@@@@@@@@@"));
         return post(baseRoutePath, HttpStatus.BAD_REQUEST, partner, Error.class);
     }
 

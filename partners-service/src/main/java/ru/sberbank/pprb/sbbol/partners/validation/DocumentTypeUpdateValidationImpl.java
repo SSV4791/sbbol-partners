@@ -8,6 +8,6 @@ public class DocumentTypeUpdateValidationImpl extends AbstractValidatorImpl<Docu
 
     @Override
     public void validator(List<String> errors, DocumentTypeChange entity) {
-        commonValidationUuid(entity.getId());
+        commonValidationUuid(errors,entity.getId());
     }
 }

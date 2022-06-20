@@ -7,6 +7,8 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 
 import java.util.List;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 public class AccountsSignFilterValidationImpl extends AbstractValidatorImpl<AccountsSignFilter> {
     private final Validator<Pagination> paginationValidator;
 
@@ -16,10 +18,12 @@ public class AccountsSignFilterValidationImpl extends AbstractValidatorImpl<Acco
 
     @Override
     public void validator(List<String> errors, AccountsSignFilter entity) {
-        commonValidationUuid(entity.getPartnerId());
-        commonValidationDigitalId(entity.getDigitalId());
-        for(var accountId : entity.getAccountsId()) {
-            commonValidationUuid(accountId);
+        commonValidationUuid(errors,entity.getPartnerId());
+        commonValidationDigitalId(errors,entity.getDigitalId());
+        if (!isEmpty(entity.getAccountsId())) {
+            for (var accountId : entity.getAccountsId()) {
+                commonValidationUuid(errors,accountId);
+            }
         }
         if (entity.getPagination() != null) {
             paginationValidator.validator(errors, entity.getPagination());

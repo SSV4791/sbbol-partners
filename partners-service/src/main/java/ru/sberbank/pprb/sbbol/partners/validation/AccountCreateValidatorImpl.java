@@ -20,6 +20,11 @@ import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccou
 
 public class AccountCreateValidatorImpl extends AbstractValidatorImpl<AccountCreate> {
 
+    private static final String DOCUMENT_NAME = "partner";
+    private static final String DEFAULT_MESSAGE_ACCOUNT_LENGTH = "account.account.length";
+    private static final String DEFAULT_MESSAGE_BIC_LENGTH = "account.bic.length";
+    private static final String DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER = "account.bank_account.control_number";
+    private static final String DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER = "account.account.control_number";
     private final PartnerRepository partnerRepository;
 
     public AccountCreateValidatorImpl(PartnerRepository partnerRepository) {
@@ -29,17 +34,17 @@ public class AccountCreateValidatorImpl extends AbstractValidatorImpl<AccountCre
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, AccountCreate entity) {
-        commonValidationUuid(entity.getPartnerId());
-        commonValidationDigitalId(entity.getDigitalId());
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getPartnerId()));
         if (foundPartner.isEmpty()) {
-            throw new MissingValueException("Не найден partner " + entity.getDigitalId() + " " + entity.getPartnerId());
+            throw new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getPartnerId()));
         }
+        commonValidationUuid(errors, entity.getPartnerId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getComment()) && entity.getComment().length() > COMMENT_MAX_LENGTH_VALIDATION) {
-            errors.add(MessagesTranslator.toLocale("default.fields.length", "comment", "1", "50"));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "comment", "1", "50"));
         }
         if (StringUtils.isNotEmpty(entity.getAccount()) && entity.getAccount().length() != ACCOUNT_VALID_LENGTH) {
-            errors.add(MessagesTranslator.toLocale("account.account.length"));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_LENGTH));
         }
         if (entity.getBank() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "bank"));
@@ -54,7 +59,7 @@ public class AccountCreateValidatorImpl extends AbstractValidatorImpl<AccountCre
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "bank.bic"));
         }
         if (bank.getBic().length() != BIC_VALID_LENGTH) {
-            errors.add("account.bic.length");
+            errors.add(DEFAULT_MESSAGE_BIC_LENGTH);
         }
         if (StringUtils.isNotEmpty(bank.getName()) && bank.getName().length() > BANK_NAME_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "bank.name", "1", "160"));
@@ -65,14 +70,12 @@ public class AccountCreateValidatorImpl extends AbstractValidatorImpl<AccountCre
         var matchBic = RKC_BIC.matcher(bank.getBic());
         if (matchBic.matches()) {
             if (StringUtils.isNotEmpty(entity.getAccount()) && !validateBankAccount(entity.getAccount(), bank.getBic())) {
-                errors.add(MessagesTranslator.toLocale("account.account.control_number", entity.getAccount()));
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER, entity.getAccount()));
             }
         } else if (StringUtils.isNotEmpty(entity.getAccount()) && !validateUserAccount(entity.getAccount(), bank.getBic())) {
-            errors.add(MessagesTranslator.toLocale("account.account.control_number", entity.getAccount()));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER, entity.getAccount()));
         }
-        if (bank.getBankAccount() == null) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "bank.bankAccounts"));
-        } else {
+        if (bank.getBankAccount() != null) {
             checkBankAccount(bank, errors);
         }
     }
@@ -83,10 +86,10 @@ public class AccountCreateValidatorImpl extends AbstractValidatorImpl<AccountCre
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "bank.bankAccount.account"));
         }
         if (StringUtils.isNotEmpty(bankAccount.getBankAccount()) && bankAccount.getBankAccount().length() != ACCOUNT_VALID_LENGTH) {
-            errors.add("account.account.length");
+            errors.add(DEFAULT_MESSAGE_ACCOUNT_LENGTH);
         }
         if (StringUtils.isNotEmpty(bankAccount.getBankAccount()) && !validateBankAccount(bankAccount.getBankAccount(), bank.getBic())) {
-            errors.add(MessagesTranslator.toLocale("account.bank_account.control_number", bankAccount.getBankAccount()));
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER, bankAccount.getBankAccount()));
         }
     }
 }

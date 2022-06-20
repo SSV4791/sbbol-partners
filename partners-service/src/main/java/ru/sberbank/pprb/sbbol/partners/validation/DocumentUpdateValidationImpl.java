@@ -1,34 +1,44 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
 import java.util.List;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 public class DocumentUpdateValidationImpl extends AbstractValidatorImpl<DocumentChange> {
+    private static final String DEFAULT_MESSAGE_ERROR_DOCUMENT_TYPE = "document.documentTypeId_valid";
     public static final String DOCUMENT_NAME = "document";
     private final DocumentRepository documentRepository;
+    private final DocumentDictionaryRepository documentDictionaryRepository;
 
-    public DocumentUpdateValidationImpl(DocumentRepository documentRepository) {
+    public DocumentUpdateValidationImpl(DocumentRepository documentRepository, DocumentDictionaryRepository documentDictionaryRepository) {
         this.documentRepository = documentRepository;
+        this.documentDictionaryRepository = documentDictionaryRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, DocumentChange entity) {
-        commonValidationDigitalId(entity.getDigitalId());
-        commonValidationUuid(entity.getUnifiedId(), entity.getId());
         var foundDocument = documentRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
-            .orElseThrow(() -> new ModelValidationException("Не найден объект" + DOCUMENT_NAME + entity.getDigitalId() + entity.getId()));
+            .orElseThrow(() -> new ModelValidationException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
+        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors,entity.getUnifiedId(), entity.getId());
+        if (isNotEmpty(entity.getDocumentTypeId())) {
+            var foundDocumentDictionary = documentDictionaryRepository.getByUuid(UUID.fromString(entity.getDocumentTypeId()));
+            if (foundDocumentDictionary.isEmpty()) {
+                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ERROR_DOCUMENT_TYPE, entity.getDocumentTypeId()));
+            }
+        }
         if (!entity.getVersion().equals(foundDocument.getVersion())) {
-            throw new OptimisticLockingFailureException("Версия записи в базе данных " + foundDocument.getVersion() +
-                " не равна версии записи в запросе version=" + entity.getVersion());
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundDocument.getVersion().toString(), entity.getVersion().toString()));
         }
         if (entity.getVersion() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "version"));

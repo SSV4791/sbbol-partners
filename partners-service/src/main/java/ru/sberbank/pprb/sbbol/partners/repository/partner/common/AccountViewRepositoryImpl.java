@@ -42,7 +42,10 @@ public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, Acc
             );
         }
         if (filter.getPartnerIds() != null) {
-            predicates.add(root.get("partnerUuid").in(filter.getPartnerIds().stream().map(UUID::fromString).collect(Collectors.toList())));
+            predicates.add(root.get("partnerUuid").in(filter.getPartnerIds().stream().map(UUID::fromString).collect(Collectors.toSet())));
+        }
+        if (filter.getAccountIds() != null) {
+            predicates.add(root.get("uuid").in(filter.getAccountIds().stream().map(UUID::fromString).collect(Collectors.toSet())));
         }
         if (filter.getIsBudget()) {
             var masks = budgetMaskDictionaryRepository.findAll();

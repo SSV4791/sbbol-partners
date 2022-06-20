@@ -12,8 +12,8 @@ public class EmailCreateValidationImpl extends AbstractValidatorImpl<EmailCreate
 
     @Override
     public void validator(List<String> errors, EmailCreate entity) {
-        commonValidationDigitalId(entity.getDigitalId());
-        commonValidationUuid(entity.getUnifiedId());
+        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors,entity.getUnifiedId());
         if (StringUtils.isEmpty(entity.getEmail())) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "email"));
         } else {
