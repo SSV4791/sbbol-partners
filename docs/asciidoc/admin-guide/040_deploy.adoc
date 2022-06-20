@@ -10,7 +10,7 @@
 
 === Описание установки
 
-Установка проивзодится через job Install_EIP
+Установка производится через job SBBOL
 ====
 Описание параметров установки находится в репозиторие https://sbtatlas.sigma.sbrf.ru/stashdbo/scm/cibufs/sbbol-params.git
 ====
