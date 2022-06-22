@@ -23,9 +23,9 @@ public class AddressUpdateValidationImpl extends AbstractValidatorImpl<Address> 
     public void validator(List<String> errors, Address entity) {
         var foundAddress = addressRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
-        commonValidationUuid(errors,entity.getId());
-        commonValidationUuid(errors,entity.getUnifiedId());
-        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors, entity.getId());
+        commonValidationUuid(errors, entity.getUnifiedId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (entity.getVersion() == null) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "version"));
         }

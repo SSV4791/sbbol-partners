@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 
@@ -42,6 +43,7 @@ abstract class AbstractValidatorImpl<T> implements Validator<T> {
 
     private static final int ID_LENGTH = 36;
     private static final int DIGITAL_ID_MAX_LENGTH = 40;
+    private static final String DOCUMENT = "partnerId/unifiedId/id";
 
     protected static final String DEFAULT_MESSAGE_FIELDS_IS_LENGTH = "default.fields.length";
     protected static final String DEFAULT_MESSAGE_FIELD_IS_NULL = "default.field.is_null";
@@ -61,22 +63,20 @@ abstract class AbstractValidatorImpl<T> implements Validator<T> {
     }
 
     protected void commonValidationUuid(List<String> errors, String... uuid) {
-        for (String id : uuid) {
-            if (StringUtils.isEmpty(id)) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "partnerId/unifiedId/id"));
-            } else if (StringUtils.isNotEmpty(id) && id.length() != ID_LENGTH) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "partnerId/unifiedId/id", "36", "36"));
-            }
-        }
+        commonValidationUuid(errors, List.of(uuid));
     }
 
     protected void commonValidationUuid(List<String> errors, List<String> uuid) {
-        for (String id : uuid) {
-            if (StringUtils.isEmpty(id)) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "partnerId/unifiedId/id"));
-            } else if (StringUtils.isNotEmpty(id) && id.length() != ID_LENGTH) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "partnerId/unifiedId/id", "36", "36"));
+        if (!CollectionUtils.isEmpty(uuid)) {
+            for (String id : uuid) {
+                if (StringUtils.isEmpty(id)) {
+                    errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, DOCUMENT));
+                } else if (StringUtils.isNotEmpty(id) && id.length() != ID_LENGTH) {
+                    errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, DOCUMENT, "36", "36"));
+                }
             }
+        } else {
+            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, DOCUMENT));
         }
     }
 }

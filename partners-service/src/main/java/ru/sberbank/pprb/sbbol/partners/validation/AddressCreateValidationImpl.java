@@ -11,8 +11,8 @@ public class AddressCreateValidationImpl extends AbstractValidatorImpl<AddressCr
 
     @Override
     public void validator(List<String> errors, AddressCreate entity) {
-        commonValidationUuid(errors,entity.getUnifiedId());
-        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors, entity.getUnifiedId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getZipCode()) && entity.getZipCode().length() > ZIP_CODE_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "zipCode", "1", "6"));
         }

@@ -20,16 +20,110 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class AccountControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner";
+
+    @Test
+    void testViewFilterSignFiveAccount() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        createValidAccountsSign(partner.getDigitalId(), account);
+
+        var filter1 = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter1,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts().size())
+            .isEqualTo(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.TRUE);
+    }
+
+    @Test
+    void testViewFilterNotSignAccount() {
+        var partner2 = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account2 = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            account2.add(createValidAccount(partner2.getId(), partner2.getDigitalId()).getId());
+        }
+        createValidAccountsSign(partner2.getDigitalId(), account2);
+        account2.add(createValidAccount(partner2.getId(), partner2.getDigitalId()).getId());
+        var filter2 = new AccountsFilter()
+            .digitalId(partner2.getDigitalId())
+            .partnerIds(List.of(partner2.getId()))
+            .accountIds(account2)
+            .state(AccountsFilter.StateEnum.NOT_SIGNED)
+            .pagination(new Pagination()
+                .count(5)
+                .offset(0));
+        var response2 = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter2,
+            AccountsResponse.class
+        );
+        assertThat(response2)
+            .isNotNull();
+        assertThat(response2.getAccounts().size())
+            .isEqualTo(1);
+        assertThat(response2.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.FALSE);
+    }
+
+    @Test
+    void testViewFilterSignFourAccount() {
+        var partner3 = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account3 = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            account3.add(createValidAccount(partner3.getId(), partner3.getDigitalId()).getId());
+        }
+        createValidAccountsSign(partner3.getDigitalId(), account3);
+        account3.add(createValidAccount(partner3.getId(), partner3.getDigitalId()).getId());
+        var filter3 = new AccountsFilter()
+            .digitalId(partner3.getDigitalId())
+            .partnerIds(List.of(partner3.getId()))
+            .accountIds(account3)
+            .state(AccountsFilter.StateEnum.SIGNED)
+            .pagination(new Pagination()
+                .count(5)
+                .offset(0));
+        var response3 = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter3,
+            AccountsResponse.class
+        );
+        assertThat(response3)
+            .isNotNull();
+        assertThat(response3.getAccounts().size())
+            .isEqualTo(4);
+        assertThat(response3.getPagination().getHasNextPage())
+            .isEqualTo(Boolean.FALSE);
+    }
 
     @Test
     @AllureId("34126")

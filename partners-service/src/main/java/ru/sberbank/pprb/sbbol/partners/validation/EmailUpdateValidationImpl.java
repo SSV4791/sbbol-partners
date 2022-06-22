@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
@@ -26,8 +25,8 @@ public class EmailUpdateValidationImpl extends AbstractValidatorImpl<Email> {
     @Override
     @Transactional(readOnly = true)
     public void validator(List<String> errors, Email entity) {
-        commonValidationDigitalId(errors,entity.getDigitalId());
-        commonValidationUuid(errors,entity.getUnifiedId(), entity.getId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
+        commonValidationUuid(errors, entity.getUnifiedId(), entity.getId());
         var uuid = UUID.fromString(entity.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(entity.getDigitalId(), uuid)
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));

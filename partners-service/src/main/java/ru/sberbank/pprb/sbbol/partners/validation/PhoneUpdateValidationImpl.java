@@ -26,8 +26,8 @@ public class PhoneUpdateValidationImpl extends AbstractValidatorImpl<Phone> {
     public void validator(List<String> errors, Phone entity) {
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
-        commonValidationDigitalId(errors,entity.getDigitalId());
-        commonValidationUuid(errors,entity.getUnifiedId(), entity.getId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
+        commonValidationUuid(errors, entity.getUnifiedId(), entity.getId());
         if (!entity.getVersion().equals(foundPhone.getVersion())) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPhone.getVersion().toString(), entity.getVersion().toString()));
         }

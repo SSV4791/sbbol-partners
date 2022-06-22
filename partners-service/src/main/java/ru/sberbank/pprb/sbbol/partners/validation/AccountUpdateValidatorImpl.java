@@ -41,8 +41,8 @@ public class AccountUpdateValidatorImpl extends AbstractValidatorImpl<AccountCha
     @Transactional(readOnly = true)
     public void validator(List<String> errors, AccountChange entity) {
         validateUpdateAccount(entity, errors);
-        commonValidationUuid(errors,entity.getPartnerId(), entity.getId());
-        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors, entity.getPartnerId(), entity.getId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getComment()) && entity.getComment().length() > COMMENT_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "comment", "1", "50"));
         }
@@ -60,7 +60,7 @@ public class AccountUpdateValidatorImpl extends AbstractValidatorImpl<AccountCha
     private void validateUpdateAccount(AccountChange entity, List<String> errors) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
-        if(!foundAccount.getPartnerUuid().toString().equals(entity.getPartnerId())) {
+        if (!foundAccount.getPartnerUuid().toString().equals(entity.getPartnerId())) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getPartnerId()));
         }
         if (!entity.getVersion().equals(foundAccount.getVersion())) {
@@ -94,7 +94,7 @@ public class AccountUpdateValidatorImpl extends AbstractValidatorImpl<AccountCha
         if (StringUtils.isNotEmpty(bank.getBic()) && bank.getBic().length() != BIC_VALID_LENGTH) {
             errors.add(DEFAULT_MESSAGE_BIC_LENGTH);
         }
-        if (StringUtils.isNotEmpty(bank.getName()) && bank.getName().length() > BANK_NAME_MAX_LENGTH_VALIDATION){
+        if (StringUtils.isNotEmpty(bank.getName()) && bank.getName().length() > BANK_NAME_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "bank.name", "1", "160"));
         }
         if (StringUtils.isNotEmpty(bank.getBic()) && StringUtils.isEmpty(bank.getName())) {

@@ -18,7 +18,7 @@ public class AccountsFilterValidationImpl extends AbstractValidatorImpl<Accounts
 
     @Override
     public void validator(List<String> errors, AccountsFilter entity) {
-        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (isEmpty(entity.getAccountIds()) && isEmpty(entity.getPartnerIds())) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "getPartnerIds"));
         }

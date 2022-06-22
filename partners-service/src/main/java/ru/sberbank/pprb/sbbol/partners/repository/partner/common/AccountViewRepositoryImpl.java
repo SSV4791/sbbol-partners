@@ -18,6 +18,8 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+
 public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, AccountsFilter> implements AccountViewRepository {
 
     private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;
@@ -46,6 +48,9 @@ public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, Acc
         }
         if (filter.getAccountIds() != null) {
             predicates.add(root.get("uuid").in(filter.getAccountIds().stream().map(UUID::fromString).collect(Collectors.toSet())));
+        }
+        if (isNotEmpty(filter.getState())) {
+            predicates.add(builder.equal(root.get("state"), filter.getState()));
         }
         if (filter.getIsBudget()) {
             var masks = budgetMaskDictionaryRepository.findAll();

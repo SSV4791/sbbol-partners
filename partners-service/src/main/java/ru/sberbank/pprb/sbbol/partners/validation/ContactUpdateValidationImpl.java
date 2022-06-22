@@ -35,11 +35,11 @@ public class ContactUpdateValidationImpl extends AbstractValidatorImpl<Contact> 
     public void validator(List<String> errors, Contact entity) {
         var foundContact = contactRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
-        if(foundContact.getPartnerUuid().toString().equals(entity.getPartnerId())) {
+        if (!foundContact.getPartnerUuid().toString().equals(entity.getPartnerId())) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME_OTHER, entity.getDigitalId(), entity.getId()));
         }
-        commonValidationDigitalId(errors,entity.getDigitalId());
-        commonValidationUuid(errors,entity.getPartnerId(), entity.getId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
+        commonValidationUuid(errors, entity.getPartnerId(), entity.getId());
         if (!entity.getVersion().equals(foundContact.getVersion())) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundContact.getVersion().toString(), entity.getVersion().toString()));
         }
