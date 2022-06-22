@@ -16,8 +16,8 @@ public class ContactsFilterValidationImpl extends AbstractValidatorImpl<Contacts
 
     @Override
     public void validator(List<String> errors, ContactsFilter entity) {
-        commonValidationDigitalId(errors,entity.getDigitalId());
-        commonValidationUuid(errors,entity.getPartnerId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
+        commonValidationUuid(errors, entity.getPartnerId());
         if (entity.getPagination() != null) {
             paginationValidator.validator(errors, entity.getPagination());
         } else {

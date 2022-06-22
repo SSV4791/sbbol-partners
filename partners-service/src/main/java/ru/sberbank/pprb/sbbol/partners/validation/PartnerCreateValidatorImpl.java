@@ -23,7 +23,7 @@ public class PartnerCreateValidatorImpl extends AbstractValidatorImpl<PartnerCre
 
     @Override
     public void validator(List<String> errors, PartnerCreate entity) {
-        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getComment()) && entity.getComment().length() > COMMENT_PARTNER_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "comment", "1", "255"));
         }

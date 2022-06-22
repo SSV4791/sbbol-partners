@@ -1,4 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
@@ -29,8 +30,8 @@ public class ContactCreateValidationImpl extends AbstractValidatorImpl<ContactCr
         if (partner.isEmpty()) {
             throw new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getPartnerId()));
         }
-        commonValidationUuid(errors,entity.getPartnerId());
-        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationUuid(errors, entity.getPartnerId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getFirstName()) && entity.getFirstName().length() > FIRST_NAME_MAX_LENGTH_VALIDATION) {
             errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "fistName", "1", "50"));
         }

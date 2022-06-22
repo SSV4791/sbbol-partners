@@ -22,8 +22,8 @@ public class DocumentCreateValidationImpl extends AbstractValidatorImpl<Document
 
     @Override
     public void validator(List<String> errors, DocumentCreate entity) {
-        commonValidationDigitalId(errors,entity.getDigitalId());
-        commonValidationUuid(errors,entity.getUnifiedId(), entity.getDocumentTypeId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
+        commonValidationUuid(errors, entity.getUnifiedId(), entity.getDocumentTypeId());
         if (isNotEmpty(entity.getDocumentTypeId())) {
             var foundDocumentDictionary = documentDictionaryRepository.getByUuid(UUID.fromString(entity.getDocumentTypeId()));
             if (foundDocumentDictionary.isEmpty()) {

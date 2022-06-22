@@ -21,12 +21,12 @@ public class AccountSignValidatorImpl extends AbstractValidatorImpl<AccountsSign
 
     @Override
     public void validator(List<String> errors, AccountsSignInfo entity) {
-        commonValidationDigitalId(errors,entity.getDigitalId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
         if (!isEmpty(entity.getAccountsSignDetail())) {
             var accountsId = entity.getAccountsSignDetail().stream()
                 .map(AccountSignDetail::getAccountId).
                 collect(Collectors.toList());
-            commonValidationUuid(errors,accountsId);
+            commonValidationUuid(errors, accountsId);
             var accountsFilter = new AccountsSignFilter()
                 .digitalId(entity.getDigitalId())
                 .accountsId(accountsId);

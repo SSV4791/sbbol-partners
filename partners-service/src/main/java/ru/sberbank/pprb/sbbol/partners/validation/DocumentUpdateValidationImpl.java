@@ -29,8 +29,8 @@ public class DocumentUpdateValidationImpl extends AbstractValidatorImpl<Document
     public void validator(List<String> errors, DocumentChange entity) {
         var foundDocument = documentRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new ModelValidationException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
-        commonValidationDigitalId(errors,entity.getDigitalId());
-        commonValidationUuid(errors,entity.getUnifiedId(), entity.getId());
+        commonValidationDigitalId(errors, entity.getDigitalId());
+        commonValidationUuid(errors, entity.getUnifiedId(), entity.getId());
         if (isNotEmpty(entity.getDocumentTypeId())) {
             var foundDocumentDictionary = documentDictionaryRepository.getByUuid(UUID.fromString(entity.getDocumentTypeId()));
             if (foundDocumentDictionary.isEmpty()) {
