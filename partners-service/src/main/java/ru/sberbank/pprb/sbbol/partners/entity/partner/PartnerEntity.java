@@ -12,8 +12,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.OffsetDateTime;
@@ -64,6 +67,10 @@ public class PartnerEntity extends BaseEntity {
 
     @Column(name = "inn", length = 12)
     private String inn;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inn", referencedColumnName = "inn", insertable = false, updatable = false)
+    private GkuInnEntity gkuInnEntity;
 
     @Column(name = "kpp", length = 9)
     private String kpp;
@@ -219,6 +226,14 @@ public class PartnerEntity extends BaseEntity {
 
     public void setEmails(List<PartnerEmailEntity> emails) {
         this.emails = emails;
+    }
+
+    public GkuInnEntity getGkuInnEntity() {
+        return gkuInnEntity;
+    }
+
+    public void setGkuInnEntity(GkuInnEntity gkuInnEntity) {
+        this.gkuInnEntity = gkuInnEntity;
     }
 
     @Override

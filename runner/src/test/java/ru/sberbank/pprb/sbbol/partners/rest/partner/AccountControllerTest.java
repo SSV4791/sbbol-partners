@@ -26,12 +26,185 @@ import java.util.List;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.ORG_NAME_FOR_TEST_PARTNER;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class AccountControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner";
+
+    public static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
+
+    @Test
+    void testViewFilter_whenGkuAttributeIsDefinedAndIsTrue() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .isHousingServicesProvider(true)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .isEmpty();
+    }
+
+    @Test
+    void testViewFilter_whenGkuAttributeIsDefinedAndIsFalse() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .isHousingServicesProvider(false)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .hasSize(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isTrue();
+    }
+
+    @Test
+    void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedPartnerName() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .partnerSearch(ORG_NAME_FOR_TEST_PARTNER)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .hasSize(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isTrue();
+    }
+
+    @Test
+    void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedInn() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .partnerSearch(partner.getInn())
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .hasSize(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isTrue();
+    }
+
+    @Test
+    void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsNotMatchedPattern() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .partnerSearch("No matched pattern")
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .isEmpty();
+    }
+
+    @Test
+    void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedAccount() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> accounts = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(accounts)
+            .partnerSearch(ACCOUNT_FOR_TEST_PARTNER)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .hasSize(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isTrue();
+    }
 
     @Test
     void testViewFilterSignFiveAccount() {
@@ -772,7 +945,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         return new AccountCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
-            .account("40802810500490014206")
+            .account(ACCOUNT_FOR_TEST_PARTNER)
             .comment("Это тестовый комментарий")
             .bank(new BankCreate()
                 .bic("044525411")
@@ -872,7 +1045,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account("40802810500490014206")
+            .account(ACCOUNT_FOR_TEST_PARTNER)
             .bank(account.getBank()
                 .bic("044525411")
                 .name(account.getBank().getName())

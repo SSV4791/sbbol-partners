@@ -10,7 +10,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
@@ -42,6 +45,10 @@ public class AccountEntity extends BaseEntity {
 
     @Column(name = "partner_uuid", nullable = false)
     private UUID partnerUuid;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partner_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)
+    private PartnerEntity partner;
 
     @Column(name = "digital_id", nullable = false)
     private String digitalId;
@@ -129,6 +136,14 @@ public class AccountEntity extends BaseEntity {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public PartnerEntity getPartner() {
+        return partner;
+    }
+
+    public void setPartner(PartnerEntity partner) {
+        this.partner = partner;
     }
 
     @Override

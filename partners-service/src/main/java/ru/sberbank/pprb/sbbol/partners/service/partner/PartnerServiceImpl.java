@@ -98,7 +98,7 @@ public class PartnerServiceImpl implements PartnerService {
             return partnersResponse;
         }
         for (Partner partner : partners) {
-            getGku(partner.getInn());
+            partner.setGku(getGku(partner.getInn()));
         }
         return partnersResponse.partners(partners);
     }
