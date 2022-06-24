@@ -33,11 +33,10 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
     @Override
     @Transactional
     public void migrate(List<MigrationGkuCandidate> gkuInns) {
-        LOGGER.debug("Начало миграции справочника ЖКУ количество записей: {}", gkuInns.size());
+        LOGGER.info("Начало миграции справочника ЖКУ количество записей: {}", gkuInns.size());
         if (CollectionUtils.isEmpty(gkuInns)) {
             return;
         }
-        migrationGkuRepository.deleteAll();
         var entities = migrationGkuMapper.toDictionary(gkuInns);
         try {
             migrationGkuRepository.saveAll(entities);
@@ -45,6 +44,14 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
             LOGGER.error("В процессе миграции справочника ЖКУ произошла ошибка. Причина: {}", ex.getLocalizedMessage());
             throw ex;
         }
-        LOGGER.debug("Окончание миграции справочника ЖКУ количество записей: {}", entities.size());
+        LOGGER.info("Окончание миграции справочника ЖКУ количество записей: {}", entities.size());
+    }
+
+    @Override
+    @Transactional
+    public void delete() {
+        LOGGER.info("Начало процедуры удаления записей ЖКУ");
+        migrationGkuRepository.deleteAll();
+        LOGGER.info("Окончание процедуры удаления записей ЖКУ");
     }
 }

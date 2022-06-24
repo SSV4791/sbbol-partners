@@ -23,4 +23,13 @@ public interface GkuMigrationService {
         @JsonRpcError(exception = InvalidTypeIdException.class, code = -32600),
     })
     void migrate(@JsonRpcParam(value = "gkuInns") List<MigrationGkuCandidate> gkuInns);
+
+    /**
+     * Очистка справочника
+     */
+    @JsonRpcErrors({
+        @JsonRpcError(exception = InvalidFormatException.class, code = -32600),
+        @JsonRpcError(exception = InvalidTypeIdException.class, code = -32600),
+    })
+    void delete();
 }
