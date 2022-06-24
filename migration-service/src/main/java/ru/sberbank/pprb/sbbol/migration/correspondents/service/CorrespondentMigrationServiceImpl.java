@@ -43,6 +43,9 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                 MigrationPartnerEntity partnerEntity;
                 if (correspondent.getPprbGuid() != null) {
                     partnerEntity = migrationPartnerRepository.findByAccount_Uuid(UUID.fromString(correspondent.getPprbGuid()));
+                    if (partnerEntity == null) {
+                        partnerEntity = new MigrationPartnerEntity();
+                    }
                     migrationPartnerMapper.toMigrationPartnerEntity(digitalId, correspondent, partnerEntity);
                 } else {
                     partnerEntity = migrationPartnerMapper.toMigrationPartnerEntity(digitalId, correspondent);
