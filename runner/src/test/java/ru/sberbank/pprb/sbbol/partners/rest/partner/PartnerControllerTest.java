@@ -32,8 +32,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignController
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class PartnerControllerTest extends AbstractIntegrationTest {
 
-    public static final String ORG_NAME_FOR_TEST_PARTNER = "Наименование компании";
-
     public static final String baseRoutePath = "/partner";
 
     @Test
@@ -243,7 +241,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         filter.setPagination(
             new Pagination()
-                .offset(1)
+                .offset(0)
                 .count(1)
         );
 
@@ -1006,10 +1004,10 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     public static PartnerCreate getValidPartner(String digitalId) {
         var partner = new PartnerCreate()
             .legalForm(LegalForm.LEGAL_ENTITY)
-            .orgName(ORG_NAME_FOR_TEST_PARTNER)
-            .firstName("Имя клиента")
-            .secondName("Фамилия клиента")
-            .middleName("Отчество клиента")
+            .orgName(randomAlphabetic(10))
+            .firstName(randomAlphabetic(10))
+            .secondName(randomAlphabetic(10))
+            .middleName(randomAlphabetic(10))
             .inn("4139314257")
             .kpp("123456789")
             .ogrn("1035006110083")

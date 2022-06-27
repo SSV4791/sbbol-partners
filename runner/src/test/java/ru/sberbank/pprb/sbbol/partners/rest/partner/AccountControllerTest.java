@@ -26,7 +26,6 @@ import java.util.List;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.ORG_NAME_FOR_TEST_PARTNER;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -103,7 +102,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
             .accountIds(account)
-            .partnerSearch(ORG_NAME_FOR_TEST_PARTNER)
+            .partnerSearch(partner.getOrgName())
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
