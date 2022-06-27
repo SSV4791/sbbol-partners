@@ -241,7 +241,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         filter.setPagination(
             new Pagination()
-                .offset(1)
+                .offset(0)
                 .count(1)
         );
 
@@ -1004,10 +1004,10 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     public static PartnerCreate getValidPartner(String digitalId) {
         var partner = new PartnerCreate()
             .legalForm(LegalForm.LEGAL_ENTITY)
-            .orgName("Наименование компании")
-            .firstName("Имя клиента")
-            .secondName("Фамилия клиента")
-            .middleName("Отчество клиента")
+            .orgName(randomAlphabetic(10))
+            .firstName(randomAlphabetic(10))
+            .secondName(randomAlphabetic(10))
+            .middleName(randomAlphabetic(10))
             .inn("4139314257")
             .kpp("123456789")
             .ogrn("1035006110083")
