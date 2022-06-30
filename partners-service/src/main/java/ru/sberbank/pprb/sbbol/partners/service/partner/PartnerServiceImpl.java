@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -27,7 +27,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.PartnersFilterValidationImpl;
 
 import java.util.UUID;
 
-@Logged(printRequestResponse = true)
+@Loggable
 public class PartnerServiceImpl implements PartnerService {
 
     public static final String DOCUMENT_NAME = "partner";

@@ -63,4 +63,11 @@ public class ContactPhoneEntity extends PhoneBaseEntity {
     public String getHashKey() {
         return contact.getHashKey();
     }
+
+    @Override
+    public String toString() {
+        return "ContactPhoneEntity{" +
+            "contact=" + (contact == null ? null : contact.getUuid().toString()) +
+            '}';
+    }
 }

@@ -175,4 +175,20 @@ public class ContactEntity extends BaseEntity {
     public String getHashKey() {
         return getPartnerUuid().toString();
     }
+
+    @Override
+    public String toString() {
+        return "ContactEntity{" +
+            "partnerUuid=" + partnerUuid +
+            ", digitalId='" + digitalId + '\'' +
+            ", type=" + type +
+            ", orgName='" + orgName + '\'' +
+            ", firstName='" + firstName + '\'' +
+            ", secondName='" + secondName + '\'' +
+            ", middleName='" + middleName + '\'' +
+            ", position='" + position + '\'' +
+            ", phones=" + phones +
+            ", emails=" + emails +
+            '}';
+    }
 }

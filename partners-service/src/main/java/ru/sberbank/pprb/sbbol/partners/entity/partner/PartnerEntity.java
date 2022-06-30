@@ -260,4 +260,27 @@ public class PartnerEntity extends BaseEntity {
     public String getHashKey() {
         return getUuid().toString();
     }
+
+    @Override
+    public String toString() {
+        return "PartnerEntity{" +
+            "createDate=" + createDate +
+            ", digitalId='" + digitalId + '\'' +
+            ", type=" + type +
+            ", legalType=" + legalType +
+            ", orgName='" + orgName + '\'' +
+            ", firstName='" + firstName + '\'' +
+            ", secondName='" + secondName + '\'' +
+            ", middleName='" + middleName + '\'' +
+            ", inn='" + inn + '\'' +
+            ", gkuInnEntity=" + gkuInnEntity +
+            ", kpp='" + kpp + '\'' +
+            ", ogrn='" + ogrn + '\'' +
+            ", okpo='" + okpo + '\'' +
+            ", comment='" + comment + '\'' +
+            ", citizenship=" + citizenship +
+            ", phones=" + phones +
+            ", emails=" + emails +
+            '}';
+    }
 }

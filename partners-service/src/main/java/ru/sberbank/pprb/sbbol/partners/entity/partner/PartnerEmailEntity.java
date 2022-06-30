@@ -63,4 +63,11 @@ public class PartnerEmailEntity extends EmailBaseEntity {
     public String getHashKey() {
         return partner.getHashKey();
     }
+
+    @Override
+    public String toString() {
+        return "PartnerEmailEntity{" +
+            "partner=" + (partner == null ? null : partner.getUuid()) +
+            '}';
+    }
 }

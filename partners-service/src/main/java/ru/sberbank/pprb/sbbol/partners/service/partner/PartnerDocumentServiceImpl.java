@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
@@ -14,7 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.DocumentCreateValidationImpl;
 
 import java.util.UUID;
 
-@Logged(printRequestResponse = true)
+@Loggable
 public class PartnerDocumentServiceImpl extends DocumentServiceImpl {
 
     private final PartnerRepository partnerRepository;

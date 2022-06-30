@@ -106,4 +106,14 @@ public class BudgetMaskEntity implements Serializable, HashKeyProvider {
     public String getHashKey() {
         return getUuid().toString();
     }
+
+    @Override
+    public String toString() {
+        return "BudgetMaskEntity{" +
+            "uuid=" + uuid +
+            ", mask='" + mask + '\'' +
+            ", condition='" + condition + '\'' +
+            ", type=" + type +
+            '}';
+    }
 }

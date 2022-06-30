@@ -170,4 +170,19 @@ public class AccountEntity extends BaseEntity {
     public String getHashKey() {
         return getPartnerUuid().toString();
     }
+
+    @Override
+    public String toString() {
+        return "AccountEntity{" +
+            "createDate=" + createDate +
+            ", partnerUuid=" + partnerUuid +
+            ", partner=" + partner +
+            ", digitalId='" + digitalId + '\'' +
+            ", account='" + account + '\'' +
+            ", state=" + state +
+            ", bank=" + (bank == null ? null : bank.getUuid()) +
+            ", priorityAccount=" + priorityAccount +
+            ", comment='" + comment + '\'' +
+            '}';
+    }
 }

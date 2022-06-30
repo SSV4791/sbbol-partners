@@ -61,4 +61,11 @@ public class EmailEntity extends EmailBaseEntity {
     public String getHashKey() {
         return getUnifiedUuid().toString();
     }
+
+    @Override
+    public String toString() {
+        return "EmailEntity{" +
+            "unifiedUuid=" + unifiedUuid +
+            '}';
+    }
 }

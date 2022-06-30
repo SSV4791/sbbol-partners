@@ -95,4 +95,13 @@ public class DocumentTypeLegalFormEntity implements Serializable, HashKeyProvide
     public String getHashKey() {
         return getDocumentType().getHashKey();
     }
+
+    @Override
+    public String toString() {
+        return "DocumentTypeLegalFormEntity{" +
+            "uuid=" + uuid +
+            ", legalForm='" + legalForm + '\'' +
+            ", documentType=" + documentType +
+            '}';
+    }
 }
