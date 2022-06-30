@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -19,7 +19,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
 
-@Logged(printRequestResponse = true)
+@Loggable
 public class BudgetMaskServiceImpl implements BudgetMaskService {
 
     private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;

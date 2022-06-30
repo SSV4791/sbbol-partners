@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggedAspect;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.ValidationAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
@@ -95,8 +95,8 @@ import javax.servlet.http.HttpServletRequest;
 public class PartnerServiceConfiguration {
 
     @Bean
-    LoggedAspect loggedAspect() {
-        return new LoggedAspect();
+    LoggerAspect loggedAspect() {
+        return new LoggerAspect();
     }
 
     @Bean

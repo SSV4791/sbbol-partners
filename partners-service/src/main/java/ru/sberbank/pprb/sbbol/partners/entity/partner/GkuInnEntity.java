@@ -79,4 +79,12 @@ public class GkuInnEntity implements Serializable, HashKeyProvider {
     public String getHashKey() {
         return getUuid().toString();
     }
+
+    @Override
+    public String toString() {
+        return "GkuInnEntity{" +
+            "uuid=" + uuid +
+            ", inn='" + inn + '\'' +
+            '}';
+    }
 }

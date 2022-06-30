@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
@@ -13,7 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.PhoneCreateValidationImpl;
 
 import java.util.UUID;
 
-@Logged(printRequestResponse = true)
+@Loggable
 public class PartnerPhoneServiceImpl extends PhoneServiceImpl {
 
     private final PartnerRepository partnerRepository;

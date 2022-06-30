@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.countererparty;
 import org.springframework.stereotype.Service;
 import ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisitesResult;
@@ -12,6 +13,7 @@ import static ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesRe
 import static ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult.StatusEnum.NOTSIGNED;
 import static ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult.StatusEnum.SIGNED;
 
+@Loggable
 @Service
 @Deprecated
 public class CounterpartyServiceImpl implements CounterpartyService {

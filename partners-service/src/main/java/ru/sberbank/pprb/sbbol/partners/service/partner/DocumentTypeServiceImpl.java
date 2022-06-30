@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -18,7 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeUpdateValidationIm
 import java.util.List;
 import java.util.UUID;
 
-@Logged(printRequestResponse = true)
+@Loggable
 public class DocumentTypeServiceImpl implements DocumentTypeService {
     private static final String DOCUMENT_TYPE = "document_type";
 

@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.replication;
 
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.Logged;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@Logged(printRequestResponse = true)
+@Loggable
 public class ReplicationServiceImpl implements ReplicationService {
 
     private final PartnerRepository partnerRepository;

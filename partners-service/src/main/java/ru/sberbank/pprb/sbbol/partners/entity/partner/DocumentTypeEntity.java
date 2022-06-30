@@ -119,4 +119,15 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
     public String getHashKey() {
         return getUuid().toString();
     }
+
+    @Override
+    public String toString() {
+        return "DocumentTypeEntity{" +
+            "uuid=" + uuid +
+            ", systemName='" + systemName + '\'' +
+            ", description='" + description + '\'' +
+            ", deleted=" + deleted +
+            ", legalForms=" + legalForms +
+            '}';
+    }
 }

@@ -111,4 +111,15 @@ public class BankEntity extends BaseEntity {
     public String getHashKey() {
         return getAccount().getHashKey();
     }
+
+    @Override
+    public String toString() {
+        return "BankEntity{" +
+            "account=" + account +
+            ", name='" + name + '\'' +
+            ", bic='" + bic + '\'' +
+            ", bankAccount=" + bankAccount +
+            ", intermediary=" + intermediary +
+            '}';
+    }
 }

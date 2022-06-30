@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
@@ -24,6 +25,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.AccountsSignFilterValidationIm
 
 import java.util.UUID;
 
+@Loggable
 public class AccountSignServiceImpl implements AccountSignService {
 
     private static final String DOCUMENT_NAME = "account";
