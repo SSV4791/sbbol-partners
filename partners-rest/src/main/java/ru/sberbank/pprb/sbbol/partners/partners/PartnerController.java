@@ -4,12 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnersApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateValidatorImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerUpdateValidatorImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnersFilterValidationImpl;
 
 @RestController
 public class PartnerController implements PartnersApi {
@@ -32,17 +36,17 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<PartnersResponse> list(PartnersFilter partnersFilter) {
+    public ResponseEntity<PartnersResponse> list(@Validation(type = PartnersFilterValidationImpl.class) PartnersFilter partnersFilter) {
         return ResponseEntity.ok(partnerService.getPartners(partnersFilter));
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> create(PartnerCreate partner) {
+    public ResponseEntity<PartnerResponse> create(@Validation(type = PartnerCreateValidatorImpl.class) PartnerCreate partner) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.savePartner(partner));
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> update(Partner partner) {
+    public ResponseEntity<PartnerResponse> update(@Validation(type = PartnerUpdateValidatorImpl.class) Partner partner) {
         return ResponseEntity.ok(partnerService.updatePartner(partner));
     }
 }

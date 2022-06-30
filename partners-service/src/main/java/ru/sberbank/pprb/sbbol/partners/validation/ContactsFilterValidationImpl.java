@@ -6,6 +6,9 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 
 import java.util.List;
+import java.util.Map;
+
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class ContactsFilterValidationImpl extends AbstractValidatorImpl<ContactsFilter> {
     private final Validator<Pagination> paginationValidator;
@@ -15,13 +18,13 @@ public class ContactsFilterValidationImpl extends AbstractValidatorImpl<Contacts
     }
 
     @Override
-    public void validator(List<String> errors, ContactsFilter entity) {
+    public void validator(Map<String, List<String>> errors, ContactsFilter entity) {
         commonValidationDigitalId(errors, entity.getDigitalId());
         commonValidationUuid(errors, entity.getPartnerId());
         if (entity.getPagination() != null) {
             paginationValidator.validator(errors, entity.getPagination());
         } else {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "pagination"));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, "pagination"));
         }
     }
 }

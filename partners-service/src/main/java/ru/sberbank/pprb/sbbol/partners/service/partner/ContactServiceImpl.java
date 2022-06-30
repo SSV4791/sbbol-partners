@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
@@ -12,9 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
-import ru.sberbank.pprb.sbbol.partners.validation.ContactCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.ContactUpdateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.ContactsFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -45,7 +41,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(readOnly = true)
-    public ContactsResponse getContacts(@Validation(type = ContactsFilterValidationImpl.class) ContactsFilter contactsFilter) {
+    public ContactsResponse getContacts(ContactsFilter contactsFilter) {
         var response = contactRepository.findByFilter(contactsFilter);
         var contactResponse = new ContactsResponse();
         for (var entity : response) {
@@ -67,7 +63,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public ContactResponse saveContact(@Validation(type = ContactCreateValidationImpl.class) ContactCreate contact) {
+    public ContactResponse saveContact(ContactCreate contact) {
         var requestContact = contactMapper.toContact(contact);
         var saveContact = contactRepository.save(requestContact);
         var response = contactMapper.toContact(saveContact);
@@ -76,7 +72,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public ContactResponse updateContact(@Validation(type = ContactUpdateValidationImpl.class) Contact contact) {
+    public ContactResponse updateContact(Contact contact) {
         var foundContact = contactRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, contact.getDigitalId(), contact.getId()));
         contactMapper.updateContact(contact, foundContact);

@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
@@ -12,8 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeUpdateValidationImpl;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +36,7 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     @Override
     @Transactional
-    public DocumentTypeResponse saveDocument(@Validation(type = DocumentTypeCreateValidationImpl.class) DocumentTypeCreate document) {
+    public DocumentTypeResponse saveDocument(DocumentTypeCreate document) {
         DocumentTypeEntity saveDocument = documentTypeMapper.toDocumentType(document);
         DocumentTypeEntity response = dictionaryRepository.save(saveDocument);
         return new DocumentTypeResponse().documentType(documentTypeMapper.toDocumentType(response));
@@ -47,7 +44,7 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     @Override
     @Transactional
-    public DocumentTypeResponse updateDocument(@Validation(type = DocumentTypeUpdateValidationImpl.class) DocumentTypeChange documentTypeChange) {
+    public DocumentTypeResponse updateDocument(DocumentTypeChange documentTypeChange) {
         DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(documentTypeChange.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, documentTypeChange.getId()));
         documentTypeMapper.updateDocument(documentTypeChange, foundDocument);

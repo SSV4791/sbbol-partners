@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.mapper.ValidationMapper;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 import javax.persistence.EntityNotFoundException;
@@ -38,6 +40,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
     private static final String FILL_OBJECT_MESSAGE_EXCEPTION = "Ошибка заполнения объекта";
+    private final ValidationMapper validationMapper;
+
+    public RestExceptionHandler(ValidationMapper validationMapper) {
+        this.validationMapper = validationMapper;
+    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<?> handleConstraintViolationException(
@@ -57,7 +64,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             EntryNotFoundException.class,
             EntityNotFoundException.class,
             ObjectNotFoundException.class,
-            PartnerMigrationException.class
+            PartnerMigrationException.class,
+            MissingValueException.class
         })
     protected ResponseEntity<Object> handleObjectNotFoundException(
         Exception ex,
@@ -77,22 +85,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpServletRequest httpRequest
     ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
-        return buildResponseEntity(
-            HttpStatus.BAD_REQUEST,
-            ex.getErrors(),
-            httpRequest.getRequestURL()
-        );
-    }
-
-    @ExceptionHandler(MissingValueException.class)
-    protected ResponseEntity<Object> handleMissingValueException(
-        MissingValueException ex,
-        HttpServletRequest httpRequest
-    ) {
-        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
-        return buildResponseEntity(
-            HttpStatus.BAD_REQUEST,
-            ex.getErrors(),
+        return buildResponsesEntity(
+            validationMapper.toDescriptions(ex),
+            ex.getText(),
             httpRequest.getRequestURL()
         );
     }
@@ -197,6 +192,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(
             errorData,
             status
+        );
+    }
+
+    private ResponseEntity<Object> buildResponsesEntity(
+        List<Descriptions> errorsDesc,
+        String text,
+        StringBuffer requestUrl
+    ) {
+        var errorData = new Error()
+            .code(HttpStatus.BAD_REQUEST.name())
+            .descriptionErrors(errorsDesc)
+            .text(Collections.singletonList(text));
+        String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
+        LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
+        return new ResponseEntity<>(
+            errorData,
+            HttpStatus.BAD_REQUEST
         );
     }
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
@@ -262,7 +263,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         );
         assertThat(emailError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(emailError.getText())
+        assertThat(emailError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (email.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

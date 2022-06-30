@@ -7,41 +7,52 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation;
 
 import java.util.List;
+import java.util.Map;
 
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseEmailValidation.commonValidationChildEmail;
-import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePhoneValidation.commonValidationChildPhone;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation.checkInn;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation.checkOgrn;
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePhoneValidation.commonValidationChildPhone;
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class PartnerCreateValidatorImpl extends AbstractValidatorImpl<PartnerCreate> {
 
-    private static final String LEGAL_FORM_LEGAL_ENTITY = "legalForm.LEGAL_ENTITY";
-    private static final String LEGAL_FORM_ENTREPRENEUR = "legalForm.ENTREPRENEUR";
-    private static final String LEGAL_FORM_PHYSICAL_PERSON = "legalForm.PHYSICAL_PERSON";
     private static final String DEFAULT_MESSAGE_INN_LENGTH = "partner.inn_length";
     private static final String DEFAULT_MESSAGE_KPP_LENGTH = "partner.kpp.length";
+    private static final String DEFAULT_MESSAGE_OGRN_LENGTH = "partner.ogrn_length";
+    private static final String DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER = "default.field.control_number";
+    private static final String DEFAULT_MESSAGE_OKPO_LENGTH = "partner.okpo_length";
 
     @Override
-    public void validator(List<String> errors, PartnerCreate entity) {
+    public void validator(Map<String, List<String>> errors, PartnerCreate entity) {
         commonValidationDigitalId(errors, entity.getDigitalId());
+        if (StringUtils.isNotEmpty(entity.getFirstName()) && entity.getFirstName().length() > FIRST_NAME_MAX_LENGTH_VALIDATION) {
+            setError(errors, "partner_firstName", MessagesTranslator.toLocale(DEFAULT_LENGTH, "50"));
+        }
+        if (StringUtils.isNotEmpty(entity.getMiddleName()) && entity.getOrgName().length() > MIDDLE_NAME_MAX_LENGTH_VALIDATION) {
+            setError(errors, "partner_middleName", MessagesTranslator.toLocale(DEFAULT_LENGTH, "50"));
+        }
+        if (StringUtils.isNotEmpty(entity.getSecondName()) && entity.getSecondName().length() > SECOND_NAME_MAX_LENGTH_VALIDATION) {
+            setError(errors, "partner_secondName", MessagesTranslator.toLocale(DEFAULT_LENGTH, "50"));
+        }
         if (StringUtils.isNotEmpty(entity.getComment()) && entity.getComment().length() > COMMENT_PARTNER_MAX_LENGTH_VALIDATION) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "comment", "1", "255"));
+            setError(errors, "partner_comment", MessagesTranslator.toLocale(DEFAULT_LENGTH, "255"));
         }
         if (StringUtils.isNotEmpty(entity.getOkpo())) {
             if (entity.getOkpo().length() > OKPO_PARTNER_MAX_LENGTH_VALIDATION && entity.getOkpo().length() < OKPO_PARTNER_MIN_LENGTH_VALIDATION) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "okpo", "8", "14"));
+                setError(errors, "okpo", MessagesTranslator.toLocale(DEFAULT_MESSAGE_OKPO_LENGTH));
             }
         }
         if (StringUtils.isNotEmpty(entity.getOgrn())) {
             if (entity.getOgrn().length() != OGRN_PARTNER_MAX_LENGTH_VALIDATION && entity.getOgrn().length() != OGRN_PARTNER_MIN_LENGTH_VALIDATION) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "ogrn", "13", "15"));
+                setError(errors, "ogrn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_OGRN_LENGTH));
             }
         }
         if (StringUtils.isNotEmpty(entity.getKpp()) && entity.getKpp().length() != BasePartnerValidation.KPP_VALID_LENGTH) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_KPP_LENGTH, "9"));
+            setError(errors, "kpp", MessagesTranslator.toLocale(DEFAULT_MESSAGE_KPP_LENGTH));
         }
         if (entity.getLegalForm() == null) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "legalForm"));
+            setError(errors, "partner_legalForm", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "правовую форму партнёра"));
         } else {
             checkLegalFormProperty(entity, errors);
         }
@@ -57,36 +68,42 @@ public class PartnerCreateValidatorImpl extends AbstractValidatorImpl<PartnerCre
         }
     }
 
-    private void checkLegalFormProperty(PartnerCreate entity, List<String> errors) {
+    private void checkLegalFormProperty(PartnerCreate entity, Map<String, List<String>> errors) {
         if (entity.getLegalForm() == LegalForm.LEGAL_ENTITY) {
             if (StringUtils.isEmpty(entity.getOrgName())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "orgName", LEGAL_FORM_LEGAL_ENTITY));
+                setError(errors, "partner_orgName", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "название организации"));
+            }
+            if (StringUtils.isNotEmpty(entity.getInn()) && entity.getInn().length() != 10 && entity.getInn().length() != 5) {
+                setError(errors, "inn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_INN_LENGTH, "10"));
             }
             if (StringUtils.isNotEmpty(entity.getInn()) && !checkInn(entity.getInn())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
+                setError(errors, "inn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ИНН"));
             }
             if (StringUtils.isNotEmpty(entity.getOgrn()) && !checkOgrn(entity.getOgrn())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ogrn"));
+                setError(errors, "ogrn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ОГРН"));
             }
         } else if (entity.getLegalForm() == LegalForm.ENTREPRENEUR) {
             if (StringUtils.isEmpty(entity.getOrgName())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "orgName", LEGAL_FORM_ENTREPRENEUR));
+                setError(errors, "partner_orgName", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "название организации"));
+            }
+            if (StringUtils.isNotEmpty(entity.getInn()) && entity.getInn().length() != 12 && entity.getInn().length() != 5) {
+                setError(errors, "inn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_INN_LENGTH, "12"));
             }
             if (StringUtils.isNotEmpty(entity.getInn()) && !checkInn(entity.getInn())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
+                setError(errors, "inn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ИНН"));
             }
             if (StringUtils.isNotEmpty(entity.getOgrn()) && !checkOgrn(entity.getOgrn())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ogrn"));
+                setError(errors, "orgn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ОГРН"));
             }
         } else if (entity.getLegalForm() == LegalForm.PHYSICAL_PERSON) {
             if (StringUtils.isEmpty(entity.getFirstName())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "firstName", LEGAL_FORM_PHYSICAL_PERSON));
+                setError(errors, "partner_firstName", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "имя партнёра"));
             }
-            if (StringUtils.isNotEmpty(entity.getInn()) && entity.getInn().length() != 12) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_INN_LENGTH, "inn", LEGAL_FORM_PHYSICAL_PERSON, "12"));
+            if (StringUtils.isNotEmpty(entity.getInn()) && entity.getInn().length() != 12 && entity.getInn().length() != 5) {
+                setError(errors, "inn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_INN_LENGTH, "12"));
             }
             if (StringUtils.isNotEmpty(entity.getInn()) && !checkInn(entity.getInn())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "inn"));
+                setError(errors, "inn", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER, "ИНН"));
             }
         }
     }

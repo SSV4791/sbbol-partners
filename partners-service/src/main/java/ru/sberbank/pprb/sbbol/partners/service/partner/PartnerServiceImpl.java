@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
@@ -21,9 +20,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryReposi
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
-import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateValidatorImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.PartnerUpdateValidatorImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.PartnersFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -76,7 +72,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional(readOnly = true)
-    public PartnersResponse getPartners(@Validation(type = PartnersFilterValidationImpl.class) PartnersFilter partnersFilter) {
+    public PartnersResponse getPartners(PartnersFilter partnersFilter) {
         PartnersResponse partnersResponse = new PartnersResponse();
         var response = partnerRepository.findByFilter(partnersFilter);
         for (PartnerEntity entity : response) {
@@ -105,7 +101,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public PartnerResponse savePartner(@Validation(type = PartnerCreateValidatorImpl.class) PartnerCreate partner) {
+    public PartnerResponse savePartner(PartnerCreate partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
         var response = partnerMapper.toPartner(savePartner);
@@ -115,7 +111,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public PartnerResponse updatePartner(@Validation(type = PartnerUpdateValidatorImpl.class) Partner partner) {
+    public PartnerResponse updatePartner(Partner partner) {
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
         partnerMapper.updatePartner(partner, foundPartner);

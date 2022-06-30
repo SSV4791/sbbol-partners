@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
@@ -11,9 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
-import ru.sberbank.pprb.sbbol.partners.validation.AddressCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AddressUpdateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AddressesFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -43,7 +39,7 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional(readOnly = true)
-    public AddressesResponse getAddresses(@Validation(type = AddressesFilterValidationImpl.class) AddressesFilter addressesFilter) {
+    public AddressesResponse getAddresses(AddressesFilter addressesFilter) {
         var response = addressRepository.findByFilter(addressesFilter);
         var addressesResponse = new AddressesResponse();
         for (var entity : response) {
@@ -65,7 +61,7 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressResponse saveAddress(@Validation(type = AddressCreateValidationImpl.class) AddressCreate address) {
+    public AddressResponse saveAddress(AddressCreate address) {
         var requestAddress = addressMapper.toAddress(address);
         var saveAddress = addressRepository.save(requestAddress);
         var response = addressMapper.toAddress(saveAddress);
@@ -74,7 +70,7 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressResponse updateAddress(@Validation(type = AddressUpdateValidationImpl.class) Address address) {
+    public AddressResponse updateAddress(Address address) {
         var foundAddress = addressRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, address.getDigitalId(), address.getId()));
         addressMapper.updateAddress(address, foundAddress);

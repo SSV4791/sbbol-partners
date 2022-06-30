@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -20,14 +21,16 @@ import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccou
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation.RKC_BIC;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation.validateBankAccount;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValidation.validateUserAccount;
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class AccountUpdateValidatorImpl extends AbstractValidatorImpl<AccountChange> {
 
     private static final String DOCUMENT_NAME = "account";
     private static final String DEFAULT_MESSAGE_ACCOUNT_LENGTH = "account.account.length";
-    private static final String DEFAULT_MESSAGE_BIC_LENGTH = "account.bic.length";
-    private static final String DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER = "account.bank_account.control_number";
+    private static final String DEFAULT_MESSAGE_BIC_LENGTH = "account.account.bank.bic_length";
+    private static final String DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER = "account.account.bank_account.control_number";
     private static final String DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER = "account.account.control_number";
+    private static final String DEFAULT_MESSAGE_ACCOUNT_IS_NULL = "account.account.fields.is_null";
     private static final String DEFAULT_MESSAGE_ACCOUNT_SIGN_IS_TRUE = "account.account.sign.is_true";
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
@@ -39,79 +42,79 @@ public class AccountUpdateValidatorImpl extends AbstractValidatorImpl<AccountCha
 
     @Override
     @Transactional(readOnly = true)
-    public void validator(List<String> errors, AccountChange entity) {
+    public void validator(Map<String, List<String>> errors, AccountChange entity) {
         validateUpdateAccount(entity, errors);
         commonValidationUuid(errors, entity.getPartnerId(), entity.getId());
         commonValidationDigitalId(errors, entity.getDigitalId());
         if (StringUtils.isNotEmpty(entity.getComment()) && entity.getComment().length() > COMMENT_MAX_LENGTH_VALIDATION) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "comment", "1", "50"));
+            setError(errors, "account_comment", MessagesTranslator.toLocale(DEFAULT_LENGTH, "50"));
         }
         if (StringUtils.isNotEmpty(entity.getAccount()) && entity.getAccount().length() != ACCOUNT_VALID_LENGTH) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_LENGTH));
+            setError(errors, "account", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_LENGTH));
         }
         if (entity.getVersion() == null) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "version"));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, "version"));
         }
         if (entity.getBank() != null) {
             checkBank(entity, errors);
         }
     }
 
-    private void validateUpdateAccount(AccountChange entity, List<String> errors) {
+    private void validateUpdateAccount(AccountChange entity, Map<String, List<String>> errors) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
         if (!foundAccount.getPartnerUuid().toString().equals(entity.getPartnerId())) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getPartnerId()));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getPartnerId()));
         }
         if (!entity.getVersion().equals(foundAccount.getVersion())) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundAccount.getVersion().toString(), entity.getVersion().toString()));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundAccount.getVersion().toString(), entity.getVersion().toString()));
         }
         if (AccountStateType.SIGNED == foundAccount.getState()) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_SIGN_IS_TRUE, entity.getAccount()));
+            setError(errors, "account", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_SIGN_IS_TRUE, entity.getAccount()));
         }
         accountMapper.updateAccount(entity, foundAccount);
         if (foundAccount.getBank() == null || foundAccount.getBank().getBic() == null || foundAccount.getBank().getBankAccount() == null || foundAccount.getBank().getBankAccount().getAccount() == null) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "bic/bankAccount", DOCUMENT_NAME));
+            setError(errors, "bic", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_IS_NULL, "реквизиты банка"));
         }
         var matchBic = RKC_BIC.matcher(foundAccount.getBank().getBic());
         if (matchBic.matches()) {
             if (StringUtils.isNotEmpty(foundAccount.getAccount()) && !validateBankAccount(foundAccount.getAccount(), foundAccount.getBank().getBic())) {
-                errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER, foundAccount.getAccount()));
+                setError(errors, "account", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER));
             }
         } else if (StringUtils.isNotEmpty(foundAccount.getAccount()) && !validateUserAccount(foundAccount.getAccount(), foundAccount.getBank().getBic())) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER, foundAccount.getAccount()));
+            setError(errors, "account", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER));
         }
         if (!BasePartnerAccountValidation.validateBankAccount(foundAccount.getBank().getBankAccount().getAccount(), foundAccount.getBank().getBic())) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER, foundAccount.getBank().getBankAccount().getAccount()));
+            setError(errors, "bankAccount", MessagesTranslator.toLocale(DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER));
         }
     }
 
-    private void checkBank(AccountChange entity, List<String> errors) {
+    private void checkBank(AccountChange entity, Map<String, List<String>> errors) {
         var bank = entity.getBank();
         if (bank.getBic() != null && bank.getBic().equals(EMPTY)) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "bank.bic"));
+            setError(errors, "bic", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_IS_NULL, "реквизиты банка"));
         }
         if (StringUtils.isNotEmpty(bank.getBic()) && bank.getBic().length() != BIC_VALID_LENGTH) {
-            errors.add(DEFAULT_MESSAGE_BIC_LENGTH);
+            setError(errors, "bic", MessagesTranslator.toLocale(DEFAULT_MESSAGE_BIC_LENGTH));
         }
         if (StringUtils.isNotEmpty(bank.getName()) && bank.getName().length() > BANK_NAME_MAX_LENGTH_VALIDATION) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "bank.name", "1", "160"));
+            setError(errors, "bankName", MessagesTranslator.toLocale(DEFAULT_LENGTH, "160"));
         }
         if (StringUtils.isNotEmpty(bank.getBic()) && StringUtils.isEmpty(bank.getName())) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "bank.name"));
+            setError(errors, "bic", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_IS_NULL, "название банка"));
         }
         if (bank.getBankAccount() != null) {
             checkBankAccount(bank, errors);
         }
     }
 
-    private void checkBankAccount(Bank bank, List<String> errors) {
+    private void checkBankAccount(Bank bank, Map<String, List<String>> errors) {
         var bankAccount = bank.getBankAccount();
         if (bankAccount.getBankAccount() != null && bankAccount.getBankAccount().equals(EMPTY)) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "bankAccount.account"));
+            setError(errors, "bankAccount", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_IS_NULL, "корреспондентский счёт"));
         }
-        if (bankAccount.getBankAccount() != null && bankAccount.getBankAccount().length() != ACCOUNT_VALID_LENGTH) {
-            errors.add(DEFAULT_MESSAGE_ACCOUNT_LENGTH);
+        if (StringUtils.isNotEmpty(bankAccount.getBankAccount()) && bankAccount.getBankAccount().length() != ACCOUNT_VALID_LENGTH) {
+            setError(errors, "bankAccount", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_LENGTH));
         }
     }
 }

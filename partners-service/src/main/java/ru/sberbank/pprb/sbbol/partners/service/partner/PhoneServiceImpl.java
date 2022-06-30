@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
@@ -12,9 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
-import ru.sberbank.pprb.sbbol.partners.validation.PhoneCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.PhoneUpdateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.PhonesFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -35,7 +31,7 @@ abstract class PhoneServiceImpl implements PhoneService {
 
     @Override
     @Transactional(readOnly = true)
-    public PhonesResponse getPhones(@Validation(type = PhonesFilterValidationImpl.class) PhonesFilter phonesFilter) {
+    public PhonesResponse getPhones(PhonesFilter phonesFilter) {
         var response = phoneRepository.findByFilter(phonesFilter);
         var phoneResponse = new PhonesResponse();
         for (var entity : response) {
@@ -57,7 +53,7 @@ abstract class PhoneServiceImpl implements PhoneService {
 
     @Override
     @Transactional
-    public PhoneResponse savePhone(@Validation(type = PhoneCreateValidationImpl.class) PhoneCreate phone) {
+    public PhoneResponse savePhone(PhoneCreate phone) {
         var phoneEntity = phoneMapper.toPhone(phone);
         PhoneEntity savedPhone = phoneRepository.save(phoneEntity);
         var response = phoneMapper.toPhone(savedPhone);
@@ -66,7 +62,7 @@ abstract class PhoneServiceImpl implements PhoneService {
 
     @Override
     @Transactional
-    public PhoneResponse updatePhone(@Validation(type = PhoneUpdateValidationImpl.class) Phone phone) {
+    public PhoneResponse updatePhone(Phone phone) {
         var uuid = UUID.fromString(phone.getId());
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));

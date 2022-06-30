@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
@@ -922,7 +923,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(partnerError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(partnerError.getText())
+        assertThat(partnerError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (partner.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }
@@ -1035,6 +1036,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     private static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
         var partner = getValidPartner(digitalId);
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
+        partner.setInn("521031961500");
         return partner;
     }
 

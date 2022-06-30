@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
@@ -12,9 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentUpdateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentsFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -47,7 +43,7 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional(readOnly = true)
-    public DocumentsResponse getDocuments(@Validation(type = DocumentsFilterValidationImpl.class) DocumentsFilter documentsFilter) {
+    public DocumentsResponse getDocuments(DocumentsFilter documentsFilter) {
         var response = documentRepository.findByFilter(documentsFilter);
         var documentsResponse = new DocumentsResponse();
         for (var entity : response) {
@@ -69,7 +65,7 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional
-    public DocumentResponse saveDocument(@Validation(type = DocumentCreateValidationImpl.class) DocumentCreate document) {
+    public DocumentResponse saveDocument(DocumentCreate document) {
         var requestDocument = documentMapper.toDocument(document);
         if (requestDocument.getTypeUuid() != null) {
             var documentType = documentDictionaryRepository.getByUuid(requestDocument.getTypeUuid());
@@ -82,7 +78,7 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional
-    public DocumentResponse updateDocument(@Validation(type = DocumentUpdateValidationImpl.class) DocumentChange document) {
+    public DocumentResponse updateDocument(DocumentChange document) {
         var foundDocument = documentRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId()));
         documentMapper.updateDocument(document, foundDocument);

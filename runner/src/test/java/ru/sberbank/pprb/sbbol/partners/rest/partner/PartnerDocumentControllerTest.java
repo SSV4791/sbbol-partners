@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
@@ -62,74 +63,80 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithoutDigitalId() {
-        List<String> errorText = List.of("Поля обязательны для заполнения digitalId");
+        var errorText ="Ошибка заполнения одного из возможных полей: digitalId поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), null);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getText()).isEqualTo(errorText);
+        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithEmptyDigitalId() {
-        List<String> errorText = List.of("Поля обязательны для заполнения digitalId");
+        var errorText ="Ошибка заполнения одного из возможных полей: digitalId поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), "");
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getText()).isEqualTo(errorText);
+        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithBadDigitalId() {
-        List<String> errorText = List.of("digitalId допустимая длина от 1 до 40 символов");
+        var errorText ="Проверьте заполненное значение на корректность. Максимальное количество символов 1-40";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), RandomStringUtils.randomAlphanumeric(41));
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getText()).isEqualTo(errorText);
+        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithoutUnifiedId() {
-        List<String> errorText = List.of("Поля обязательны для заполнения id/partnerId/unifiedId/documentTypeId");
+        var errorText ="Ошибка заполнения одного из возможных полей: id/partnerId/accountId/unifiedId поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(null, partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getText()).isEqualTo(errorText);
+        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithEmptyUnifiedId() {
-        List<String> errorText = List.of("Поля обязательны для заполнения id/partnerId/unifiedId/documentTypeId");
+        var errorText ="Ошибка заполнения одного из возможных полей: id/partnerId/accountId/unifiedId поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors("" ,partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getText()).isEqualTo(errorText);
+        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithBadUnifiedId() {
-        List<String> errorText = List.of("Ошибка заполнения одного из полей id/partnerId/unifiedId/documentTypeId длина значения не равна 36");
+        var errorText ="Проверьте заполненное значение на корректность. Максимальное количество символов 36";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(RandomStringUtils.randomAlphanumeric(37) ,partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getText()).isEqualTo(errorText);
+        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .contains(errorText);
     }
 
     @Test
@@ -235,7 +242,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         );
         assertThat(documentError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(documentError.getText())
+        assertThat(documentError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

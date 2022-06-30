@@ -15,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
@@ -352,7 +353,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         );
 
         var filter2 = new AccountsFilter()
-            .digitalId(partner.getDigitalId())
+            .digitalId(null)
             .partnerIds(List.of(partner.getId()));
         var response2 = post(
             baseRoutePath + "/accounts/view",
@@ -557,7 +558,9 @@ class AccountControllerTest extends AbstractIntegrationTest {
 
         var acc = updateAccount(account)
             .bank(account.getBank()
-                .bic(""));
+                .bic("")
+                .bankAccount(account.getBank().getBankAccount()
+                    .bankAccount("")));
         var updateAccount = put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
@@ -745,7 +748,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         );
         assertThat(accountError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(accountError.getText())
+        assertThat(accountError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (account.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }
@@ -1006,6 +1009,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var account = getValidAccount(partnerUuid, digitalId);
         account.setAccount("222222");
         account.getBank().setBic("44444");
+        account.getBank().getBankAccount().setBankAccount("2131243255234324123123123");
         return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
     }
 

@@ -6,8 +6,8 @@ import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
+import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
@@ -126,7 +126,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
                 maskFormatter.valueToString(param);
                 return true;
             } catch (ParseException e) {
-                throw new ModelValidationException(e.getLocalizedMessage());
+                throw new BadRequestException(e.getLocalizedMessage());
             }
         }
         return false;

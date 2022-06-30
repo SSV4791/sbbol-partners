@@ -13,7 +13,9 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Аспект, обрабатывающий вызов методов с валидацией, отмеченных аннотацией {@link Validation}
@@ -32,7 +34,7 @@ public class ValidationAspect {
      * Метод для валидации объектов в РЕСТ клиентах.
      */
     @SuppressWarnings("unchecked")
-    @Before("execution(* ru.sberbank.pprb.sbbol.partners..*Service.*(..))")
+    @Before("execution(* ru.sberbank.pprb.sbbol.partners..*Controller.*(..))")
     public void validate(JoinPoint call) {
         var signature = (MethodSignature) call.getSignature();
         var method = signature.getMethod();
@@ -45,7 +47,7 @@ public class ValidationAspect {
                 }
                 var type = ((Validation) annotation).type();
                 Validator bean = getBean(type, type.getName());
-                var errors = new ArrayList<String>();
+                Map<String, List<String>> errors = new HashMap<>();
                 bean.validator(errors, args[argIndex]);
                 if (CollectionUtils.isEmpty(errors)) {
                     return;

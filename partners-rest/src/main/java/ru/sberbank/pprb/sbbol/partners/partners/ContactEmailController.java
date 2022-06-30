@@ -4,12 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.ContactEmailApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.EmailService;
+import ru.sberbank.pprb.sbbol.partners.validation.EmailCreateValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.EmailUpdateValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.EmailsFilterValidationImpl;
 
 @RestController
 public class ContactEmailController implements ContactEmailApi {
@@ -21,7 +25,7 @@ public class ContactEmailController implements ContactEmailApi {
     }
 
     @Override
-    public ResponseEntity<EmailResponse> create(EmailCreate email) {
+    public ResponseEntity<EmailResponse> create(@Validation(type = EmailCreateValidationImpl.class) EmailCreate email) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactEmailService.saveEmail(email));
     }
 
@@ -32,12 +36,12 @@ public class ContactEmailController implements ContactEmailApi {
     }
 
     @Override
-    public ResponseEntity<EmailsResponse> list(EmailsFilter emailsFilter) {
+    public ResponseEntity<EmailsResponse> list(@Validation(type = EmailsFilterValidationImpl.class) EmailsFilter emailsFilter) {
         return ResponseEntity.ok(contactEmailService.getEmails(emailsFilter));
     }
 
     @Override
-    public ResponseEntity<EmailResponse> update(Email email) {
+    public ResponseEntity<EmailResponse> update(@Validation(type = EmailUpdateValidationImpl.class) Email email) {
         return ResponseEntity.ok(contactEmailService.updateEmail(email));
     }
 }

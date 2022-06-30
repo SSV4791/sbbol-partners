@@ -4,12 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.ContactDocumentApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
+import ru.sberbank.pprb.sbbol.partners.validation.DocumentCreateValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.DocumentUpdateValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.DocumentsFilterValidationImpl;
 
 @RestController
 public class ContactDocumentController implements ContactDocumentApi {
@@ -21,7 +25,7 @@ public class ContactDocumentController implements ContactDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> create(DocumentCreate document) {
+    public ResponseEntity<DocumentResponse> create(@Validation(type = DocumentCreateValidationImpl.class) DocumentCreate document) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactDocumentService.saveDocument(document));
     }
 
@@ -37,12 +41,12 @@ public class ContactDocumentController implements ContactDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentsResponse> list(DocumentsFilter documentsFilter) {
+    public ResponseEntity<DocumentsResponse> list(@Validation(type = DocumentsFilterValidationImpl.class) DocumentsFilter documentsFilter) {
         return ResponseEntity.ok(contactDocumentService.getDocuments(documentsFilter));
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> update(DocumentChange document) {
+    public ResponseEntity<DocumentResponse> update(@Validation(type = DocumentUpdateValidationImpl.class) DocumentChange document) {
         return ResponseEntity.ok(contactDocumentService.updateDocument(document));
     }
 }

@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
@@ -146,9 +147,9 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
         );
         assertThat(addressError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(addressError.getText())
+        assertThat(addressError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (address.getVersion() - 1) +
-                " не равна версии записи в запросе version=" + version);
+            " не равна версии записи в запросе version=" + version);
     }
 
     @Test
