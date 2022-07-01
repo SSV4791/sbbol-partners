@@ -30,6 +30,109 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
+    @AllureId("34184")
+    void testCreatePartnerDocument() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var expected = getValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        var document = createValidPartnerDocument(expected);
+        assertThat(document)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "id",
+                "version",
+                "documentType"
+            )
+            .isEqualTo(expected);
+    }
+
+    @Test
+    void testCreateEmptyPartnerDocument() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var expected = getEmptyPartnerDocument(partner.getId(), partner.getDigitalId());
+        var document = createValidPartnerDocument(expected);
+        assertThat(document)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "id",
+                "version",
+                "documentType"
+            )
+            .isEqualTo(expected);
+    }
+
+    @Test
+    void testCreatePartnerDocumentWithoutDigitalId() {
+        List<String> errorText = List.of("Поля обязательны для заполнения digitalId");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var response = createPartnerDocumentWithErrors(partner.getId(), null);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response.getText()).isEqualTo(errorText);
+    }
+
+    @Test
+    void testCreatePartnerDocumentWithEmptyDigitalId() {
+        List<String> errorText = List.of("Поля обязательны для заполнения digitalId");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var response = createPartnerDocumentWithErrors(partner.getId(), "");
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response.getText()).isEqualTo(errorText);
+    }
+
+    @Test
+    void testCreatePartnerDocumentWithBadDigitalId() {
+        List<String> errorText = List.of("digitalId допустимая длина от 1 до 40 символов");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var response = createPartnerDocumentWithErrors(partner.getId(), RandomStringUtils.randomAlphanumeric(41));
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response.getText()).isEqualTo(errorText);
+    }
+
+    @Test
+    void testCreatePartnerDocumentWithoutUnifiedId() {
+        List<String> errorText = List.of("Поля обязательны для заполнения id/partnerId/unifiedId/documentTypeId");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var response = createPartnerDocumentWithErrors(null, partner.getDigitalId());
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response.getText()).isEqualTo(errorText);
+    }
+
+    @Test
+    void testCreatePartnerDocumentWithEmptyUnifiedId() {
+        List<String> errorText = List.of("Поля обязательны для заполнения id/partnerId/unifiedId/documentTypeId");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var response = createPartnerDocumentWithErrors("" ,partner.getDigitalId());
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response.getText()).isEqualTo(errorText);
+    }
+
+    @Test
+    void testCreatePartnerDocumentWithBadUnifiedId() {
+        List<String> errorText = List.of("Ошибка заполнения одного из полей id/partnerId/unifiedId/documentTypeId длина значения не равна 36");
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var response = createPartnerDocumentWithErrors(RandomStringUtils.randomAlphanumeric(37) ,partner.getDigitalId());
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        assertThat(response.getText()).isEqualTo(errorText);
+    }
+
+    @Test
     @AllureId("34115")
     void testGetPartnerDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
@@ -93,22 +196,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isEqualTo(4);
         assertThat(response2.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
-    }
-
-    @Test
-    @AllureId("34184")
-    void testCreatePartnerDocument() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var expected = getValidPartnerDocument(partner.getId(), partner.getDigitalId());
-        var document = createValidPartnerDocument(expected);
-        assertThat(document)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "id",
-                "version",
-                "documentType"
-            )
-            .isEqualTo(expected);
     }
 
     @Test
@@ -238,20 +325,33 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         return response.getDocument();
     }
 
+    private static Error createPartnerDocumentWithErrors(String partnerUuid, String digitalId) {
+        var response = post(baseRoutePath + "/document", HttpStatus.BAD_REQUEST, getValidPartnerDocument(partnerUuid, digitalId), Error.class);
+        assertThat(response)
+            .isNotNull();
+        return response;
+    }
+
     private static DocumentCreate getValidPartnerDocument(String partnerUuid, String digitalId) {
         return new DocumentCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
-            .certifierName("Имя")
+            .certifierName(RandomStringUtils.randomAlphabetic(100))
             .certifierType(CertifierType.NOTARY)
             .dateIssue(LocalDate.now())
-            .divisionCode("1111")
-            .divisionIssue("444")
-            .number("23")
-            .series("111")
-            .positionCertifier("12345")
-            .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2")
-            ;
+            .divisionCode(RandomStringUtils.randomAlphanumeric(50))
+            .divisionIssue(RandomStringUtils.randomAlphanumeric(250))
+            .number(RandomStringUtils.randomAlphanumeric(50))
+            .series(RandomStringUtils.randomAlphanumeric(50))
+            .positionCertifier(RandomStringUtils.randomAlphanumeric(100))
+            .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2");
+    }
+
+    private static DocumentCreate getEmptyPartnerDocument(String partnerUuid, String digitalId) {
+        return new DocumentCreate()
+            .unifiedId(partnerUuid)
+            .digitalId(digitalId)
+            .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2");
     }
 
     public static Document updateDocument(Document document) {
