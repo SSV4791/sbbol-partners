@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
+import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -32,14 +33,15 @@ import java.util.Map;
 )
 public interface AccountMapper extends BaseMapper {
 
-    @Mapping(target = "id", expression = "java(accounts.getUuid() == null ? null : accounts.getUuid().toString())")
-    @Mapping(target = "partnerId", expression = "java(accounts.getPartnerUuid() == null ? null : accounts.getPartnerUuid().toString())")
-    @Mapping(target = "budget", ignore = true)
+    @InheritConfiguration
     List<Account> toAccounts(List<AccountEntity> accounts);
 
-    @Mapping(target = "id", expression = "java(account.getUuid() == null ? null :account.getUuid().toString())")
+    @Mapping(target = "id", expression = "java(account.getUuid() == null ? null : account.getUuid().toString())")
     @Mapping(target = "partnerId", expression = "java(account.getPartnerUuid() == null ? null : account.getPartnerUuid().toString())")
     @Mapping(target = "budget", ignore = true)
+    Account toAccount(AccountEntity account);
+
+    @InheritConfiguration(name = "toAccount")
     Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
 
     @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")

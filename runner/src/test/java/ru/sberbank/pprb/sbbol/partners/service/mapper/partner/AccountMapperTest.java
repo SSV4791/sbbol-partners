@@ -23,6 +23,34 @@ class AccountMapperTest extends BaseUnitConfiguration {
     private static final AccountMapper mapper = Mappers.getMapper(AccountMapper.class);
 
     @Test
+    void testToAccount() {
+        var expected = factory.manufacturePojo(AccountEntity.class);
+        var actual = mapper.toAccount(expected);
+        assertThat(expected.getPartnerUuid().toString())
+            .isEqualTo(actual.getPartnerId());
+        assertThat(expected.getUuid().toString())
+            .isEqualTo(actual.getId());
+        assertThat(expected.getDigitalId())
+            .isEqualTo(actual.getDigitalId());
+        assertThat(expected.getAccount())
+            .isEqualTo(actual.getAccount());
+        assertThat(expected.getPriorityAccount())
+            .isEqualTo(actual.getPriorityAccount());
+        assertThat(expected.getVersion())
+            .isEqualTo(actual.getVersion());
+        assertThat(expected.getComment())
+            .isEqualTo(actual.getComment());
+        assertThat(expected.getBank().getName())
+            .isEqualTo(actual.getBank().getName());
+        assertThat(expected.getBank().getBic())
+            .isEqualTo(actual.getBank().getBic());
+        assertThat(expected.getBank().getIntermediary())
+            .isEqualTo(actual.getBank().getMediary());
+        assertThat(expected.getBank().getBankAccount().getAccount())
+            .isEqualTo(actual.getBank().getBankAccount().getBankAccount());
+    }
+
+    @Test
     @AllureId("34097")
     void testToAccountCreate() {
         var expected = factory.manufacturePojo(AccountCreate.class);
