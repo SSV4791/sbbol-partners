@@ -140,6 +140,59 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testCreatePartnerDocumentWithBadRequest() {
+        List<Descriptions> errorTexts = List.of(
+            new Descriptions()
+                .field("positionCertifier")
+                .message(
+                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 100")
+                ),
+            new Descriptions()
+                .field("number")
+                .message(
+                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 50")
+                ),
+            new Descriptions()
+                .field("divisionCode")
+                .message(
+                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 50")
+                ),
+            new Descriptions()
+                .field("series")
+                .message(
+                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 50")
+                ),
+            new Descriptions()
+                .field("divisionIssue")
+                .message(
+                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 250")
+                ),
+            new Descriptions()
+                .field("certifierName")
+                .message(
+                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 100")
+                )
+        );
+
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var partnerDocument = getValidPartnerDocument(partner.getId(), partner.getDigitalId())
+            .certifierName(RandomStringUtils.randomAlphabetic(101))
+            .series(RandomStringUtils.randomAlphanumeric(51))
+            .number(RandomStringUtils.randomAlphanumeric(51))
+            .divisionIssue(RandomStringUtils.randomAlphabetic(251))
+            .divisionCode(RandomStringUtils.randomAlphanumeric(51))
+            .positionCertifier(RandomStringUtils.randomAlphabetic(101));
+        var response = createPartnerWithErrors(partnerDocument);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+        for (var text : errorTexts) {
+            assertThat(errorTexts.contains(text)).isTrue();
+        }
+    }
+
+    @Test
     @AllureId("34115")
     void testGetPartnerDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
@@ -160,49 +213,104 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     @AllureId("34113")
-    void testViewPartnerDocument() {
+    void testViewPartnerDocumentWithExpectedQuantity() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
-        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
-        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
 
-        var filter1 = new DocumentsFilter()
+        var filterForQuantity = new DocumentsFilter()
             .digitalId(partner.getDigitalId())
             .unifiedIds(List.of(partner.getId()))
             .pagination(new Pagination()
-                .count(4)
+                .count(2)
                 .offset(0));
-        var response1 = post(
+        var responseForQuantity = post(
             baseRoutePath + "/documents/view",
             HttpStatus.OK,
-            filter1,
+            filterForQuantity,
             DocumentsResponse.class
         );
-        assertThat(response1)
+        assertThat(responseForQuantity)
             .isNotNull();
-        assertThat(response1.getDocuments().size())
-            .isEqualTo(4);
-        var filter2 = new DocumentsFilter()
+        assertThat(responseForQuantity.getDocuments().size())
+            .isEqualTo(2);
+    }
+
+    @Test
+    void testViewPartnerDocumentWithEmptyList() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+
+        var filterForQuantity = new DocumentsFilter()
+            .digitalId(partner.getDigitalId())
+            .unifiedIds(List.of(partner.getId()))
+            .pagination(new Pagination()
+                .count(2)
+                .offset(0));
+        var responseForQuantity = post(
+            baseRoutePath + "/documents/view",
+            HttpStatus.OK,
+            filterForQuantity,
+            DocumentsResponse.class
+        );
+        assertThat(responseForQuantity)
+            .isNotNull();
+        assertThat(responseForQuantity.getDocuments())
+            .isEqualTo(null);
+    }
+
+    @Test
+    void testViewPartnerDocumentWithExpectedDocumentType() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+
+        var filterForDocumentType = new DocumentsFilter()
             .digitalId(partner.getDigitalId())
             .unifiedIds(List.of(partner.getId()))
             .documentType("SEAMAN_PASSPORT")
             .pagination(new Pagination()
-                .count(4)
+                .count(2)
                 .offset(0));
-        var response2 = post(
+        var responseForDocumentType = post(
             baseRoutePath + "/documents/view",
             HttpStatus.OK,
-            filter2,
+            filterForDocumentType,
             DocumentsResponse.class
         );
-        assertThat(response2)
+        assertThat(responseForDocumentType)
             .isNotNull();
-        assertThat(response2.getDocuments().size())
-            .isEqualTo(4);
-        assertThat(response2.getPagination().getHasNextPage())
+        assertThat(responseForDocumentType.getDocuments().size())
+            .isEqualTo(2);
+        assertThat(responseForDocumentType.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
+    }
+
+    @Test
+    void testViewPartnerDocumentWithNotExpectedDocumentType() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+        createValidPartnerDocument(partner.getId(), partner.getDigitalId());
+
+        var filterForDocumentType = new DocumentsFilter()
+            .digitalId(partner.getDigitalId())
+            .unifiedIds(List.of(partner.getId()))
+            .documentType("PASSPORT_OF_RUSSIA")
+            .pagination(new Pagination()
+                .count(2)
+                .offset(0));
+        var responseForDocumentType = post(
+            baseRoutePath + "/documents/view",
+            HttpStatus.OK,
+            filterForDocumentType,
+            DocumentsResponse.class
+        );
+        assertThat(responseForDocumentType)
+            .isNotNull();
+        assertThat(responseForDocumentType.getDocuments())
+            .isEqualTo(null);
     }
 
     @Test
@@ -334,6 +442,13 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     private static Error createPartnerDocumentWithErrors(String partnerUuid, String digitalId) {
         var response = post(baseRoutePath + "/document", HttpStatus.BAD_REQUEST, getValidPartnerDocument(partnerUuid, digitalId), Error.class);
+        assertThat(response)
+            .isNotNull();
+        return response;
+    }
+
+    private static Error createPartnerWithErrors(DocumentCreate document) {
+        var response = post(baseRoutePath + "/document", HttpStatus.BAD_REQUEST, document, Error.class);
         assertThat(response)
             .isNotNull();
         return response;
