@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
@@ -18,10 +17,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountChangePriorityValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountCreateValidatorImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountUpdateValidatorImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountsFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -61,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional(readOnly = true)
-    public AccountsResponse getAccounts(@Validation(type = AccountsFilterValidationImpl.class) AccountsFilter accountsFilter) {
+    public AccountsResponse getAccounts(AccountsFilter accountsFilter) {
         var accountsResponse = new AccountsResponse();
         var response = accountRepository.findByFilter(accountsFilter);
         for (var entity : response) {
@@ -84,7 +79,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse saveAccount(@Validation(type = AccountCreateValidatorImpl.class) AccountCreate account) {
+    public AccountResponse saveAccount(AccountCreate account) {
         var requestAccount = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(requestAccount);
@@ -106,7 +101,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse updateAccount(@Validation(type = AccountUpdateValidatorImpl.class) AccountChange account) {
+    public AccountResponse updateAccount(AccountChange account) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
         accountMapper.updateAccount(account, foundAccount);
@@ -151,7 +146,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse changePriority(@Validation(type = AccountChangePriorityValidationImpl.class) AccountPriority accountPriority) {
+    public AccountResponse changePriority(AccountPriority accountPriority) {
         var digitalId = accountPriority.getDigitalId();
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountPriority.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountPriority.getId()));

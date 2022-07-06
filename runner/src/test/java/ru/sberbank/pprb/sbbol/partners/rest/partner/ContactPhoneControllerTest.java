@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -265,7 +266,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         );
         assertThat(phoneError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(phoneError.getText())
+        assertThat(phoneError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (phone.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

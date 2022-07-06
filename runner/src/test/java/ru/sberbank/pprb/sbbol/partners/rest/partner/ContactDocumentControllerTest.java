@@ -8,6 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
@@ -154,7 +155,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         );
         assertThat(documentError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(documentError.getText())
+        assertThat(documentError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
@@ -20,8 +19,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountSignValidatorImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountsSignFilterValidationImpl;
 
 import java.util.UUID;
 
@@ -52,7 +49,7 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     @Override
     @Transactional(readOnly = true)
-    public AccountsSignResponse getAccountsSign(@Validation(type = AccountsSignFilterValidationImpl.class) AccountsSignFilter filter) {
+    public AccountsSignResponse getAccountsSign(AccountsSignFilter filter) {
         var foundSignedAccounts = accountRepository.findByFilter(filter);
         var accountsSignResponse = new AccountsSignResponse();
         for (AccountEntity account : foundSignedAccounts) {
@@ -74,7 +71,7 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     @Override
     @Transactional
-    public AccountsSignInfoResponse createAccountsSign(@Validation(type = AccountSignValidatorImpl.class) AccountsSignInfo accountsSign) {
+    public AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign) {
         var response = new AccountsSignInfoResponse();
         response.setDigitalId(accountsSign.getDigitalId());
         for (var accountSign : accountsSign.getAccountsSignDetail()) {

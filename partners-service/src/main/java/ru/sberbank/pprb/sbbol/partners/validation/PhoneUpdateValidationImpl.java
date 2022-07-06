@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
+import java.util.Map;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 
@@ -12,6 +13,8 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePhoneValidation.commonValidationChildPhone;
+
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class PhoneUpdateValidationImpl extends AbstractValidatorImpl<Phone> {
     private static final String DOCUMENT_NAME = "phone";
@@ -23,22 +26,22 @@ public class PhoneUpdateValidationImpl extends AbstractValidatorImpl<Phone> {
 
     @Override
     @Transactional(readOnly = true)
-    public void validator(List<String> errors, Phone entity) {
+    public void validator(Map<String, List<String>> errors, Phone entity) {
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
         commonValidationDigitalId(errors, entity.getDigitalId());
         commonValidationUuid(errors, entity.getUnifiedId(), entity.getId());
         if (!entity.getVersion().equals(foundPhone.getVersion())) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPhone.getVersion().toString(), entity.getVersion().toString()));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPhone.getVersion().toString(), entity.getVersion().toString()));
         }
         if (entity.getPhone().equals(EMPTY)) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "phone"));
+            setError(errors, "phone", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "номер телефона"));
         }
         if (StringUtils.isNotEmpty(entity.getPhone())) {
             commonValidationChildPhone(errors, entity.getPhone());
         }
         if (entity.getVersion() == null) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "version"));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, "version"));
         }
     }
 }

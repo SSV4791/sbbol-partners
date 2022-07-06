@@ -7,9 +7,11 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountSignViewRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class AccountSignValidatorImpl extends AbstractValidatorImpl<AccountsSignInfo> {
     private static final String DEFAULT_MESSAGE_ACCOUNT_SIGN_IS_TRUE = "account.account.sign.is_true";
@@ -20,7 +22,7 @@ public class AccountSignValidatorImpl extends AbstractValidatorImpl<AccountsSign
     }
 
     @Override
-    public void validator(List<String> errors, AccountsSignInfo entity) {
+    public void validator(Map<String, List<String>> errors, AccountsSignInfo entity) {
         commonValidationDigitalId(errors, entity.getDigitalId());
         if (!isEmpty(entity.getAccountsSignDetail())) {
             var accountsId = entity.getAccountsSignDetail().stream()
@@ -33,7 +35,7 @@ public class AccountSignValidatorImpl extends AbstractValidatorImpl<AccountsSign
             var viewAccount = accountRepository.findByFilter(accountsFilter);
             for (var account : viewAccount) {
                 if (account.getUuid() != null) {
-                    errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_SIGN_IS_TRUE, account.getUuid().toString()));
+                    setError(errors, "account", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_SIGN_IS_TRUE, account.getUuid().toString()));
                 }
             }
         }

@@ -3,6 +3,8 @@ package ru.sberbank.pprb.sbbol.partners.aspect.validation.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.mapper.ValidationMapper;
+import ru.sberbank.pprb.sbbol.partners.aspect.validation.mapper.ValidationMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -251,5 +253,10 @@ public class ValidationConfiguration {
     Validator<DocumentTypeChange> documentTypeUpdate(
     ) {
         return new DocumentTypeUpdateValidationImpl();
+    }
+
+    @Bean
+    ValidationMapper validationMapper() {
+        return new ValidationMapperImpl();
     }
 }

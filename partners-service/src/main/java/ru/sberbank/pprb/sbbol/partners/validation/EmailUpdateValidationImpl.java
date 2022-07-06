@@ -8,11 +8,12 @@ import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseEmailValidation.commonValidationChildEmail;
-
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class EmailUpdateValidationImpl extends AbstractValidatorImpl<Email> {
     private static final String DOCUMENT_NAME = "document";
@@ -24,23 +25,23 @@ public class EmailUpdateValidationImpl extends AbstractValidatorImpl<Email> {
 
     @Override
     @Transactional(readOnly = true)
-    public void validator(List<String> errors, Email entity) {
+    public void validator(Map<String, List<String>> errors, Email entity) {
         commonValidationDigitalId(errors, entity.getDigitalId());
         commonValidationUuid(errors, entity.getUnifiedId(), entity.getId());
         var uuid = UUID.fromString(entity.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(entity.getDigitalId(), uuid)
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
         if (!entity.getVersion().equals(foundEmail.getVersion())) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundEmail.getVersion().toString(), entity.getVersion().toString()));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundEmail.getVersion().toString(), entity.getVersion().toString()));
         }
         if (entity.getEmail().equals(EMPTY)) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "email"));
+            setError(errors, "email", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "email"));
         }
         if (StringUtils.isNotEmpty(entity.getEmail())) {
             commonValidationChildEmail(errors, entity.getEmail());
         }
         if (entity.getVersion() == null) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "version"));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, "version"));
         }
     }
 }

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.Descriptions",
+  "type": "object",
+  "properties": {
+    "field": {
+      "type": "string",
+      "title": "Код ошибки"
+    },
+    "message": {
+      "type": "array",
+      "title": "Описание ошибки клиента",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

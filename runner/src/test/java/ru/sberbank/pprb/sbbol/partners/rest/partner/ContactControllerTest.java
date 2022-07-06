@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
@@ -462,7 +463,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         );
         assertThat(contactError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(contactError.getText())
+        assertThat(contactError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (contact.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

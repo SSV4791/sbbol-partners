@@ -5,7 +5,11 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validator;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 abstract class AbstractValidatorImpl<T> implements Validator<T> {
 
@@ -43,40 +47,40 @@ abstract class AbstractValidatorImpl<T> implements Validator<T> {
 
     private static final int ID_LENGTH = 36;
     private static final int DIGITAL_ID_MAX_LENGTH = 40;
-    private static final String DOCUMENT = "partnerId/unifiedId/id";
+    private static final String KEY_DIGITAL_ID = "digitalId";
+    private static final String KEY_UUID = "id/partnerId/accountId/unifiedId";
 
-    protected static final String DEFAULT_MESSAGE_FIELDS_IS_LENGTH = "default.fields.length";
-    protected static final String DEFAULT_MESSAGE_FIELD_IS_NULL = "default.field.is_null";
+    protected static final String DEFAULT_LENGTH = "default.field.length";
+    protected static final String DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL = "default.field.is_null";
     protected static final String DEFAULT_MESSAGE_FIELDS_IS_NULL = "default.fields.is_null";
-    protected static final String DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER = "default.field.control_number";
     protected static final String DEFAULT_MESSAGE_FIELDS_DUPLICATION = "default.fields.duplication";
     protected static final String DEFAULT_MESSAGE_VERSION_ERROR = "default.fields.object_version_error";
     protected static final String DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR = "default.fields.object_not_found";
 
 
-    protected void commonValidationDigitalId(List<String> errors, String digitalId) {
+    protected void commonValidationDigitalId(Map<String, List<String>> errors, String digitalId) {
         if (StringUtils.isEmpty(digitalId)) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, "digitalId"));
+            setError(errors, KEY_DIGITAL_ID, MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, KEY_DIGITAL_ID));
         } else if (StringUtils.isNotEmpty(digitalId) && digitalId.length() > DIGITAL_ID_MAX_LENGTH) {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, "digitalId", "1", "40"));
+            setError(errors, KEY_DIGITAL_ID, MessagesTranslator.toLocale(DEFAULT_LENGTH, "1-40"));
         }
     }
 
-    protected void commonValidationUuid(List<String> errors, String... uuid) {
-        commonValidationUuid(errors, List.of(uuid));
+    protected void commonValidationUuid(Map<String, List<String>> errors, String... uuid) {
+        commonValidationUuid(errors, Arrays.asList(uuid));
     }
 
-    protected void commonValidationUuid(List<String> errors, List<String> uuid) {
+    protected void commonValidationUuid(Map<String, List<String>> errors, List<String> uuid) {
         if (!CollectionUtils.isEmpty(uuid)) {
             for (String id : uuid) {
                 if (StringUtils.isEmpty(id)) {
-                    errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, DOCUMENT));
+                    setError(errors, KEY_UUID, MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, KEY_UUID));
                 } else if (StringUtils.isNotEmpty(id) && id.length() != ID_LENGTH) {
-                    errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_LENGTH, DOCUMENT, "36", "36"));
+                    setError(errors, KEY_UUID, MessagesTranslator.toLocale(DEFAULT_LENGTH, "36"));
                 }
             }
         } else {
-            errors.add(MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELD_IS_NULL, DOCUMENT));
+            setError(errors, KEY_UUID, MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, KEY_UUID));
         }
     }
 }

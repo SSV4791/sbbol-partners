@@ -8,7 +8,10 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class AccountChangePriorityValidationImpl extends AbstractValidatorImpl<AccountPriority> {
     private final AccountRepository accountRepository;
@@ -19,7 +22,7 @@ public class AccountChangePriorityValidationImpl extends AbstractValidatorImpl<A
 
     @Override
     @Transactional(readOnly = true)
-    public void validator(List<String> errors, AccountPriority entity) {
+    public void validator(Map<String, List<String>> errors, AccountPriority entity) {
         var digitalId = entity.getDigitalId();
         var accountId = entity.getId();
         if (entity.getPriorityAccount()) {
@@ -28,7 +31,7 @@ public class AccountChangePriorityValidationImpl extends AbstractValidatorImpl<A
             var foundPriorityAccounts = accountRepository
                 .findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(digitalId, findAccount.getPartnerUuid());
             if (!CollectionUtils.isEmpty(foundPriorityAccounts)) {
-                errors.add(MessagesTranslator.toLocale("У пользователя digitalId: " + digitalId + "партнера " + findAccount.getPartnerUuid() + " уже есть приоритетные счета"));
+                setError(errors, "account", MessagesTranslator.toLocale("У пользователя digitalId: " + digitalId + "партнёра " + findAccount.getPartnerUuid() + " уже есть приоритетные счета"));
             }
         }
         commonValidationUuid(errors, entity.getId());

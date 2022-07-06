@@ -2,14 +2,12 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.validation.EmailCreateValidationImpl;
 
 import java.util.UUID;
 
@@ -29,7 +27,7 @@ public class PartnerEmailServiceImpl extends EmailServiceImpl {
 
     @Override
     @Transactional
-    public EmailResponse saveEmail(@Validation(type = EmailCreateValidationImpl.class) EmailCreate email) {
+    public EmailResponse saveEmail(EmailCreate email) {
         var uuid = UUID.fromString(email.getUnifiedId());
         var partner = partnerRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid);
         if (partner.isEmpty()) {

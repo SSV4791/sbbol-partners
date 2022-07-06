@@ -60,7 +60,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     @Test
     @AllureId("34122")
     void testCreateAccount() {
-        var account = getValidAccount(randomAlphabetic(36), randomAlphabetic(10));
+        var account = getValidAccount("bcd979a0-47ab-4337-84b8-8b4160448391", randomAlphabetic(10));
         var response = post(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
             .isNotNull();
