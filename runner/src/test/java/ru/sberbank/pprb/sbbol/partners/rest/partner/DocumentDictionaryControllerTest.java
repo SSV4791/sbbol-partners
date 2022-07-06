@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 
 import java.util.Collections;
@@ -27,7 +28,13 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/dictionary/documents";
 
-    private static final DocumentTypeFilter defaultFilter = new DocumentTypeFilter().deleted(false);
+    private static final DocumentTypeFilter defaultFilter = new DocumentTypeFilter()
+        .deleted(false)
+        .pagination(
+            new Pagination()
+                .offset(0)
+                .count(20)
+        );
 
     @Autowired
     private DocumentDictionaryRepository documentDictionaryRepository;
@@ -35,12 +42,12 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
 
     @AfterEach
     void dropEntity() {
-            if (isNotEmpty(saveDocument) && isNotEmpty(saveDocument.getDocumentType())) {
-                documentDictionaryRepository.deleteById(
-                    UUID.fromString(saveDocument.getDocumentType().getId())
-                );
-                saveDocument.setDocumentType(null);
-            }
+        if (isNotEmpty(saveDocument) && isNotEmpty(saveDocument.getDocumentType())) {
+            documentDictionaryRepository.deleteById(
+                UUID.fromString(saveDocument.getDocumentType().getId())
+            );
+            saveDocument.setDocumentType(null);
+        }
     }
 
     @Test
@@ -58,6 +65,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     void testGetDocumentsWhenLegalFormIsMatched() {
         var filter = new DocumentTypeFilter()
             .deleted(false)
+            .pagination(new Pagination().offset(0).count(4))
             .legalForms(List.of(ENTREPRENEUR));
         var response = post(baseRoutePath + "/view", HttpStatus.OK, filter, DocumentsTypeResponse.class);
         assertThat(response)
@@ -245,7 +253,9 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
 
         delete(baseRoutePath + "/{id}", HttpStatus.NO_CONTENT, saveDocument.getDocumentType().getId());
 
-        var filter = new DocumentTypeFilter().deleted(true);
+        var filter = new DocumentTypeFilter()
+            .deleted(true)
+            .pagination(new Pagination().offset(0).count(4));
         var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, filter, DocumentsTypeResponse.class);
         assertThat(searchDocument.getDocumentType().stream()
             .map(DocumentType::getDocumentType)

@@ -11,6 +11,10 @@
         "$ref": "document_type.json"
       }
     },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса Партнеров"
+    },
     "errors": {
       "type": "array",
       "items": {

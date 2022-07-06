@@ -26,11 +26,11 @@ public class DocumentDictionaryViewRepositoryImpl extends BaseRepository<Documen
 
     @Override
     void createPredicate(CriteriaBuilder builder, CriteriaQuery<DocumentTypeEntity> criteria, List<Predicate> predicates, Root<DocumentTypeEntity> root, DocumentTypeFilter filter) {
-        predicates.add(builder.equal(root.get("deleted"), filter.getDeleted()));
         if (!CollectionUtils.isEmpty(filter.getLegalForms())) {
             Join<DocumentTypeEntity, DocumentTypeLegalFormEntity> legalForm = root.join("legalForms");
             predicates.add(legalForm.get("legalForm").in(filter.getLegalForms().stream().map(LegalForm::getValue).collect(toList())));
         }
+        predicates.add(builder.equal(root.get("deleted"), filter.getDeleted()));
     }
 
     @Override
@@ -40,6 +40,11 @@ public class DocumentDictionaryViewRepositoryImpl extends BaseRepository<Documen
 
     @Override
     void pagination(TypedQuery<DocumentTypeEntity> query, DocumentTypeFilter filter) {
+        if (filter.getPagination() != null) {
+            var pagination = filter.getPagination();
+            query.setFirstResult(pagination.getOffset());
+            query.setMaxResults(pagination.getCount() + 1);
+        }
     }
 
     @Override
