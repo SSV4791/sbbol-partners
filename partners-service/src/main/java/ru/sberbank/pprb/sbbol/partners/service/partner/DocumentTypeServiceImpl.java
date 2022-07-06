@@ -10,9 +10,9 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Loggable
@@ -30,8 +30,21 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Override
     @Transactional(readOnly = true)
     public DocumentsTypeResponse getDocuments(DocumentTypeFilter filter) {
-        List<DocumentTypeEntity> response = dictionaryRepository.findByFilter(filter);
-        return new DocumentsTypeResponse().documentType(documentTypeMapper.toDocumentType(response));
+        var response = dictionaryRepository.findByFilter(filter);
+        var documentsTypeResponse = new DocumentsTypeResponse();
+        documentsTypeResponse.documentType(documentTypeMapper.toDocumentType(response));
+        var pagination = filter.getPagination();
+        documentsTypeResponse.setPagination(
+            new Pagination()
+                .offset(pagination.getOffset())
+                .count(pagination.getCount())
+        );
+        var size = response.size();
+        if (pagination.getCount() < size) {
+            documentsTypeResponse.getPagination().hasNextPage(Boolean.TRUE);
+            documentsTypeResponse.getDocumentType().remove(size - 1);
+        }
+        return documentsTypeResponse;
     }
 
     @Override
