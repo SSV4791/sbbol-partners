@@ -24,7 +24,6 @@ pr_check:
       path: jenkins/resources/liquibase/liquibase.properties
   openshift:
     workdir: openshift
-
     match:
       files:
         - 'openshift/'
@@ -34,9 +33,13 @@ pr_check:
   build_gradle:
     match:
       files:
+        - 'migration-service/'
         - 'partners-adapter/'
+        - 'partners-api/'
         - 'partners-openapi/'
+        - 'partners-rest/'
         - 'partners-service/'
+        - 'runner/'
         - 'buildSrc/'
         - 'docs/'
         - 'build.gradle.kts'
