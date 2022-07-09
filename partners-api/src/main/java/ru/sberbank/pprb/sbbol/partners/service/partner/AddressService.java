@@ -2,10 +2,8 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
-import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 /**
  * Сервис по работе с адресами
@@ -19,7 +17,7 @@ public interface AddressService {
      * @param id        Идентификатор документа
      * @return Адрес
      */
-    AddressResponse getAddress(String digitalId, String id);
+    Address getAddress(String digitalId, String id);
 
     /**
      * Получение списка адресов по заданному фильтру
@@ -35,7 +33,7 @@ public interface AddressService {
      * @param address данные адреса
      * @return Адрес
      */
-    AddressResponse saveAddress(AddressCreate address);
+    Address saveAddress(AddressCreate address);
 
     /**
      * Обновление адреса
@@ -43,7 +41,7 @@ public interface AddressService {
      * @param address данные адреса
      * @return Адрес
      */
-    AddressResponse updateAddress(Address address);
+    Address updateAddress(Address address);
 
     /**
      * Удаление адреса

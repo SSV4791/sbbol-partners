@@ -7,6 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
@@ -68,8 +69,10 @@ public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, Par
         }
         if (filter.getAccountSignType() != null) {
             var accounts = switch (filter.getAccountSignType()) {
-                case SIGNED -> accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(PartnersFilter.AccountSignTypeEnum.SIGNED.name()));
-                case NOT_SIGNED -> accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(PartnersFilter.AccountSignTypeEnum.NOT_SIGNED.name()));
+                case SIGNED ->
+                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(SignType.SIGNED.name()));
+                case NOT_SIGNED ->
+                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(SignType.NOT_SIGNED.name()));
             };
             predicates.add(root.get("uuid").in(accounts.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
         }

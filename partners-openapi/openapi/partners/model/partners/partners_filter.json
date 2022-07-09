@@ -17,12 +17,7 @@
       "$ref": "../common/partner_filter_type.json"
     },
     "accountSignType": {
-      "type": "string",
-      "title": "Фильтр по видам счетов партнеров",
-      "enum": [
-        "SIGNED",
-        "NOT_SIGNED"
-      ]
+      "$ref": "../common/sign_type.json"
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",

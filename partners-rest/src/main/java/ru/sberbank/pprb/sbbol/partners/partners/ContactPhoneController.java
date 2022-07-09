@@ -7,7 +7,6 @@ import ru.sberbank.pprb.sbbol.partners.ContactPhoneApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PhoneService;
@@ -25,7 +24,7 @@ public class ContactPhoneController implements ContactPhoneApi {
     }
 
     @Override
-    public ResponseEntity<PhoneResponse> create(@Validation(type = PhoneCreateValidationImpl.class) PhoneCreate phone) {
+    public ResponseEntity<Phone> create(@Validation(type = PhoneCreateValidationImpl.class) PhoneCreate phone) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactPhoneService.savePhone(phone));
     }
 
@@ -41,7 +40,7 @@ public class ContactPhoneController implements ContactPhoneApi {
     }
 
     @Override
-    public ResponseEntity<PhoneResponse> update(@Validation(type = PhoneUpdateValidationImpl.class) Phone phone) {
+    public ResponseEntity<Phone> update(@Validation(type = PhoneUpdateValidationImpl.class) Phone phone) {
         return ResponseEntity.ok(contactPhoneService.updatePhone(phone));
     }
 }

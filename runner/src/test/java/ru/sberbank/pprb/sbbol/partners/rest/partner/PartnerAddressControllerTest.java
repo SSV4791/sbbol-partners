@@ -8,7 +8,6 @@ import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
-import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
@@ -37,12 +36,10 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                AddressResponse.class,
+                Address.class,
                 address.getDigitalId(), address.getId()
             );
         assertThat(actualAddress)
-            .isNotNull();
-        assertThat(actualAddress.getAddress())
             .isNotNull()
             .isEqualTo(address);
     }
@@ -120,16 +117,14 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/address",
             HttpStatus.OK,
             updateAddress(address),
-            AddressResponse.class
+            Address.class
         );
         assertThat(newUpdateAddress)
             .isNotNull();
-        assertThat(newUpdateAddress.getAddress().getStreet())
-            .isEqualTo(newUpdateAddress.getAddress().getStreet());
-        assertThat(newUpdateAddress.getAddress().getStreet())
+        assertThat(newUpdateAddress.getStreet())
+            .isEqualTo(newUpdateAddress.getStreet());
+        assertThat(newUpdateAddress.getStreet())
             .isNotEqualTo(address.getStreet());
-        assertThat(newUpdateAddress.getErrors())
-            .isNull();
     }
 
     @Test
@@ -161,19 +156,17 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/address",
             HttpStatus.OK,
             updateAddress(address),
-            AddressResponse.class
+            Address.class
         );
         var checkAddress = get(
             baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AddressResponse.class,
-            addressUpdate.getAddress().getDigitalId(), addressUpdate.getAddress().getId());
+            Address.class,
+            addressUpdate.getDigitalId(), addressUpdate.getId());
         assertThat(checkAddress)
             .isNotNull();
-        assertThat(checkAddress.getAddress().getVersion())
+        assertThat(checkAddress.getVersion())
             .isEqualTo(address.getVersion() + 1);
-        assertThat(checkAddress.getErrors())
-            .isNull();
     }
 
     @Test
@@ -185,13 +178,10 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                AddressResponse.class,
+                Address.class,
                 address.getDigitalId(), address.getId()
             );
         assertThat(actualAddress)
-            .isNotNull();
-
-        assertThat(actualAddress.getAddress())
             .isNotNull()
             .isEqualTo(address);
 
@@ -199,7 +189,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             delete(
                 baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
                 HttpStatus.NO_CONTENT,
-                actualAddress.getAddress().getDigitalId(), actualAddress.getAddress().getId()
+                actualAddress.getDigitalId(), actualAddress.getId()
             ).getBody();
         assertThat(deleteAddress)
             .isNotNull();
@@ -220,31 +210,21 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
     }
 
     private static Address createValidAddress(String partnerUuid, String digitalId) {
-        var response = post(
+        return post(
             baseRoutePath + "/address",
             HttpStatus.CREATED,
             getValidPartnerAddress(partnerUuid, digitalId),
-            AddressResponse.class
+            Address.class
         );
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getAddress();
     }
 
     private static Address createValidAddress(AddressCreate address) {
-        var response = post(
+        return post(
             baseRoutePath + "/address",
             HttpStatus.CREATED,
             address,
-            AddressResponse.class
+            Address.class
         );
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getAddress();
     }
 
     private static AddressCreate getValidPartnerAddress(String partnerUuid, String digitalId) {

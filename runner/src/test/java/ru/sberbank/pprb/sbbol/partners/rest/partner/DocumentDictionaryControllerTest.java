@@ -9,7 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -38,13 +37,13 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
 
     @Autowired
     private DocumentDictionaryRepository documentDictionaryRepository;
-    private DocumentTypeResponse saveDocument;
+    private DocumentType saveDocument;
 
     @AfterEach
     void dropEntity() {
         if (isNotEmpty(saveDocument) && isNotEmpty(saveDocument.getDocumentType())) {
             documentDictionaryRepository.deleteById(
-                UUID.fromString(saveDocument.getDocumentType().getId())
+                UUID.fromString(saveDocument.getId())
             );
             saveDocument.setDocumentType(null);
         }
@@ -82,18 +81,18 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_CREATE_TYPE2")
             .description("Описание для создания")
             .legalForms(legalForms);
-        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentType.class);
         assertThat(saveDocument)
             .isNotNull();
-        assertThat(saveDocument.getDocumentType())
+        assertThat(saveDocument)
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(mapToDocumentType(documentTypeCreate));
-        assertThat(saveDocument.getDocumentType().getLegalForms())
+        assertThat(saveDocument.getLegalForms())
             .containsAll(legalForms);
         var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, defaultFilter, DocumentsTypeResponse.class);
         assertThat(searchDocument.getDocumentType())
-            .contains(saveDocument.getDocumentType());
+            .contains(saveDocument);
     }
 
     @Test
@@ -140,29 +139,27 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_NOT_CHANGE")
             .description("Описание для обновления")
             .legalForms(legalForms);
-        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentType.class);
         assertThat(saveDocument)
             .isNotNull();
-        assertThat(saveDocument.getDocumentType())
+        assertThat(saveDocument)
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(mapToDocumentType(documentTypeCreate));
 
-        var newSaveDocument = saveDocument.getDocumentType();
+        var newSaveDocument = saveDocument;
         newSaveDocument.setDocumentType("SUPER_NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_NOT_CHANGE");
 
-        var updateDocument = put(baseRoutePath, HttpStatus.OK, newSaveDocument, DocumentTypeResponse.class);
+        var updateDocument = put(baseRoutePath, HttpStatus.OK, newSaveDocument, DocumentType.class);
         assertThat(updateDocument)
-            .isNotNull();
-
-        assertThat(updateDocument.getDocumentType())
+            .isNotNull()
             .isEqualTo(newSaveDocument);
-        assertThat(updateDocument.getDocumentType().getLegalForms())
+        assertThat(updateDocument.getLegalForms())
             .containsAll(legalForms);
 
         var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, defaultFilter, DocumentsTypeResponse.class);
         assertThat(searchDocument.getDocumentType())
-            .contains(updateDocument.getDocumentType());
+            .contains(updateDocument);
     }
 
     @Test
@@ -173,30 +170,28 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_IS_DELETED")
             .description("Описание для обновления")
             .legalForms(legalForms);
-        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentType.class);
         assertThat(saveDocument)
             .isNotNull();
-        assertThat(saveDocument.getDocumentType())
+        assertThat(saveDocument)
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(mapToDocumentType(documentTypeCreate));
 
-        var newSaveDocument = saveDocument.getDocumentType();
+        var newSaveDocument = saveDocument;
         newSaveDocument.setDocumentType("SUPER_NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_IS_DELETED");
         newSaveDocument.getLegalForms().remove(ENTREPRENEUR);
 
-        var updateDocument = put(baseRoutePath, HttpStatus.OK, newSaveDocument, DocumentTypeResponse.class);
+        var updateDocument = put(baseRoutePath, HttpStatus.OK, newSaveDocument, DocumentType.class);
         assertThat(updateDocument)
-            .isNotNull();
-
-        assertThat(updateDocument.getDocumentType())
+            .isNotNull()
             .isEqualTo(newSaveDocument);
-        assertThat(updateDocument.getDocumentType().getLegalForms())
+        assertThat(updateDocument.getLegalForms())
             .isEqualTo(List.of(PHYSICAL_PERSON));
 
         var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, defaultFilter, DocumentsTypeResponse.class);
         assertThat(searchDocument.getDocumentType())
-            .contains(updateDocument.getDocumentType());
+            .contains(updateDocument);
     }
 
     @Test
@@ -207,32 +202,32 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_IS_EMPTY")
             .description("Описание для обновления")
             .legalForms(legalForms);
-        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentType.class);
         assertThat(saveDocument)
             .isNotNull();
-        assertThat(saveDocument.getDocumentType())
+        assertThat(saveDocument)
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(mapToDocumentType(documentTypeCreate));
 
-        var newSaveDocument = saveDocument.getDocumentType();
+        var newSaveDocument = saveDocument;
         newSaveDocument.setDocumentType("SUPER_NEW_UPDATE_TYPE_WHEN_LEGAL_FORM_IS_EMPTY");
         newSaveDocument.getLegalForms().clear();
 
-        var updateDocument = put(baseRoutePath, HttpStatus.OK, newSaveDocument, DocumentTypeResponse.class);
+        var updateDocument = put(baseRoutePath, HttpStatus.OK, newSaveDocument, DocumentType.class);
         assertThat(updateDocument)
             .isNotNull();
 
-        assertThat(updateDocument.getDocumentType())
+        assertThat(updateDocument)
             .usingRecursiveComparison()
             .ignoringFields("legalForms")
             .isEqualTo(newSaveDocument);
-        assertThat(updateDocument.getDocumentType().getLegalForms())
+        assertThat(updateDocument.getLegalForms())
             .containsAll(legalForms);
 
         var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, defaultFilter, DocumentsTypeResponse.class);
         assertThat(searchDocument.getDocumentType())
-            .contains(updateDocument.getDocumentType());
+            .contains(updateDocument);
     }
 
     @Test
@@ -243,15 +238,15 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .documentType("NEW_DELETE_TYPE")
             .description("Описание для удаления")
             .legalForms(legalForms);
-        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentTypeResponse.class);
+        saveDocument = post(baseRoutePath, HttpStatus.CREATED, documentTypeCreate, DocumentType.class);
         assertThat(saveDocument)
             .isNotNull();
-        assertThat(saveDocument.getDocumentType())
+        assertThat(saveDocument)
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(mapToDocumentType(documentTypeCreate));
 
-        delete(baseRoutePath + "/{id}", HttpStatus.NO_CONTENT, saveDocument.getDocumentType().getId());
+        delete(baseRoutePath + "/{id}", HttpStatus.NO_CONTENT, saveDocument.getId());
 
         var filter = new DocumentTypeFilter()
             .deleted(true)

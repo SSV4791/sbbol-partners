@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAccountsApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
-import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
@@ -27,12 +27,12 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> change(@Validation(type = AccountChangePriorityValidationImpl.class)  AccountPriority accountPriority) {
+    public ResponseEntity<Account> change(@Validation(type = AccountChangePriorityValidationImpl.class)  AccountPriority accountPriority) {
         return ResponseEntity.ok(accountService.changePriority(accountPriority));
     }
 
     @Override
-    public ResponseEntity<AccountResponse> create(@Validation(type = AccountCreateValidatorImpl.class) AccountCreate account) {
+    public ResponseEntity<Account> create(@Validation(type = AccountCreateValidatorImpl.class) AccountCreate account) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.saveAccount(account));
     }
 
@@ -43,7 +43,7 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> getById(String id, String digitalId) {
+    public ResponseEntity<Account> getById(String id, String digitalId) {
         return ResponseEntity.ok(accountService.getAccount(id, digitalId));
     }
 
@@ -53,7 +53,7 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<AccountResponse> update(@Validation(type = AccountUpdateValidatorImpl.class) AccountChange account) {
+    public ResponseEntity<Account> update(@Validation(type = AccountUpdateValidatorImpl.class) AccountChange account) {
         return ResponseEntity.ok(accountService.updateAccount(account));
     }
 }

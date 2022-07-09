@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 
@@ -18,7 +18,7 @@ public interface DocumentService {
      * @param id        Идентификатор документа
      * @return Документ
      */
-    DocumentResponse getDocument(String digitalId, String id);
+    Document getDocument(String digitalId, String id);
 
     /**
      * Получение списка документов партнеров по заданному фильтру
@@ -34,7 +34,7 @@ public interface DocumentService {
      * @param document данные документа
      * @return Документ
      */
-    DocumentResponse saveDocument(DocumentCreate document);
+    Document saveDocument(DocumentCreate document);
 
     /**
      * Обновление документа
@@ -42,7 +42,7 @@ public interface DocumentService {
      * @param document новые данные документа
      * @return Документ
      */
-    DocumentResponse updateDocument(DocumentChange document);
+    Document updateDocument(DocumentChange document);
 
     /**
      * Удаление документа

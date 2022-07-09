@@ -1,9 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
-import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 
@@ -19,7 +19,7 @@ public interface AccountService {
      * @param id        Идентификатор счёта
      * @return Счёт
      */
-    AccountResponse getAccount(String digitalId, String id);
+    Account getAccount(String digitalId, String id);
 
     /**
      * Получение списка счётов партнеров по заданному фильтру
@@ -35,7 +35,7 @@ public interface AccountService {
      * @param account данные счёта Партнера
      * @return Счёт
      */
-    AccountResponse saveAccount(AccountCreate account);
+    Account saveAccount(AccountCreate account);
 
     /**
      * Обновление счёта Партнера
@@ -43,7 +43,7 @@ public interface AccountService {
      * @param account новые данные счёта Партнера
      * @return Счёт
      */
-    AccountResponse updateAccount(AccountChange account);
+    Account updateAccount(AccountChange account);
 
     /**
      * Удаление счёта Партнера
@@ -58,6 +58,6 @@ public interface AccountService {
      *
      * @param accountPriority данные по приоритетному счёту
      */
-    AccountResponse changePriority(AccountPriority accountPriority);
+    Account changePriority(AccountPriority accountPriority);
 
 }

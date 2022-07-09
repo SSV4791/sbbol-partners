@@ -14,13 +14,6 @@
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
       "title": "Параметры ответа Партнеров"
-    },
-    "errors": {
-      "type": "array",
-      "items": {
-        "$ref": "../common/error.json"
-      },
-      "title": "Ошибки"
     }
   }
 }

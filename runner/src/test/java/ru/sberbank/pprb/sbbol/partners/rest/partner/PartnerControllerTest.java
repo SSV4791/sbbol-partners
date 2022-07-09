@@ -13,11 +13,11 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.HashSet;
@@ -43,7 +43,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             partner,
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner)
             .isNotNull();
@@ -51,15 +51,15 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var actualPartner = get(
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            PartnerResponse.class,
-            createdPartner.getPartner().getDigitalId(),
-            createdPartner.getPartner().getId()
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
         );
         assertThat(actualPartner)
             .isNotNull();
-        assertThat(actualPartner.getPartner())
+        assertThat(actualPartner)
             .isNotNull()
-            .isEqualTo(createdPartner.getPartner());
+            .isEqualTo(createdPartner);
     }
 
     @Test
@@ -70,7 +70,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -79,7 +79,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -130,7 +130,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -139,7 +139,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -148,7 +148,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         filter.setDigitalId(digitalId);
         filter.search(
             new SearchPartners()
-                .search(createdPartner1.getPartner().getInn().substring(4))
+                .search(createdPartner1.getInn().substring(4))
         );
         filter.setPagination(
             new Pagination()
@@ -176,17 +176,17 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
-        createValidBudgetAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
+        createValidBudgetAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
 
         var createdPartner2 = post(
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -220,7 +220,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -229,7 +229,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -238,7 +238,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         filter.setDigitalId(digitalId);
         filter.search(
             new SearchPartners()
-                .search(createdPartner1.getPartner().getOrgName().substring(4))
+                .search(createdPartner1.getOrgName().substring(4))
         );
         filter.setPagination(
             new Pagination()
@@ -265,7 +265,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -274,7 +274,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -283,7 +283,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         filter.setDigitalId(digitalId);
         filter.search(
             new SearchPartners()
-                .search(createdPartner1.getPartner().getSecondName() + " " + createdPartner1.getPartner().getFirstName())
+                .search(createdPartner1.getSecondName() + " " + createdPartner1.getFirstName())
         );
         filter.setPagination(
             new Pagination()
@@ -311,7 +311,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -321,7 +321,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             HttpStatus.CREATED,
 
             getValidPhysicalPersonPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -354,7 +354,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -363,7 +363,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPhysicalPersonPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -396,7 +396,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -405,7 +405,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidEntrepreneurPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -439,24 +439,24 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
-        createValidAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
+        createValidAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
 
         var createdPartner2 = post(
             baseRoutePath,
             HttpStatus.CREATED,
             getValidEntrepreneurPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
 
         var filter = new PartnersFilter();
         filter.setDigitalId(digitalId);
-        filter.accountSignType(PartnersFilter.AccountSignTypeEnum.NOT_SIGNED);
+        filter.accountSignType(SignType.NOT_SIGNED);
         filter.setPagination(
             new Pagination()
                 .offset(0)
@@ -483,25 +483,25 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
-        var validAccount = createValidAccount(createdPartner1.getPartner().getId(), createdPartner1.getPartner().getDigitalId());
-        createValidAccountsSign(createdPartner1.getPartner().getDigitalId(), validAccount.getId());
+        var validAccount = createValidAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
+        createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId());
 
         var createdPartner2 = post(
             baseRoutePath,
             HttpStatus.CREATED,
             getValidEntrepreneurPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
 
         var filter = new PartnersFilter();
         filter.setDigitalId(digitalId);
-        filter.accountSignType(PartnersFilter.AccountSignTypeEnum.SIGNED);
+        filter.accountSignType(SignType.SIGNED);
         filter.setPagination(
             new Pagination()
                 .offset(0)
@@ -554,16 +554,14 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updatePartner(partner),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(newUpdatePartner)
             .isNotNull();
-        assertThat(newUpdatePartner.getPartner().getFirstName())
-            .isEqualTo(newUpdatePartner.getPartner().getFirstName());
-        assertThat(newUpdatePartner.getPartner().getFirstName())
+        assertThat(newUpdatePartner.getFirstName())
+            .isEqualTo(newUpdatePartner.getFirstName());
+        assertThat(newUpdatePartner.getFirstName())
             .isNotEqualTo(partner.getFirstName());
-        assertThat(newUpdatePartner.getErrors())
-            .isNull();
 
         HashSet<Phone> newPhones1 = new HashSet<>();
         if (partner.getPhones() != null) {
@@ -591,7 +589,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         }
         partner.setPhones(newPhones1);
         partner.setEmails(newEmails1);
-        partner.setVersion(newUpdatePartner.getPartner().getVersion() + 1);
+        partner.setVersion(newUpdatePartner.getVersion() + 1);
         var newUpdatePartner1 = put(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
@@ -638,19 +636,16 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updatePartner(partner),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(newUpdatePartner)
             .isNotNull();
-        assertThat(newUpdatePartner.getPartner().getFirstName())
-            .isEqualTo(newUpdatePartner.getPartner().getFirstName());
-        assertThat(newUpdatePartner.getPartner().getFirstName())
+        assertThat(newUpdatePartner.getFirstName())
+            .isEqualTo(newUpdatePartner.getFirstName());
+        assertThat(newUpdatePartner.getFirstName())
             .isNotEqualTo(partner.getFirstName());
-        assertThat(newUpdatePartner.getErrors())
-            .isNull();
 
-
-        HashSet<Phone> newPhones1 = new HashSet<>();
+        Set<Phone> newPhones1 = new HashSet<>();
         if (partner.getPhones() != null) {
             for (var phone : partner.getPhones()) {
                 var newPhone = new Phone();
@@ -662,7 +657,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 newPhones1.add(newPhone);
             }
         }
-        HashSet<Email> newEmails1 = new HashSet<>();
+        Set<Email> newEmails1 = new HashSet<>();
         if (partner.getEmails() != null) {
             for (var email : partner.getEmails()) {
                 var newEmail1 = new Email();
@@ -681,16 +676,14 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updatePartner(partner),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(newUpdatePartner1)
             .isNotNull();
-        assertThat(newUpdatePartner1.getPartner().getFirstName())
-            .isEqualTo(newUpdatePartner1.getPartner().getFirstName());
-        assertThat(newUpdatePartner1.getPartner().getFirstName())
+        assertThat(newUpdatePartner1.getFirstName())
+            .isEqualTo(newUpdatePartner1.getFirstName());
+        assertThat(newUpdatePartner1.getFirstName())
             .isNotEqualTo(partner.getFirstName());
-        assertThat(newUpdatePartner1.getErrors())
-            .isNull();
     }
 
 
@@ -702,7 +695,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -711,7 +704,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -720,7 +713,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner3)
             .isNotNull();
@@ -780,7 +773,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner1)
             .isNotNull();
@@ -789,7 +782,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner2)
             .isNotNull();
@@ -798,7 +791,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner3)
             .isNotNull();
@@ -859,24 +852,21 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             partner,
-            PartnerResponse.class
+            Partner.class
         );
         String newKpp = "999999999";
-        var updatePartner = createdPartner.getPartner();
-        updatePartner.kpp(newKpp);
+        createdPartner.kpp(newKpp);
         var newUpdatePartner = put(
             baseRoutePath,
             HttpStatus.OK,
-            updatePartner,
-            PartnerResponse.class
+            createdPartner,
+            Partner.class
         );
 
-        assertThat(updatePartner)
+        assertThat(createdPartner)
             .isNotNull();
-        assertThat(newUpdatePartner.getPartner().getKpp())
+        assertThat(newUpdatePartner.getKpp())
             .isEqualTo(newKpp);
-        assertThat(newUpdatePartner.getErrors())
-            .isNull();
     }
 
     @Test
@@ -887,26 +877,23 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             partner,
-            PartnerResponse.class
+            Partner.class
         );
         String newKpp = "999999999";
-        var updatePartner = createdPartner.getPartner();
-        updatePartner.kpp(newKpp);
-        updatePartner.setPhones(null);
-        updatePartner.setEmails(null);
-        PartnerResponse newUpdatePartner = put(
+        createdPartner.kpp(newKpp);
+        createdPartner.setPhones(null);
+        createdPartner.setEmails(null);
+        Partner newUpdatePartner = put(
             baseRoutePath,
             HttpStatus.OK,
-            updatePartner,
-            PartnerResponse.class
+            createdPartner,
+            Partner.class
         );
 
-        assertThat(updatePartner)
+        assertThat(createdPartner)
             .isNotNull();
-        assertThat(newUpdatePartner.getPartner().getKpp())
+        assertThat(newUpdatePartner.getKpp())
             .isEqualTo(newKpp);
-        assertThat(newUpdatePartner.getErrors())
-            .isNull();
     }
 
     @Test
@@ -936,21 +923,19 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updatePartner(partner),
-            PartnerResponse.class
+            Partner.class
         );
         var checkPartner = get(
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            PartnerResponse.class,
-            updatePartner.getPartner().getDigitalId(),
-            updatePartner.getPartner().getId()
+            Partner.class,
+            updatePartner.getDigitalId(),
+            updatePartner.getId()
         );
         assertThat(checkPartner)
             .isNotNull();
-        assertThat(checkPartner.getPartner().getVersion())
+        assertThat(checkPartner.getVersion())
             .isEqualTo(partner.getVersion() + 1);
-        assertThat(checkPartner.getErrors())
-            .isNull();
     }
 
     @Test
@@ -960,36 +945,34 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(),
-            PartnerResponse.class
+            Partner.class
         );
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            PartnerResponse.class,
-            createdPartner.getPartner().getDigitalId(),
-            createdPartner.getPartner().getId()
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
         );
         assertThat(actualPartner)
-            .isNotNull();
-        assertThat(actualPartner.getPartner())
             .isNotNull()
-            .isEqualTo(createdPartner.getPartner());
+            .isEqualTo(createdPartner);
 
         delete(
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.NO_CONTENT,
-            actualPartner.getPartner().getDigitalId(),
-            actualPartner.getPartner().getId()
+            actualPartner.getDigitalId(),
+            actualPartner.getId()
         ).getBody();
 
         var searchPartner = get(
             baseRoutePath + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
-            createdPartner.getPartner().getDigitalId(),
-            createdPartner.getPartner().getId()
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
         );
         assertThat(searchPartner)
             .isNotNull();
@@ -1041,38 +1024,29 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Partner createValidPartner() {
-        var createPartner = post(
+        return post(
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(),
-            PartnerResponse.class
+            Partner.class
         );
-        assertThat(createPartner)
-            .isNotNull();
-        return createPartner.getPartner();
     }
 
     protected static Partner createValidPartner1(PartnerCreate partner) {
-        var createPartner = post(
+        return post(
             baseRoutePath,
             HttpStatus.CREATED,
             partner,
-            PartnerResponse.class
+            Partner.class
         );
-        assertThat(createPartner)
-            .isNotNull();
-        return createPartner.getPartner();
     }
 
     protected static Partner createValidPartner(String digitalId) {
-        var createPartner = post(
+        return post(
             baseRoutePath,
             HttpStatus.CREATED,
             getValidPartner(digitalId),
-            PartnerResponse.class);
-        assertThat(createPartner)
-            .isNotNull();
-        return createPartner.getPartner();
+            Partner.class);
     }
 
     private static Error createNotValidPartner() {

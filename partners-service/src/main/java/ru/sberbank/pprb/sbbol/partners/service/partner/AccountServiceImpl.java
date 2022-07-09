@@ -8,10 +8,10 @@ import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
-import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -47,11 +47,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional(readOnly = true)
-    public AccountResponse getAccount(String digitalId, String id) {
+    public Account getAccount(String digitalId, String id) {
         var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        var response = accountMapper.toAccount(account, budgetMaskService);
-        return new AccountResponse().account(response);
+        return accountMapper.toAccount(account, budgetMaskService);
     }
 
     @Override
@@ -79,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse saveAccount(AccountCreate account) {
+    public Account saveAccount(AccountCreate account) {
         var requestAccount = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(requestAccount);
@@ -89,7 +88,7 @@ public class AccountServiceImpl implements AccountService {
             );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             replicationService.saveCounterparty(response);
-            return new AccountResponse().account(response);
+            return response;
         } catch (RuntimeException e) {
             auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_CREATE_ERROR)
@@ -101,7 +100,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse updateAccount(AccountChange account) {
+    public Account updateAccount(AccountChange account) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
         accountMapper.updateAccount(account, foundAccount);
@@ -113,7 +112,7 @@ public class AccountServiceImpl implements AccountService {
             );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             replicationService.saveCounterparty(response);
-            return new AccountResponse().account(response);
+            return response;
         } catch (RuntimeException e) {
             auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_UPDATE_ERROR)
@@ -146,13 +145,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountResponse changePriority(AccountPriority accountPriority) {
+    public Account changePriority(AccountPriority accountPriority) {
         var digitalId = accountPriority.getDigitalId();
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountPriority.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountPriority.getId()));
         foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());
         var savedAccount = accountRepository.save(foundAccount);
-        var account = accountMapper.toAccount(savedAccount, budgetMaskService);
-        return new AccountResponse().account(account);
+        return accountMapper.toAccount(savedAccount, budgetMaskService);
     }
 }

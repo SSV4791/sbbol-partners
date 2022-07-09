@@ -4,8 +4,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
+import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
@@ -29,7 +29,7 @@ public class ContactDocumentServiceImpl extends DocumentServiceImpl {
 
     @Override
     @Transactional
-    public DocumentResponse saveDocument(DocumentCreate document) {
+    public Document saveDocument(DocumentCreate document) {
         var contact = contactRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getUnifiedId()));
         if (contact.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId());

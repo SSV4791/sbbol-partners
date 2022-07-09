@@ -14,13 +14,6 @@
     "pagination": {
       "title": "Пагинация контактов",
       "$ref": "../../../common/model/pagination.json"
-    },
-    "error": {
-      "type": "array",
-      "title": "Список ошибок",
-      "items": {
-        "$ref": "../common/error.json"
-      }
     }
   }
 }

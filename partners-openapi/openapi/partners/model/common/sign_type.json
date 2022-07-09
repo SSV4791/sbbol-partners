@@ -1,0 +1,8 @@
+{
+    "type": "string",
+    "title": "Признак 'Подписан'",
+    "enum": [
+        "SIGNED",
+        "NOT_SIGNED"
+    ]
+}

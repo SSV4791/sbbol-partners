@@ -7,7 +7,6 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
@@ -53,23 +52,21 @@ abstract class PhoneServiceImpl implements PhoneService {
 
     @Override
     @Transactional
-    public PhoneResponse savePhone(PhoneCreate phone) {
+    public Phone savePhone(PhoneCreate phone) {
         var phoneEntity = phoneMapper.toPhone(phone);
         PhoneEntity savedPhone = phoneRepository.save(phoneEntity);
-        var response = phoneMapper.toPhone(savedPhone);
-        return new PhoneResponse().phone(response);
+        return phoneMapper.toPhone(savedPhone);
     }
 
     @Override
     @Transactional
-    public PhoneResponse updatePhone(Phone phone) {
+    public Phone updatePhone(Phone phone) {
         var uuid = UUID.fromString(phone.getId());
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
         phoneMapper.updatePhone(phone, foundPhone);
         var savedPhone = phoneRepository.save(foundPhone);
-        var response = phoneMapper.toPhone(savedPhone);
-        return new PhoneResponse().phone(response);
+        return phoneMapper.toPhone(savedPhone);
     }
 
     @Override

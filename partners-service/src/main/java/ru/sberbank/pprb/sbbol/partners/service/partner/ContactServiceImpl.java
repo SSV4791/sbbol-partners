@@ -6,7 +6,6 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
-import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -32,11 +31,10 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(readOnly = true)
-    public ContactResponse getContact(String digitalId, String id) {
+    public Contact getContact(String digitalId, String id) {
         var contact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        var response = contactMapper.toContact(contact);
-        return new ContactResponse().contact(response);
+        return  contactMapper.toContact(contact);
     }
 
     @Override
@@ -63,22 +61,20 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public ContactResponse saveContact(ContactCreate contact) {
+    public Contact saveContact(ContactCreate contact) {
         var requestContact = contactMapper.toContact(contact);
         var saveContact = contactRepository.save(requestContact);
-        var response = contactMapper.toContact(saveContact);
-        return new ContactResponse().contact(response);
+        return contactMapper.toContact(saveContact);
     }
 
     @Override
     @Transactional
-    public ContactResponse updateContact(Contact contact) {
+    public Contact updateContact(Contact contact) {
         var foundContact = contactRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, contact.getDigitalId(), contact.getId()));
         contactMapper.updateContact(contact, foundContact);
         var saveContact = contactRepository.save(foundContact);
-        var response = contactMapper.toContact(saveContact);
-        return new ContactResponse().contact(response);
+        return contactMapper.toContact(saveContact);
     }
 
     @Override

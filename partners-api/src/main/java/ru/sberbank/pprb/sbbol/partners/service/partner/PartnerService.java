@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 
@@ -18,7 +17,7 @@ public interface PartnerService {
      * @param id        Идентификатор Партнера
      * @return Партнер
      */
-    PartnerResponse getPartner(String digitalId, String id);
+    Partner getPartner(String digitalId, String id);
 
 
     /**
@@ -35,7 +34,7 @@ public interface PartnerService {
      * @param partner данные Партнера
      * @return Партнер
      */
-    PartnerResponse savePartner(PartnerCreate partner);
+    Partner savePartner(PartnerCreate partner);
 
     /**
      * Обновление Партнера
@@ -43,7 +42,7 @@ public interface PartnerService {
      * @param partner новые данные Партнера
      * @return Партнер
      */
-    PartnerResponse updatePartner(Partner partner);
+    Partner updatePartner(Partner partner);
 
     /**
      * Удаление Партнера

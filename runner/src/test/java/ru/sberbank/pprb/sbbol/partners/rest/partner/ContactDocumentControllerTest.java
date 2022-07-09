@@ -11,7 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -42,12 +41,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                DocumentResponse.class,
+                Document.class,
                 document.getDigitalId(), document.getId()
             );
         assertThat(actualDocument)
-            .isNotNull();
-        assertThat(actualDocument.getDocument())
             .isNotNull()
             .isEqualTo(document);
     }
@@ -128,15 +125,11 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
-        var newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument(document), DocumentResponse.class);
+        var newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument(document), Document.class);
         assertThat(newUpdateDocument)
             .isNotNull();
-        assertThat(newUpdateDocument.getDocument().getNumber())
-            .isEqualTo(newUpdateDocument.getDocument().getNumber());
-        assertThat(newUpdateDocument.getDocument().getNumber())
-            .isNotEqualTo(document.getNumber());
-        assertThat(newUpdateDocument.getErrors())
-            .isNull();
+        assertThat(newUpdateDocument.getNumber())
+            .isEqualTo(newUpdateDocument.getNumber());
     }
 
     @Test
@@ -170,19 +163,17 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/document",
             HttpStatus.OK,
             updateDocument(document),
-            DocumentResponse.class
+            Document.class
         );
         var checkDocument = get(
             baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            DocumentResponse.class,
-            documentUpdate.getDocument().getDigitalId(), documentUpdate.getDocument().getId());
+            Document.class,
+            documentUpdate.getDigitalId(), documentUpdate.getId());
         assertThat(checkDocument)
             .isNotNull();
-        assertThat(checkDocument.getDocument().getVersion())
+        assertThat(checkDocument.getVersion())
             .isEqualTo(document.getVersion() + 1);
-        assertThat(checkDocument.getErrors())
-            .isNull();
     }
 
     @Test
@@ -195,13 +186,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                DocumentResponse.class,
+                Document.class,
                 document.getDigitalId(), document.getId()
             );
         assertThat(actualDocument)
-            .isNotNull();
-
-        assertThat(actualDocument.getDocument())
             .isNotNull()
             .isEqualTo(document);
 
@@ -209,7 +197,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             delete(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 HttpStatus.NO_CONTENT,
-                actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getId()
+                actualDocument.getDigitalId(), actualDocument.getId()
             ).getBody();
         assertThat(deleteDocument)
             .isNotNull();
@@ -243,31 +231,21 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     private static Document createValidContactDocument(String contactUuid, String digitalId) {
-        var documentResponse = post(
+        return post(
             baseRoutePath + "/document",
             HttpStatus.CREATED,
             getValidContactDocument(contactUuid, digitalId),
-            DocumentResponse.class
+            Document.class
         );
-        assertThat(documentResponse)
-            .isNotNull();
-        assertThat(documentResponse.getErrors())
-            .isNull();
-        return documentResponse.getDocument();
     }
 
     private static Document createValidContactDocument(DocumentCreate document) {
-        var documentResponse = post(
+        return post(
             baseRoutePath + "/document",
             HttpStatus.CREATED,
             document,
-            DocumentResponse.class
+            Document.class
         );
-        assertThat(documentResponse)
-            .isNotNull();
-        assertThat(documentResponse.getErrors())
-            .isNull();
-        return documentResponse.getDocument();
     }
 
     public static Document updateDocument(Document document) {

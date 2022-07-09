@@ -6,7 +6,6 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
-import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -53,23 +52,21 @@ abstract class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional
-    public EmailResponse saveEmail(EmailCreate email) {
+    public Email saveEmail(EmailCreate email) {
         var emailEntity = emailMapper.toEmail(email);
         EmailEntity savedEmail = emailRepository.save(emailEntity);
-        var response = emailMapper.toEmail(savedEmail);
-        return new EmailResponse().email(response);
+        return emailMapper.toEmail(savedEmail);
     }
 
     @Override
     @Transactional
-    public EmailResponse updateEmail(Email email) {
+    public Email updateEmail(Email email) {
         var uuid = UUID.fromString(email.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
         emailMapper.updateEmail(email, foundEmail);
         var savedEmail = emailRepository.save(foundEmail);
-        var response = emailMapper.toEmail(savedEmail);
-        return new EmailResponse().email(response);
+        return emailMapper.toEmail(savedEmail);
     }
 
     @Override

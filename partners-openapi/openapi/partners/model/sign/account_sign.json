@@ -13,12 +13,7 @@
       "title": "Идентификатор счёта или контрагента"
     },
     "state": {
-      "type": "string",
-      "title": "Признак 'Подписан'",
-      "enum": [
-        "SIGNED",
-        "NOT_SIGNED"
-      ]
+      "$ref": "../common/sign_type.json"
     }
   }
 }

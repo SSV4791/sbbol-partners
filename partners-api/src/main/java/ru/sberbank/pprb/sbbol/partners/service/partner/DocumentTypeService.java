@@ -1,9 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 
 /**
@@ -25,7 +25,7 @@ public interface DocumentTypeService {
      * @param document типы документа Контакта
      * @return Документ
      */
-    DocumentTypeResponse saveDocument(DocumentTypeCreate document);
+    DocumentType saveDocument(DocumentTypeCreate document);
 
     /**
      * Обновление типа документа Контакта
@@ -33,13 +33,12 @@ public interface DocumentTypeService {
      * @param document новые данные документа Контакта
      * @return Документ
      */
-    DocumentTypeResponse updateDocument(DocumentTypeChange document);
+    DocumentType updateDocument(DocumentTypeChange document);
 
     /**
      * Удаление документа Контакта
      *
      * @param id уникальный идентификатор документа Контакта
-     * @return void
      */
     void deleteDocument(String id);
 }
