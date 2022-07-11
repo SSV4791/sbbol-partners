@@ -5,10 +5,10 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
@@ -49,20 +49,20 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     @Override
     @Transactional
-    public DocumentTypeResponse saveDocument(DocumentTypeCreate document) {
+    public DocumentType saveDocument(DocumentTypeCreate document) {
         DocumentTypeEntity saveDocument = documentTypeMapper.toDocumentType(document);
         DocumentTypeEntity response = dictionaryRepository.save(saveDocument);
-        return new DocumentTypeResponse().documentType(documentTypeMapper.toDocumentType(response));
+        return documentTypeMapper.toDocumentType(response);
     }
 
     @Override
     @Transactional
-    public DocumentTypeResponse updateDocument(DocumentTypeChange documentTypeChange) {
+    public DocumentType updateDocument(DocumentTypeChange documentTypeChange) {
         DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(documentTypeChange.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, documentTypeChange.getId()));
         documentTypeMapper.updateDocument(documentTypeChange, foundDocument);
         dictionaryRepository.save(foundDocument);
-        return new DocumentTypeResponse().documentType(documentTypeMapper.toDocumentType(foundDocument));
+        return documentTypeMapper.toDocumentType(foundDocument);
     }
 
     @Override

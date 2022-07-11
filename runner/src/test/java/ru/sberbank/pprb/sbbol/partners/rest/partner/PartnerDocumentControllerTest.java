@@ -11,7 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -201,12 +200,12 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                DocumentResponse.class,
+                Document.class,
                 document.getDigitalId(), document.getId()
             );
         assertThat(actualDocument)
             .isNotNull();
-        assertThat(actualDocument.getDocument())
+        assertThat(actualDocument)
             .isNotNull()
             .isEqualTo(document);
     }
@@ -325,14 +324,12 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
         updateDocument.setVersion(document.getVersion());
-        DocumentResponse newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, DocumentResponse.class);
+        Document newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, Document.class);
 
         assertThat(newUpdateDocument)
             .isNotNull();
-        assertThat(newUpdateDocument.getDocument().getNumber())
+        assertThat(newUpdateDocument.getNumber())
             .isEqualTo(newName);
-        assertThat(newUpdateDocument.getErrors())
-            .isNull();
     }
 
     @Test
@@ -364,19 +361,17 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/document",
             HttpStatus.OK,
             updateDocument(document),
-            DocumentResponse.class
+            Document.class
         );
         var checkDocument = get(
             baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            DocumentResponse.class,
-            documentUpdate.getDocument().getDigitalId(), documentUpdate.getDocument().getId());
+            Document.class,
+            documentUpdate.getDigitalId(), documentUpdate.getId());
         assertThat(checkDocument)
             .isNotNull();
-        assertThat(checkDocument.getDocument().getVersion())
+        assertThat(checkDocument.getVersion())
             .isEqualTo(document.getVersion() + 1);
-        assertThat(checkDocument.getErrors())
-            .isNull();
     }
 
     @Test
@@ -388,13 +383,13 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                DocumentResponse.class,
+                Document.class,
                 document.getDigitalId(), document.getId()
             );
         assertThat(actualDocument)
             .isNotNull();
 
-        assertThat(actualDocument.getDocument())
+        assertThat(actualDocument)
             .isNotNull()
             .isEqualTo(document);
 
@@ -402,7 +397,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             delete(
                 baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
                 HttpStatus.NO_CONTENT,
-                actualDocument.getDocument().getDigitalId(), actualDocument.getDocument().getId()
+                actualDocument.getDigitalId(), actualDocument.getId()
             ).getBody();
         assertThat(deleteDocument)
             .isNotNull();
@@ -423,21 +418,17 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     private static Document createValidPartnerDocument(String partnerUuid, String digitalId) {
-        var response = post(baseRoutePath + "/document", HttpStatus.CREATED, getValidPartnerDocument(partnerUuid, digitalId), DocumentResponse.class);
+        var response = post(baseRoutePath + "/document", HttpStatus.CREATED, getValidPartnerDocument(partnerUuid, digitalId), Document.class);
         assertThat(response)
             .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getDocument();
+        return response;
     }
 
     private static Document createValidPartnerDocument(DocumentCreate document) {
-        var response = post(baseRoutePath + "/document", HttpStatus.CREATED, document, DocumentResponse.class);
+        var response = post(baseRoutePath + "/document", HttpStatus.CREATED, document, Document.class);
         assertThat(response)
             .isNotNull();
-        assertThat(response.getErrors())
-            .isNull();
-        return response.getDocument();
+        return response;
     }
 
     private static Error createPartnerDocumentWithErrors(String partnerUuid, String digitalId) {

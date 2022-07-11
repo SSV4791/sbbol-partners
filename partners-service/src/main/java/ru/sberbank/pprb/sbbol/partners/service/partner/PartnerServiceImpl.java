@@ -9,7 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
@@ -62,12 +61,12 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional(readOnly = true)
-    public PartnerResponse getPartner(String digitalId, String id) {
+    public Partner getPartner(String digitalId, String id) {
         PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = partnerMapper.toPartner(partner);
         response.setGku(getGku(response.getInn()));
-        return new PartnerResponse().partner(response);
+        return response;
     }
 
     @Override
@@ -101,24 +100,24 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public PartnerResponse savePartner(PartnerCreate partner) {
+    public Partner savePartner(PartnerCreate partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
         var response = partnerMapper.toPartner(savePartner);
         response.setGku(getGku(response.getInn()));
-        return new PartnerResponse().partner(response);
+        return response;
     }
 
     @Override
     @Transactional
-    public PartnerResponse updatePartner(Partner partner) {
+    public Partner updatePartner(Partner partner) {
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
         var response = partnerMapper.toPartner(savePartner);
         response.setGku(getGku(response.getInn()));
-        return new PartnerResponse().partner(response);
+        return response;
     }
 
     @Override

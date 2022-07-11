@@ -7,7 +7,6 @@ import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
-import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
@@ -41,12 +40,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                ContactResponse.class,
+                Contact.class,
                 contact.getDigitalId(), contact.getId()
             );
         assertThat(actualContact)
-            .isNotNull();
-        assertThat(actualContact.getContact())
             .isNotNull()
             .isEqualTo(contact);
     }
@@ -263,16 +260,14 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            ContactResponse.class
+            Contact.class
         );
         assertThat(newUpdateContact)
             .isNotNull();
-        assertThat(newUpdateContact.getContact().getFirstName())
-            .isEqualTo(newUpdateContact.getContact().getFirstName());
-        assertThat(newUpdateContact.getContact().getFirstName())
+        assertThat(newUpdateContact.getFirstName())
+            .isEqualTo(newUpdateContact.getFirstName());
+        assertThat(newUpdateContact.getFirstName())
             .isNotEqualTo(contact.getFirstName());
-        assertThat(newUpdateContact.getErrors())
-            .isNull();
 
         HashSet<Phone> newPhones1 = new HashSet<>();
         if (contact.getPhones() != null) {
@@ -300,7 +295,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         }
         contact.setPhones(newPhones1);
         contact.setEmails(newEmails1);
-        contact.setVersion(newUpdateContact.getContact().getVersion() + 1);
+        contact.setVersion(newUpdateContact.getVersion() + 1);
         var newUpdateContact1 = put(
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
@@ -348,17 +343,14 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            ContactResponse.class
+            Contact.class
         );
         assertThat(newUpdateContact)
             .isNotNull();
-        assertThat(newUpdateContact.getContact().getFirstName())
-            .isEqualTo(newUpdateContact.getContact().getFirstName());
-        assertThat(newUpdateContact.getContact().getFirstName())
+        assertThat(newUpdateContact.getFirstName())
+            .isEqualTo(newUpdateContact.getFirstName());
+        assertThat(newUpdateContact.getFirstName())
             .isNotEqualTo(contact.getFirstName());
-        assertThat(newUpdateContact.getErrors())
-            .isNull();
-
 
         HashSet<Phone> newPhones1 = new HashSet<>();
         if (contact.getPhones() != null) {
@@ -391,16 +383,14 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            ContactResponse.class
+            Contact.class
         );
         assertThat(newUpdateContact1)
             .isNotNull();
-        assertThat(newUpdateContact1.getContact().getFirstName())
-            .isEqualTo(newUpdateContact1.getContact().getFirstName());
-        assertThat(newUpdateContact1.getContact().getFirstName())
+        assertThat(newUpdateContact1.getFirstName())
+            .isEqualTo(newUpdateContact1.getFirstName());
+        assertThat(newUpdateContact1.getFirstName())
             .isNotEqualTo(contact.getFirstName());
-        assertThat(newUpdateContact1.getErrors())
-            .isNull();
     }
 
     @Test
@@ -412,16 +402,14 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            ContactResponse.class
+            Contact.class
         );
         assertThat(newUpdateContact)
             .isNotNull();
-        assertThat(newUpdateContact.getContact().getFirstName())
-            .isEqualTo(newUpdateContact.getContact().getFirstName());
-        assertThat(newUpdateContact.getContact().getFirstName())
+        assertThat(newUpdateContact.getFirstName())
+            .isEqualTo(newUpdateContact.getFirstName());
+        assertThat(newUpdateContact.getFirstName())
             .isNotEqualTo(contact.getFirstName());
-        assertThat(newUpdateContact.getErrors())
-            .isNull();
     }
 
     @Test
@@ -436,16 +424,14 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.OK,
             contactUpdate,
-            ContactResponse.class
+            Contact.class
         );
         assertThat(newUpdateContact)
             .isNotNull();
-        assertThat(newUpdateContact.getContact().getFirstName())
-            .isEqualTo(newUpdateContact.getContact().getFirstName());
-        assertThat(newUpdateContact.getContact().getFirstName())
+        assertThat(newUpdateContact.getFirstName())
+            .isEqualTo(newUpdateContact.getFirstName());
+        assertThat(newUpdateContact.getFirstName())
             .isNotEqualTo(contact.getFirstName());
-        assertThat(newUpdateContact.getErrors())
-            .isNull();
     }
 
     @Test
@@ -477,19 +463,17 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            ContactResponse.class
+            Contact.class
         );
         var checkContact = get(
             baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            ContactResponse.class,
-            contactUpdate.getContact().getDigitalId(), contactUpdate.getContact().getId());
+            Contact.class,
+            contactUpdate.getDigitalId(), contactUpdate.getId());
         assertThat(checkContact)
             .isNotNull();
-        assertThat(checkContact.getContact().getVersion())
+        assertThat(checkContact.getVersion())
             .isEqualTo(contact.getVersion() + 1);
-        assertThat(checkContact.getErrors())
-            .isNull();
     }
 
     @Test
@@ -501,12 +485,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             get(
                 baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
-                ContactResponse.class,
+                Contact.class,
                 contact.getDigitalId(), contact.getId()
             );
         assertThat(actualContact)
-            .isNotNull();
-        assertThat(actualContact.getContact())
             .isNotNull()
             .isEqualTo(contact);
 
@@ -514,7 +496,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             delete(
                 baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
                 HttpStatus.NO_CONTENT,
-                actualContact.getContact().getDigitalId(), actualContact.getContact().getId()
+                actualContact.getDigitalId(), actualContact.getId()
             ).getBody();
 
         assertThat(deleteContact)
@@ -556,31 +538,21 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Contact createValidContact(String partnerUuid, String digitalId) {
-        var createContact = post(
+        return post(
             baseRoutePath + "/contact",
             HttpStatus.CREATED,
             getValidContact(partnerUuid, digitalId),
-            ContactResponse.class
+            Contact.class
         );
-        assertThat(createContact)
-            .isNotNull();
-        assertThat(createContact.getErrors())
-            .isNull();
-        return createContact.getContact();
     }
 
     protected static Contact createValidContact(ContactCreate contact) {
-        var createContact = post(
+        return post(
             baseRoutePath + "/contact",
             HttpStatus.CREATED,
             contact,
-            ContactResponse.class
+            Contact.class
         );
-        assertThat(createContact)
-            .isNotNull();
-        assertThat(createContact.getErrors())
-            .isNull();
-        return createContact.getContact();
     }
 
     public static Contact updateContact(Contact contact) {

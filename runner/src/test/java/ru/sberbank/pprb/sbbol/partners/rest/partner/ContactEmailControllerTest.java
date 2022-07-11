@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
-import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -192,17 +191,15 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updateEmail(email),
-            EmailResponse.class
+            Email.class
         );
 
         assertThat(newUpdateEmail)
             .isNotNull();
-        assertThat(newUpdateEmail.getEmail().getEmail())
-            .isEqualTo(newUpdateEmail.getEmail().getEmail());
-        assertThat(newUpdateEmail.getEmail().getEmail())
+        assertThat(newUpdateEmail.getEmail())
+            .isEqualTo(newUpdateEmail.getEmail());
+        assertThat(newUpdateEmail.getEmail())
             .isNotEqualTo(email.getEmail());
-        assertThat(newUpdateEmail.getErrors())
-            .isNull();
     }
 
     @Test
@@ -278,11 +275,11 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updateEmail(email),
-            EmailResponse.class
+            Email.class
         );
         var checkEmail = new EmailsFilter();
-        checkEmail.digitalId(updateEmail.getEmail().getDigitalId());
-        checkEmail.unifiedIds(Collections.singletonList(updateEmail.getEmail().getUnifiedId()));
+        checkEmail.digitalId(updateEmail.getDigitalId());
+        checkEmail.unifiedIds(Collections.singletonList(updateEmail.getUnifiedId()));
         checkEmail.pagination(new Pagination()
             .count(4)
             .offset(0));
@@ -303,8 +300,6 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             .findAny()
             .orElse(null))
             .isEqualTo(email.getVersion() + 1);
-        assertThat(response.getErrors())
-            .isNull();
     }
 
     @Test
@@ -359,21 +354,11 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
     }
 
     private static Email createEmail(String contactUuid, String digitalId) {
-        var emailResponse = post(baseRoutePath, HttpStatus.CREATED, getEmail(contactUuid, digitalId), EmailResponse.class);
-        assertThat(emailResponse)
-            .isNotNull();
-        assertThat(emailResponse.getErrors())
-            .isNull();
-        return emailResponse.getEmail();
+        return post(baseRoutePath, HttpStatus.CREATED, getEmail(contactUuid, digitalId), Email.class);
     }
 
     private static Email createEmail(EmailCreate email) {
-        var emailResponse = post(baseRoutePath, HttpStatus.CREATED, email, EmailResponse.class);
-        assertThat(emailResponse)
-            .isNotNull();
-        assertThat(emailResponse.getErrors())
-            .isNull();
-        return emailResponse.getEmail();
+        return post(baseRoutePath, HttpStatus.CREATED, email, Email.class);
     }
 
     public static Email updateEmail(Email email) {

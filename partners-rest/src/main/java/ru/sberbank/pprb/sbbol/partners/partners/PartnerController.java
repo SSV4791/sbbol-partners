@@ -7,7 +7,6 @@ import ru.sberbank.pprb.sbbol.partners.PartnersApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
@@ -31,7 +30,7 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> getById(String digitalId, String id) {
+    public ResponseEntity<Partner> getById(String digitalId, String id) {
         return ResponseEntity.ok(partnerService.getPartner(digitalId, id));
     }
 
@@ -41,12 +40,12 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> create(@Validation(type = PartnerCreateValidatorImpl.class) PartnerCreate partner) {
+    public ResponseEntity<Partner> create(@Validation(type = PartnerCreateValidatorImpl.class) PartnerCreate partner) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.savePartner(partner));
     }
 
     @Override
-    public ResponseEntity<PartnerResponse> update(@Validation(type = PartnerUpdateValidatorImpl.class) Partner partner) {
+    public ResponseEntity<Partner> update(@Validation(type = PartnerUpdateValidatorImpl.class) Partner partner) {
         return ResponseEntity.ok(partnerService.updatePartner(partner));
     }
 }

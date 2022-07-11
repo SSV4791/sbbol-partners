@@ -7,7 +7,6 @@ import ru.sberbank.pprb.sbbol.partners.ContactEmailApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
-import ru.sberbank.pprb.sbbol.partners.model.EmailResponse;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.EmailService;
@@ -25,7 +24,7 @@ public class ContactEmailController implements ContactEmailApi {
     }
 
     @Override
-    public ResponseEntity<EmailResponse> create(@Validation(type = EmailCreateValidationImpl.class) EmailCreate email) {
+    public ResponseEntity<Email> create(@Validation(type = EmailCreateValidationImpl.class) EmailCreate email) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactEmailService.saveEmail(email));
     }
 
@@ -41,7 +40,7 @@ public class ContactEmailController implements ContactEmailApi {
     }
 
     @Override
-    public ResponseEntity<EmailResponse> update(@Validation(type = EmailUpdateValidationImpl.class) Email email) {
+    public ResponseEntity<Email> update(@Validation(type = EmailUpdateValidationImpl.class) Email email) {
         return ResponseEntity.ok(contactEmailService.updateEmail(email));
     }
 }

@@ -23,12 +23,7 @@
       }
     },
     "state": {
-      "type": "string",
-      "title": "Признак 'Подписан'",
-      "enum": [
-        "SIGNED",
-        "NOT_SIGNED"
-      ]
+      "$ref": "../common/sign_type.json"
     },
     "isBudget": {
       "title": "Фильтр для отображения счетов бюджетных организаций",

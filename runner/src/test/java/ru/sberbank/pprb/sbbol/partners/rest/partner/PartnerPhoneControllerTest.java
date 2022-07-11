@@ -13,7 +13,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
@@ -156,16 +155,14 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updatePhone(phone),
-            PhoneResponse.class
+            Phone.class
         );
         assertThat(newUpdatePhone)
             .isNotNull();
-        assertThat(newUpdatePhone.getPhone().getPhone())
-            .isEqualTo(newUpdatePhone.getPhone().getPhone());
+        assertThat(newUpdatePhone.getPhone())
+            .isEqualTo(newUpdatePhone.getPhone());
         assertThat(phone.getPhone())
-            .isNotEqualTo(newUpdatePhone.getPhone().getPhone());
-        assertThat(newUpdatePhone.getErrors())
-            .isNull();
+            .isNotEqualTo(newUpdatePhone.getPhone());
 
         var phone1 = createPhone(partner.getId(), partner.getDigitalId());
         updatePhone(phone1);
@@ -233,16 +230,14 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updatePhone(phone),
-            PhoneResponse.class
+            Phone.class
         );
         assertThat(newUpdatePhone)
             .isNotNull();
-        assertThat(newUpdatePhone.getPhone().getPhone())
-            .isEqualTo(newUpdatePhone.getPhone().getPhone());
+        assertThat(newUpdatePhone.getPhone())
+            .isEqualTo(newUpdatePhone.getPhone());
         assertThat(phone.getPhone())
-            .isNotEqualTo(newUpdatePhone.getPhone().getPhone());
-        assertThat(newUpdatePhone.getErrors())
-            .isNull();
+            .isNotEqualTo(newUpdatePhone.getPhone());
     }
 
     @Test
@@ -274,11 +269,11 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
             baseRoutePath,
             HttpStatus.OK,
             updatePhone(phone),
-            PhoneResponse.class
+            Phone.class
         );
         var checkPhone = new PhonesFilter();
-        checkPhone.digitalId(updatePhone.getPhone().getDigitalId());
-        checkPhone.unifiedIds(Collections.singletonList(updatePhone.getPhone().getUnifiedId()));
+        checkPhone.digitalId(updatePhone.getDigitalId());
+        checkPhone.unifiedIds(Collections.singletonList(updatePhone.getUnifiedId()));
         checkPhone.pagination(new Pagination()
             .count(4)
             .offset(0));
@@ -299,8 +294,6 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
             .findAny()
             .orElse(null))
             .isEqualTo(phone.getVersion() + 1);
-        assertThat(response.getErrors())
-            .isNull();
     }
 
     @Test
@@ -354,21 +347,17 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
     }
 
     private static Phone createPhone(String partnerUuid, String digitalId) {
-        var phoneResponse = post(baseRoutePath, HttpStatus.CREATED, getPhone(partnerUuid, digitalId), PhoneResponse.class);
+        var phoneResponse = post(baseRoutePath, HttpStatus.CREATED, getPhone(partnerUuid, digitalId), Phone.class);
         assertThat(phoneResponse)
             .isNotNull();
-        assertThat(phoneResponse.getErrors())
-            .isNull();
-        return phoneResponse.getPhone();
+        return phoneResponse;
     }
 
     private static Phone createPhone(PhoneCreate phone) {
-        var phoneResponse = post(baseRoutePath, HttpStatus.CREATED, phone, PhoneResponse.class);
+        var phoneResponse = post(baseRoutePath, HttpStatus.CREATED, phone, Phone.class);
         assertThat(phoneResponse)
             .isNotNull();
-        assertThat(phoneResponse.getErrors())
-            .isNull();
-        return phoneResponse.getPhone();
+        return phoneResponse;
     }
 
     public static Phone updatePhone(Phone phone) {

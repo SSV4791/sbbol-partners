@@ -10,7 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
-import ru.sberbank.pprb.sbbol.partners.model.AccountResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
@@ -19,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.ArrayList;
@@ -249,7 +249,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .digitalId(partner2.getDigitalId())
             .partnerIds(List.of(partner2.getId()))
             .accountIds(account2)
-            .state(AccountsFilter.StateEnum.NOT_SIGNED)
+            .state(SignType.NOT_SIGNED)
             .pagination(new Pagination()
                 .count(5)
                 .offset(0));
@@ -280,7 +280,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .digitalId(partner3.getDigitalId())
             .partnerIds(List.of(partner3.getId()))
             .accountIds(account3)
-            .state(AccountsFilter.StateEnum.SIGNED)
+            .state(SignType.SIGNED)
             .pagination(new Pagination()
                 .count(5)
                 .offset(0));
@@ -306,14 +306,12 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var actualAccount = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AccountResponse.class,
+            Account.class,
             account.getDigitalId(), account.getId()
         );
-        assertThat(actualAccount)
-            .isNotNull();
-        assertThat(actualAccount.getAccount().getComment())
+        assertThat(actualAccount.getComment())
             .isEqualTo("Это тестовый комментарий");
-        assertThat(actualAccount.getAccount())
+        assertThat(actualAccount)
             .isNotNull()
             .isEqualTo(account);
     }
@@ -538,16 +536,14 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount(account),
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount)
             .isNotNull();
-        assertThat(updateAccount.getAccount().getComment())
+        assertThat(updateAccount.getComment())
             .isNotEqualTo(account.getComment());
-        assertThat(updateAccount.getAccount().getComment())
+        assertThat(updateAccount.getComment())
             .isNotNull();
-        assertThat(updateAccount.getErrors())
-            .isNull();
     }
 
     @Test
@@ -633,12 +629,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             acc,
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount)
             .isNotNull();
-        assertThat(updateAccount.getErrors())
-            .isNull();
 
         var acc1 = acc
             .version(acc.getVersion() + 1)
@@ -651,12 +645,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             acc1,
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount1)
             .isNotNull();
-        assertThat(updateAccount1.getErrors())
-            .isNull();
 
         var acc2 = acc1
             .version(acc1.getVersion() + 1)
@@ -665,12 +657,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             acc2,
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount2)
             .isNotNull();
-        assertThat(updateAccount2.getErrors())
-            .isNull();
 
         var acc3 = acc2
             .version(acc2.getVersion() + 1)
@@ -683,12 +673,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             acc3,
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount3)
             .isNotNull();
-        assertThat(updateAccount3.getErrors())
-            .isNull();
 
         var acc4 = updateAccount(account2)
             .account("");
@@ -696,12 +684,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             acc4,
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount4)
             .isNotNull();
-        assertThat(updateAccount4.getErrors())
-            .isNull();
 
         var acc5 = acc4
             .version(acc4.getVersion() + 1)
@@ -711,12 +697,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             acc5,
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount5)
             .isNotNull();
-        assertThat(updateAccount5.getErrors())
-            .isNull();
 
         var acc6 = acc5
             .version(acc5.getVersion())
@@ -725,12 +709,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             acc6,
-            AccountResponse.class
+            Account.class
         );
         assertThat(updateAccount6)
             .isNotNull();
-        assertThat(updateAccount6.getErrors())
-            .isNull();
     }
 
     @Test
@@ -762,19 +744,17 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount(account),
-            AccountResponse.class
+            Account.class
         );
         var checkAccount = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AccountResponse.class,
-            accountVersion.getAccount().getDigitalId(), accountVersion.getAccount().getId());
+            Account.class,
+            accountVersion.getDigitalId(), accountVersion.getId());
         assertThat(checkAccount)
             .isNotNull();
-        assertThat(checkAccount.getAccount().getVersion())
+        assertThat(checkAccount.getVersion())
             .isEqualTo(account.getVersion() + 1);
-        assertThat(checkAccount.getErrors())
-            .isNull();
     }
 
     @Test
@@ -789,22 +769,20 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             account,
-            AccountResponse.class
+            Account.class
         );
         var checkAccount = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AccountResponse.class,
-            accountVersion.getAccount().getDigitalId(), accountVersion.getAccount().getId());
+            Account.class,
+            accountVersion.getDigitalId(), accountVersion.getId());
         assertThat(checkAccount)
             .isNotNull();
-        assertThat(checkAccount.getAccount().getVersion())
+        assertThat(checkAccount.getVersion())
             .isEqualTo(account.getVersion() + 1);
-        assertThat(checkAccount.getErrors())
-            .isNull();
 
         updateAccount(account);
-        account.setVersion(accountVersion.getAccount().getVersion() + 1);
+        account.setVersion(accountVersion.getVersion() + 1);
         account.setAccount("40702810600000109222");
         account.getBank().getBankAccount().setBankAccount("40102810545370000003");
         var accountVersion1 = put(
@@ -820,7 +798,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
 
         updateAccount(account);
         account.setAccount("40702810600000009222");
-        account.setVersion(accountVersion.getAccount().getVersion() + 1);
+        account.setVersion(accountVersion.getVersion() + 1);
         account.getBank().setBic("048602001");
         account.getBank().getBankAccount().setBankAccount("40102810945370000073");
         var accountVersion2 = put(
@@ -835,7 +813,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
 
         updateAccount(account);
-        account.setVersion(accountVersion.getAccount().getVersion() + 1);
+        account.setVersion(accountVersion.getVersion() + 1);
         account.setAccount("40101810600000010006");
         account.getBank().setBic("048602001");
         account.getBank().getBankAccount().setBankAccount("40102810945370000073");
@@ -843,19 +821,17 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.OK,
             account,
-            AccountResponse.class
+            Account.class
         );
         var checkAccount3 = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AccountResponse.class,
-            accountVersion3.getAccount().getDigitalId(), accountVersion.getAccount().getId());
+            Account.class,
+            accountVersion3.getDigitalId(), accountVersion.getId());
         assertThat(checkAccount3)
             .isNotNull();
-        assertThat(checkAccount3.getAccount().getVersion())
-            .isEqualTo(accountVersion3.getAccount().getVersion() + 1);
-        assertThat(checkAccount3.getErrors())
-            .isNull();
+        assertThat(checkAccount3.getVersion())
+            .isEqualTo(accountVersion3.getVersion() + 1);
     }
 
     @Test
@@ -866,12 +842,10 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var actualAccount = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AccountResponse.class,
+            Account.class,
             account.getDigitalId(), account.getId()
         );
         assertThat(actualAccount)
-            .isNotNull();
-        assertThat(actualAccount.getAccount())
             .isNotNull()
             .isEqualTo(account);
 
@@ -879,7 +853,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             delete(
                 baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
                 HttpStatus.NO_CONTENT,
-                actualAccount.getAccount().getDigitalId(), actualAccount.getAccount().getId()
+                actualAccount.getDigitalId(), actualAccount.getId()
             ).getBody();
         assertThat(deleteAccount)
             .isNotNull();
@@ -904,15 +878,13 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var foundAccount = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AccountResponse.class,
+            Account.class,
             account.getDigitalId(), account.getId()
         );
         assertThat(foundAccount)
-            .isNotNull();
-        assertThat(foundAccount.getAccount())
             .isNotNull()
             .isEqualTo(account);
-        assertThat(foundAccount.getAccount().getPriorityAccount())
+        assertThat(foundAccount.getPriorityAccount())
             .isEqualTo(false);
 
         createValidPriorityAccount(account.getId(), account.getDigitalId());
@@ -920,12 +892,12 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var actualAccount = get(
             baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
-            AccountResponse.class,
+            Account.class,
             account.getDigitalId(), account.getId()
         );
         assertThat(actualAccount)
             .isNotNull();
-        assertThat(actualAccount.getAccount().getPriorityAccount())
+        assertThat(actualAccount.getPriorityAccount())
             .isEqualTo(true);
     }
 
@@ -969,40 +941,28 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account",
             HttpStatus.CREATED,
             getValidBudgetAccount(partnerUuid, digitalId),
-            AccountResponse.class
+            Account.class
         );
         assertThat(createAccount)
             .isNotNull();
-        assertThat(createAccount.getErrors())
-            .isNull();
     }
 
     public static Account createValidAccount(String partnerUuid, String digitalId) {
-        var createAccount = post(
+        return post(
             baseRoutePath + "/account",
             HttpStatus.CREATED,
             getValidAccount(partnerUuid, digitalId),
-            AccountResponse.class
+            Account.class
         );
-        assertThat(createAccount)
-            .isNotNull();
-        assertThat(createAccount.getErrors())
-            .isNull();
-        return createAccount.getAccount();
     }
 
     public static Account createValidAccount(AccountCreate account) {
-        var createAccount = post(
+        return post(
             baseRoutePath + "/account",
             HttpStatus.CREATED,
             account,
-            AccountResponse.class
+            Account.class
         );
-        assertThat(createAccount)
-            .isNotNull();
-        assertThat(createAccount.getErrors())
-            .isNull();
-        return createAccount.getAccount();
     }
 
     public static Error createNotValidAccount(String partnerUuid, String digitalId) {
@@ -1025,11 +985,9 @@ class AccountControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/account/priority",
             HttpStatus.OK,
             getValidPriorityAccount(accountId, digitalId),
-            AccountResponse.class);
+            Account.class);
         assertThat(createAccount)
             .isNotNull();
-        assertThat(createAccount.getErrors())
-            .isNull();
     }
 
     public static Error notCreatePriorityAccount(String accountId, String digitalId) {

@@ -7,7 +7,6 @@ import ru.sberbank.pprb.sbbol.partners.ContactAddressApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
-import ru.sberbank.pprb.sbbol.partners.model.AddressResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AddressService;
@@ -25,7 +24,7 @@ public class ContactAddressController implements ContactAddressApi {
     }
 
     @Override
-    public ResponseEntity<AddressResponse> create(@Validation(type = AddressCreateValidationImpl.class) AddressCreate address) {
+    public ResponseEntity<Address> create(@Validation(type = AddressCreateValidationImpl.class) AddressCreate address) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactAddressService.saveAddress(address));
     }
 
@@ -36,7 +35,7 @@ public class ContactAddressController implements ContactAddressApi {
     }
 
     @Override
-    public ResponseEntity<AddressResponse> getById(String digitalId, String id) {
+    public ResponseEntity<Address> getById(String digitalId, String id) {
         return ResponseEntity.ok(contactAddressService.getAddress(digitalId, id));
     }
 
@@ -46,7 +45,7 @@ public class ContactAddressController implements ContactAddressApi {
     }
 
     @Override
-    public ResponseEntity<AddressResponse> update(@Validation(type = AddressUpdateValidationImpl.class) Address address) {
+    public ResponseEntity<Address> update(@Validation(type = AddressUpdateValidationImpl.class) Address address) {
         return ResponseEntity.ok(contactAddressService.updateAddress(address));
     }
 }

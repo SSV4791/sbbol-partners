@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerDocumentApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
+import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentResponse;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
@@ -25,7 +25,7 @@ public class PartnerDocumentController implements PartnerDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> create(@Validation(type = DocumentCreateValidationImpl.class) DocumentCreate document) {
+    public ResponseEntity<Document> create(@Validation(type = DocumentCreateValidationImpl.class) DocumentCreate document) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerDocumentService.saveDocument(document));
     }
 
@@ -36,7 +36,7 @@ public class PartnerDocumentController implements PartnerDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> getById(String digitalId, String id) {
+    public ResponseEntity<Document> getById(String digitalId, String id) {
         return ResponseEntity.ok(partnerDocumentService.getDocument(digitalId, id));
     }
 
@@ -46,7 +46,7 @@ public class PartnerDocumentController implements PartnerDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentResponse> update(@Validation(type = DocumentUpdateValidationImpl.class) DocumentChange document) {
+    public ResponseEntity<Document> update(@Validation(type = DocumentUpdateValidationImpl.class) DocumentChange document) {
         return ResponseEntity.ok(partnerDocumentService.updateDocument(document));
     }
 }

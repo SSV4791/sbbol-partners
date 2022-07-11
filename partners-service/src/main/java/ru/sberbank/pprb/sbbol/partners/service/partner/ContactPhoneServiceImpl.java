@@ -4,8 +4,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
+import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PhoneResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 
@@ -27,7 +27,7 @@ public class ContactPhoneServiceImpl extends PhoneServiceImpl {
 
     @Override
     @Transactional
-    public PhoneResponse savePhone(PhoneCreate phone) {
+    public Phone savePhone(PhoneCreate phone) {
         var uuid = UUID.fromString(phone.getUnifiedId());
         var contact = contactRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid);
         if (contact.isEmpty()) {

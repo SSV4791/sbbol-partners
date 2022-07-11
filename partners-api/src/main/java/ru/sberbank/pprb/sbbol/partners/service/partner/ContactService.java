@@ -2,10 +2,8 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
-import ru.sberbank.pprb.sbbol.partners.model.ContactResponse;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 /**
  * Сервис по работе с контактами Партнера
@@ -19,7 +17,7 @@ public interface ContactService {
      * @param id        Идентификатор контакта
      * @return Контакт
      */
-    ContactResponse getContact(String digitalId, String id);
+    Contact getContact(String digitalId, String id);
 
     /**
      * Получение списка контактов партнеров по заданному фильтру
@@ -35,7 +33,7 @@ public interface ContactService {
      * @param contact данные контакта Партнера
      * @return Контакт
      */
-    ContactResponse saveContact(ContactCreate contact);
+    Contact saveContact(ContactCreate contact);
 
     /**
      * Обновление контакта Партнера
@@ -43,7 +41,7 @@ public interface ContactService {
      * @param contact новые данные контакта Партнера
      * @return Контакт
      */
-    ContactResponse updateContact(Contact contact);
+    Contact updateContact(Contact contact);
 
     /**
      * Удаление контакта Партнера
