@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerAccountValid
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -63,11 +64,11 @@ public class AccountUpdateValidatorImpl extends AbstractValidatorImpl<AccountCha
     private void validateUpdateAccount(AccountChange entity, Map<String, List<String>> errors) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
-        if (!foundAccount.getPartnerUuid().toString().equals(entity.getPartnerId())) {
+        if (!Objects.equals(foundAccount.getPartnerUuid().toString(), entity.getPartnerId())) {
             setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getPartnerId()));
         }
-        if (!entity.getVersion().equals(foundAccount.getVersion())) {
-            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundAccount.getVersion().toString(), entity.getVersion().toString()));
+        if (!Objects.equals(entity.getVersion(), foundAccount.getVersion())) {
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundAccount.getVersion(), entity.getVersion()));
         }
         if (AccountStateType.SIGNED == foundAccount.getState()) {
             setError(errors, "account", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ACCOUNT_SIGN_IS_TRUE, entity.getAccount()));
