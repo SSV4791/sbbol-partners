@@ -37,14 +37,14 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String id, String digitalId) {
-        accountService.deleteAccount(id, digitalId);
+    public ResponseEntity<Void> delete(String digitalId, String id) {
+        accountService.deleteAccount(digitalId, id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Account> getById(String id, String digitalId) {
-        return ResponseEntity.ok(accountService.getAccount(id, digitalId));
+    public ResponseEntity<Account> getById(String digitalId, String id) {
+        return ResponseEntity.ok(accountService.getAccount(digitalId, id));
     }
 
     @Override
