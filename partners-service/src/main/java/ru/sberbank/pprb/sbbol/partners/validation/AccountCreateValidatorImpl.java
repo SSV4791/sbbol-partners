@@ -24,11 +24,11 @@ import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.s
 public class AccountCreateValidatorImpl extends AbstractValidatorImpl<AccountCreate> {
 
     private static final String DOCUMENT_NAME = "partner";
-    private static final String DEFAULT_MESSAGE_ACCOUNT_LENGTH = "account.account.length";
-    private static final String DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER = "account.account.control_number";
-    private static final String DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER = "account.account.bank_account.control_number";
-    private static final String DEFAULT_MESSAGE_ACCOUNT_IS_NULL = "account.account.fields.is_null";
-    private static final String DEFAULT_MESSAGE_BIC_LENGTH = "account.account.bank.bic_length";
+    public static final String DEFAULT_MESSAGE_ACCOUNT_LENGTH = "account.account.length";
+    public static final String DEFAULT_MESSAGE_ACCOUNT_CONTROL_NUMBER = "account.account.control_number";
+    public static final String DEFAULT_MESSAGE_BANK_ACCOUNT_CONTROL_NUMBER = "account.account.bank_account.control_number";
+    public static final String DEFAULT_MESSAGE_ACCOUNT_IS_NULL = "account.account.fields.is_null";
+    public static final String DEFAULT_MESSAGE_BIC_LENGTH = "account.account.bank.bic_length";
     private final PartnerRepository partnerRepository;
 
     public AccountCreateValidatorImpl(PartnerRepository partnerRepository) {

@@ -38,6 +38,13 @@ public class ReplicationServiceImpl implements ReplicationService {
     }
 
     @Override
+    public void saveCounterparty(List<Account> accounts) {
+        for (Account account : accounts) {
+            saveCounterparty(account);
+        }
+    }
+
+    @Override
     public void saveCounterparty(Account account) {
         var partnerUuid = UUID.fromString(account.getPartnerId());
         var accountUuid = UUID.fromString(account.getId());

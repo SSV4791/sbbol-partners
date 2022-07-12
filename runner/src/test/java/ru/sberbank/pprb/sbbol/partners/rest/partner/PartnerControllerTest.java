@@ -1,17 +1,28 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.AllureId;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AddressType;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
+import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
@@ -20,6 +31,7 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +39,7 @@ import java.util.Set;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.ACCOUNT_FOR_TEST_PARTNER;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
@@ -980,6 +993,92 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(searchPartner.getCode())
             .isEqualTo(HttpStatus.NOT_FOUND.name());
+    }
+
+    @Test
+    void savePartnerFullModel() {
+        var request = new PartnerCreateFullModel()
+            .digitalId(randomAlphabetic(10))
+            .legalForm(LegalForm.LEGAL_ENTITY)
+            .orgName(randomAlphabetic(10))
+            .firstName(randomAlphabetic(10))
+            .secondName(randomAlphabetic(10))
+            .middleName(randomAlphabetic(10))
+            .inn("4139314257")
+            .kpp("123456789")
+            .ogrn("1035006110083")
+            .okpo("12345678")
+            .phones(
+                Set.of(
+                    "79241111111"
+                ))
+            .emails(
+                Set.of(
+                    "a.a.a@sberbank.ru"
+                ))
+            .comment("555555")
+            .accounts(Set.of(new AccountCreateFullModel()
+                .account(ACCOUNT_FOR_TEST_PARTNER)
+                .comment("Это тестовый комментарий")
+                .bank(new BankCreate()
+                    .bic("044525411")
+                    .name(randomAlphabetic(10))
+                    .bankAccount(
+                        new BankAccountCreate()
+                            .bankAccount("30101810145250000411"))
+                ))
+            )
+            .documents(Set.of(new DocumentCreateFullModel()
+                    .certifierName(RandomStringUtils.randomAlphabetic(100))
+                    .certifierType(CertifierType.NOTARY)
+                    .dateIssue(LocalDate.now())
+                    .divisionCode(RandomStringUtils.randomAlphanumeric(50))
+                    .divisionIssue(RandomStringUtils.randomAlphanumeric(250))
+                    .number(RandomStringUtils.randomAlphanumeric(50))
+                    .series(RandomStringUtils.randomAlphanumeric(50))
+                    .positionCertifier(RandomStringUtils.randomAlphanumeric(100))
+                    .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2")
+                )
+            )
+            .address(Set.of(new AddressCreateFullModel()
+                    .building("1")
+                    .buildingBlock("2")
+                    .city("3")
+                    .flat("4")
+                    .location("5")
+                    .region("6")
+                    .regionCode("7")
+                    .street("8")
+                    .type(AddressType.LEGAL_ADDRESS)
+                    .zipCode("9")
+                )
+            )
+            .contacts(Set.of(new ContactCreateFullModel()
+                    .legalForm(LegalForm.LEGAL_ENTITY)
+                    .orgName("Наименование компании")
+                    .firstName("Имя клиента")
+                    .secondName("Фамилия клиента")
+                    .middleName("Отчество клиента")
+                    .position("Должность")
+                    .phones(
+                        Set.of(
+                            "79241111111"
+                        ))
+                    .emails(
+                        Set.of(
+                            "a.a.a@sberbank.ru"
+                        ))
+                )
+            );
+
+        var createdPartner = post(
+            baseRoutePath + "/full-model",
+            HttpStatus.CREATED,
+            request,
+            PartnerCreateFullModelResponse.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
     }
 
     public static PartnerCreate getValidPartner() {

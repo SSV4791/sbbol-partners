@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Citizenship;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 
 import java.util.HashSet;
 import java.util.List;
@@ -97,6 +98,24 @@ class PartnerMapperTest extends BaseUnitConfiguration {
             .ignoringFields(
                 "phones",
                 "emails"
+            )
+            .isEqualTo(actual);
+    }
+
+    @Test
+    void toPartnerCreateFullModel() {
+        PartnerCreateFullModel expected = factory.manufacturePojo(PartnerCreateFullModel.class);
+        PartnerEntity partnerEntity = mapper.toPartner(expected);
+        Partner actual = mapper.toPartner(partnerEntity);
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "phones",
+                "emails",
+                "address",
+                "documents",
+                "accounts",
+                "contacts"
             )
             .isEqualTo(actual);
     }

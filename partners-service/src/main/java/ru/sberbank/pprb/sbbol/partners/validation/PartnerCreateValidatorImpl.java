@@ -17,11 +17,11 @@ import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.s
 
 public class PartnerCreateValidatorImpl extends AbstractValidatorImpl<PartnerCreate> {
 
-    private static final String DEFAULT_MESSAGE_INN_LENGTH = "partner.inn_length";
-    private static final String DEFAULT_MESSAGE_KPP_LENGTH = "partner.kpp.length";
-    private static final String DEFAULT_MESSAGE_OGRN_LENGTH = "partner.ogrn_length";
-    private static final String DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER = "default.field.control_number";
-    private static final String DEFAULT_MESSAGE_OKPO_LENGTH = "partner.okpo_length";
+    public static final String DEFAULT_MESSAGE_INN_LENGTH = "partner.inn_length";
+    public static final String DEFAULT_MESSAGE_KPP_LENGTH = "partner.kpp.length";
+    public static final String DEFAULT_MESSAGE_OGRN_LENGTH = "partner.ogrn_length";
+    public static final String DEFAULT_MESSAGE_FIELD_CONTROL_NUMBER = "default.field.control_number";
+    public static final String DEFAULT_MESSAGE_OKPO_LENGTH = "partner.okpo_length";
 
     @Override
     public void validator(Map<String, List<String>> errors, PartnerCreate entity) {

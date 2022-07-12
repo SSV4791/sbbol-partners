@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
@@ -15,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
@@ -25,6 +27,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Loggable
 @Mapper(
@@ -53,6 +58,27 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "bankId", expression = "java(bankAccount.getBank().getUuid() ==null ? null : bankAccount.getBank().getUuid().toString())")
     @Mapping(target = "bankAccount", source = "account")
     BankAccount toBankAccount(BankAccountEntity bankAccount);
+
+
+    default List<AccountEntity> toAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid) {
+        if (CollectionUtils.isEmpty(accounts)) {
+            return Collections.emptyList();
+        }
+        return accounts.stream()
+            .map(value -> toAccount(value, digitalId, partnerUuid))
+            .collect(Collectors.toList());
+    }
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "partnerUuid", source = "partnerUuid")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "priorityAccount", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "digitalId", source = "digitalId")
+    @Mapping(target = "account", source = "account.account")
+    AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")

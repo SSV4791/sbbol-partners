@@ -8,6 +8,13 @@ import java.util.List;
 public interface ReplicationService {
 
     /**
+     * Сохранение контрагентов в СББОЛ
+     *
+     * @param accounts Счёта на обновление
+     */
+    void saveCounterparty(List<Account> accounts);
+
+    /**
      * Сохранение контрагента в СББОЛ
      *
      * @param account Счёт на обновление

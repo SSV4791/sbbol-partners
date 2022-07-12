@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.ufs.partner.model.PartnerCreateFullModel",
+  "type": "object",
+  "title": "Партнер",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации партнера",
+      "maxLength": 350
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя партнера",
+      "maxLength": 50
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия партнера",
+      "maxLength": 50
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество партнера",
+      "maxLength": 50
+    },
+    "inn": {
+      "type": "string",
+      "title": "ИНН",
+      "minLength": 5,
+      "maxLength": 12
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП",
+      "minLength": 9,
+      "maxLength": 9
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН",
+      "minLength": 13,
+      "maxLength": 15
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО",
+      "minLength": 8,
+      "maxLength": 14
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий пользователя"
+    },
+    "citizenship": {
+      "$ref": "../common/citizenship.json"
+    },
+    "accounts": {
+      "type": "array",
+      "title": "Счета",
+      "items": {
+        "$ref": "../accounts/account_create_full_model.json"
+      },
+      "uniqueItems": true
+    },
+    "phones": {
+      "type": "array",
+      "title": "Номера телефонов партнера",
+      "items": {
+        "type": "string",
+        "title": "Номер телефона"
+      },
+      "uniqueItems": true
+    },
+    "emails": {
+      "type": "array",
+      "title": "Адреса электронной почты партнера",
+      "items": {
+        "type": "string",
+        "title": "Электронный адрес"
+      },
+      "uniqueItems": true
+    },
+    "contacts": {
+      "title": "Контакты",
+      "type": "array",
+      "items": {
+        "$ref": "../contact/contact_create_full_model.json"
+      },
+      "uniqueItems": true
+    },
+    "address": {
+      "title": "Адрес",
+      "type": "array",
+      "items": {
+        "$ref": "../address/address_create_full_model.json"
+      },
+      "uniqueItems": true
+    },
+    "documents": {
+      "title": "Документы",
+      "type": "array",
+      "items": {
+        "$ref": "../documents/document_create_full_model.json"
+      },
+      "uniqueItems": true
+    }
+  }
+}
+
