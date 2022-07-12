@@ -5,15 +5,15 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
-import java.util.Map;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
 
 public class DocumentUpdateValidationImpl extends AbstractValidatorImpl<DocumentChange> {
@@ -40,8 +40,8 @@ public class DocumentUpdateValidationImpl extends AbstractValidatorImpl<Document
                 setError(errors, "documentType", MessagesTranslator.toLocale(DEFAULT_MESSAGE_ERROR_DOCUMENT_TYPE, entity.getDocumentTypeId()));
             }
         }
-        if (!entity.getVersion().equals(foundDocument.getVersion())) {
-            setError(errors, "commom", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundDocument.getVersion().toString(), entity.getVersion().toString()));
+        if (!Objects.equals(entity.getVersion(), foundDocument.getVersion())) {
+            setError(errors, "commom", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundDocument.getVersion(), entity.getVersion()));
         }
         if (entity.getVersion() == null) {
             setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, "version"));

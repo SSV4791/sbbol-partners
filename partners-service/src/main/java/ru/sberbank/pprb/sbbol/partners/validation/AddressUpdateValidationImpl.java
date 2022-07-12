@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
@@ -32,8 +33,8 @@ public class AddressUpdateValidationImpl extends AbstractValidatorImpl<Address> 
         if (entity.getVersion() == null) {
             setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, "version"));
         }
-        if (!entity.getVersion().equals(foundAddress.getVersion())) {
-            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundAddress.getVersion().toString(), entity.getVersion().toString()));
+        if (!Objects.equals(entity.getVersion(), foundAddress.getVersion())) {
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundAddress.getVersion(), entity.getVersion()));
         }
         if (StringUtils.isNotEmpty(entity.getZipCode()) && entity.getZipCode().length() > ZIP_CODE_MAX_LENGTH_VALIDATION) {
             setError(errors, "zipCode", MessagesTranslator.toLocale(DEFAULT_LENGTH, "6"));

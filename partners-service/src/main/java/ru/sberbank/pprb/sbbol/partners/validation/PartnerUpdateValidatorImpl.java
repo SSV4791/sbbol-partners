@@ -15,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BasePartnerValidation.checkInn;
@@ -98,8 +99,8 @@ public class PartnerUpdateValidatorImpl extends AbstractValidatorImpl<Partner> {
     private void checkLegalFormProperty(Map<String, List<String>> errors, Partner entity) {
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(entity.getDigitalId(), UUID.fromString(entity.getId()))
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
-        if (!entity.getVersion().equals(foundPartner.getVersion())) {
-            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPartner.getVersion().toString(), entity.getVersion().toString()));
+        if (!Objects.equals(entity.getVersion(), foundPartner.getVersion())) {
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPartner.getVersion(), entity.getVersion()));
         }
         partnerMapper.updatePartner(entity, foundPartner);
         if (foundPartner.getLegalType() != null) {

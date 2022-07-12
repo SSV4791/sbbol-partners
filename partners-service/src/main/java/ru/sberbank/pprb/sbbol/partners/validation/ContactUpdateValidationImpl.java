@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.setError;
@@ -44,8 +45,8 @@ public class ContactUpdateValidationImpl extends AbstractValidatorImpl<Contact> 
         }
         commonValidationDigitalId(errors, entity.getDigitalId());
         commonValidationUuid(errors, entity.getPartnerId(), entity.getId());
-        if (!entity.getVersion().equals(foundContact.getVersion())) {
-            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundContact.getVersion().toString(), entity.getVersion().toString()));
+        if (!Objects.equals(entity.getVersion(), foundContact.getVersion())) {
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundContact.getVersion(), entity.getVersion()));
         }
         if (entity.getVersion() == null) {
             setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_CAMMON_FIELD_IS_NULL, "version"));

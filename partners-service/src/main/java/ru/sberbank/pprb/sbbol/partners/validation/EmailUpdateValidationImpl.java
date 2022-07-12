@@ -30,9 +30,11 @@ public class EmailUpdateValidationImpl extends AbstractValidatorImpl<Email> {
         commonValidationUuid(errors, entity.getUnifiedId(), entity.getId());
         var uuid = UUID.fromString(entity.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(entity.getDigitalId(), uuid)
-            .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
+            .orElseThrow(() -> new MissingValueException(
+                MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId()))
+            );
         if (!entity.getVersion().equals(foundEmail.getVersion())) {
-            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundEmail.getVersion().toString(), entity.getVersion().toString()));
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundEmail.getVersion(), entity.getVersion()));
         }
         if (entity.getEmail().equals(EMPTY)) {
             setError(errors, "email", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "email"));

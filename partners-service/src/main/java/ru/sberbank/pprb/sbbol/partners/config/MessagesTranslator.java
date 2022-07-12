@@ -20,7 +20,7 @@ public class MessagesTranslator {
         return messageSource.getMessage(msgCode, null, locale);
     }
 
-    public static String toLocale(String msgCode, String... agrs) {
+    public static String toLocale(String msgCode, Object... agrs) {
         Locale locale = LocaleContextHolder.getLocale();
         return messageSource.getMessage(msgCode, agrs, locale);
     }

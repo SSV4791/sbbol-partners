@@ -4,11 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
+
 import java.util.Map;
+
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -31,8 +34,8 @@ public class PhoneUpdateValidationImpl extends AbstractValidatorImpl<Phone> {
             .orElseThrow(() -> new MissingValueException(MessagesTranslator.toLocale(DEFAULT_MESSAGE_OBJECT_NOT_FOUND_ERROR, DOCUMENT_NAME, entity.getDigitalId(), entity.getId())));
         commonValidationDigitalId(errors, entity.getDigitalId());
         commonValidationUuid(errors, entity.getUnifiedId(), entity.getId());
-        if (!entity.getVersion().equals(foundPhone.getVersion())) {
-            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPhone.getVersion().toString(), entity.getVersion().toString()));
+        if (!Objects.equals(entity.getVersion(), foundPhone.getVersion())) {
+            setError(errors, "common", MessagesTranslator.toLocale(DEFAULT_MESSAGE_VERSION_ERROR, foundPhone.getVersion(), entity.getVersion()));
         }
         if (entity.getPhone().equals(EMPTY)) {
             setError(errors, "phone", MessagesTranslator.toLocale(DEFAULT_MESSAGE_FIELDS_IS_NULL, "номер телефона"));
