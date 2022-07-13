@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithSbbolConfiguration;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +27,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     @AllureId("34191")
     void testGetPartner() {
         var response = get(
-            baseRoutePath + "/{digitalId}" + "/{id}",
+            "/partners/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
             RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)
@@ -97,9 +98,10 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     @AllureId("34114")
     void testDeletePartner() {
         var response = delete(
-            baseRoutePath + "/{digitalId}" + "/{id}",
+            "/partners/{digitalId}",
             HttpStatus.NOT_FOUND,
-            RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)
+            Map.of("ids", RandomStringUtils.randomAlphabetic(10)),
+            RandomStringUtils.randomAlphabetic(10)
         ).as(Error.class);
         assertThat(response)
             .isNotNull();

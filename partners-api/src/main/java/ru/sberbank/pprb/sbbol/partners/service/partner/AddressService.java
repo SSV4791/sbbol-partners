@@ -5,6 +5,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с адресами
  */
@@ -47,7 +49,7 @@ public interface AddressService {
      * Удаление адреса
      *
      * @param digitalId Идентификатор личного кабинета клиента
-     * @param id        Идентификатор адреса Контакта
+     * @param ids       Идентификаторы адресов Контакта
      */
-    void deleteAddress(String digitalId, String id);
+    void deleteAddresses(String digitalId, List<String> ids);
 }

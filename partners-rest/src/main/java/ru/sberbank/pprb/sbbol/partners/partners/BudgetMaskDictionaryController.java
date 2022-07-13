@@ -9,6 +9,8 @@ import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
+import java.util.List;
+
 @RestController
 public class BudgetMaskDictionaryController implements BudgetMaskDictionaryApi {
 
@@ -24,8 +26,8 @@ public class BudgetMaskDictionaryController implements BudgetMaskDictionaryApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String id) {
-        budgetMaskService.deleteBudgetMask(id);
+    public ResponseEntity<Void> delete(List<String> ids) {
+        budgetMaskService.deleteBudgetMasks(ids);
         return ResponseEntity.noContent().build();
     }
 

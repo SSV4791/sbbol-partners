@@ -41,7 +41,7 @@ paths:
         403:
           description: Forbidden
 
-  /partner/account/{digitalId}/{id}:
+  /partner/accounts/{digitalId}/{id}:
     get:
       tags:
         - Partner Accounts
@@ -79,6 +79,8 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
+
+  /partner/accounts/{digitalId}:
     delete:
       tags:
         - Partner Accounts
@@ -91,11 +93,14 @@ paths:
           schema:
             type: string
           description: Идентификатор личного кабинета
-        - name: id
-          in: path
+        - name: ids
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентефикатор счёта
       responses:
         204:

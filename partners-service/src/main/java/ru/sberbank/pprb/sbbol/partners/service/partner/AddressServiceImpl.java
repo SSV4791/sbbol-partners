@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 abstract class AddressServiceImpl implements AddressService {
@@ -77,9 +78,11 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public void deleteAddress(String digitalId, String id) {
-        var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        addressRepository.delete(foundAddress);
+    public void deleteAddresses(String digitalId, List<String> ids) {
+        for (String id : ids) {
+            var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
+            addressRepository.delete(foundAddress);
+        }
     }
 }

@@ -4,6 +4,8 @@ import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с масками по определению бюджетности
  */
@@ -28,9 +30,9 @@ public interface BudgetMaskService {
     /**
      * Удаление маски из справочника
      *
-     * @param id идентификатор записи в справочнике
+     * @param ids идентификаторы записей в справочнике
      */
-    void deleteBudgetMask(String id);
+    void deleteBudgetMasks(List<String> ids);
 
     /**
      * Проверка является ли счет бюджетным

@@ -112,6 +112,8 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
+
+  /partner/accounts/sign/{digitalId}:
     delete:
       tags:
         - Accounts Sign
@@ -124,11 +126,14 @@ paths:
           schema:
             type: string
           description: Идентификатор личного кабинета
-        - name: accountId
-          in: path
+        - name: accountIds
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентификатор счёта
       responses:
         204:

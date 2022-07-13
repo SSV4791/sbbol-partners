@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
@@ -38,7 +39,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
-                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Contact.class,
                 contact.getDigitalId(), contact.getId()
@@ -466,7 +467,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             Contact.class
         );
         var checkContact = get(
-            baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Contact.class,
             contactUpdate.getDigitalId(), contactUpdate.getId());
@@ -483,7 +484,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var actualContact =
             get(
-                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Contact.class,
                 contact.getDigitalId(), contact.getId()
@@ -494,9 +495,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
 
         var deleteContact =
             delete(
-                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contacts" + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                actualContact.getDigitalId(), actualContact.getId()
+                Map.of("ids", actualContact.getId()),
+                actualContact.getDigitalId()
             ).getBody();
 
         assertThat(deleteContact)
@@ -504,7 +506,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
 
         var searchContact =
             get(
-                baseRoutePath + "/contact" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
                 contact.getDigitalId(), contact.getId()

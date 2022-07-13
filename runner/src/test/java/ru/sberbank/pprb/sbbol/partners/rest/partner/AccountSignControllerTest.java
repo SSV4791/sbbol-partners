@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -148,9 +149,10 @@ public class AccountSignControllerTest extends AbstractIntegrationTest {
 
         var deleteAccountSign =
             delete(
-                baseRoutePath + "/{digitalId}" + "/{accountId}",
+                baseRoutePath + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                savedSign.getDigitalId(), accountSignDetail.getAccountId()
+                Map.of("accountIds", accountSignDetail.getAccountId()),
+                savedSign.getDigitalId()
             ).getBody();
         assertThat(deleteAccountSign)
             .isNotNull();

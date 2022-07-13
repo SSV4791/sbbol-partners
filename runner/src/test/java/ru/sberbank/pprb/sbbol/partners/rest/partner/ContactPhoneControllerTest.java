@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +50,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
             .pagination(new Pagination()
                 .count(4));
         var response = post(
-            baseRoutePath + "/view",
+            "/partner/contact/phones/view",
             HttpStatus.BAD_REQUEST,
             filter1,
             Error.class
@@ -67,7 +68,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
                 )
             );
         var response1 = post(
-            baseRoutePath + "/view",
+            "/partner/contact/phones/view",
             HttpStatus.BAD_REQUEST,
             filter2,
             Error.class
@@ -87,7 +88,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
             .pagination(new Pagination()
                 .offset(0));
         var response2 = post(
-            baseRoutePath + "/view",
+            "/partner/contact/phones/view",
             HttpStatus.BAD_REQUEST,
             filter3,
             Error.class
@@ -119,7 +120,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
                 .count(4)
                 .offset(0));
         var response = post(
-            baseRoutePath + "/view",
+            "/partner/contact/phones/view",
             HttpStatus.OK,
             filter1,
             PhonesResponse.class
@@ -168,7 +169,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
 
         var phone2 = createPhone(contact.getId(), contact.getDigitalId());
         updatePhone(phone2);
-        phone2.setPhone((randomNumeric(11)) + "+" );
+        phone2.setPhone((randomNumeric(11)) + "+");
         var newUpdatePhone2 = put(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
@@ -285,7 +286,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
             .count(4)
             .offset(0));
         var response = post(
-            baseRoutePath + "/view",
+            "/partner/contact/phones/view",
             HttpStatus.OK,
             checkPhone,
             PhonesResponse.class);
@@ -320,7 +321,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
                 .count(4)
                 .offset(0));
         var actualPhone = post(
-            baseRoutePath + "/view",
+            "/partner/contact/phones/view",
             HttpStatus.OK,
             filter1,
             PhonesResponse.class
@@ -330,15 +331,16 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
 
         var deletePhone =
             delete(
-                baseRoutePath + "/{digitalId}" + "/{id}",
+                "/partner/contact/phones/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                contact.getDigitalId(), actualPhone.getPhones().get(0).getId()
+                Map.of("ids", actualPhone.getPhones().get(0).getId()),
+                contact.getDigitalId()
             ).getBody();
         assertThat(deletePhone)
             .isNotNull();
 
         var searchPhone = post(
-            baseRoutePath + "/view",
+            "/partner/contact/phones/view",
             HttpStatus.OK,
             filter1,
             PhonesResponse.class

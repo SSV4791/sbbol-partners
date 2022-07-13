@@ -14,6 +14,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.AddressCreateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AddressUpdateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AddressesFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class PartnerAddressController implements PartnerAddressApi {
 
@@ -29,8 +31,8 @@ public class PartnerAddressController implements PartnerAddressApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, String id) {
-        partnerAddressService.deleteAddress(digitalId, id);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        partnerAddressService.deleteAddresses(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 

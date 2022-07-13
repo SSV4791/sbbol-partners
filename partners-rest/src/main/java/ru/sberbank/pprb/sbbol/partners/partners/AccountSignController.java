@@ -13,6 +13,8 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountSignValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountsSignFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class AccountSignController implements AccountsSignApi {
 
@@ -28,8 +30,8 @@ public class AccountSignController implements AccountsSignApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, String accountId) {
-        accountSignService.deleteAccountSign(digitalId, accountId);
+    public ResponseEntity<Void> delete(String digitalId, List<String> accountIds) {
+        accountSignService.deleteAccountsSign(digitalId, accountIds);
         return ResponseEntity.noContent().build();
     }
 
@@ -39,7 +41,9 @@ public class AccountSignController implements AccountsSignApi {
     }
 
     @Override
-    public ResponseEntity<AccountsSignResponse> list(@Validation(type = AccountsSignFilterValidationImpl.class) AccountsSignFilter accountsSignFilter) {
+    public ResponseEntity<AccountsSignResponse> list(
+        @Validation(type = AccountsSignFilterValidationImpl.class) AccountsSignFilter accountsSignFilter
+    ) {
         return ResponseEntity.ok(accountSignService.getAccountsSign(accountsSignFilter));
     }
 }

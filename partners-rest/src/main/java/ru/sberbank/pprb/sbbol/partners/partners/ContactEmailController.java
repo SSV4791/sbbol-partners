@@ -14,6 +14,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.EmailCreateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.EmailUpdateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.EmailsFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class ContactEmailController implements ContactEmailApi {
 
@@ -29,8 +31,8 @@ public class ContactEmailController implements ContactEmailApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, String id) {
-        contactEmailService.deleteEmail(digitalId, id);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        contactEmailService.deleteEmails(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 

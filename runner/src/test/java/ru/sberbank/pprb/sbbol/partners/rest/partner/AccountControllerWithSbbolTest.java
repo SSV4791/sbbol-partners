@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithSbbolConfiguration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -29,7 +30,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     @AllureId("34208")
     void testGetAccount() {
         var response = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
             randomAlphabetic(10), UUID.randomUUID()
@@ -96,9 +97,10 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     @AllureId("34159")
     void testDeleteAccount() {
         var response = delete(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}",
             HttpStatus.NOT_FOUND,
-            randomAlphabetic(10), randomAlphabetic(10)
+            Map.of("ids", randomAlphabetic(10)),
+            randomAlphabetic(10)
         ).as(Error.class);
         assertThat(response)
             .isNotNull();

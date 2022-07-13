@@ -7,6 +7,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с счётами Партнера
  */
@@ -49,9 +51,9 @@ public interface AccountService {
      * Удаление счёта Партнера
      *
      * @param digitalId Идентификатор личного кабинета клиента
-     * @param id        Идентификатор счёта Партнера
+     * @param ids       Идентификаторы счетов Партнера
      */
-    void deleteAccount(String digitalId, String id);
+    void deleteAccounts(String digitalId, List<String> ids);
 
     /**
      * Изменение приоритетного счета

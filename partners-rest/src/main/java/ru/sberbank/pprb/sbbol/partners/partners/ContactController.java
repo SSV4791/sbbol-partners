@@ -14,6 +14,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.ContactCreateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.ContactUpdateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.ContactsFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class ContactController implements PartnerContactsApi {
 
@@ -29,8 +31,8 @@ public class ContactController implements PartnerContactsApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, String id) {
-        contactService.deleteContact(digitalId, id);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        contactService.deleteContacts(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 

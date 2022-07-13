@@ -16,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepo
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -246,7 +247,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .ignoringFields("id")
             .isEqualTo(mapToDocumentType(documentTypeCreate));
 
-        delete(baseRoutePath + "/{id}", HttpStatus.NO_CONTENT, saveDocument.getId());
+        delete(baseRoutePath, HttpStatus.NO_CONTENT, Map.of("ids", saveDocument.getId()));
 
         var filter = new DocumentTypeFilter()
             .deleted(true)

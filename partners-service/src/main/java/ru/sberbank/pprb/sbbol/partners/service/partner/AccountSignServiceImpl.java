@@ -20,6 +20,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Loggable
@@ -112,38 +113,39 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     @Override
     @Transactional
-    public void deleteAccountSign(String digitalId, String accountId) {
-        var uuid = UUID.fromString(accountId);
-        var account = accountRepository.getByDigitalIdAndUuid(digitalId, uuid)
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
-        var sign = accountSignRepository.getByAccountUuid(uuid)
-            .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
-        try {
-            accountSignRepository.delete(sign);
-            auditAdapter.send(new Event()
-                .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
-                .eventParams(accountSingMapper.toEventParams(sign))
-            );
-        } catch (RuntimeException e) {
-            auditAdapter.send(new Event()
-                .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
-                .eventParams(accountSingMapper.toEventParams(sign))
-            );
-            throw new EntrySaveException(DOCUMENT_NAME, e);
-        }
-        try {
-            account.setState(AccountStateType.NOT_SIGNED);
-            var saveAccount = accountRepository.save(account);
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
-                .eventParams(accountMapper.toEventParams(saveAccount))
-            );
-        } catch (RuntimeException e) {
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_UPDATE_ERROR)
-                .eventParams(accountMapper.toEventParams(account))
-            );
-            throw new EntrySaveException(DOCUMENT_NAME, e);
+    public void deleteAccountsSign(String digitalId, List<String> accountIds) {
+        for (String accountId : accountIds) {
+            var sign = accountSignRepository.getByAccountUuid(UUID.fromString(accountId))
+                .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
+            try {
+                accountSignRepository.delete(sign);
+                auditAdapter.send(new Event()
+                    .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
+                    .eventParams(accountSingMapper.toEventParams(sign))
+                );
+            } catch (RuntimeException e) {
+                auditAdapter.send(new Event()
+                    .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
+                    .eventParams(accountSingMapper.toEventParams(sign))
+                );
+                throw new EntrySaveException(DOCUMENT_NAME, e);
+            }
+            var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountId))
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
+            try {
+                account.setState(AccountStateType.NOT_SIGNED);
+                var saveAccount = accountRepository.save(account);
+                auditAdapter.send(new Event()
+                    .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
+                    .eventParams(accountMapper.toEventParams(saveAccount))
+                );
+            } catch (RuntimeException e) {
+                auditAdapter.send(new Event()
+                    .eventType(EventType.ACCOUNT_UPDATE_ERROR)
+                    .eventParams(accountMapper.toEventParams(account))
+                );
+                throw new EntrySaveException(DOCUMENT_NAME, e);
+            }
         }
     }
 

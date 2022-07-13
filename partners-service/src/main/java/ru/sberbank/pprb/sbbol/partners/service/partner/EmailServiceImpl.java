@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 abstract class EmailServiceImpl implements EmailService {
@@ -71,11 +72,13 @@ abstract class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional
-    public void deleteEmail(String digitalId, String id) {
-        var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
-        if (foundEmail.isEmpty()) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+    public void deleteEmails(String digitalId, List<String> ids) {
+        for (String id : ids) {
+            var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            if (foundEmail.isEmpty()) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+            }
+            emailRepository.delete(foundEmail.get());
         }
-        emailRepository.delete(foundEmail.get());
     }
 }

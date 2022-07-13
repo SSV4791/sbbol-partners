@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 abstract class PhoneServiceImpl implements PhoneService {
@@ -71,11 +72,13 @@ abstract class PhoneServiceImpl implements PhoneService {
 
     @Override
     @Transactional
-    public void deletePhone(String digitalId, String id) {
-        var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
-        if (foundPhone.isEmpty()) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+    public void deletePhones(String digitalId, List<String> ids) {
+        for (String id : ids) {
+            var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            if (foundPhone.isEmpty()) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+            }
+            phoneRepository.delete(foundPhone.get());
         }
-        phoneRepository.delete(foundPhone.get());
     }
 }

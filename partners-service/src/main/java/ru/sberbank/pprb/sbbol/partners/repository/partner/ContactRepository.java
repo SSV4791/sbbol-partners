@@ -29,12 +29,4 @@ public interface ContactRepository extends CrudRepository<ContactEntity, UUID>, 
      * @return контакты Партнера
      */
     List<ContactEntity> findByDigitalIdAndPartnerUuid(String digitalId, UUID partnerUuid);
-
-    /**
-     * Получение контакта Партнера
-     *
-     * @param uuid Идентификатор контакта
-     * @return контакт Партнера
-     */
-    ContactEntity getByUuid(UUID uuid);
 }

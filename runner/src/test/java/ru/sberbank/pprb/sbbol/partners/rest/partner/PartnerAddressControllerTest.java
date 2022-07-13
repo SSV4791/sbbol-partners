@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
         var address = createValidAddress(partner.getId(), partner.getDigitalId());
         var actualAddress =
             get(
-                baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Address.class,
                 address.getDigitalId(), address.getId()
@@ -159,7 +160,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             Address.class
         );
         var checkAddress = get(
-            baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Address.class,
             addressUpdate.getDigitalId(), addressUpdate.getId());
@@ -176,7 +177,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
         var address = createValidAddress(partner.getId(), partner.getDigitalId());
         var actualAddress =
             get(
-                baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Address.class,
                 address.getDigitalId(), address.getId()
@@ -187,16 +188,17 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
 
         var deleteAddress =
             delete(
-                baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/addresses" + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                actualAddress.getDigitalId(), actualAddress.getId()
+                Map.of("ids", actualAddress.getId()),
+                actualAddress.getDigitalId()
             ).getBody();
         assertThat(deleteAddress)
             .isNotNull();
 
         var searchAddress =
             get(
-                baseRoutePath + "/address" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
                 address.getDigitalId(), address.getId()

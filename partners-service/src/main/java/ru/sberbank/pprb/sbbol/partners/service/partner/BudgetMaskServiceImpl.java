@@ -18,6 +18,7 @@ import javax.swing.text.MaskFormatter;
 import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Loggable
 public class BudgetMaskServiceImpl implements BudgetMaskService {
@@ -54,13 +55,17 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
 
     @Override
     @Transactional
-    public void deleteBudgetMask(String id) {
-        var uuid = UUID.fromString(id);
-        var foundMask = budgetMaskDictionaryRepository.getByUuid(uuid);
-        if (foundMask.isEmpty()) {
-            throw new EntryNotFoundException("budget_mask", id);
+    public void deleteBudgetMasks(List<String> ids) {
+        var uuids = ids.stream()
+            .map(UUID::fromString)
+            .collect(Collectors.toList());
+        for (UUID uuid : uuids) {
+            var foundMask = budgetMaskDictionaryRepository.getByUuid(uuid);
+            if (foundMask.isEmpty()) {
+                throw new EntryNotFoundException("budget_mask", uuid);
+            }
+            budgetMaskDictionaryRepository.delete(foundMask.get());
         }
-        budgetMaskDictionaryRepository.delete(foundMask.get());
     }
 
     @Override

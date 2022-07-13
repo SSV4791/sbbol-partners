@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,7 +48,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
             .pagination(new Pagination()
                 .count(4));
         var response = post(
-            baseRoutePath + "/view",
+            "/partner/emails/view",
             HttpStatus.BAD_REQUEST,
             filter1,
             Error.class
@@ -65,7 +66,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
                 )
             );
         var response1 = post(
-            baseRoutePath + "/view",
+            "/partner/emails/view",
             HttpStatus.BAD_REQUEST,
             filter2,
             Error.class
@@ -85,7 +86,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
             .pagination(new Pagination()
                 .offset(0));
         var response2 = post(
-            baseRoutePath + "/view",
+            "/partner/emails/view",
             HttpStatus.BAD_REQUEST,
             filter3,
             Error.class
@@ -116,7 +117,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
                 .count(4)
                 .offset(0));
         var response = post(
-            baseRoutePath + "/view",
+            "/partner/emails/view",
             HttpStatus.OK,
             filter1,
             EmailsResponse.class
@@ -277,7 +278,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
             .count(4)
             .offset(0));
         var response = post(
-            baseRoutePath + "/view",
+            "/partner/emails/view",
             HttpStatus.OK,
             checkEmail,
             EmailsResponse.class);
@@ -311,7 +312,7 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
                 .count(4)
                 .offset(0));
         var actualEmail = post(
-            baseRoutePath + "/view",
+            "/partner/emails/view",
             HttpStatus.OK,
             filter1,
             EmailsResponse.class
@@ -321,15 +322,16 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
 
         var deleteEmail =
             delete(
-                baseRoutePath + "/{digitalId}" + "/{id}",
+                "/partner/emails/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                partner.getDigitalId(), actualEmail.getEmails().get(0).getId()
+                Map.of("ids", actualEmail.getEmails().get(0).getId()),
+                partner.getDigitalId()
             ).getBody();
         assertThat(deleteEmail)
             .isNotNull();
 
         var searchEmail = post(
-            baseRoutePath + "/view",
+            "/partner/emails/view",
             HttpStatus.OK,
             filter1,
             EmailsResponse.class

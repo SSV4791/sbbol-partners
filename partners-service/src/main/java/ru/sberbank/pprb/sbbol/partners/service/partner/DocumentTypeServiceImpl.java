@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Loggable
@@ -67,10 +68,12 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
 
     @Override
     @Transactional
-    public void deleteDocument(String id) {
-        DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(id))
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, id));
-        foundDocument.setDeleted(Boolean.TRUE);
-        dictionaryRepository.save(foundDocument);
+    public void deleteDocuments(List<String> ids) {
+        for (String id : ids) {
+            DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(id))
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, id));
+            foundDocument.setDeleted(Boolean.TRUE);
+            dictionaryRepository.save(foundDocument);
+        }
     }
 }

@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -198,7 +199,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         var actualDocument =
             get(
-                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Document.class,
                 document.getDigitalId(), document.getId()
@@ -364,7 +365,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             Document.class
         );
         var checkDocument = get(
-            baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Document.class,
             documentUpdate.getDigitalId(), documentUpdate.getId());
@@ -381,7 +382,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
         var actualDocument =
             get(
-                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Document.class,
                 document.getDigitalId(), document.getId()
@@ -395,16 +396,17 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
         var deleteDocument =
             delete(
-                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/documents" + "/{digitalId}" ,
                 HttpStatus.NO_CONTENT,
-                actualDocument.getDigitalId(), actualDocument.getId()
+                Map.of("ids", actualDocument.getId()),
+                actualDocument.getDigitalId()
             ).getBody();
         assertThat(deleteDocument)
             .isNotNull();
 
         var searchDocument =
             get(
-                baseRoutePath + "/document" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
                 document.getDigitalId(), document.getId()

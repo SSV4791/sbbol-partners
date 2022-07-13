@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 abstract class DocumentServiceImpl implements DocumentService {
@@ -86,11 +87,13 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional
-    public void deleteDocument(String digitalId, String id) {
-        var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
-        if (foundDocument.isEmpty()) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+    public void deleteDocuments(String digitalId, List<String> ids) {
+        for (String id : ids) {
+            var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            if (foundDocument.isEmpty()) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+            }
+            documentRepository.delete(foundDocument.get());
         }
-        documentRepository.delete(foundDocument.get());
     }
 }

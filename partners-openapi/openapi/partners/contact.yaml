@@ -8,7 +8,7 @@ servers:
   - url: /
 
 paths:
-  /partner/contact/{digitalId}/{id}:
+  /partner/contacts/{digitalId}/{id}:
     get:
       tags:
         - Partner Contacts
@@ -46,6 +46,8 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
+
+  /partner/contacts/{digitalId}:
     delete:
       tags:
         - Partner Contacts
@@ -58,11 +60,14 @@ paths:
           schema:
             type: string
           description: Идентификатор личного кабинета
-        - name: id
-          in: path
+        - name: ids
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентефикатор контакта
       responses:
         204:

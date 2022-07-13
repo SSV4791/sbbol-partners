@@ -8,7 +8,7 @@ servers:
   - url: /
 
 paths:
-  /partner/contact/email/view:
+  /partner/contact/emails/view:
     post:
       tags:
         - Contact Email
@@ -41,7 +41,7 @@ paths:
         403:
           description: Forbidden
 
-  /partner/contact/email/{digitalId}/{id}:
+  /partner/contact/emails/{digitalId}:
     delete:
       tags:
         - Contact Email
@@ -54,11 +54,14 @@ paths:
           schema:
             type: string
           description: Идентификатор личного кабинета
-        - name: id
-          in: path
+        - name: ids
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентификатор электронного адреса
       responses:
         204:
