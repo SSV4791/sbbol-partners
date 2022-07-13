@@ -7,9 +7,12 @@ import ru.sberbank.pprb.sbbol.partners.PartnersApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateFullModelValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnerUpdateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnersFilterValidationImpl;
@@ -44,6 +47,13 @@ public class PartnerController implements PartnersApi {
     public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
         partnerService.deletePartners(digitalId, ids);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<PartnerCreateFullModelResponse> createFullModel(
+        @Validation(type = PartnerCreateFullModelValidationImpl.class) PartnerCreateFullModel partnerCreateFullModel
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.savePartner(partnerCreateFullModel));
     }
 
     @Override

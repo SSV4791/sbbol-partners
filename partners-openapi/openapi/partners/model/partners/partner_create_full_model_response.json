@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.ufs.partner.model.PartnerCreateResponse",
+  "type": "object",
+  "title": "Ответ на запрос создания партнера",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Уникальный идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации партнера",
+      "maxLength": 350
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя партнера",
+      "maxLength": 50
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия партнера",
+      "maxLength": 50
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество партнера",
+      "maxLength": 50
+    },
+    "inn": {
+      "type": "string",
+      "title": "ИНН",
+      "minLength": 5,
+      "maxLength": 12
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП",
+      "minLength": 9,
+      "maxLength": 9
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН",
+      "minLength": 13,
+      "maxLength": 15
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО",
+      "minLength": 8,
+      "maxLength": 10
+    },
+    "accounts": {
+      "type": "array",
+      "title": "Счета",
+      "items": {
+        "$ref": "../accounts/account.json"
+      },
+      "uniqueItems": false
+    },
+    "documents": {
+      "type": "array",
+      "title": "Документы",
+      "items": {
+        "$ref": "../documents/document.json"
+      },
+      "uniqueItems": false
+    },
+    "address": {
+      "title": "Адрес",
+      "type": "array",
+      "items": {
+        "$ref": "../address/address.json"
+      },
+      "uniqueItems": false
+    },
+    "contacts": {
+      "title": "Контакты",
+      "type": "array",
+      "items": {
+        "$ref": "../contact/contact.json"
+      },
+      "uniqueItems": false
+    },
+    "phones": {
+      "type": "array",
+      "title": "Номера телефонов партнера",
+      "items": {
+        "$ref": "../phone/phone.json"
+      },
+      "uniqueItems": false
+    },
+    "emails": {
+      "type": "array",
+      "title": "Адреса электронной почты партнера",
+      "items": {
+        "$ref": "../email/email.json"
+      },
+      "uniqueItems": false
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий пользователя"
+    },
+    "gku": {
+      "type": "boolean",
+      "title": "Признак ЖКУ",
+      "default": false
+    },
+    "budget": {
+      "type": "boolean",
+      "title": "Признак бюджетности",
+      "default": false
+    },
+    "citizenship": {
+      "$ref": "../common/citizenship.json"
+    }
+  },
+  "required": [
+    "version",
+    "id",
+    "legalForm"
+  ]
+}

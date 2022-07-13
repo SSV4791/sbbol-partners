@@ -6,6 +6,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentCertifierType;
@@ -14,6 +15,13 @@ import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Loggable
 @Mapper(
@@ -37,6 +45,32 @@ public interface DocumentMapper extends BaseMapper {
         return certifierType != null ? CertifierType.valueOf(certifierType.name()) : null;
     }
 
+    default List<DocumentEntity> toDocuments(Set<DocumentCreateFullModel> documents, String digitalId, UUID unifiedUuid) {
+        if (CollectionUtils.isEmpty(documents)) {
+            return Collections.emptyList();
+        }
+        return documents.stream()
+            .map(value -> toDocument(value, digitalId, unifiedUuid))
+            .collect(Collectors.toList());
+    }
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "unifiedUuid", source = "unifiedUuid")
+    @Mapping(target = "digitalId", source = "digitalId")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "certifierType", source = "document.certifierType", qualifiedByName = "toCertifierType")
+    @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
+    @Mapping(target = "series", source = "document.series")
+    @Mapping(target = "number", source = "document.number")
+    @Mapping(target = "dateIssue", source = "document.dateIssue")
+    @Mapping(target = "divisionIssue", source = "document.divisionIssue")
+    @Mapping(target = "divisionCode", source = "document.divisionCode")
+    @Mapping(target = "certifierName", source = "document.certifierName")
+    @Mapping(target = "positionCertifier", source = "document.positionCertifier")
+    DocumentEntity toDocument(DocumentCreateFullModel document, String digitalId, UUID unifiedUuid);
+
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "version", ignore = true)
@@ -58,4 +92,5 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void updateDocument(DocumentChange document, @MappingTarget() DocumentEntity documentEntity);
+
 }

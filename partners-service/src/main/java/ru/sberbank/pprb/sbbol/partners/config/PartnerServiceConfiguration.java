@@ -333,6 +333,7 @@ public class PartnerServiceConfiguration {
         EmailRepository emailRepository,
         PartnerRepository partnerRepository,
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
+        BudgetMaskService budgetMaskService,
         ReplicationService replicationService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
@@ -344,7 +345,12 @@ public class PartnerServiceConfiguration {
             emailRepository,
             partnerRepository,
             gkuInnDictionaryRepository,
+            budgetMaskService,
             replicationService,
+            accountMapper(),
+            documentMapper(),
+            addressMapper(),
+            contactMapper(),
             partnerMapper()
         );
     }

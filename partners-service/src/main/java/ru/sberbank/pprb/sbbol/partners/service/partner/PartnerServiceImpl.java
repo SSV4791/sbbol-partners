@@ -5,10 +5,16 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
@@ -23,6 +29,7 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -37,7 +44,12 @@ public class PartnerServiceImpl implements PartnerService {
     private final EmailRepository emailRepository;
     private final PartnerRepository partnerRepository;
     private final GkuInnDictionaryRepository gkuInnDictionaryRepository;
+    private final BudgetMaskService budgetMaskService;
     private final ReplicationService replicationService;
+    private final AccountMapper accountMapper;
+    private final DocumentMapper documentMapper;
+    private final AddressMapper addressMapper;
+    private final ContactMapper contactMapper;
     private final PartnerMapper partnerMapper;
 
     public PartnerServiceImpl(
@@ -49,7 +61,12 @@ public class PartnerServiceImpl implements PartnerService {
         EmailRepository emailRepository,
         PartnerRepository partnerRepository,
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
+        BudgetMaskService budgetMaskService,
         ReplicationService replicationService,
+        AccountMapper accountMapper,
+        DocumentMapper documentMapper,
+        AddressMapper addressMapper,
+        ContactMapper contactMapper,
         PartnerMapper partnerMapper
     ) {
         this.accountRepository = accountRepository;
@@ -60,7 +77,12 @@ public class PartnerServiceImpl implements PartnerService {
         this.emailRepository = emailRepository;
         this.partnerRepository = partnerRepository;
         this.gkuInnDictionaryRepository = gkuInnDictionaryRepository;
+        this.budgetMaskService = budgetMaskService;
         this.replicationService = replicationService;
+        this.accountMapper = accountMapper;
+        this.documentMapper = documentMapper;
+        this.addressMapper = addressMapper;
+        this.contactMapper = contactMapper;
         this.partnerMapper = partnerMapper;
     }
 
@@ -101,6 +123,40 @@ public class PartnerServiceImpl implements PartnerService {
             partner.setGku(getGku(partner.getInn()));
         }
         return partnersResponse.partners(partners);
+    }
+
+    @Override
+    @Transactional
+    public PartnerCreateFullModelResponse savePartner(PartnerCreateFullModel partner) {
+        var partnerEntity = partnerMapper.toPartner(partner);
+        var savedPartner = partnerRepository.save(partnerEntity);
+        var digitalId = partner.getDigitalId();
+        var partnerUuid = savedPartner.getUuid();
+        var accounts = accountMapper.toAccounts(partner.getAccounts(), digitalId, partnerUuid).stream()
+            .map(accountRepository::save)
+            .map(value -> accountMapper.toAccount(value, budgetMaskService))
+            .collect(Collectors.toList());
+        var addresses = addressMapper.toAddress(partner.getAddress(), digitalId, partnerUuid).stream()
+            .map(addressRepository::save)
+            .map(addressMapper::toAddress)
+            .collect(Collectors.toList());
+        var documents = documentMapper.toDocuments(partner.getDocuments(), digitalId, partnerUuid).stream()
+            .map(documentRepository::save)
+            .map(documentMapper::toDocument)
+            .collect(Collectors.toList());
+        var contacts = contactMapper.toContacts(partner.getContacts(), digitalId, partnerUuid).stream()
+            .map(contactRepository::save)
+            .map(contactMapper::toContact)
+            .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(accounts)) {
+            replicationService.saveCounterparty(accounts);
+        }
+        return partnerMapper.toPartnerMullResponse(savedPartner)
+            .gku(getGku(savedPartner.getInn()))
+            .accounts(accounts)
+            .address(addresses)
+            .documents(documents)
+            .contacts(contacts);
     }
 
     @Override

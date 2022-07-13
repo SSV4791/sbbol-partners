@@ -29,6 +29,7 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
@@ -62,6 +63,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.EmailCreateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.EmailUpdateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.EmailsFilterValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PaginationValidationImpl;
+import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateFullModelValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnerUpdateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnersFilterValidationImpl;
@@ -234,6 +236,13 @@ public class ValidationConfiguration {
     Validator<PartnerCreate> partnerCreateValidator(
     ) {
         return new PartnerCreateValidatorImpl();
+    }
+
+    @Bean
+    Validator<PartnerCreateFullModel> partnerCreateFullModelValidator(
+        DocumentDictionaryRepository documentDictionaryRepository
+    ) {
+        return new PartnerCreateFullModelValidationImpl(documentDictionaryRepository);
     }
 
     @Bean

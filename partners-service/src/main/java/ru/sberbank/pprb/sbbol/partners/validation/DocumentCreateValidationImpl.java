@@ -14,7 +14,7 @@ import static ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidation.s
 
 public class DocumentCreateValidationImpl extends AbstractValidatorImpl<DocumentCreate> {
 
-    private static final String DEFAULT_MESSAGE_ERROR_DOCUMENT_TYPE = "document.documentTypeId_valid";
+    public static final String DEFAULT_MESSAGE_ERROR_DOCUMENT_TYPE = "document.documentTypeId_valid";
 
     private final DocumentDictionaryRepository documentDictionaryRepository;
 

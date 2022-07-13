@@ -16,11 +16,13 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Loggable
@@ -82,6 +84,31 @@ public interface ContactMapper extends BaseMapper {
                 }).collect(Collectors.toList());
         }
     }
+
+    default List<ContactEntity> toContacts(Set<ContactCreateFullModel> contacts, String digitalId, UUID partnerUuid) {
+        if (CollectionUtils.isEmpty(contacts)) {
+            return Collections.emptyList();
+        }
+        return contacts.stream()
+            .map(value -> toContact(value, digitalId, partnerUuid))
+            .collect(Collectors.toList());
+    }
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "partnerUuid", source = "partnerUuid")
+    @Mapping(target = "digitalId", source = "digitalId")
+    @Mapping(target = "emails", expression = "java(toEmail(contact.getEmails(), digitalId))")
+    @Mapping(target = "phones", expression = "java(toPhone(contact.getPhones(), digitalId))")
+    @Mapping(target = "type", source = "contact.legalForm", qualifiedByName = "toLegalType")
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "orgName", source = "contact.orgName")
+    @Mapping(target = "firstName", source = "contact.firstName")
+    @Mapping(target = "secondName", source = "contact.secondName")
+    @Mapping(target = "middleName", source = "contact.middleName")
+    @Mapping(target = "position", source = "contact.position")
+    ContactEntity toContact(ContactCreateFullModel contact, String digitalId, UUID partnerUuid);
+
 
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")

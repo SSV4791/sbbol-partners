@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "ru.sberbank.pprb.partners.model.AccountCreateFullModel",
+  "type": "object",
+  "title": "Счёт партнера",
+  "properties": {
+    "account": {
+      "type": "string",
+      "title": "Счёт"
+    },
+    "bank": {
+      "title": "Банк",
+      "$ref": "../bank/bank_create.json"
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий счета"
+    }
+  }
+}

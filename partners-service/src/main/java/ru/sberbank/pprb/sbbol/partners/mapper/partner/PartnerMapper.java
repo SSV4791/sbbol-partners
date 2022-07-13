@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
+import org.mapstruct.InheritConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,6 +20,8 @@ import ru.sberbank.pprb.sbbol.partners.model.Citizenship;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -93,6 +96,17 @@ public interface PartnerMapper extends BaseMapper {
         }
     }
 
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "emails", expression = "java(toEmail(partner.getEmails(), partner.getDigitalId()))")
+    @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), partner.getDigitalId()))")
+    @Mapping(target = "type", constant = "PARTNER")
+    @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
+    @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "version", ignore = true)
+    PartnerEntity toPartner(PartnerCreateFullModel partner);
+
     @Named("toCitizenshipType")
     static PartnerCitizenshipType toCitizenshipType(Citizenship citizenshipType) {
         return citizenshipType != null ? PartnerCitizenshipType.valueOf(citizenshipType.getValue()) : null;
@@ -138,4 +152,11 @@ public interface PartnerMapper extends BaseMapper {
             }
         }
     }
+
+    @Mapping(target = "gku", ignore = true)
+    @Mapping(target = "budget", ignore = true)
+    @Mapping(target = "id", expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
+    @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
+    @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    PartnerCreateFullModelResponse toPartnerMullResponse(PartnerEntity partner);
 }
