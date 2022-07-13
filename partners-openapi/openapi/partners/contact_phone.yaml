@@ -8,7 +8,7 @@ servers:
   - url: /
 
 paths:
-  /partner/contact/phone/view:
+  /partner/contact/phones/view:
     post:
       tags:
         - Contact Phone
@@ -41,7 +41,7 @@ paths:
         403:
           description: Forbidden
 
-  /partner/contact/phone/{digitalId}/{id}:
+  /partner/contact/phones/{digitalId}:
     delete:
       tags:
         - Contact Phone
@@ -54,11 +54,14 @@ paths:
           schema:
             type: string
           description: Идентификатор личного кабинета
-        - name: id
-          in: path
+        - name: ids
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентефикатор номера телефона
       responses:
         204:

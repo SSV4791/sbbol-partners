@@ -23,6 +23,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -304,7 +305,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         var actualAccount = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
@@ -747,7 +748,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             Account.class
         );
         var checkAccount = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion.getDigitalId(), accountVersion.getId());
@@ -772,7 +773,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             Account.class
         );
         var checkAccount = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion.getDigitalId(), accountVersion.getId());
@@ -824,7 +825,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
             Account.class
         );
         var checkAccount3 = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion3.getDigitalId(), accountVersion.getId());
@@ -840,7 +841,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         var actualAccount = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
@@ -851,15 +852,16 @@ class AccountControllerTest extends AbstractIntegrationTest {
 
         var deleteAccount =
             delete(
-                baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+                baseRoutePath + "/accounts" + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                actualAccount.getDigitalId(), actualAccount.getId()
+                Map.of("ids", actualAccount.getId()),
+                actualAccount.getDigitalId()
             ).getBody();
         assertThat(deleteAccount)
             .isNotNull();
 
         var searchAccount = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
             account.getDigitalId(), account.getId()
@@ -876,7 +878,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         var foundAccount = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
@@ -890,7 +892,7 @@ class AccountControllerTest extends AbstractIntegrationTest {
         createValidPriorityAccount(account.getId(), account.getDigitalId());
 
         var actualAccount = get(
-            baseRoutePath + "/account" + "/{digitalId}" + "/{id}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()

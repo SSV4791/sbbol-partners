@@ -41,7 +41,7 @@ paths:
         403:
           description: Forbidden
 
-  /partner/contact/address/{digitalId}/{id}:
+  /partner/contact/addresses/{digitalId}/{id}:
     get:
       tags:
         - Contact Address
@@ -79,6 +79,8 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
+
+  /partner/contact/addresses/{digitalId}:
     delete:
       tags:
         - Contact Address
@@ -91,11 +93,14 @@ paths:
           schema:
             type: string
           description: Идентификатор личного кабинета
-        - name: id
-          in: path
+        - name: ids
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентификатор адреса
       responses:
         204:

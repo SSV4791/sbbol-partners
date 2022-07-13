@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Loggable
@@ -124,22 +125,24 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public void deleteAccount(String digitalId, String id) {
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        try {
-            accountRepository.delete(foundAccount);
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_DELETE_SUCCESS)
-                .eventParams(accountMapper.toEventParams(foundAccount))
-            );
-            replicationService.deleteCounterparty(foundAccount);
-        } catch (RuntimeException e) {
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_DELETE_ERROR)
-                .eventParams(accountMapper.toEventParams(foundAccount))
-            );
-            throw new EntrySaveException(DOCUMENT_NAME, e);
+    public void deleteAccounts(String digitalId, List<String> ids) {
+        for (String id : ids) {
+            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
+            try {
+                accountRepository.delete(foundAccount);
+                auditAdapter.send(new Event()
+                    .eventType(EventType.ACCOUNT_DELETE_SUCCESS)
+                    .eventParams(accountMapper.toEventParams(foundAccount))
+                );
+                replicationService.deleteCounterparty(foundAccount);
+            } catch (RuntimeException e) {
+                auditAdapter.send(new Event()
+                    .eventType(EventType.ACCOUNT_DELETE_ERROR)
+                    .eventParams(accountMapper.toEventParams(foundAccount))
+                );
+                throw new EntrySaveException(DOCUMENT_NAME, e);
+            }
         }
     }
 

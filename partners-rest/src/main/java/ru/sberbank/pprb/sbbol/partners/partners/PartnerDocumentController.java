@@ -15,6 +15,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.DocumentCreateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.DocumentUpdateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.DocumentsFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class PartnerDocumentController implements PartnerDocumentApi {
 
@@ -30,8 +32,8 @@ public class PartnerDocumentController implements PartnerDocumentApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, String id) {
-        partnerDocumentService.deleteDocument(digitalId, id);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        partnerDocumentService.deleteDocuments(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 

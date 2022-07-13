@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Loggable
@@ -24,7 +25,7 @@ public class ContactServiceImpl implements ContactService {
     public ContactServiceImpl(
         ContactRepository contactRepository,
         ContactMapper contactMapper
-    ){
+    ) {
         this.contactRepository = contactRepository;
         this.contactMapper = contactMapper;
     }
@@ -34,7 +35,7 @@ public class ContactServiceImpl implements ContactService {
     public Contact getContact(String digitalId, String id) {
         var contact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        return  contactMapper.toContact(contact);
+        return contactMapper.toContact(contact);
     }
 
     @Override
@@ -79,11 +80,13 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public void deleteContact(String digitalId, String id) {
-        var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
-        if (foundContact.isEmpty()) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+    public void deleteContacts(String digitalId, List<String> ids) {
+        for (String id : ids) {
+            var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            if (foundContact.isEmpty()) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+            }
+            contactRepository.delete(foundContact.get());
         }
-        contactRepository.delete(foundContact.get());
     }
 }

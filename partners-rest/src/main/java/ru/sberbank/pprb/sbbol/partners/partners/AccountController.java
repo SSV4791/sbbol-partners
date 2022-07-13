@@ -17,6 +17,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.AccountCreateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountUpdateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.AccountsFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class AccountController implements PartnerAccountsApi {
 
@@ -37,8 +39,8 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, String id) {
-        accountService.deleteAccount(digitalId, id);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        accountService.deleteAccounts(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 

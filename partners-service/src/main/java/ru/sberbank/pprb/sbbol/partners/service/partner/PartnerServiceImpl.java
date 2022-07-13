@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
@@ -20,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Loggable
@@ -30,6 +32,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final AccountRepository accountRepository;
     private final DocumentRepository documentRepository;
     private final ContactRepository contactRepository;
+    private final AddressRepository addressRepository;
     private final PhoneRepository phoneRepository;
     private final EmailRepository emailRepository;
     private final PartnerRepository partnerRepository;
@@ -41,6 +44,7 @@ public class PartnerServiceImpl implements PartnerService {
         AccountRepository accountRepository,
         DocumentRepository documentRepository,
         ContactRepository contactRepository,
+        AddressRepository addressRepository,
         PhoneRepository phoneRepository,
         EmailRepository emailRepository,
         PartnerRepository partnerRepository,
@@ -51,6 +55,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.accountRepository = accountRepository;
         this.documentRepository = documentRepository;
         this.contactRepository = contactRepository;
+        this.addressRepository = addressRepository;
         this.phoneRepository = phoneRepository;
         this.emailRepository = emailRepository;
         this.partnerRepository = partnerRepository;
@@ -122,19 +127,22 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public void deletePartner(String digitalId, String id) {
-        var partnerUuid = UUID.fromString(id);
-        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        partnerRepository.delete(foundPartner);
-        emailRepository.deleteAll(emailRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
-        phoneRepository.deleteAll(phoneRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
-        contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid));
-        documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
-        var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
-        if (!CollectionUtils.isEmpty(accounts)) {
-            accountRepository.deleteAll(accounts);
-            replicationService.deleteCounterparties(accounts);
+    public void deletePartners(String digitalId, List<String> ids) {
+        for (String partnerId : ids) {
+            var partnerUuid = UUID.fromString(partnerId);
+            PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
+            partnerRepository.delete(foundPartner);
+            emailRepository.deleteAll(emailRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
+            phoneRepository.deleteAll(phoneRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
+            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
+            contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid));
+            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
+            var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
+            if (!CollectionUtils.isEmpty(accounts)) {
+                accountRepository.deleteAll(accounts);
+                replicationService.deleteCounterparties(accounts);
+            }
         }
     }
 

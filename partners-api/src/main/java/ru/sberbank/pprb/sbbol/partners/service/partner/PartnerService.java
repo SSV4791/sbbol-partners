@@ -5,6 +5,8 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с Партнерами
  */
@@ -48,7 +50,7 @@ public interface PartnerService {
      * Удаление Партнера
      *
      * @param digitalId Идентификатор личного кабинета клиента
-     * @param id        Идентификатор Партнера
+     * @param id        Идентификаторы Партнеров
      */
-    void deletePartner(String digitalId, String id);
+    void deletePartners(String digitalId, List<String> id);
 }

@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,9 +88,9 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
 
         var deleteBudgetMask =
             delete(
-                baseRoutePath + "/{id}",
+                baseRoutePath,
                 HttpStatus.NO_CONTENT,
-                saveDocument.getId()
+                Map.of("ids", saveDocument.getId())
             ).getBody();
         assertThat(deleteBudgetMask)
             .isNotNull();

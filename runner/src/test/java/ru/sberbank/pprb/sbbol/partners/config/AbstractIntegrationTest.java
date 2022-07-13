@@ -22,6 +22,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
 
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 
 @ApiTestLayer
@@ -181,6 +183,17 @@ public abstract class AbstractIntegrationTest {
             .response();
     }
 
+    protected static Response delete(String url, HttpStatus responseHttpStatus, Map<String, ?> queryParams, Object... params) {
+        return given()
+            .spec(requestSpec)
+            .when()
+            .queryParams(queryParams)
+            .delete(url, params)
+            .then()
+            .spec(specResponseHandler(responseHttpStatus))
+            .extract()
+            .response();
+    }
     private static ResponseSpecification specResponseHandler(HttpStatus httpStatus) {
         return switch (httpStatus) {
             case OK -> responseSpec;

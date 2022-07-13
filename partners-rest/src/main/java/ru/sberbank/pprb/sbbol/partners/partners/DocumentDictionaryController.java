@@ -14,6 +14,8 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeService;
 import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeCreateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeUpdateValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
 
@@ -30,8 +32,8 @@ public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String id) {
-        documentTypeService.deleteDocument(id);
+    public ResponseEntity<Void> delete(List<String> ids) {
+        documentTypeService.deleteDocuments(ids);
         return ResponseEntity.noContent().build();
     }
 

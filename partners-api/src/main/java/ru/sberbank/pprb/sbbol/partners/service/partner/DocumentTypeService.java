@@ -6,6 +6,8 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с типами документов
  */
@@ -38,7 +40,7 @@ public interface DocumentTypeService {
     /**
      * Удаление документа Контакта
      *
-     * @param id уникальный идентификатор документа Контакта
+     * @param ids уникальные идентификаторы документов Контакта
      */
-    void deleteDocument(String id);
+    void deleteDocuments(List<String> ids);
 }

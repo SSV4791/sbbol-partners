@@ -40,19 +40,20 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
-
-  /dictionary/budget-mask/{id}:
     delete:
       tags:
         - Budget Mask Dictionary
       description: Удаление записи в справочнике масок бюджетности
       operationId: delete
       parameters:
-        - name: id
-          in: path
+        - name: ids
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентификатор маски
       responses:
         204:

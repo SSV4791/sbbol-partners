@@ -21,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
@@ -49,7 +50,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var actualPartner = get(
-            baseRoutePath + "/{digitalId}" + "/{id}",
+            "/partners/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -926,7 +927,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Partner.class
         );
         var checkPartner = get(
-            baseRoutePath + "/{digitalId}" + "/{id}",
+            "/partners/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Partner.class,
             updatePartner.getDigitalId(),
@@ -950,7 +951,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
-            baseRoutePath + "/{digitalId}" + "/{id}",
+            "/partners/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -961,14 +962,14 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isEqualTo(createdPartner);
 
         delete(
-            baseRoutePath + "/{digitalId}" + "/{id}",
+            "/partners/{digitalId}",
             HttpStatus.NO_CONTENT,
-            actualPartner.getDigitalId(),
-            actualPartner.getId()
+            Map.of("ids", actualPartner.getId()),
+            actualPartner.getDigitalId()
         ).getBody();
 
         var searchPartner = get(
-            baseRoutePath + "/{digitalId}" + "/{id}",
+            "/partners/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
             createdPartner.getDigitalId(),

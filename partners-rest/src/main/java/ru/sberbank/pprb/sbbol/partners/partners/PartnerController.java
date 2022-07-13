@@ -14,6 +14,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.PartnerCreateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnerUpdateValidatorImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PartnersFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class PartnerController implements PartnersApi {
 
@@ -21,12 +23,6 @@ public class PartnerController implements PartnersApi {
 
     public PartnerController(PartnerService partnerService) {
         this.partnerService = partnerService;
-    }
-
-    @Override
-    public ResponseEntity<Void> delete(String digitalId, String id) {
-        partnerService.deletePartner(digitalId, id);
-        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -42,6 +38,12 @@ public class PartnerController implements PartnersApi {
     @Override
     public ResponseEntity<Partner> create(@Validation(type = PartnerCreateValidatorImpl.class) PartnerCreate partner) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.savePartner(partner));
+    }
+
+    @Override
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        partnerService.deletePartners(digitalId, ids);
+        return ResponseEntity.noContent().build();
     }
 
     @Override

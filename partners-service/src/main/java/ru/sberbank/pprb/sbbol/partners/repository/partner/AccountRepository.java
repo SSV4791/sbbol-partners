@@ -46,7 +46,7 @@ public interface AccountRepository
     /**
      * Поиск счетов Партнеров c признаком приоритетных
      *
-     * @param digitalId Идентификатор личного кабинета
+     * @param digitalId   Идентификатор личного кабинета
      * @param partnerUuid Идентификатор партнера
      * @return Счёта партнера
      */

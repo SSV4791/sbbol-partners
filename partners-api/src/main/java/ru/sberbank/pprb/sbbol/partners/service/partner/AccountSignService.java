@@ -6,6 +6,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с подписями счётов Партнера
  */
@@ -31,9 +33,9 @@ public interface AccountSignService {
      * Удаление информации о подписи счёта Партнера
      *
      * @param digitalId Идентификатор личного кабинета
-     * @param accountId Идентификатор счёта
+     * @param accountIds Идентификаторы счетов
      */
-    void deleteAccountSign(String digitalId, String accountId);
+    void deleteAccountsSign(String digitalId, List<String> accountIds);
 
     /**
      * Получение информации о подписи счёта Партнера

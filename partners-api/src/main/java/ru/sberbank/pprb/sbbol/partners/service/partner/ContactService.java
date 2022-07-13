@@ -5,6 +5,8 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с контактами Партнера
  */
@@ -47,7 +49,7 @@ public interface ContactService {
      * Удаление контакта Партнера
      *
      * @param digitalId Идентификатор личного кабинета клиента
-     * @param id        Идентификатор контакта Партнера
+     * @param ids       Идентификаторы контактов Партнера
      */
-    void deleteContact(String digitalId, String id);
+    void deleteContacts(String digitalId, List<String> ids);
 }

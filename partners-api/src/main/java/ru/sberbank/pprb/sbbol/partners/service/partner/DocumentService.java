@@ -6,6 +6,8 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 
+import java.util.List;
+
 /**
  * Сервис по работе с документами
  */
@@ -48,7 +50,7 @@ public interface DocumentService {
      * Удаление документа
      *
      * @param digitalId Идентификатор личного кабинета клиента
-     * @param id        Идентификатор документа
+     * @param ids       Идентификаторы документов
      */
-    void deleteDocument(String digitalId, String id);
+    void deleteDocuments(String digitalId, List<String> ids);
 }

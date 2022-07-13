@@ -14,6 +14,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.PhoneCreateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PhoneUpdateValidationImpl;
 import ru.sberbank.pprb.sbbol.partners.validation.PhonesFilterValidationImpl;
 
+import java.util.List;
+
 @RestController
 public class ContactPhoneController implements ContactPhoneApi {
 
@@ -29,8 +31,8 @@ public class ContactPhoneController implements ContactPhoneApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, String id) {
-        contactPhoneService.deletePhone(digitalId, id);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        contactPhoneService.deletePhones(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 

@@ -102,18 +102,20 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
-  /dictionary/documents/{id}:
     delete:
       tags:
         - Document Type Dictionary
       description: Удаление вида документа
       operationId: delete
       parameters:
-        - name: id
-          in: path
+        - name: ids
+          in: query
           required: true
           schema:
-            type: string
+            type: array
+            items: {
+              type: string
+            }
           description: Идентификатор типа документа
       responses:
         204:
