@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.ufs.partner.model.PartnerCreateFullModel",
   "type": "object",
   "title": "Партнер",
+  "x-extra-class-annotation": "@LegalFormPartnerFullModelValidation @InnLengthPartnerFullModelValidation",
   "properties": {
     "digitalId": {
       "type": "string",
@@ -13,8 +13,7 @@
     },
     "orgName": {
       "type": "string",
-      "title": "Наименование организации партнера",
-      "maxLength": 350
+      "title": "Наименование организации партнера"
     },
     "firstName": {
       "type": "string",
@@ -34,8 +33,7 @@
     "inn": {
       "type": "string",
       "title": "ИНН",
-      "minLength": 5,
-      "maxLength": 12
+      "x-extra-annotation": "@InnValidation"
     },
     "kpp": {
       "type": "string",
@@ -46,8 +44,8 @@
     "ogrn": {
       "type": "string",
       "title": "ОГРН",
-      "minLength": 13,
-      "maxLength": 15
+      "maxLength": 13,
+      "x-extra-annotation": "@OgrnValidation"
     },
     "okpo": {
       "type": "string",
@@ -74,8 +72,7 @@
       "type": "array",
       "title": "Номера телефонов партнера",
       "items": {
-        "type": "string",
-        "title": "Номер телефона"
+        "type": "string"
       },
       "uniqueItems": true
     },
@@ -83,8 +80,7 @@
       "type": "array",
       "title": "Адреса электронной почты партнера",
       "items": {
-        "type": "string",
-        "title": "Электронный адрес"
+        "type": "string"
       },
       "uniqueItems": true
     },
@@ -112,6 +108,10 @@
       },
       "uniqueItems": true
     }
-  }
+  },
+  "required": [
+    "id",
+    "legalForm"
+  ]
 }
 

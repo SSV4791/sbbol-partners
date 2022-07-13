@@ -1,12 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.AccountsSignInfo",
   "type": "object",
   "title": "Подпись счетов",
   "properties": {
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета клиента"
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "accountSignDetail": {
       "type": "object",

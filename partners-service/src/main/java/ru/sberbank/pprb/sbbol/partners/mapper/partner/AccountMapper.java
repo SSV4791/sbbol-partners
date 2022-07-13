@@ -76,6 +76,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "search", ignore = true)
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "account", source = "account.account")
     AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
@@ -87,6 +88,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "search", ignore = true)
     AccountEntity toAccount(AccountCreate account);
 
     @Mapping(target = "intermediary", source = "mediary")
@@ -121,6 +123,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "state", ignore = true)
+    @Mapping(target = "search", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget() AccountEntity accountEntity);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
@@ -135,10 +138,19 @@ public interface AccountMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
+        var join =
+            String.join(",", account.getDigitalId(), account.getPartnerUuid().toString(), account.getAccount());
+
         var bank = account.getBank();
         if (bank != null) {
             bank.setAccount(account);
+            join = String.join(",", join, bank.getBic());
+            var bankAccount = bank.getBankAccount();
+            if (bankAccount != null) {
+                join = String.join(",", join, bankAccount.getAccount());
+            }
         }
+        account.setSearch(join);
     }
 
     @AfterMapping

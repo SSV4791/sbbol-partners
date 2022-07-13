@@ -1,34 +1,44 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.ContactCreateFullModel",
   "type": "object",
   "title": "Контакт",
   "properties": {
     "orgName": {
       "type": "string",
-      "title": "Наименование организации"
+      "title": "Наименование организации",
+      "maxLength": 350,
+      "x-not-empty": true
     },
     "firstName": {
       "type": "string",
-      "title": "Имя контакта"
+      "title": "Имя контакта",
+      "maxLength": 50,
+      "x-not-empty": true
     },
     "secondName": {
       "type": "string",
-      "title": "Фамилия контакта"
+      "title": "Фамилия контакта",
+      "maxLength": 50,
+      "x-not-empty": true
     },
     "middleName": {
       "type": "string",
-      "title": "Отчество контакта"
+      "title": "Отчество контакта",
+      "maxLength": 50,
+      "x-not-empty": true
     },
     "position": {
       "type": "string",
-      "title": "Должность"
+      "title": "Должность",
+      "maxLength": 100,
+      "x-not-empty": true
     },
     "phones": {
       "type": "array",
       "title": "Номера телефона контакта",
       "items": {
-        "type": "string"
+        "type": "string",
+        "x-extra-annotation": "@PhoneValid"
       },
       "uniqueItems": true
     },
@@ -36,12 +46,16 @@
       "type": "array",
       "title": "Номера телефона контакта",
       "items": {
-        "type": "string"
+        "type": "string",
+        "format": "email"
       },
       "uniqueItems": true
     },
     "legalForm": {
       "$ref": "../common/legal_form.json"
     }
-  }
+  },
+  "required": [
+    "legalForm"
+  ]
 }

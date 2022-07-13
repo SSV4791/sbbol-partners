@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.Account",
   "type": "object",
   "title": "Счёт партнера",
   "properties": {
@@ -30,7 +29,7 @@
       "type": "string",
       "title": "Счёт"
     },
-    "priority_account": {
+    "priorityAccount": {
       "type": "boolean",
       "title": "Избранный счёт",
       "default": false

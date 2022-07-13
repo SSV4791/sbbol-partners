@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.AccountsResponse",
   "type": "object",
   "title": "Счетa Партнера",
   "properties": {
@@ -9,8 +8,7 @@
       "items": {
         "$ref": "account.json"
       },
-      "title": "Счетa Партнера",
-      "minItems": 0
+      "title": "Счетa Партнера"
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",

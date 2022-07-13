@@ -7,22 +7,28 @@ autonumber
 alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
 СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+ППРБ.Партнеры --> Клиент: Error 400 [клиент не мигрирован]
 end
 else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
 СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
 ППРБ.Партнеры -> ППРБ.Партнеры: Поиск записи в account
-alt#gold Есть запись в таблице account
+alt#gold Есть записи в таблице account
 ППРБ.Партнеры -> ППРБ.Партнеры: Проверка на наличие у аккаунта значения SIGN
 alt#gold state.SIGNED
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 400 [аккаунт подписан]
+ППРБ.Партнеры --> Клиент: Error 400 [один из аккаунтов подписан]
 end
 Else state.NOT_SIGNED
 ППРБ.Партнеры -> ППРБ.Партнеры: Обновление данных в таблицах account.sign и создание записи в таблице sign
 ППРБ.Партнеры --> Клиент: 200
-ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid}
+loop Цикл в зависимости от кол-ва счетов
+ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid} поиск контрагента по digitalId и account_uuid
+СББОЛ -> СББОЛ: Поиск контрагента
 ППРБ.Партнеры -> СББОЛ: /update/{digitalId} (изменение контрагента по account.uuid = correspondent.pprb_guid)
+note right of ППРБ.Партнеры
+Старт репликации
+end note
+СББОЛ -> СББОЛ: Обновление статуса подписания счета
 СББОЛ -> ППРБ.Партнеры: 200
 group#Gold #pink negative
 СББОЛ --> ППРБ.Партнеры: Error 40*/50*
@@ -31,6 +37,7 @@ group#Gold #pink negative
 Мониторинг -> BRAIN_TEAM: Разбор ошибки и подготовка исправлений
 СББОЛ ->> ФП.Журналирование: Считывание очереди
 СББОЛ -> СББОЛ: Создание записи
+end
 end
 end
 else Нет записи в account

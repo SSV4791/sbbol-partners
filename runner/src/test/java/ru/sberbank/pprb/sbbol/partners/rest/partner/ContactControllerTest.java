@@ -373,7 +373,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 newEmail1.setId(email.getId());
                 newEmail1.setUnifiedId(email.getUnifiedId());
                 newEmail1.setDigitalId(email.getDigitalId());
-                newEmail1.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(255));
+                newEmail1.setEmail(randomAlphabetic(64) + "@mail.ru");
                 newEmails1.add(newEmail1);
             }
         }
@@ -450,7 +450,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         );
         assertThat(contactError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(contactError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(contactError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (contact.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

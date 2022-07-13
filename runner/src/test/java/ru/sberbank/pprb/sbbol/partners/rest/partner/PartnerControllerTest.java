@@ -535,7 +535,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testNegativeUpdateChildPartner() {
         var partner = createValidPartner(randomAlphabetic(10));
         HashSet<Phone> newPhones = new HashSet<>();
@@ -617,7 +616,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testUpdateChildPartner() {
         var partner = createValidPartner(randomAlphabetic(10));
         HashSet<Phone> newPhones = new HashSet<>();
@@ -679,7 +677,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 newEmail1.setId(email.getId());
                 newEmail1.setUnifiedId(email.getUnifiedId());
                 newEmail1.setDigitalId(email.getDigitalId());
-                newEmail1.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(255));
+                newEmail1.setEmail(randomAlphabetic(64) + "@mail.ru");
                 newEmails1.add(newEmail1);
             }
         }
@@ -924,7 +922,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(partnerError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(partnerError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (partner.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

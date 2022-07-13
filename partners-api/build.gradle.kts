@@ -70,6 +70,7 @@ tasks {
                     generateApiTests.set(false)
                     generateApiDocumentation.set(false)
                     generateModelTests.set(false)
+                    templateDir.set("${project(":partners-api").projectDir}/config/openapi-generator/templates/JavaSpring")
                     modelPackage.set("ru.sberbank.pprb.sbbol.partners.model")
                     globalProperties.putAll(
                         mapOf(
@@ -108,6 +109,7 @@ sourceSets {
 }
 
 dependencies {
+    implementation(liveLibs.apache.commons.lang3)
     implementation(liveLibs.jackson.databind.nullable)
     implementation(liveLibs.javax.annotation.api)
     implementation(liveLibs.javax.validation.api)

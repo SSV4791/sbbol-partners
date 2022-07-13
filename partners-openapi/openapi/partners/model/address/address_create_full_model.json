@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.AddressCreateFullModel",
   "type": "object",
   "title": "Адрес партнера",
   "properties": {
@@ -9,39 +8,53 @@
     },
     "zipCode": {
       "type": "string",
-      "title": "Индекс"
+      "title": "Индекс",
+      "maxLength": 6
     },
     "region": {
       "type": "string",
-      "title": "Район"
+      "title": "Район",
+      "maxLength": 50
     },
     "regionCode": {
       "type": "string",
-      "title": "Код района"
+      "title": "Код района",
+      "maxLength": 10
     },
     "city": {
       "type": "string",
-      "title": "Город"
+      "title": "Город",
+      "maxLength": 300
     },
     "location": {
       "type": "string",
-      "title": "Населённый пункт"
+      "title": "Населённый пункт",
+      "maxLength": 300
     },
     "street": {
       "type": "string",
-      "title": "Улица"
+      "title": "Улица",
+      "maxLength": 300
     },
     "building": {
       "type": "string",
-      "title": "Дом"
+      "title": "Дом",
+      "maxLength": 100
     },
     "buildingBlock": {
       "type": "string",
-      "title": "Строение"
+      "title": "Строение",
+      "maxLength": 20
     },
     "flat": {
       "type": "string",
-      "title": "Квартира"
+      "title": "Квартира",
+      "maxLength": 20
     }
-  }
+  },
+  "required": [
+    "unifiedId",
+    "digitalId",
+    "type"
+  ]
 }

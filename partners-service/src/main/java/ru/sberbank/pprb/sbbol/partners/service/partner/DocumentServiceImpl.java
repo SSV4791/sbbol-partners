@@ -1,7 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
@@ -13,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepo
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 abstract class DocumentServiceImpl implements DocumentService {
@@ -68,8 +71,9 @@ abstract class DocumentServiceImpl implements DocumentService {
     public Document saveDocument(DocumentCreate document) {
         var requestDocument = documentMapper.toDocument(document);
         if (requestDocument.getTypeUuid() != null) {
-            var documentType = documentDictionaryRepository.getByUuid(requestDocument.getTypeUuid());
-            documentType.ifPresent(requestDocument::setType);
+            var documentType = documentDictionaryRepository.getByUuid(requestDocument.getTypeUuid())
+                .orElseThrow(() -> new EntryNotFoundException("documentType", requestDocument.getTypeUuid()));
+            requestDocument.setType(documentType);
         }
         var saveDocument = documentRepository.save(requestDocument);
         return documentMapper.toDocument(saveDocument);
@@ -80,6 +84,16 @@ abstract class DocumentServiceImpl implements DocumentService {
     public Document updateDocument(DocumentChange document) {
         var foundDocument = documentRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId()));
+        if (!Objects.equals(document.getVersion(), foundDocument.getVersion())) {
+            throw new OptimisticLockException(foundDocument.getVersion(), document.getVersion());
+        }
+        if (StringUtils.isNotEmpty(document.getDocumentTypeId())) {
+            var foundDocumentType =
+                documentDictionaryRepository.getByUuid(UUID.fromString(document.getDocumentTypeId()));
+            if (foundDocumentType.isPresent()) {
+                throw new EntryNotFoundException("documentType", document.getDigitalId(), document.getId());
+            }
+        }
         documentMapper.updateDocument(document, foundDocument);
         var saveContact = documentRepository.save(foundDocument);
         return documentMapper.toDocument(saveContact);

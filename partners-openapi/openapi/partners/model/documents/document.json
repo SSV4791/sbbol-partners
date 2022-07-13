@@ -1,20 +1,28 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.Document",
   "type": "object",
   "title": "Документ",
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор"
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета"
+      "title": "Идентификатор личного кабинета",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "unifiedId": {
       "type": "string",
-      "title": "Идентификатор партнера или контакта"
+      "title": "Идентификатор партнера или контакта",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "version": {
       "type": "integer",
@@ -23,15 +31,18 @@
     },
     "documentType": {
       "$ref": "../dictionary/document_type.json",
-      "title": "Тип документа"
+      "title": "Тип документа",
+      "x-not-empty": true
     },
     "series": {
       "type": "string",
-      "title": "Серия документа"
+      "title": "Серия документа",
+      "maxLength": 50
     },
     "number": {
       "type": "string",
-      "title": "Номер документа"
+      "title": "Номер документа",
+      "maxLength": 50
     },
     "dateIssue": {
       "type": "string",
@@ -40,23 +51,34 @@
     },
     "divisionIssue": {
       "type": "string",
-      "title": "Место выдачи документа"
+      "title": "Место выдачи документа",
+      "maxLength": 250
     },
     "divisionCode": {
       "type": "string",
-      "title": "Код документа"
+      "title": "Код документа",
+      "maxLength": 50
     },
     "certifierName": {
       "type": "string",
-      "title": "Имя удостоверяющего сотрудника"
+      "title": "Имя удостоверяющего сотрудника",
+      "maxLength": 100
     },
     "positionCertifier": {
       "type": "string",
-      "title": "Должность удостоверяющего сотрудника"
+      "title": "Должность удостоверяющего сотрудника",
+      "maxLength": 100
     },
     "certifierType": {
       "$ref": "../common/certifier_type.json"
     }
-  }
+  },
+  "required": [
+    "id",
+    "digitalId",
+    "unifiedId",
+    "documentType",
+    "version"
+  ]
 }
 

@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
@@ -12,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 abstract class EmailServiceImpl implements EmailService {
@@ -65,6 +67,9 @@ abstract class EmailServiceImpl implements EmailService {
         var uuid = UUID.fromString(email.getId());
         var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
+        if (!Objects.equals(email.getVersion(), foundEmail.getVersion())) {
+            throw new OptimisticLockException(foundEmail.getVersion(), email.getVersion());
+        }
         emailMapper.updateEmail(email, foundEmail);
         var savedEmail = emailRepository.save(foundEmail);
         return emailMapper.toEmail(savedEmail);

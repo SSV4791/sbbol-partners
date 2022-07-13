@@ -1,28 +1,39 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.ContactFilter",
   "type": "object",
   "title": "Фильтр контактов партнера",
   "properties": {
     "partnerId": {
       "type": "string",
-      "title": "Идентификатор партнера"
+      "title": "Идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "ids": {
       "type": "array",
       "title": "Идентификаторы контактов",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 36,
+        "maxLength": 36,
+        "x-not-empty": true
       }
     },
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета"
+      "title": "Идентификатор личного кабинета",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
       "title": "Параметры запроса Контактов"
     }
-  }
+  },
+  "required": [
+    "pagination"
+  ]
 }
 

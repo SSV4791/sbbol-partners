@@ -1,12 +1,17 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -19,6 +24,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Loggable
@@ -80,9 +87,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public Account saveAccount(AccountCreate account) {
-        var requestAccount = accountMapper.toAccount(account);
+        var accountEntity = accountMapper.toAccount(account);
         try {
-            var savedAccount = accountRepository.save(requestAccount);
+            var savedAccount = accountRepository.save(accountEntity);
             auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_CREATE_SUCCESS)
                 .eventParams(accountMapper.toEventParams(savedAccount))
@@ -93,7 +100,7 @@ public class AccountServiceImpl implements AccountService {
         } catch (RuntimeException e) {
             auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_CREATE_ERROR)
-                .eventParams(accountMapper.toEventParams(requestAccount))
+                .eventParams(accountMapper.toEventParams(accountEntity))
             );
             throw new EntrySaveException(DOCUMENT_NAME, e);
         }
@@ -104,7 +111,18 @@ public class AccountServiceImpl implements AccountService {
     public Account updateAccount(AccountChange account) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
+        if (!Objects.equals(account.getVersion(), foundAccount.getVersion())) {
+            throw new OptimisticLockException(foundAccount.getVersion(), account.getVersion());
+        }
         accountMapper.updateAccount(account, foundAccount);
+        if (AccountStateType.SIGNED == foundAccount.getState()) {
+            throw new CheckValidationException(Map.of(
+                "account",
+                List.of(
+                    MessagesTranslator.toLocale("account.account.sign.is_true")
+                )
+            ));
+        }
         try {
             var savedAccount = accountRepository.save(foundAccount);
             auditAdapter.send(new Event()
@@ -152,6 +170,16 @@ public class AccountServiceImpl implements AccountService {
         var digitalId = accountPriority.getDigitalId();
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountPriority.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountPriority.getId()));
+        var foundPriorityAccounts = accountRepository
+            .findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(digitalId, foundAccount.getPartnerUuid());
+        if (!CollectionUtils.isEmpty(foundPriorityAccounts)) {
+            throw new CheckValidationException(Map.of(
+                "account.priorityAccount",
+                List.of(
+                    MessagesTranslator.toLocale("account.priority_account.more.one", foundAccount.getDigitalId(), foundAccount.getUuid())
+                )
+            ));
+        }
         foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());
         var savedAccount = accountRepository.save(foundAccount);
         return accountMapper.toAccount(savedAccount, budgetMaskService);

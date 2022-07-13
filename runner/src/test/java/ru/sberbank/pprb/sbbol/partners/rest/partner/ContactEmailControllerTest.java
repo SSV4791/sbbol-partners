@@ -261,7 +261,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         );
         assertThat(emailError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(emailError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(emailError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (email.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }
@@ -365,7 +365,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
 
     public static Email updateEmail(Email email) {
         return new Email()
-            .email(randomAlphabetic(64) + "@" + randomAlphabetic(255))
+            .email(randomAlphabetic(64) + "@mail.ru")
             .id(email.getId())
             .version(email.getVersion())
             .unifiedId(email.getUnifiedId())

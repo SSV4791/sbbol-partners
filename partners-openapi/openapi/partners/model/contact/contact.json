@@ -1,45 +1,63 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.Contact",
   "type": "object",
   "title": "Контакт",
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор"
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета"
+      "title": "Идентификатор личного кабинета",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
+    },
+    "partnerId": {
+      "type": "string",
+      "title": "Идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "orgName": {
       "type": "string",
-      "title": "Наименование организации"
+      "title": "Наименование организации",
+      "maxLength": 350,
+      "x-not-empty": true
     },
     "version": {
       "type": "integer",
       "format": "int64",
       "title": "Версия"
     },
-    "partnerId": {
-      "type": "string",
-      "title": "Идентификатор партнера"
-    },
     "firstName": {
       "type": "string",
-      "title": "Имя контакта"
+      "title": "Имя контакта",
+      "maxLength": 50,
+      "x-not-empty": true
     },
     "secondName": {
       "type": "string",
-      "title": "Фамилия контакта"
+      "title": "Фамилия контакта",
+      "maxLength": 50,
+      "x-not-empty": true
     },
     "middleName": {
       "type": "string",
-      "title": "Отчество контакта"
+      "title": "Отчество контакта",
+      "maxLength": 50,
+      "x-not-empty": true
     },
     "position": {
       "type": "string",
-      "title": "Должность"
+      "title": "Должность",
+      "maxLength": 100,
+      "x-not-empty": true
     },
     "phones": {
       "type": "array",
@@ -60,5 +78,11 @@
     "legalForm": {
       "$ref": "../common/legal_form.json"
     }
-  }
+  },
+  "required": [
+    "id",
+    "digitalId",
+    "partnerId",
+    "version"
+  ]
 }

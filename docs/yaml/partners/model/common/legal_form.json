@@ -1,9 +1,0 @@
-{
-  "type": "string",
-  "title": "Организационно-правовая форма",
-  "enum": [
-    "LEGAL_ENTITY",
-    "ENTREPRENEUR",
-    "PHYSICAL_PERSON"
-  ]
-}

@@ -29,4 +29,11 @@ public interface PartnerRepository extends CrudRepository<PartnerEntity, UUID>, 
      * @return Партнер
      */
     List<PartnerEntity> findAllByUuid(UUID uuid);
+
+    /**
+    * Поиск партнера по ключевым параметрам
+     *
+     * @param search Данные для поиска партнера
+     */
+    int countBySearch(String search);
 }

@@ -52,4 +52,12 @@ public interface AccountRepository
      */
 
     List<AccountEntity> findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(String digitalId, UUID partnerUuid);
+
+    /**
+     * Поиск счетов Партнера по ключевым полям
+     *
+     * @param search Данный для поиска
+     * */
+
+    List<AccountEntity> findBySearch(String search);
 }

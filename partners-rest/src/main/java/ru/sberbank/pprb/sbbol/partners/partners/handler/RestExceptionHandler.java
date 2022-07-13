@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,12 +17,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.mapper.ValidationMapper;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
+import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
-import ru.sberbank.pprb.sbbol.partners.exception.MissingValueException;
-import ru.sberbank.pprb.sbbol.partners.exception.ModelValidationException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -33,18 +33,19 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
     private static final String FILL_OBJECT_MESSAGE_EXCEPTION = "Ошибка заполнения объекта";
-    private final ValidationMapper validationMapper;
-
-    public RestExceptionHandler(ValidationMapper validationMapper) {
-        this.validationMapper = validationMapper;
-    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<?> handleConstraintViolationException(
@@ -54,19 +55,19 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         LOG.error("Нарушение ограничений уникальности в БД", ex);
         return buildResponseEntity(
             HttpStatus.BAD_REQUEST,
-            ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(". ")),
+            ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(joining(". ")),
             httpRequest.getRequestURL()
         );
     }
 
-    @ExceptionHandler(
-        {
-            EntryNotFoundException.class,
-            EntityNotFoundException.class,
-            ObjectNotFoundException.class,
-            PartnerMigrationException.class,
-            MissingValueException.class
-        })
+    @ExceptionHandler({
+        EntryNotFoundException.class,
+        EntityNotFoundException.class,
+        ObjectNotFoundException.class,
+        PartnerMigrationException.class
+    })
     protected ResponseEntity<Object> handleObjectNotFoundException(
         Exception ex,
         HttpServletRequest httpRequest
@@ -79,30 +80,41 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(ModelValidationException.class)
+    @ExceptionHandler(OptimisticLockException.class)
     protected ResponseEntity<Object> handleObjectModelValidationException(
-        ModelValidationException ex,
+        OptimisticLockException ex,
         HttpServletRequest httpRequest
     ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponsesEntity(
-            validationMapper.toDescriptions(ex),
+            ex.getErrors(),
             ex.getText(),
             httpRequest.getRequestURL()
         );
     }
 
-    @ExceptionHandler(
-        {
-            BadRequestException.class,
-            OptimisticLockingFailureException.class,
-            EntrySaveException.class
-        })
-    protected ResponseEntity<Object> handleObjectBadRequestException
-        (
-            Exception ex,
-            HttpServletRequest httpRequest
-        ) {
+    @ExceptionHandler(CheckValidationException.class)
+    protected ResponseEntity<Object> handleObjectModelValidationException(
+        CheckValidationException ex,
+        HttpServletRequest httpRequest
+    ) {
+        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
+        return buildResponsesEntity(
+            ex.getErrors(),
+            ex.getText(),
+            httpRequest.getRequestURL()
+        );
+    }
+
+    @ExceptionHandler({
+        BadRequestException.class,
+        EntrySaveException.class,
+        OptimisticLockingFailureException.class
+    })
+    protected ResponseEntity<Object> handleObjectBadRequestException(
+        Exception ex,
+        HttpServletRequest httpRequest
+    ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponseEntity(
             HttpStatus.BAD_REQUEST,
@@ -139,15 +151,35 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @NotNull
     @Override
-    protected @NonNull
-    ResponseEntity<Object> handleMethodArgumentNotValid(
+    protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         @NonNull HttpHeaders headers,
         @NonNull HttpStatus status,
         @NonNull WebRequest request
     ) {
-        return buildResponseEntity(status,
-            ex.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(". ")),
+        var errorsField = ex.getFieldErrors().stream()
+            .collect(groupingBy(FieldError::getField,
+                collectingAndThen(
+                    toList(), list -> list.stream()
+                        .map(FieldError::getDefaultMessage)
+                        .collect(toList())
+                )
+            ));
+        var errorsGlobal = ex.getGlobalErrors().stream()
+            .collect(groupingBy(ObjectError::getObjectName,
+                    collectingAndThen(
+                        toList(), list -> list.stream()
+                            .map(ObjectError::getDefaultMessage)
+                            .collect(toList()))
+
+                )
+            );
+        var errors =
+            Stream.concat(errorsField.entrySet().stream(), errorsGlobal.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return buildResponsesEntity(
+            errors,
+            ex.getLocalizedMessage(),
             ((ServletWebRequest) request).getRequest().getRequestURL()
         );
     }
@@ -196,13 +228,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponsesEntity(
-        List<Descriptions> errorsDesc,
+        Map<String, List<String>> errors,
         String text,
         StringBuffer requestUrl
     ) {
+        var descriptions = errors.entrySet().stream()
+            .map(value -> new Descriptions().field(value.getKey()).message(value.getValue()))
+            .collect(toList());
         var errorData = new Error()
             .code(HttpStatus.BAD_REQUEST.name())
-            .descriptionErrors(errorsDesc)
+            .descriptions(descriptions)
             .text(Collections.singletonList(text));
         String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
         LOG.error("Ошибка вызова \"{}\": {}", url, errorData);

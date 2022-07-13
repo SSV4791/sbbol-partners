@@ -13,4 +13,11 @@ else appobj UfsCounterpartiesDictionaryMigratedToPartners = false
 СББОЛ -> СББОЛ: Создать контрагента
 СББОЛ --> Клиент: Информация о контрагенте
 end
+==GET/VIEW==
+note right of СББОЛ
+Внезависимости от аппобжа.
+Методы get/view не влияют на аппобж
+end note
+Клиент -> СББОЛ: GET/VIEW /counterparty/...
+СББОЛ --> Клиент: 200
 @enduml

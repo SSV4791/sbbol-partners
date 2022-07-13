@@ -84,6 +84,9 @@ public class PartnerEntity extends BaseEntity {
     @Column(name = "comment")
     private String comment;
 
+    @Column(name = "search", length = 1000)
+    private String search;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "citizenship", length = 20)
     private PartnerCitizenshipType citizenship;
@@ -93,6 +96,7 @@ public class PartnerEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnerEmailEntity> emails;
+
 
     public OffsetDateTime getCreateDate() {
         return createDate;
@@ -226,6 +230,14 @@ public class PartnerEntity extends BaseEntity {
 
     public void setEmails(List<PartnerEmailEntity> emails) {
         this.emails = emails;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 
     public GkuInnEntity getGkuInnEntity() {

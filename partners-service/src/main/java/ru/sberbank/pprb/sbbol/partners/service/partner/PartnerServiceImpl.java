@@ -5,6 +5,7 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
@@ -28,6 +29,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -174,6 +176,9 @@ public class PartnerServiceImpl implements PartnerService {
     public Partner updatePartner(Partner partner) {
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
+        if (!Objects.equals(partner.getVersion(), foundPartner.getVersion())) {
+            throw new OptimisticLockException(foundPartner.getVersion(), partner.getVersion());
+        }
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
         var response = partnerMapper.toPartner(savePartner);

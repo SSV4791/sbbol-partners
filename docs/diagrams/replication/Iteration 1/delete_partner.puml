@@ -7,7 +7,7 @@ autonumber
 alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
 СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+ППРБ.Партнеры --> Клиент: Error 400 [клиент не мигрирован]
 end
 else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
 СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
@@ -17,11 +17,16 @@ alt#Gold Есть запись партнера в таблице partner
 alt#gold Есть запись в таблице account
 ППРБ.Партнеры -> ППРБ.Партнеры: Удаление партнера в таблицах partner, phone, email, account, bank, bank_account, contact, document, address
 ППРБ.Партнеры --> Клиент: 204
-loop#gold = count(account.uuid)
-ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid}
+loop#gold = count(account.uuid) цикл
+ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid} (поиск контрагента по digitalId и account_uuid)
+СББОЛ -> СББОЛ: Поиск контрагента
 alt#Gold 200
 СББОЛ --> ППРБ.Партнеры: 200
+note right of ППРБ.Партнеры
+Старт репликации
+end note
 ППРБ.Партнеры -> СББОЛ: /delete/{digitalId}/{pprbGuid} (удалить контрагента по account.uuid = pprb_guid)
+СББОЛ -> СББОЛ: Удаление
 СББОЛ -> ППРБ.Партнеры: 200
 group#Gold #pink negative
 СББОЛ --> ППРБ.Партнеры: Error 40*/50*
@@ -31,9 +36,9 @@ group#Gold #pink negative
 СББОЛ ->> ФП.Журналирование: Считывание очереди
 СББОЛ -> СББОЛ: Создание записи
 end
-else 404
+else 404 контрагент не найден
 break#Gold #pink
-СББОЛ -> ППРБ.Партнеры: 404
+СББОЛ -> ППРБ.Партнеры: 404 контрагент не найден
 end
 end
 end

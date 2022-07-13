@@ -1,20 +1,29 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.AccountChange",
   "type": "object",
   "title": "Счёт партнера",
+  "x-extra-class-annotation": "@AccountAccountChangeValidation @BankAccountAccountChangeValidation",
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор счёта"
+      "title": "Идентификатор счёта",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "partnerId": {
       "type": "string",
-      "title": "Идентификатор партнера"
+      "title": "Идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета клиента"
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "version": {
       "type": "integer",
@@ -23,7 +32,8 @@
     },
     "account": {
       "type": "string",
-      "title": "Счёт"
+      "title": "Счёт",
+      "maxLength": 20
     },
     "bank": {
       "title": "Банк",
@@ -31,7 +41,15 @@
     },
     "comment": {
       "type": "string",
-      "title": "Комментарий счета"
+      "title": "Комментарий счета",
+      "maxLength": 50
     }
-  }
+  },
+  "required": [
+    "id",
+    "partnerId",
+    "digitalId",
+    "bank",
+    "version"
+  ]
 }

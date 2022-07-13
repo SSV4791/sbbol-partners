@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
@@ -11,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 abstract class AddressServiceImpl implements AddressService {
@@ -71,6 +73,9 @@ abstract class AddressServiceImpl implements AddressService {
     public Address updateAddress(Address address) {
         var foundAddress = addressRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, address.getDigitalId(), address.getId()));
+        if (!Objects.equals(address.getVersion(), foundAddress.getVersion())) {
+            throw new OptimisticLockException(foundAddress.getVersion(), address.getVersion());
+        }
         addressMapper.updateAddress(address, foundAddress);
         var saveContact = addressRepository.save(foundAddress);
         return addressMapper.toAddress(saveContact);

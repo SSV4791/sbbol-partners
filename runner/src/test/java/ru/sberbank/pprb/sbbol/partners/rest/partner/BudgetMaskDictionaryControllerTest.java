@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskForm;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 import uk.co.jemos.podam.api.PodamFactory;
 
@@ -40,7 +41,11 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     @AllureId("34157")
     void testViewBudgetMasks() {
         var filter1 = new BudgetMaskFilter()
-            .maskType(BudgetMaskForm.BUDGET_ACCOUNT);
+            .maskType(BudgetMaskForm.BUDGET_ACCOUNT)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0)
+            );
         var response = post(
             baseRoutePath + "/view",
             HttpStatus.OK,
@@ -66,7 +71,11 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
         assertThat(budgetMask.getMask())
             .isEqualTo(mask.getMask());
         var filter1 = new BudgetMaskFilter()
-            .maskType(BudgetMaskForm.BIC);
+            .maskType(BudgetMaskForm.BIC)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0)
+            );
         var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, filter1, BudgetMasksResponse.class);
         assertThat(searchDocument.getMasks())
             .contains(budgetMask);
@@ -81,7 +90,11 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var filter1 = new BudgetMaskFilter()
-            .maskType(BudgetMaskForm.BUDGET_CORR_ACCOUNT);
+            .maskType(BudgetMaskForm.BUDGET_CORR_ACCOUNT)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0)
+            );
         var searchDocument = post(baseRoutePath + "/view", HttpStatus.OK, filter1, BudgetMasksResponse.class);
         assertThat(searchDocument.getMasks())
             .contains(saveDocument);

@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.DocumentTypeFilter",
   "type": "object",
   "title": "Запрос типов документов по фильтру",
   "properties": {
@@ -19,5 +18,8 @@
       "$ref": "../../../common/model/pagination.json",
       "title": "Параметры запроса Партнеров"
     }
-  }
+  },
+  "required": [
+    "pagination"
+  ]
 }

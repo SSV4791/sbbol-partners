@@ -7,7 +7,7 @@ autonumber
 alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
 СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+ППРБ.Партнеры --> Клиент: Error 400 [клиент не мигрирован]
 end
 else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
 СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
@@ -15,8 +15,11 @@ else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
 alt#Gold Есть запись в таблице partner
 ППРБ.Партнеры -> ППРБ.Партнеры: Создание записей в account, bank, bank_account
 ППРБ.Партнеры --> Клиент: 200
-loop#gold = count(account.uuid)
-ППРБ.Партнеры -> СББОЛ: /update/{digitalId} (создание контрагента используя account.uuid в качестве = correspondent.pprb_guid)
+note right of ППРБ.Партнеры
+Старт репликации
+end note
+ППРБ.Партнеры -> СББОЛ: /create/{digitalId} (создание контрагента используя account.uuid в качестве = correspondent.pprb_guid)
+СББОЛ -> СББОЛ: Создание
 СББОЛ --> ППРБ.Партнеры: 200
 group#Gold #Pink negative
 СББОЛ --> ППРБ.Партнеры: Error 50*/40*
@@ -25,7 +28,6 @@ group#Gold #Pink negative
 Мониторинг -> BRAIN_TEAM: Разбор ошибки и подготовка исправлений
 СББОЛ ->> ФП.Журналирование: Считывание очереди
 СББОЛ -> СББОЛ: Создание записи
-end
 end
 else В таблице partner отсутствует партнер
 break#Gold #Pink Ошибка. Отсутствует партнер

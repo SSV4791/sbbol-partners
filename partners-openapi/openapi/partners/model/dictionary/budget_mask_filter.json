@@ -1,11 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.BudgetMaskFilter",
   "type": "object",
   "title": "Запрос Бюджетных масок по фильтру",
   "properties": {
     "maskType": {
       "$ref": "../common/budget_mask_form.json"
+    },
+    "pagination": {
+      "$ref": "../../../common/model/pagination.json",
+      "title": "Параметры запроса бюджетных масок"
     }
-  }
+  },
+  "required": [
+    "pagination"
+  ]
 }
