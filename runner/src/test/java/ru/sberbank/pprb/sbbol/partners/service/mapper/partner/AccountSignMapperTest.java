@@ -7,9 +7,11 @@ import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 
+import java.sql.Date;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,5 +100,25 @@ class AccountSignMapperTest extends BaseUnitConfiguration {
             .isEqualTo(actual.getExternalDataFileId());
         assertThat(expected.getDateTimeOfSign())
             .isEqualTo(actual.getDateTimeOfSign());
+    }
+
+    @Test
+    void testToCounterpartySignData() {
+        var signProfileId = factory.manufacturePojo(Long.class);
+        var signEntity = factory.manufacturePojo(SignEntity.class);
+        signEntity.setSignProfileId(String.valueOf(signProfileId));
+        var actual = mapper.toCounterpartySignData(signEntity);
+
+        var expected = new CounterpartySignData();
+        expected.setBase64sign(signEntity.getSign());
+        expected.setSignDate(Date.from(signEntity.getDateTimeOfSign().toInstant()));
+        expected.setDigest(signEntity.getDigest());
+        expected.setSignProfileId(Long.parseLong(signEntity.getSignProfileId()));
+        expected.setPprbGuid(signEntity.getAccountUuid());
+        expected.setDcsId("default");
+
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .isEqualTo(expected);
     }
 }

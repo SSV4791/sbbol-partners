@@ -1,10 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.service.replication;
 
+import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
@@ -21,6 +23,7 @@ public class ReplicationServiceImpl implements ReplicationService {
     private final AccountRepository accountRepository;
     private final LegacySbbolAdapter legacySbbolAdapter;
     private final AccountMapper accountMapper;
+    private final AccountSingMapper accountSingMapper;
     private final CounterpartyMapper counterpartyMapper;
 
     public ReplicationServiceImpl(
@@ -28,12 +31,14 @@ public class ReplicationServiceImpl implements ReplicationService {
         AccountRepository accountRepository,
         LegacySbbolAdapter legacySbbolAdapter,
         AccountMapper accountMapper,
+        AccountSingMapper accountSingMapper,
         CounterpartyMapper counterpartyMapper
     ) {
         this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
         this.legacySbbolAdapter = legacySbbolAdapter;
         this.accountMapper = accountMapper;
+        this.accountSingMapper = accountSingMapper;
         this.counterpartyMapper = counterpartyMapper;
     }
 
@@ -77,5 +82,23 @@ public class ReplicationServiceImpl implements ReplicationService {
     @Override
     public void deleteCounterparty(AccountEntity account) {
         deleteCounterparties(Collections.singletonList(account));
+    }
+
+    @Override
+    public void saveSign(String digitalId, SignEntity sign) {
+        var accountId = sign.getAccountUuid().toString();
+        var counterparty = legacySbbolAdapter.getByPprbGuid(digitalId, accountId);
+        if (counterparty != null) {
+            var counterpartySignData = accountSingMapper.toCounterpartySignData(sign);
+            legacySbbolAdapter.saveSign(digitalId, counterpartySignData);
+        }
+    }
+
+    @Override
+    public void deleteSign(String digitalId, String counterpartyId) {
+        var counterparty = legacySbbolAdapter.getByPprbGuid(digitalId, counterpartyId);
+        if (counterparty != null) {
+            legacySbbolAdapter.removeSign(digitalId, counterpartyId);
+        }
     }
 }

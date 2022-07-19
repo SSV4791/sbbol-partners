@@ -25,6 +25,7 @@ micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-p
 postgresql-core = { module = "org.postgresql:postgresql", version = "42.2.12" }
 sbp-hibernate-standin = { module = "sbp.integration.orm:sbp-hibernate-standin", version = "4.2.1" }
 sbp-jpa-model-support = { module = "sbp.com.sbt.dataspace:jpa-model-support", version = "4.3.34" }
+sbt-kafka-validator-interceptor = { module = "ru.sbt.ss:validator-interceptor_2.13" , version = "2.7.1-1.0.1"}
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-context-core = { module = "org.springframework:spring-context", version = "5.3.12" }
 spring-context-support = { module = "org.springframework:spring-context-support", version = "5.3.12" }

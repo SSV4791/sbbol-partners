@@ -15,6 +15,8 @@ dependencies {
     implementation(platform(liveLibs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.kafka:spring-kafka")
+
     implementation(liveLibs.bundles.micrometer)
     implementation(liveLibs.hibernate.jcache)
     implementation(liveLibs.javax.servlet.api)
@@ -22,6 +24,7 @@ dependencies {
     implementation(liveLibs.sbp.hibernate.standin)
     //Поддержка генераторов ID на время перехода.
     implementation(liveLibs.sbp.jpa.model.support)
+    implementation(liveLibs.sbt.kafka.validator.interceptor)
 
     runtimeOnly(liveLibs.ehcache.org.core)
 }
