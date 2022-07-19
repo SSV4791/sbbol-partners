@@ -1,23 +1,17 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
-import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
 @Table(
     name = "budget_mask_dictionary",
@@ -29,16 +23,10 @@ import java.util.UUID;
 @DynamicUpdate
 @DynamicInsert
 @Entity
-public class BudgetMaskEntity implements Serializable, HashKeyProvider {
+public class BudgetMaskEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1;
-
-    @Column(name = "uuid", updatable = false, nullable = false)
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private UUID uuid;
 
     @Column(name = "mask", nullable = false, length = 20)
     private String mask;
@@ -74,14 +62,6 @@ public class BudgetMaskEntity implements Serializable, HashKeyProvider {
         this.condition = condition;
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
     @Override
     public int hashCode() {
         return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
@@ -105,15 +85,5 @@ public class BudgetMaskEntity implements Serializable, HashKeyProvider {
     @Override
     public String getHashKey() {
         return getUuid().toString();
-    }
-
-    @Override
-    public String toString() {
-        return "BudgetMaskEntity{" +
-            "uuid=" + uuid +
-            ", mask='" + mask + '\'' +
-            ", condition='" + condition + '\'' +
-            ", type=" + type +
-            '}';
     }
 }

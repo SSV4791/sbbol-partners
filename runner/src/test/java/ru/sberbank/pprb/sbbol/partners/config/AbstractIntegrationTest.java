@@ -36,6 +36,9 @@ import static io.restassured.RestAssured.given;
     {
         PodamConfiguration.class,
         TestReplicationConfiguration.class
+    },
+    initializers = {
+        HibernatePluginCleanerInitializer.class
     }
 )
 @ExtendWith({SpringExtension.class})
@@ -194,6 +197,7 @@ public abstract class AbstractIntegrationTest {
             .extract()
             .response();
     }
+
     private static ResponseSpecification specResponseHandler(HttpStatus httpStatus) {
         return switch (httpStatus) {
             case OK -> responseSpec;

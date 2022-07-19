@@ -23,13 +23,12 @@ micrometer-core = { module = "io.micrometer:micrometer-core", version.ref = "mic
 micrometer-registry-jmx = { module = "io.micrometer:micrometer-registry-jmx", version.ref = "micrometer" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "micrometer" }
 postgresql-core = { module = "org.postgresql:postgresql", version = "42.2.12" }
-sbp-hibernate-standin = { module = "sbp.integration.orm:sbp-hibernate-standin", version = "4.1.14" }
+sbp-hibernate-standin = { module = "sbp.integration.orm:sbp-hibernate-standin", version = "4.2.1" }
 sbp-jpa-model-support = { module = "sbp.com.sbt.dataspace:jpa-model-support", version = "4.3.34" }
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-context-core = { module = "org.springframework:spring-context", version = "5.3.12" }
 spring-context-support = { module = "org.springframework:spring-context-support", version = "5.3.12" }
 springfox-boot-starter = { module = "io.springfox:springfox-boot-starter", version = "3.0.0" }
-standin-client-cloud = { module = "ru.sbrf.journal:standin-client-cloud", version = "4.0.27" }
 swagger-annotations-core = { module = "io.swagger:swagger-annotations", version = "1.6.3" }
 
 [bundles]

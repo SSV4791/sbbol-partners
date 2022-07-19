@@ -72,4 +72,4 @@ Credentials хранятся в `GRADLE_HOME/gradle.encrypted.properties`
 
 Для изменения директории создания патча использовать с флагом
 
-`./gradlew newpatch -Ppatchname=newpatch -Preleaseversion='01.000.00'` или изменить версию в gradle.properties
+`./gradlew newpatch -Ppatchname=newpatch -Preleaseversion='02.000.00'` или изменить версию в gradle.properties

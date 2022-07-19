@@ -187,22 +187,4 @@ public class AddressEntity extends BaseEntity {
     public String getHashKey() {
         return getUnifiedUuid().toString();
     }
-
-    @Override
-    public String toString() {
-        return "AddressEntity{" +
-            "unifiedUuid=" + unifiedUuid +
-            ", digitalId='" + digitalId + '\'' +
-            ", type=" + type +
-            ", zipCode='" + zipCode + '\'' +
-            ", regionCode='" + regionCode + '\'' +
-            ", region='" + region + '\'' +
-            ", city='" + city + '\'' +
-            ", location='" + location + '\'' +
-            ", street='" + street + '\'' +
-            ", building='" + building + '\'' +
-            ", buildingBlock='" + buildingBlock + '\'' +
-            ", flat='" + flat + '\'' +
-            '}';
-    }
 }

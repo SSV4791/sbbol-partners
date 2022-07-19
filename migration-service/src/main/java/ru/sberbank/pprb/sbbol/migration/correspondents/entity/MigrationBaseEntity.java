@@ -2,12 +2,15 @@ package ru.sberbank.pprb.sbbol.migration.correspondents.entity;
 
 import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Version;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -18,15 +21,30 @@ public abstract class MigrationBaseEntity implements Serializable, HashKeyProvid
     @Column(name = "uuid", updatable = false, nullable = false)
     @Id
     @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @GenericGenerator(
+        name = "uuid",
+        strategy = "uuid2",
+        parameters = {
+            @Parameter(
+                name = "uuid_gen_strategy_class",
+                value = "org.hibernate.id.uuid.CustomVersionOneStrategy"
+            )
+        }
+    )
     private UUID uuid;
 
+    @Version
     @Column(name = "version", nullable = false)
     private Long version;
 
-    @UpdateTimestamp
     @Column(name = "SYS_LASTCHANGEDATE", nullable = false)
     private OffsetDateTime lastModifiedDate;
+
+    @PreUpdate
+    @PrePersist
+    public void updateSysLastChangeDate() {
+        lastModifiedDate = OffsetDateTime.now();
+    }
 
     public UUID getUuid() {
         return uuid;

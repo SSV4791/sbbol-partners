@@ -9,13 +9,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Deprecated
+@Deprecated(forRemoval = true)
 @Entity
 @DynamicUpdate
 @DynamicInsert
@@ -30,6 +34,13 @@ public class FlatRenter implements Serializable, HashKeyProvider {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID uuid;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    @Column(name = "SYS_LASTCHANGEDATE", nullable = false)
+    private OffsetDateTime lastModifiedDate;
 
     @Column(name = "partner_uuid", nullable = false)
     private UUID partnerUuid;
@@ -58,12 +69,34 @@ public class FlatRenter implements Serializable, HashKeyProvider {
     @Column(name = "phone_uuid")
     private UUID phoneUuid;
 
+    @PreUpdate
+    @PrePersist
+    public void updateSysLastChangeDate() {
+        lastModifiedDate = OffsetDateTime.now();
+    }
+
     public UUID getUuid() {
         return uuid;
     }
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public OffsetDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public UUID getPhoneUuid() {
@@ -163,3 +196,5 @@ public class FlatRenter implements Serializable, HashKeyProvider {
         return getPartnerUuid().toString();
     }
 }
+
+

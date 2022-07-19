@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.adapter.legacy.config;
 
-import com.hazelcast.util.UuidUtil;
 import org.mockito.ArgumentMatchers;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,7 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -63,7 +63,7 @@ public class LegasyAdapterConfiguration extends PodamConfiguration {
             .thenReturn(new ResponseEntity<>(Boolean.class, HttpStatus.OK));
 
         when(restTemplate.exchange(ArgumentMatchers.eq(CHECK_REQUISITES), ArgumentMatchers.eq(POST), ArgumentMatchers.any(), ArgumentMatchers.<ParameterizedTypeReference<CounterpartyCheckRequisitesResult>>any()))
-            .thenReturn(new ResponseEntity<>(new CounterpartyCheckRequisitesResult(UuidUtil.buildRandomUuidString(), false), HttpStatus.OK));
+            .thenReturn(new ResponseEntity<>(new CounterpartyCheckRequisitesResult(UUID.randomUUID().toString(), false), HttpStatus.OK));
 
         when(restTemplate.exchange(ArgumentMatchers.eq(UPDATE), ArgumentMatchers.eq(PUT), ArgumentMatchers.any(), ArgumentMatchers.<ParameterizedTypeReference<CounterpartyCheckRequisitesResult>>any(), ArgumentMatchers.anyString()))
             .thenAnswer((Answer<ResponseEntity<Counterparty>>) invocation -> {

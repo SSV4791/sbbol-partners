@@ -61,11 +61,4 @@ public class PhoneEntity extends PhoneBaseEntity {
     public int hashCode() {
         return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
     }
-
-    @Override
-    public String toString() {
-        return "PhoneEntity{" +
-            "unifiedUuid=" + unifiedUuid +
-            '}';
-    }
 }

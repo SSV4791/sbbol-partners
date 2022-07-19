@@ -65,3 +65,21 @@ databaseChangeLog:
   - include:
       file: 1648723867914_drop_funcion_generate_uuid.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1658239352706_add_new_primery_key_crtj_clientlockevent.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1658246983565_add_new_field_version_for_flat_renter.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1658247037032_add_new_field_version_for_document_type_dictionary.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1658247059459_add_new_field_version_for_budget_mask_dictionary.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1658247081892_add_new_field_version_for_gku_inn_dictionary.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1658247099898_add_new_field_version_for_legal_form_document_type.sql
+      relativeToChangelogFile: true

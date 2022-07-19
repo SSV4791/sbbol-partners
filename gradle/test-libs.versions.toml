@@ -11,7 +11,7 @@ junit5-provider = { module = "au.com.dius.pact.provider:junit5", version.ref = "
 mockserver-client-java = { module = "org.mock-server:mockserver-client-java", version.ref = "mockserver" }
 mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = "mockserver" }
 mockserver-spring-test-listener = { module = "org.mock-server:mockserver-spring-test-listener", version.ref = "mockserver" }
-orm-tests-common = { module = "sbp.integration.orm:orm-tests-common", version = "4.1.14" }
+orm-tests-common = { module = "sbp.integration.orm:orm-tests-common", version = "4.2.1" }
 podam-core = { module = "uk.co.jemos.podam:podam", version = "7.2.7.RELEASE" }
 rest-assured = { module = "io.rest-assured:rest-assured", version.ref = "assured" }
 rest-assured-common = { module = "io.rest-assured:rest-assured-common", version.ref = "assured" }

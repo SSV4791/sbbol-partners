@@ -75,12 +75,4 @@ public class BankAccountEntity extends BaseEntity {
     public String getHashKey() {
         return getBank().getHashKey();
     }
-
-    @Override
-    public String toString() {
-        return "BankAccountEntity{" +
-            "bank=" + (bank == null ? null : bank.getUuid()) +
-            ", account='" + account + '\'' +
-            '}';
-    }
 }
