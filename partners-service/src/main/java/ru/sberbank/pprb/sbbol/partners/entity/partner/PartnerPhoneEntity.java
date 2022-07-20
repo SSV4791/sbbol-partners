@@ -63,11 +63,4 @@ public class PartnerPhoneEntity extends PhoneBaseEntity {
     public String getHashKey() {
         return partner.getHashKey();
     }
-
-    @Override
-    public String toString() {
-        return "PartnerPhoneEntity{" +
-            "partner=" + (partner == null ? null : partner.getUuid())+
-            '}';
-    }
 }

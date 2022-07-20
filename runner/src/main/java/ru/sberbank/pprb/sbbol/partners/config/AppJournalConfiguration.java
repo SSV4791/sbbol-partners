@@ -44,7 +44,7 @@ public class AppJournalConfiguration {
      *
      * @param moduleId идентификатор модуля, по которому фабрика зарегистрирована в ПЖ
      * @param masterDataSource основной датасорс
-     * @param standinDataSource датасорс базы SI
+     * @param standInDataSource датасорс базы SI
      * @param entityManagerFactory фабрика EntityManager
      * @param journalClient клиент для работы с Kafka ПЖ
      * @return плагин с конфигурацией для отправки векторов в ПЖ
@@ -53,13 +53,13 @@ public class AppJournalConfiguration {
     public StandinPlugin standinPlugin(
         @Value("${appjournal.moduleId}") String moduleId,
         @Qualifier("mainDataSource") DataSource masterDataSource,
-        @Qualifier("standInDataSource") DataSource standinDataSource,
+        @Qualifier("standInDataSource") DataSource standInDataSource,
         EntityManagerFactory entityManagerFactory,
         JournalCreatorClientApi journalClient
     ) {
         StandinPlugin.Configurator configurator = StandinPlugin.configurator(entityManagerFactory);
         configurator.setMasterDataSource(masterDataSource);
-        configurator.setStandinDataSource(standinDataSource);
+        configurator.setStandinDataSource(standInDataSource);
         configurator.setJournalClient(journalClient);
 
         // HashKey функция. В данном случае используется определение хэша по интерфейсу HashKeyProvider
@@ -73,7 +73,7 @@ public class AppJournalConfiguration {
         // Сериализация отправки в ПЖ по hashKey
         configurator.setPartitionLockMode(PartitionLockMode.NONE);
         // Стратегия контроля порядка применения векторов
-        configurator.setOrderingControlStrategy(OrderingControlStrategy.DISABLED);
+        configurator.setOrderingControlStrategy(OrderingControlStrategy.OPTIMISTIC_LOCK_VERSION_CONTROL);
         // Стратегия работы с несколькими hashKey в одной транзакции. В одной транзакции могут быть только сущности с
         // одинаковым hashKey
         configurator.setPartitionMultiplyingMode(PartitionMultiplyingMode.FORBIDDEN);

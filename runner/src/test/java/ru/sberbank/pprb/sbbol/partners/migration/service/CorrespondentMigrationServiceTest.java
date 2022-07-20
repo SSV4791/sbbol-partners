@@ -14,7 +14,6 @@ import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateCorrespondentRequest;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
-import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithSbbolConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;

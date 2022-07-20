@@ -51,7 +51,6 @@ dependencies {
     implementation(liveLibs.liquibase.core)
     implementation(liveLibs.logstash.logback.encoder)
     implementation(liveLibs.sbp.hibernate.standin)
-    implementation(liveLibs.standin.client.cloud)
 
     // реализация кэша
     runtimeOnly(liveLibs.ehcache.org.core)

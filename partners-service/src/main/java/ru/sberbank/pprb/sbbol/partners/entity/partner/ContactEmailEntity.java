@@ -63,11 +63,4 @@ public class ContactEmailEntity extends EmailBaseEntity {
     public String getHashKey() {
         return contact.getHashKey();
     }
-
-    @Override
-    public String toString() {
-        return "ContactEmailEntity{" +
-            "contact=" + (contact == null ? null : contact.getUuid()) +
-            '}';
-    }
 }

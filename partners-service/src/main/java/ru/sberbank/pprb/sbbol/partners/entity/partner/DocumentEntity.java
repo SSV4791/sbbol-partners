@@ -191,22 +191,4 @@ public class DocumentEntity extends BaseEntity {
     public String getHashKey() {
         return getUnifiedUuid().toString();
     }
-
-    @Override
-    public String toString() {
-        return "DocumentEntity{" +
-            "unifiedUuid=" + unifiedUuid +
-            ", digitalId='" + digitalId + '\'' +
-            ", type=" + type +
-            ", typeUuid=" + typeUuid +
-            ", series='" + series + '\'' +
-            ", number='" + number + '\'' +
-            ", dateIssue=" + dateIssue +
-            ", divisionIssue='" + divisionIssue + '\'' +
-            ", divisionCode='" + divisionCode + '\'' +
-            ", certifierName='" + certifierName + '\'' +
-            ", positionCertifier='" + positionCertifier + '\'' +
-            ", certifierType=" + certifierType +
-            '}';
-    }
 }

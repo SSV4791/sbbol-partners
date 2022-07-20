@@ -150,19 +150,4 @@ public class SignEntity extends BaseEntity {
     public String getHashKey() {
         return getPartnerUuid().toString();
     }
-
-    @Override
-    public String toString() {
-        return "SignEntity{" +
-            "entityUuid=" + entityUuid +
-            ", digest='" + digest + '\'' +
-            ", sign='" + sign + '\'' +
-            ", partnerUuid=" + partnerUuid +
-            ", accountUuid=" + accountUuid +
-            ", externalDataFileId='" + externalDataFileId + '\'' +
-            ", externalDataSignFileId='" + externalDataSignFileId + '\'' +
-            ", signProfileId='" + signProfileId + '\'' +
-            ", dateTimeOfSign=" + dateTimeOfSign +
-            '}';
-    }
 }

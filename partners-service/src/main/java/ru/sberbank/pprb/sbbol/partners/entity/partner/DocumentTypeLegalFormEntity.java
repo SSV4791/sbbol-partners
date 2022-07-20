@@ -1,23 +1,17 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
-import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
 @Table(
     name = "legal_form_document_type",
@@ -29,16 +23,10 @@ import java.util.UUID;
 @DynamicUpdate
 @DynamicInsert
 @Entity
-public class DocumentTypeLegalFormEntity implements Serializable, HashKeyProvider {
+public class DocumentTypeLegalFormEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1;
-
-    @Column(name = "uuid", updatable = false, nullable = false)
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private UUID uuid;
 
     @Column(name = "legal_form", nullable = false, length = 100)
     private String legalForm;
@@ -46,14 +34,6 @@ public class DocumentTypeLegalFormEntity implements Serializable, HashKeyProvide
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "document_type_uuid")
     private DocumentTypeEntity documentType;
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 
     public String getLegalForm() {
         return legalForm;
@@ -94,14 +74,5 @@ public class DocumentTypeLegalFormEntity implements Serializable, HashKeyProvide
     @Override
     public String getHashKey() {
         return getDocumentType().getHashKey();
-    }
-
-    @Override
-    public String toString() {
-        return "DocumentTypeLegalFormEntity{" +
-            "uuid=" + uuid +
-            ", legalForm='" + legalForm + '\'' +
-            ", documentType=" + documentType +
-            '}';
     }
 }

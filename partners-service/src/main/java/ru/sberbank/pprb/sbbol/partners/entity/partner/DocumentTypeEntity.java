@@ -1,24 +1,18 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
-import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Table(
     name = "document_type_dictionary",
@@ -29,16 +23,10 @@ import java.util.UUID;
 @DynamicUpdate
 @DynamicInsert
 @Entity
-public class DocumentTypeEntity implements Serializable, HashKeyProvider {
+public class DocumentTypeEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1;
-
-    @Column(name = "uuid", updatable = false, nullable = false)
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private UUID uuid;
 
     @Column(name = "system_name", nullable = false, length = 50)
     private String systemName;
@@ -51,14 +39,6 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
 
     @OneToMany(mappedBy = "documentType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentTypeLegalFormEntity> legalForms;
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 
     public Boolean getDeleted() {
         return deleted;
@@ -118,16 +98,5 @@ public class DocumentTypeEntity implements Serializable, HashKeyProvider {
     @Override
     public String getHashKey() {
         return getUuid().toString();
-    }
-
-    @Override
-    public String toString() {
-        return "DocumentTypeEntity{" +
-            "uuid=" + uuid +
-            ", systemName='" + systemName + '\'' +
-            ", description='" + description + '\'' +
-            ", deleted=" + deleted +
-            ", legalForms=" + legalForms +
-            '}';
     }
 }
