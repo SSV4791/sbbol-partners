@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import ru.sbrf.journal.client.JournalCreatorClientApi;
 import ru.sbrf.journal.standin.StandinConfiguration;
+import ru.sbrf.journal.standin.StandinResourceHelper;
 import ru.sbrf.journal.standin.consumer.api.SubscriptionService;
 
 import javax.persistence.EntityManagerFactory;
@@ -26,6 +28,15 @@ import javax.sql.DataSource;
 @Configuration
 @Import({StandinConfiguration.class})
 public class AppJournalConfiguration {
+
+    @Bean
+    @Primary
+    public StandinResourceHelper<DataSource> standInResourceHelper(
+        @Qualifier("mainDataSource") DataSource masterDataSource,
+        @Qualifier("standInDataSource") DataSource standInDataSource
+    ) {
+        return new StandinResourceHelper<>(masterDataSource, standInDataSource);
+    }
 
     /**
      * Бин, подписывающийся на сообщения прикладного журнала и выполняющий применение векторов изменений на
@@ -44,7 +55,7 @@ public class AppJournalConfiguration {
      *
      * @param moduleId идентификатор модуля, по которому фабрика зарегистрирована в ПЖ
      * @param masterDataSource основной датасорс
-     * @param standinDataSource датасорс базы SI
+     * @param standInDataSource датасорс базы SI
      * @param entityManagerFactory фабрика EntityManager
      * @param journalClient клиент для работы с Kafka ПЖ
      * @return плагин с конфигурацией для отправки векторов в ПЖ
@@ -53,13 +64,13 @@ public class AppJournalConfiguration {
     public StandinPlugin standinPlugin(
         @Value("${appjournal.moduleId}") String moduleId,
         @Qualifier("mainDataSource") DataSource masterDataSource,
-        @Qualifier("standInDataSource") DataSource standinDataSource,
+        @Qualifier("standInDataSource") DataSource standInDataSource,
         EntityManagerFactory entityManagerFactory,
         JournalCreatorClientApi journalClient
     ) {
         StandinPlugin.Configurator configurator = StandinPlugin.configurator(entityManagerFactory);
         configurator.setMasterDataSource(masterDataSource);
-        configurator.setStandinDataSource(standinDataSource);
+        configurator.setStandinDataSource(standInDataSource);
         configurator.setJournalClient(journalClient);
 
         // HashKey функция. В данном случае используется определение хэша по интерфейсу HashKeyProvider
