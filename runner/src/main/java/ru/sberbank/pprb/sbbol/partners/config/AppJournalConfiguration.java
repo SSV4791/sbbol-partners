@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import ru.sbrf.journal.client.JournalCreatorClientApi;
 import ru.sbrf.journal.standin.StandinConfiguration;
+import ru.sbrf.journal.standin.StandinResourceHelper;
 import ru.sbrf.journal.standin.consumer.api.SubscriptionService;
 
 import javax.persistence.EntityManagerFactory;
@@ -26,6 +28,15 @@ import javax.sql.DataSource;
 @Configuration
 @Import({StandinConfiguration.class})
 public class AppJournalConfiguration {
+
+    @Bean
+    @Primary
+    public StandinResourceHelper<DataSource> standInResourceHelper(
+        @Qualifier("mainDataSource") DataSource masterDataSource,
+        @Qualifier("standInDataSource") DataSource standInDataSource
+    ) {
+        return new StandinResourceHelper<>(masterDataSource, standInDataSource);
+    }
 
     /**
      * Бин, подписывающийся на сообщения прикладного журнала и выполняющий применение векторов изменений на
