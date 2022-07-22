@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
@@ -90,17 +91,25 @@ public class PartnerCreateFullModelValidationImpl extends AbstractValidatorImpl<
                 commonValidationChildPhone(errors, phone);
             }
         }
-        for (AccountCreateFullModel account : entity.getAccounts()) {
-            validatorAccount(errors, account);
+        if (!CollectionUtils.isEmpty(entity.getAccounts())) {
+            for (AccountCreateFullModel account : entity.getAccounts()) {
+                validatorAccount(errors, account);
+            }
         }
-        for (AddressCreateFullModel address : entity.getAddress()) {
-            validatorAddress(errors, address);
+        if (!CollectionUtils.isEmpty(entity.getAddress())) {
+            for (AddressCreateFullModel address : entity.getAddress()) {
+                validatorAddress(errors, address);
+            }
         }
-        for (DocumentCreateFullModel document : entity.getDocuments()) {
-            validatorDocument(errors, document);
+        if (!CollectionUtils.isEmpty(entity.getDocuments())) {
+            for (DocumentCreateFullModel document : entity.getDocuments()) {
+                validatorDocument(errors, document);
+            }
         }
-        for (ContactCreateFullModel contact : entity.getContacts()) {
-            validatorContact(errors, contact);
+        if (!CollectionUtils.isEmpty(entity.getContacts())) {
+            for (ContactCreateFullModel contact : entity.getContacts()) {
+                validatorContact(errors, contact);
+            }
         }
     }
 
