@@ -33,7 +33,7 @@
     "inn": {
       "type": "string",
       "title": "ИНН",
-      "x-extra-annotation": "@InnValidation"
+      "x-extra-field-annotation": "@InnValidation"
     },
     "kpp": {
       "type": "string",
@@ -45,7 +45,7 @@
       "type": "string",
       "title": "ОГРН",
       "maxLength": 13,
-      "x-extra-annotation": "@OgrnValidation"
+      "x-extra-field-annotation": "@OgrnValidation"
     },
     "okpo": {
       "type": "string",

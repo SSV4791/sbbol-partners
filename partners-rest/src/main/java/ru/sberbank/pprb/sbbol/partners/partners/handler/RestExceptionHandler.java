@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -179,7 +180,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return buildResponsesEntity(
             errors,
-            ex.getLocalizedMessage(),
+            MessagesTranslator.toLocale("error.message.check.validation"),
             ((ServletWebRequest) request).getRequest().getRequestURL()
         );
     }
