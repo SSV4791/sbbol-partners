@@ -13,7 +13,8 @@ import ru.sberbank.pprb.sbbol.partners.model.Phone;
 public interface ContactPhoneMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(phone.getUuid() == null ? null : phone.getUuid().toString())")
-    @Mapping(target = "unifiedId", expression = "java(phone.getHashKey())")
+    @Mapping(target = "unifiedId",
+        expression = "java(phone.getContact().getUuid() == null ? null : phone.getContact().getUuid().toString())")
     Phone toPhone(ContactPhoneEntity phone);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(phone.getId()))")

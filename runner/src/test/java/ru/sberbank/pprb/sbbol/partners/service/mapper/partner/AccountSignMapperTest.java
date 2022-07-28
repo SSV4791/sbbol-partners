@@ -81,8 +81,10 @@ class AccountSignMapperTest extends BaseUnitConfiguration {
     @Test
     @AllureId("34069")
     void testToSign() {
+        var partnerUuid = factory.manufacturePojo(UUID.class);
+        var digitalId = factory.manufacturePojo(String.class);
         var expected = factory.manufacturePojo(AccountSignDetail.class);
-        var actual = mapper.toSing(expected, UUID.randomUUID());
+        var actual = mapper.toSing(expected, partnerUuid, digitalId);
 
         assertThat(expected.getEntityId())
             .isEqualTo(actual.getEntityUuid().toString());

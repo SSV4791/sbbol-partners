@@ -30,6 +30,9 @@ public class SignEntity extends BaseEntity {
     @Column(name = "entity_uuid", nullable = false)
     private UUID entityUuid;
 
+    @Column(name = "digital_id")
+    private String digitalId;
+
     @Column(name = "digest", nullable = false, length = 4000)
     private String digest;
 
@@ -53,6 +56,14 @@ public class SignEntity extends BaseEntity {
 
     @Column(name = "date_time_of_sign")
     private OffsetDateTime dateTimeOfSign;
+
+    public String getDigitalId() {
+        return digitalId;
+    }
+
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
+    }
 
     public OffsetDateTime getDateTimeOfSign() {
         return dateTimeOfSign;
@@ -148,6 +159,6 @@ public class SignEntity extends BaseEntity {
 
     @Override
     public String getHashKey() {
-        return getPartnerUuid().toString();
+        return getDigitalId();
     }
 }

@@ -59,6 +59,6 @@ public class EmailEntity extends EmailBaseEntity {
 
     @Override
     public String getHashKey() {
-        return getUnifiedUuid().toString();
+        return getDigitalId();
     }
 }

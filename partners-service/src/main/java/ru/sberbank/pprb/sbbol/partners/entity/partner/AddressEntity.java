@@ -185,6 +185,6 @@ public class AddressEntity extends BaseEntity {
 
     @Override
     public String getHashKey() {
-        return getUnifiedUuid().toString();
+        return getDigitalId();
     }
 }

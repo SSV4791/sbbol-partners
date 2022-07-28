@@ -13,7 +13,8 @@ import ru.sberbank.pprb.sbbol.partners.model.Email;
 public interface PartnerEmailMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
-    @Mapping(target = "unifiedId", expression = "java(email.getHashKey())")
+    @Mapping(target = "unifiedId",
+        expression = "java(email.getPartner().getUuid() == null ? null : email.getPartner().getUuid().toString())")
     Email toEmail(PartnerEmailEntity email);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
