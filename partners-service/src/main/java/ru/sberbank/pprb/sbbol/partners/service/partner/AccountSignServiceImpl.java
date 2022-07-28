@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,7 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
+    private final ReplicationService replicationService;
     private final AuditAdapter auditAdapter;
     private final AccountSingMapper accountSingMapper;
     private final AccountMapper accountMapper;
@@ -37,12 +39,14 @@ public class AccountSignServiceImpl implements AccountSignService {
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
+        ReplicationService replicationService,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         AccountSingMapper accountSingMapper
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
+        this.replicationService = replicationService;
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
         this.accountSingMapper = accountSingMapper;
@@ -82,6 +86,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
             try {
                 var savedSign = accountSignRepository.save(sign);
+                replicationService.saveSign(accountsSign.getDigitalId(), sign);
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(savedSign))
@@ -120,6 +125,7 @@ public class AccountSignServiceImpl implements AccountSignService {
                 .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
             try {
                 accountSignRepository.delete(sign);
+                replicationService.deleteSign(digitalId, accountId);
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(sign))

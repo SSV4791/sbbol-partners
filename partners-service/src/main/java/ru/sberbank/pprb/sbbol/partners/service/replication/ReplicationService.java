@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.replication;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 
 import java.util.List;
@@ -34,5 +35,21 @@ public interface ReplicationService {
      * @param account Счёт на удаление
      */
     void deleteCounterparty(AccountEntity account);
+
+    /**
+     * Сохранение подписи контрагента в СББОЛ
+     *
+     * @param digitalId Цифровой идентификатор клиента
+     * @param sign Подпись по контрагенту
+     */
+    void saveSign(String digitalId, SignEntity sign);
+
+    /**
+     * Удаление подписи контрагента в СББОЛ
+     *
+     * @param digitalId Цифровой идентификатор клиента
+     * @param counterpartyId Идентификатор контрагента
+     */
+    void deleteSign(String digitalId, String counterpartyId);
 }
 

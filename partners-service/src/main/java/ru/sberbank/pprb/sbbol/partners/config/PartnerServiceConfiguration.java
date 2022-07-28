@@ -1,15 +1,21 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.kafka.core.KafkaTemplate;
+import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyAsynchReplicationAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.validation.ValidationAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
+import ru.sberbank.pprb.sbbol.partners.config.props.ReplicationKafkaProducerProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.AsynchReplicationCounterpartyMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.AsynchReplicationCounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -85,6 +91,8 @@ import ru.sberbank.pprb.sbbol.partners.service.renter.PartnerServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.AsynchReplicationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.AsynchReplicationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceImpl;
 
@@ -110,6 +118,16 @@ public class PartnerServiceConfiguration {
         LegacySbbolAdapter legacySbbolAdapter
     ) {
         return new LegacyCheckAspect(servletRequest, legacySbbolAdapter);
+    }
+
+    @Bean
+    LegacyAsynchReplicationAspect legacyAsynchReplicationAspect(AsynchReplicationService asynchReplicationService) {
+        return new LegacyAsynchReplicationAspect(asynchReplicationService);
+    }
+
+    @Bean
+    AsynchReplicationCounterpartyMapper asynchReplicationCounterpartyMapper() {
+        return new AsynchReplicationCounterpartyMapperImpl();
     }
 
     @Bean
@@ -173,6 +191,7 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
+    @SuppressWarnings("java:S5738")
     RenterPartnerMapper renterPartnerMapper() {
         return new RenterPartnerMapperImpl();
     }
@@ -208,8 +227,23 @@ public class PartnerServiceConfiguration {
             accountRepository,
             legacySbbolAdapter,
             accountMapper(),
+            accountSingMapper(),
             counterpartyMapper()
         );
+    }
+
+    @Bean
+    AsynchReplicationService asynchReplicationService(
+        ReplicationKafkaProducerProperties kafkaProperties,
+        KafkaTemplate<String, String> kafkaTemplate,
+        AsynchReplicationCounterpartyMapper asynchReplicationCounterpartyMapper,
+        ObjectMapper objectMapper
+    ) {
+        return new AsynchReplicationServiceImpl(
+            kafkaProperties,
+            kafkaTemplate,
+            asynchReplicationCounterpartyMapper,
+            objectMapper);
     }
 
     @Bean
@@ -231,11 +265,13 @@ public class PartnerServiceConfiguration {
     AccountSignService accountSignService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
+        ReplicationService replicationService,
         AuditAdapter auditAdapter
     ) {
         return new AccountSignServiceImpl(
             accountRepository,
             accountSignRepository,
+            replicationService,
             auditAdapter,
             accountMapper(),
             accountSingMapper()
@@ -323,6 +359,7 @@ public class PartnerServiceConfiguration {
         return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper());
     }
 
+    @SuppressWarnings("java:S107")
     @Bean
     PartnerService partnerService(
         AccountRepository accountRepository,
@@ -355,6 +392,7 @@ public class PartnerServiceConfiguration {
         );
     }
 
+    @SuppressWarnings("java:S5738")
     @Bean
     RenterService renterService(RenterRepository repository,
                                 ValidationService validationService,
@@ -362,6 +400,7 @@ public class PartnerServiceConfiguration {
         return new RenterServiceImpl(repository, validationService, renterMapper);
     }
 
+    @SuppressWarnings("java:S5738")
     @Bean
     @Primary
     RenterService renterService(

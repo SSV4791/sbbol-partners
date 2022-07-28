@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Схема модели репликации контрагента",
+  "type": "object",
+  "properties": {
+    "operation": {
+      "type": "string",
+      "maxLength": 30
+    },
+    "digitalId": {
+      "type": "string",
+      "maxLength": 36
+    },
+    "counterparty": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "signData": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "operation",
+    "digitalId"
+  ],
+  "additionalProperties": false
+}

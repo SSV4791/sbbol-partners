@@ -7,12 +7,15 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSign;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 
+import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +53,19 @@ public interface AccountSingMapper extends BaseMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     SignEntity toSing(AccountSignDetail sing, UUID partnerUuid, String digitalId);
+
+    @Mapping(target = "pprbGuid", source = "accountUuid")
+    @Mapping(target = "signProfileId", source = "signProfileId")
+    @Mapping(target = "signDate", source = "dateTimeOfSign", qualifiedByName = "toSignDate")
+    @Mapping(target = "base64sign", source = "sign")
+    @Mapping(target = "digest", source = "digest")
+    @Mapping(target = "dcsId", expression = "java(\"default\")")
+    CounterpartySignData toCounterpartySignData(SignEntity signEntity);
+
+    @Named("toSignDate")
+    default Date toSignDate(OffsetDateTime dateTimeOfSign) {
+        return Date.from(dateTimeOfSign.toInstant());
+    }
 
     default Map<String, String> toEventParams(SignEntity sign) {
         if (sign == null) {
