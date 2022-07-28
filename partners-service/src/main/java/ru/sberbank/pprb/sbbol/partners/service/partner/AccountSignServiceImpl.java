@@ -74,11 +74,12 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Transactional
     public AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign) {
         var response = new AccountsSignInfoResponse();
-        response.setDigitalId(accountsSign.getDigitalId());
+        var digitalId = accountsSign.getDigitalId();
+        response.setDigitalId(digitalId);
         for (var accountSign : accountsSign.getAccountsSignDetail()) {
-            var account = accountRepository.getByDigitalIdAndUuid(accountsSign.getDigitalId(), UUID.fromString(accountSign.getAccountId()))
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, accountsSign.getDigitalId(), accountSign.getAccountId()));
-            var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid());
+            var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountSign.getAccountId()))
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountSign.getAccountId()));
+            var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
             try {
                 var savedSign = accountSignRepository.save(sign);
                 auditAdapter.send(new Event()

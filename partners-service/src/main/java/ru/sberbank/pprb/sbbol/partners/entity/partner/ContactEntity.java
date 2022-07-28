@@ -173,6 +173,6 @@ public class ContactEntity extends BaseEntity {
 
     @Override
     public String getHashKey() {
-        return getPartnerUuid().toString();
+        return getDigitalId();
     }
 }

@@ -45,10 +45,11 @@ public interface AccountSingMapper extends BaseMapper {
     @Mapping(target = "entityUuid", expression = "java(mapUuid(sing.getEntityId()))")
     @Mapping(target = "accountUuid", expression = "java(mapUuid(sing.getAccountId()))")
     @Mapping(target = "partnerUuid", source = "partnerUuid")
+    @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    SignEntity toSing(AccountSignDetail sing, UUID partnerUuid);
+    SignEntity toSing(AccountSignDetail sing, UUID partnerUuid, String digitalId);
 
     default Map<String, String> toEventParams(SignEntity sign) {
         if (sign == null) {

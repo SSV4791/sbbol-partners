@@ -15,7 +15,8 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 public interface EmailMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
-    @Mapping(target = "unifiedId", expression = "java(email.getHashKey())")
+    @Mapping(target = "unifiedId",
+        expression = "java(email.getUnifiedUuid() == null ? null : email.getUnifiedUuid().toString())")
     Email toEmail(EmailEntity email);
 
     @Mapping(target = "uuid", ignore = true)

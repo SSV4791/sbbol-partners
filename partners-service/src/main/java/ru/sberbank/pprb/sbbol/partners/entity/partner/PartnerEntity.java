@@ -258,6 +258,6 @@ public class PartnerEntity extends BaseEntity {
 
     @Override
     public String getHashKey() {
-        return getUuid().toString();
+        return getDigitalId();
     }
 }

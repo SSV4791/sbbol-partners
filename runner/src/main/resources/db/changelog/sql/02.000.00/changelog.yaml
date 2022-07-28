@@ -83,3 +83,6 @@ databaseChangeLog:
   - include:
       file: 1658247099898_add_new_field_version_for_legal_form_document_type.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1658994826692_add_new_field_for_sign.sql
+      relativeToChangelogFile: true
