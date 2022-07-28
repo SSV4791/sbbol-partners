@@ -90,6 +90,7 @@ public class PartnerServiceImpl implements RenterService {
         List<CheckResult> checkResults = validationService.check(renter);
         if (checkResults.isEmpty()) {
             var flatRenter = new FlatRenter();
+            flatRenter.setDigitalId(renter.getDigitalId());
             var partner = renterPartnerMapper.toPartner(renter);
             var savedPartner = partnerRepository.save(partner);
             flatRenter.setPartnerUuid(savedPartner.getUuid());
