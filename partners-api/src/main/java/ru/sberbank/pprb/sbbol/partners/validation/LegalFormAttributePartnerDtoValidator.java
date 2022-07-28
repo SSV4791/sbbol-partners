@@ -3,12 +3,13 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
-import ru.sberbank.pprb.sbbol.partners.model.LegalFormPartnerValidation;
+import ru.sberbank.pprb.sbbol.partners.model.LegalFormAttributePartnerDtoValidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class LegalFormAttributePartnerDtoValidation implements ConstraintValidator<LegalFormPartnerValidation, Partner> {
+public class LegalFormAttributePartnerDtoValidator
+    implements ConstraintValidator<LegalFormAttributePartnerDtoValidation, Partner> {
 
     @Override
     public boolean isValid(Partner value, ConstraintValidatorContext context) {

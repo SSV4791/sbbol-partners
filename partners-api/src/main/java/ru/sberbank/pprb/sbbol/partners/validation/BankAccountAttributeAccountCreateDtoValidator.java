@@ -3,14 +3,14 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccountAccountCreateValidation;
-import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidation;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountAttributeAccountCreateDtoValidation;
+import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class BankAccountAttributeAccountCreateDtoValidation
-    implements ConstraintValidator<BankAccountAccountCreateValidation, AccountCreate> {
+public class BankAccountAttributeAccountCreateDtoValidator
+    implements ConstraintValidator<BankAccountAttributeAccountCreateDtoValidation, AccountCreate> {
 
     @Override
     public boolean isValid(AccountCreate value, ConstraintValidatorContext context) {
@@ -25,6 +25,6 @@ public class BankAccountAttributeAccountCreateDtoValidation
         if (bankAccount == null || StringUtils.isEmpty(bankAccount.getBankAccount())) {
             return true;
         }
-        return AccountValidation.validateBankAccount(bankAccount.getBankAccount(), bank.getBic());
+        return AccountValidator.validateBankAccount(bankAccount.getBankAccount(), bank.getBic());
     }
 }

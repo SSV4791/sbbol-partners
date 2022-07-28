@@ -5,7 +5,8 @@ import org.springframework.util.StringUtils;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class OgrnAttributeValidation implements ConstraintValidator<ru.sberbank.pprb.sbbol.partners.model.OgrnValidation, String> {
+public class OgrnValidator
+    implements ConstraintValidator<ru.sberbank.pprb.sbbol.partners.model.OgrnValidation, String> {
 
     private static final int OGRN_13_VALID_LENGTH = 13;
     private static final int OGRN_15_VALID_LENGTH = 15;

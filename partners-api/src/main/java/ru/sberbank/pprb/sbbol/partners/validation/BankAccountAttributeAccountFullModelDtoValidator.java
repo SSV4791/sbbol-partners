@@ -2,18 +2,18 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccountAccountChangeValidation;
-import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidation;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountAttributeAccountFullModelDtoValidation;
+import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class BankAccountAttributeAccountChangeDtoValidation
-    implements ConstraintValidator<BankAccountAccountChangeValidation, AccountChange> {
+public class BankAccountAttributeAccountFullModelDtoValidator
+    implements ConstraintValidator<BankAccountAttributeAccountFullModelDtoValidation, AccountCreateFullModel> {
 
     @Override
-    public boolean isValid(AccountChange value, ConstraintValidatorContext context) {
+    public boolean isValid(AccountCreateFullModel value, ConstraintValidatorContext context) {
         if (ObjectUtils.isEmpty(value)) {
             return true;
         }
@@ -25,6 +25,6 @@ public class BankAccountAttributeAccountChangeDtoValidation
         if (bankAccount == null || StringUtils.isEmpty(bankAccount.getBankAccount())) {
             return true;
         }
-        return AccountValidation.validateBankAccount(bankAccount.getBankAccount(), bank.getBic());
+        return AccountValidator.validateBankAccount(bankAccount.getBankAccount(), bank.getBic());
     }
 }

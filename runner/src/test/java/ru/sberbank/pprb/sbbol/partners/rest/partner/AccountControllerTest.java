@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -889,5 +890,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(error.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    private static String getBic() {
+        String bic = "525411";
+        var key = randomNumeric(3);
+        return key + bic;
     }
 }

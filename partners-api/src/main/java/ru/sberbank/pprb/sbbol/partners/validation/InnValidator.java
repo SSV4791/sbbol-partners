@@ -6,7 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.model.InnValidation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class InnAttributeValidation implements ConstraintValidator<InnValidation, String> {
+public class InnValidator implements ConstraintValidator<InnValidation, String> {
 
     private static final int INN_5_VALID_LENGTH = 5;
     private static final int INN_10_VALID_LENGTH = 10;

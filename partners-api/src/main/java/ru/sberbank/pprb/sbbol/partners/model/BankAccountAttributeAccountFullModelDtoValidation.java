@@ -1,6 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.LegalFormAttributePartnerFullModelDtoValidation;
+import ru.sberbank.pprb.sbbol.partners.validation.BankAccountAttributeAccountFullModelDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -17,10 +17,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = LegalFormAttributePartnerFullModelDtoValidation.class)
-public @interface LegalFormPartnerFullModelValidation {
+@Constraint(validatedBy = BankAccountAttributeAccountFullModelDtoValidator.class)
+public @interface BankAccountAttributeAccountFullModelDtoValidation {
 
-    String message() default "{partner.legal_form}";
+    String message() default "{account.account.bank_account.control_number}";
 
     Class<?>[] groups() default {};
 

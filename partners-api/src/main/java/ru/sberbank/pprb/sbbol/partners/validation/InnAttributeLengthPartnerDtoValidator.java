@@ -3,16 +3,17 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
-import ru.sberbank.pprb.sbbol.partners.model.InnLengthPartnerCreateValidation;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.InnLengthAttributePartnerDtoValidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class InnAttributeLengthPartnerCreateDtoValidation implements ConstraintValidator<InnLengthPartnerCreateValidation, PartnerCreate> {
+public class InnAttributeLengthPartnerDtoValidator
+    implements ConstraintValidator<InnLengthAttributePartnerDtoValidation, Partner> {
 
     @Override
-    public boolean isValid(PartnerCreate value, ConstraintValidatorContext context) {
+    public boolean isValid(Partner value, ConstraintValidatorContext context) {
         if (ObjectUtils.isEmpty(value)) {
             return true;
         }
@@ -20,9 +21,10 @@ public class InnAttributeLengthPartnerCreateDtoValidation implements ConstraintV
         if (!StringUtils.hasText(inn)) {
             return true;
         }
+        var length = inn.length();
         if (value.getLegalForm() == LegalForm.LEGAL_ENTITY) {
-            return inn.length() == 10 || inn.length() == 5;
+            return length == 10 || length == 5;
         }
-        return inn.length() == 12 || inn.length() == 5;
+        return length == 12 || length == 5;
     }
 }

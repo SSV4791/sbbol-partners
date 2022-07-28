@@ -1,6 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.PhoneAttributeValidation;
+import ru.sberbank.pprb.sbbol.partners.validation.PhoneValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = PhoneAttributeValidation.class)
+@Constraint(validatedBy = PhoneValidator.class)
 public @interface PhoneValidation {
 
     String message() default "{phone.phone_valid}";

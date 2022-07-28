@@ -4,7 +4,7 @@ import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
-import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidation;
+import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,27 +15,27 @@ class AccountValidatorTest {
     @AllureId("34104")
     void testUserAccountValid() {
         assertThat(Boolean.TRUE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidation.class, "validateUserAccount", "40802810500490014206", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidator.class, "validateUserAccount", "40802810500490014206", "044525411"));
     }
 
     @Test
     @AllureId("34063")
     void testUserAccountNotValid() {
         assertThat(Boolean.FALSE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidation.class, "validateUserAccount", "30101810145250000411", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidator.class, "validateUserAccount", "30101810145250000411", "044525411"));
     }
 
     @Test
     @AllureId("34044")
     void testBankAccountValid() {
         assertThat(Boolean.TRUE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidation.class, "validateBankAccount", "30101810145250000411", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidator.class, "validateBankAccount", "30101810145250000411", "044525411"));
     }
 
     @Test
     @AllureId("34053")
     void testBankAccountNotValid() {
         assertThat(Boolean.FALSE)
-            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidation.class, "validateBankAccount", "40802810500490014206", "044525411"));
+            .isEqualTo(ReflectionTestUtils.invokeMethod(AccountValidator.class, "validateBankAccount", "40802810500490014206", "044525411"));
     }
 }

@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeValidation;
+
+import ru.sberbank.pprb.sbbol.partners.validation.InnValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -16,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = InnAttributeValidation.class)
+@Constraint(validatedBy = InnValidator.class)
 public @interface InnValidation {
 
     String message() default "{partner.inn.control_number}";

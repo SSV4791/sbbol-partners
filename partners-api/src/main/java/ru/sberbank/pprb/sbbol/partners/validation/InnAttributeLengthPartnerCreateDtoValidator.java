@@ -3,16 +3,17 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.InnLengthPartnerFullModelValidation;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.InnLengthAttributePartnerCreateDtoValidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class InnAttributeLengthPartnerFullModelDtoValidation implements ConstraintValidator<InnLengthPartnerFullModelValidation, PartnerCreateFullModel> {
+public class InnAttributeLengthPartnerCreateDtoValidator
+    implements ConstraintValidator<InnLengthAttributePartnerCreateDtoValidation, PartnerCreate> {
 
     @Override
-    public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
+    public boolean isValid(PartnerCreate value, ConstraintValidatorContext context) {
         if (ObjectUtils.isEmpty(value)) {
             return true;
         }

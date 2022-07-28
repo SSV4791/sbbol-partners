@@ -5,7 +5,8 @@ import org.springframework.util.StringUtils;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class PhoneAttributeValidation implements ConstraintValidator<ru.sberbank.pprb.sbbol.partners.model.PhoneValidation, String> {
+public class PhoneValidator
+    implements ConstraintValidator<ru.sberbank.pprb.sbbol.partners.model.PhoneValidation, String> {
 
     private static final String SEARCH_SYMBOL = "+";
 

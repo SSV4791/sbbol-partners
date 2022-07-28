@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Партнер",
-  "x-extra-class-annotation": "@LegalFormPartnerCreateValidation @InnLengthPartnerCreateValidation",
+  "x-extra-class-annotation": "@LegalFormAttributePartnerCreateDtoValidation @InnLengthAttributePartnerCreateDtoValidation",
   "properties": {
     "digitalId": {
       "type": "string",

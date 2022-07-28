@@ -2,16 +2,17 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
-import ru.sberbank.pprb.sbbol.partners.model.LegalFormPartnerCreateValidation;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.LegalFormAttributePartnerFullModelDtoValidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class LegalFormAttributePartnerCreateDtoValidation implements ConstraintValidator<LegalFormPartnerCreateValidation, PartnerCreate> {
+public class LegalFormAttributePartnerFullModelDtoValidator
+    implements ConstraintValidator<LegalFormAttributePartnerFullModelDtoValidation, PartnerCreateFullModel> {
 
     @Override
-    public boolean isValid(PartnerCreate value, ConstraintValidatorContext context) {
+    public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
         if (value != null) {
             if (value.getLegalForm() != LegalForm.PHYSICAL_PERSON) {
                 return StringUtils.hasText(value.getOrgName());

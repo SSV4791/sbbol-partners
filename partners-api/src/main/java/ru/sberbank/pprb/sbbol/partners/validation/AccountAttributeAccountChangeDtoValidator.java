@@ -2,15 +2,15 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import ru.sberbank.pprb.sbbol.partners.model.AccountAttributeAccountChangeDtoValidation;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
-import ru.sberbank.pprb.sbbol.partners.model.AccountAccountChangeValidation;
-import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidation;
+import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class AccountAttributeAccountChangeDtoValidation
-    implements ConstraintValidator<AccountAccountChangeValidation, AccountChange> {
+public class AccountAttributeAccountChangeDtoValidator
+    implements ConstraintValidator<AccountAttributeAccountChangeDtoValidation, AccountChange> {
 
 
     @Override
@@ -23,6 +23,6 @@ public class AccountAttributeAccountChangeDtoValidation
             return true;
         }
         var account = value.getAccount();
-        return AccountValidation.isValidAccount(account, bank.getBic());
+        return AccountValidator.isValidAccount(account, bank.getBic());
     }
 }

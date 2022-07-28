@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
-public final class AccountValidation {
+public final class AccountValidator {
 
     private static final int[] CONTROL_KEY_ACCOUNT = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
 
@@ -16,7 +16,7 @@ public final class AccountValidation {
 
     private static final Pattern RKC_BIC = Pattern.compile("^\\d{6}00\\d$");
 
-    private AccountValidation() {
+    private AccountValidator() {
         throw new AssertionError();
     }
 
@@ -47,9 +47,9 @@ public final class AccountValidation {
         }
         var matchBic = RKC_BIC.matcher(bic);
         if (matchBic.matches()) {
-            return AccountValidation.validateBankAccount(account, bic);
+            return AccountValidator.validateBankAccount(account, bic);
         }
-        return AccountValidation.validateUserAccount(account, bic);
+        return AccountValidator.validateUserAccount(account, bic);
     }
 
     /**
