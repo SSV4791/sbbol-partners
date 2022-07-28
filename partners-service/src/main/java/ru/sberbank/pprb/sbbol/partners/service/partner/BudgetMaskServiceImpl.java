@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
 import javax.swing.text.MaskFormatter;
@@ -44,11 +45,22 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
 
     @Override
     @Transactional(readOnly = true)
-    public BudgetMasksResponse getBudgetMasks(BudgetMaskFilter budgetMaskFilter) {
-        var response = budgetMaskDictionaryRepository.findByFilter(budgetMaskFilter);
+    public BudgetMasksResponse getBudgetMasks(BudgetMaskFilter filter) {
+        var response = budgetMaskDictionaryRepository.findByFilter(filter);
         BudgetMasksResponse budgetMasksResponse = new BudgetMasksResponse();
         for (var budgetMaskEntity : response) {
             budgetMasksResponse.addMasksItem(budgetMaskMapper.toBudgetMask(budgetMaskEntity));
+        }
+        var pagination = filter.getPagination();
+        budgetMasksResponse.setPagination(
+            new Pagination()
+                .offset(pagination.getOffset())
+                .count(pagination.getCount())
+        );
+        var size = response.size();
+        if (pagination.getCount() < size) {
+            budgetMasksResponse.getPagination().hasNextPage(Boolean.TRUE);
+            budgetMasksResponse.getMasks().remove(size - 1);
         }
         return budgetMasksResponse;
     }

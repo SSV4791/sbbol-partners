@@ -1,12 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.BankCreate",
   "type": "object",
   "title": "Банк",
   "properties": {
     "bic": {
       "type": "string",
-      "title": "БИК"
+      "title": "БИК",
+      "minLength": 9,
+      "maxLength": 9,
+      "x-not-empty": true
     },
     "name": {
       "type": "string",
@@ -21,5 +23,9 @@
       "title": "Корреспондентский счёт",
       "$ref": "bank_account_create.json"
     }
-  }
+  },
+  "required": [
+    "bic",
+    "name"
+  ]
 }

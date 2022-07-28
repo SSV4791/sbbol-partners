@@ -1,12 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.PartnerCreate",
   "type": "object",
   "title": "Партнер",
+  "x-extra-class-annotation": "@LegalFormAttributePartnerCreateDtoValidation @InnLengthAttributePartnerCreateDtoValidation",
   "properties": {
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета клиента"
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "legalForm": {
       "$ref": "../common/legal_form.json"
@@ -17,35 +20,45 @@
     },
     "firstName": {
       "type": "string",
-      "title": "Имя партнера"
+      "title": "Имя партнера",
+      "maxLength": 50
     },
     "secondName": {
       "type": "string",
-      "title": "Фамилия партнера"
+      "title": "Фамилия партнера",
+      "maxLength": 50
     },
     "middleName": {
       "type": "string",
-      "title": "Отчество партнера"
+      "title": "Отчество партнера",
+      "maxLength": 50
     },
     "inn": {
       "type": "string",
-      "title": "ИНН"
+      "title": "ИНН",
+      "x-extra-annotation": "@InnValidation"
     },
     "kpp": {
       "type": "string",
-      "title": "КПП"
+      "title": "КПП",
+      "minLength": 9,
+      "maxLength": 9
     },
     "ogrn": {
       "type": "string",
-      "title": "ОГРН"
+      "title": "ОГРН",
+      "maxLength": 13,
+      "x-extra-annotation": "@OgrnValidation"
     },
     "okpo": {
       "type": "string",
-      "title": "ОКПО"
+      "title": "ОКПО",
+      "minLength": 8,
+      "maxLength": 14
     },
     "phones": {
       "type": "array",
-      "title": "Номера телефона контакта",
+      "title": "Номера телефонов партнера",
       "items": {
         "type": "string"
       },
@@ -53,7 +66,7 @@
     },
     "emails": {
       "type": "array",
-      "title": "Номера телефона контакта",
+      "title": "Адреса электронной почты партнера",
       "items": {
         "type": "string"
       },
@@ -61,10 +74,15 @@
     },
     "comment": {
       "type": "string",
-      "title": "Комментарий пользователя"
+      "title": "Комментарий пользователя",
+      "maxLength": 255
     },
     "citizenship": {
       "$ref": "../common/citizenship.json"
     }
-  }
+  },
+  "required": [
+    "id",
+    "legalForm"
+  ]
 }

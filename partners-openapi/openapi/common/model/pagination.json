@@ -17,5 +17,9 @@
       "title": "Признак наличия следующей страницы"
     }
   },
+  "required": [
+    "offset",
+    "count"
+  ],
   "additionalProperties": false
 }

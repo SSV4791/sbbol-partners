@@ -1,12 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.AccountCreateFullModel",
   "type": "object",
   "title": "Счёт партнера",
+  "x-extra-class-annotation": "@AccountAttributeAccountFullModelDtoValidation @BankAccountAttributeAccountFullModelDtoValidation",
   "properties": {
     "account": {
       "type": "string",
-      "title": "Счёт"
+      "title": "Счёт",
+      "maxLength": 20
     },
     "bank": {
       "title": "Банк",
@@ -14,7 +15,11 @@
     },
     "comment": {
       "type": "string",
-      "title": "Комментарий счета"
+      "title": "Комментарий счета",
+      "maxLength": 50
     }
-  }
+  },
+  "required": [
+    "bank"
+  ]
 }

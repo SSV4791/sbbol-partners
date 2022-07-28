@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -537,7 +538,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    @AllureId("")
     void testNegativeUpdateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -556,19 +556,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(updateAccount)
             .isNotNull();
         assertThat(updateAccount.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
-
-        var acc1 = updateAccount(account)
-            .bank(account.getBank()
-                .bankAccount(account.getBank().getBankAccount()
-                    .bankAccount("")));
-        var updateAccount1 = put(
-            baseRoutePath + "/account",
-            HttpStatus.BAD_REQUEST,
-            acc1,
-            Error.class
-        );
-        assertThat(updateAccount1.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
 
         var acc2 = updateAccount(account)
@@ -608,7 +595,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    @AllureId("")
     void testPositiveUpdateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -628,7 +614,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .version(acc.getVersion() + 1)
             .account("30101810145250000416")
             .bank(account.getBank()
-                .bic("044525411")
+                .bic(getBic())
                 .bankAccount(account.getBank().getBankAccount()
                     .bankAccount("30101810145250000411")));
         var updateAccount1 = put(
@@ -656,7 +642,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .version(acc2.getVersion() + 1)
             .account("")
             .bank(account.getBank()
-                .bic("044525000")
+                .bic(getBic())
                 .bankAccount(account.getBank().getBankAccount()
                     .bankAccount(null)));
         var updateAccount3 = put(
@@ -693,7 +679,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
 
         var acc6 = acc5
-            .version(acc5.getVersion())
+            .version(acc5.getVersion() + 1)
             .account("40101810045250010041");
         var updateAccount6 = put(
             baseRoutePath + "/account",
@@ -720,7 +706,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         );
         assertThat(accountError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(accountError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(accountError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (account.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }
@@ -904,5 +890,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(error.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
+    }
+
+    private static String getBic() {
+        String bic = "525411";
+        var key = randomNumeric(3);
+        return key + bic;
     }
 }

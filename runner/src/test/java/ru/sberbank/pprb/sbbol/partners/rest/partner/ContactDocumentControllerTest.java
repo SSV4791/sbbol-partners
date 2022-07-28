@@ -149,7 +149,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         );
         assertThat(documentError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(documentError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(documentError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

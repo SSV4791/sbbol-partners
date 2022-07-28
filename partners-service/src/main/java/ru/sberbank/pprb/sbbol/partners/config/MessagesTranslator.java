@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
@@ -9,9 +9,9 @@ import java.util.Locale;
 @Component
 public class MessagesTranslator {
 
-    private static ResourceBundleMessageSource messageSource;
+    private static MessageSource messageSource;
 
-    MessagesTranslator(ResourceBundleMessageSource messageSource) {
+    MessagesTranslator(MessageSource messageSource) {
         MessagesTranslator.messageSource = messageSource;
     }
 

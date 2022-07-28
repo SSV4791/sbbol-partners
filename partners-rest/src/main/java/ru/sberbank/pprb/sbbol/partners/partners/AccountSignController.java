@@ -3,15 +3,12 @@ package ru.sberbank.pprb.sbbol.partners.partners;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.AccountsSignApi;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountSignValidatorImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AccountsSignFilterValidationImpl;
 
 import java.util.List;
 
@@ -25,7 +22,7 @@ public class AccountSignController implements AccountsSignApi {
     }
 
     @Override
-    public ResponseEntity<AccountsSignInfoResponse> create(@Validation(type = AccountSignValidatorImpl.class) AccountsSignInfo accountsSignInfo) {
+    public ResponseEntity<AccountsSignInfoResponse> create(AccountsSignInfo accountsSignInfo) {
         return ResponseEntity.ok(accountSignService.createAccountsSign(accountsSignInfo));
     }
 
@@ -41,9 +38,7 @@ public class AccountSignController implements AccountsSignApi {
     }
 
     @Override
-    public ResponseEntity<AccountsSignResponse> list(
-        @Validation(type = AccountsSignFilterValidationImpl.class) AccountsSignFilter accountsSignFilter
-    ) {
+    public ResponseEntity<AccountsSignResponse> list(AccountsSignFilter accountsSignFilter) {
         return ResponseEntity.ok(accountSignService.getAccountsSign(accountsSignFilter));
     }
 }

@@ -4,15 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.DocumentTypeDictionaryApi;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeService;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentTypeUpdateValidationImpl;
 
 import java.util.List;
 
@@ -26,8 +23,7 @@ public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
     }
 
     @Override
-    public ResponseEntity<DocumentType> create(@Validation(type = DocumentTypeCreateValidationImpl.class)
-                                                               DocumentTypeCreate documentTypeCreate) {
+    public ResponseEntity<DocumentType> create(DocumentTypeCreate documentTypeCreate) {
         return ResponseEntity.status(HttpStatus.CREATED).body(documentTypeService.saveDocument(documentTypeCreate));
     }
 
@@ -43,8 +39,7 @@ public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
     }
 
     @Override
-    public ResponseEntity<DocumentType> update(@Validation(type = DocumentTypeUpdateValidationImpl.class)
-                                                               DocumentTypeChange documentTypeChange) {
+    public ResponseEntity<DocumentType> update(DocumentTypeChange documentTypeChange) {
         return ResponseEntity.ok(documentTypeService.updateDocument(documentTypeChange));
     }
 }

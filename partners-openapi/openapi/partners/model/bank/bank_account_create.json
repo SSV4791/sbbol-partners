@@ -1,12 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.BankAccountCreate",
   "type": "object",
   "title": "Корреспондентский счёт банка",
   "properties": {
     "bankAccount": {
       "type": "string",
-      "title": "Корреспондентский счёт"
+      "title": "Корреспондентский счёт",
+      "maxLength": 20,
+      "x-not-empty": true
     }
   }
 }

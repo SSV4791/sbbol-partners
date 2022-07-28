@@ -1,16 +1,21 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.AccountsSignDetail",
   "type": "object",
   "title": "Подпись счетов",
   "properties": {
     "entityId": {
       "type": "string",
-      "title": "Глобальный уникальный идентификатор подписи из БПС Подтверждения"
+      "title": "Глобальный уникальный идентификатор подписи из БПС Подтверждения",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "accountId": {
       "type": "string",
-      "title": "Идентификатор счёта или контрагента"
+      "title": "Идентификатор счёта или контрагента",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "digest": {
       "type": "string",

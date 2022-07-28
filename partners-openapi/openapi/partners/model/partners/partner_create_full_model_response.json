@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.ufs.partner.model.PartnerCreateResponse",
   "type": "object",
   "title": "Ответ на запрос создания партнера",
   "properties": {

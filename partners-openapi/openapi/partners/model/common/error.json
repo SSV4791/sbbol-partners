@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.Error",
   "type": "object",
   "title": "Ошибка",
   "properties": {
@@ -15,7 +14,7 @@
         "type": "string"
       }
     },
-    "descriptionErrors": {
+    "descriptions": {
       "type": "array",
       "format": "map",
       "title": "Описание ошибок",

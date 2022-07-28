@@ -4,15 +4,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAddressApi;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AddressService;
-import ru.sberbank.pprb.sbbol.partners.validation.AddressCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AddressUpdateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.AddressesFilterValidationImpl;
 
 import java.util.List;
 
@@ -26,7 +22,7 @@ public class PartnerAddressController implements PartnerAddressApi {
     }
 
     @Override
-    public ResponseEntity<Address> create(@Validation(type = AddressCreateValidationImpl.class) AddressCreate address) {
+    public ResponseEntity<Address> create(AddressCreate address) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerAddressService.saveAddress(address));
     }
 
@@ -42,12 +38,12 @@ public class PartnerAddressController implements PartnerAddressApi {
     }
 
     @Override
-    public ResponseEntity<AddressesResponse> list(@Validation(type = AddressesFilterValidationImpl.class) AddressesFilter addressesFilter) {
+    public ResponseEntity<AddressesResponse> list(AddressesFilter addressesFilter) {
         return ResponseEntity.ok(partnerAddressService.getAddresses(addressesFilter));
     }
 
     @Override
-    public ResponseEntity<Address> update(@Validation(type = AddressUpdateValidationImpl.class) Address address) {
+    public ResponseEntity<Address> update(Address address) {
         return ResponseEntity.ok(partnerAddressService.updateAddress(address));
     }
 }

@@ -1,13 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.DocumentsFilter",
   "type": "object",
   "title": "Фильтр для поиска документов",
   "properties": {
     "unifiedIds": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 36,
+        "maxLength": 36,
+        "x-not-empty": true
       },
       "title": "Идентификаторы партнера/контакта"
     },
@@ -17,7 +19,10 @@
     },
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета"
+      "title": "Идентификатор личного кабинета",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "pagination": {
       "$ref": "../../../common/model/pagination.json",
@@ -26,6 +31,7 @@
   },
   "required": [
     "unifiedIds",
-    "digitalId"
+    "digitalId",
+    "pagination"
   ]
 }

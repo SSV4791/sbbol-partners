@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.DocumentTypeCreate",
   "type": "object",
   "title": "Вид документа",
   "properties": {
@@ -16,8 +15,13 @@
       "type": "array",
       "title": "Тип субъекта документа",
       "items": {
-        "$ref": "../common/legal_form.json"
-      }
+        "$ref": "../common/legal_form.json",
+        "uniqueItems": true
+      },
+      "x-not-empty": true
     }
-  }
+  },
+  "required": [
+    "legalForms"
+  ]
 }

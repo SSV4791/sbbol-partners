@@ -146,7 +146,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
         );
         assertThat(addressError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(addressError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(addressError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (address.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

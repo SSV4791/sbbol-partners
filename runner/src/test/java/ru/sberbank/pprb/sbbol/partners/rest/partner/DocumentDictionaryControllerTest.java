@@ -97,19 +97,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34140")
-    void testCreateDocumentsWhenLegalFormIsDuplicated() {
-        var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON, ENTREPRENEUR);
-        var documentTypeCreate = new DocumentTypeCreate()
-            .documentType("NEW_CREATE_TYPE_WHEN_LEGAL_FORM_IS_DUPLICATED")
-            .description("Описание для создания")
-            .legalForms(legalForms);
-        var error = post(baseRoutePath, HttpStatus.BAD_REQUEST, documentTypeCreate, Error.class);
-        assertThat(error.getCode())
-            .isEqualTo("BAD_REQUEST");
-    }
-
-    @Test
     @AllureId("36484")
     void testCreateDocumentsWhenLegalFormIsEmpty() {
         var documentTypeCreate = new DocumentTypeCreate()

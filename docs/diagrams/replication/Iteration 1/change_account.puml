@@ -7,7 +7,7 @@ autonumber
 alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
 СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+ППРБ.Партнеры --> Клиент: Error 400 [клиент не мигрирован]
 end
 else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
 СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
@@ -16,7 +16,7 @@ alt#gold Есть запись в таблице account
 ППРБ.Партнеры -> ППРБ.Партнеры: Проверка на наличие у аккаунта значения SIGN
 alt#gold state.SIGNED
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 403 [аккаунт подписан]
+ППРБ.Партнеры --> Клиент: Error 400 [аккаунт подписан]
 end
 END
 alt#gold state.NOT_SIGNED
@@ -24,12 +24,23 @@ alt#gold state.NOT_SIGNED
 alt#gold Есть запись в таблице partner
 ППРБ.Партнеры -> ППРБ.Партнеры: Обновление данных в таблицах account, bank, bank_account
 ППРБ.Партнеры --> Клиент: 200
-ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid}
+ППРБ.Партнеры -> СББОЛ: /{digitalId}/{pprbGuid} (поиск конрагента по digitalId и account_UUID
+СББОЛ -> СББОЛ: Поиск контрагента по заданным критериям
 alt#gold Если 200
+СББОЛ --> ППРБ.Партнеры: 200 контрагент найден
+note right of ППРБ.Партнеры
+Старт репликации
+end note
 ППРБ.Партнеры -> СББОЛ: /update/{digitalId} (изменение контрагента по account.uuid = correspondent.pprb_guid)
+СББОЛ -> СББОЛ: Изменение
 СББОЛ -> ППРБ.Партнеры: 200
 else 404
+СББОЛ --> ППРБ.Партнеры: 404 контрагент не найден
+note right of ППРБ.Партнеры
+Старт репликации
+end note
 ППРБ.Партнеры -> СББОЛ: /create/{digitalId}
+СББОЛ -> СББОЛ: Создание
 СББОЛ -> ППРБ.Партнеры: 200
 end
 group#Gold #pink negative
@@ -42,13 +53,13 @@ group#Gold #pink negative
 end
 else Нет записи в partner
 break#Gold #pink Нет записи, прерывание операции
-ППРБ.Партнеры --> Клиент: 404 ошибка
+ППРБ.Партнеры --> Клиент: 400 ошибка
 end
 end
 end
 else Нет записи в account
 break#Gold #pink Нет записи, прерывание операции
-ППРБ.Партнеры --> Клиент: 404 ошибка
+ППРБ.Партнеры --> Клиент: 400 ошибка
 end
 end
 end

@@ -4,16 +4,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.ContactDocumentApi;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.Validation;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentCreateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentUpdateValidationImpl;
-import ru.sberbank.pprb.sbbol.partners.validation.DocumentsFilterValidationImpl;
 
 import java.util.List;
 
@@ -27,7 +23,7 @@ public class ContactDocumentController implements ContactDocumentApi {
     }
 
     @Override
-    public ResponseEntity<Document> create(@Validation(type = DocumentCreateValidationImpl.class) DocumentCreate document) {
+    public ResponseEntity<Document> create(DocumentCreate document) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contactDocumentService.saveDocument(document));
     }
 
@@ -43,12 +39,12 @@ public class ContactDocumentController implements ContactDocumentApi {
     }
 
     @Override
-    public ResponseEntity<DocumentsResponse> list(@Validation(type = DocumentsFilterValidationImpl.class) DocumentsFilter documentsFilter) {
+    public ResponseEntity<DocumentsResponse> list(DocumentsFilter documentsFilter) {
         return ResponseEntity.ok(contactDocumentService.getDocuments(documentsFilter));
     }
 
     @Override
-    public ResponseEntity<Document> update(@Validation(type = DocumentUpdateValidationImpl.class) DocumentChange document) {
+    public ResponseEntity<Document> update(DocumentChange document) {
         return ResponseEntity.ok(contactDocumentService.updateDocument(document));
     }
 }

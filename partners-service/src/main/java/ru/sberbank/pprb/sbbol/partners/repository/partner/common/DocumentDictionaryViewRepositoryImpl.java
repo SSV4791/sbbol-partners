@@ -18,7 +18,8 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class DocumentDictionaryViewRepositoryImpl extends BaseRepository<DocumentTypeEntity, DocumentTypeFilter> implements DocumentDictionaryViewRepository{
+public class DocumentDictionaryViewRepositoryImpl
+    extends BaseRepository<DocumentTypeEntity, DocumentTypeFilter> implements DocumentDictionaryViewRepository{
 
     protected DocumentDictionaryViewRepositoryImpl(EntityManager entityManager) {
         super(entityManager, DocumentTypeEntity.class);

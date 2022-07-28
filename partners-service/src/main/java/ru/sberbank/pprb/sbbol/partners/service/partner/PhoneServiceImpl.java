@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
@@ -12,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 abstract class PhoneServiceImpl implements PhoneService {
@@ -65,6 +67,9 @@ abstract class PhoneServiceImpl implements PhoneService {
         var uuid = UUID.fromString(phone.getId());
         var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
+        if (!Objects.equals(phone.getVersion(), foundPhone.getVersion())) {
+            throw new OptimisticLockException(foundPhone.getVersion(), phone.getVersion());
+        }
         phoneMapper.updatePhone(phone, foundPhone);
         var savedPhone = phoneRepository.save(foundPhone);
         return phoneMapper.toPhone(savedPhone);

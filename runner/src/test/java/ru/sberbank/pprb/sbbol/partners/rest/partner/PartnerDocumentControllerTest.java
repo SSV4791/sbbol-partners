@@ -63,79 +63,79 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithoutDigitalId() {
-        var errorText ="Ошибка заполнения одного из возможных полей: digitalId поле обязательно для заполнения";
+        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), null);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithEmptyDigitalId() {
-        var errorText ="Ошибка заполнения одного из возможных полей: digitalId поле обязательно для заполнения";
+        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), "");
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithBadDigitalId() {
-        var errorText ="Проверьте заполненное значение на корректность. Максимальное количество символов 1-40";
+        var errorText ="размер должен находиться в диапазоне от 1 до 40";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), RandomStringUtils.randomAlphanumeric(41));
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithoutUnifiedId() {
-        var errorText ="Ошибка заполнения одного из возможных полей: id/partnerId/accountId/unifiedId поле обязательно для заполнения";
+        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(null, partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithEmptyUnifiedId() {
-        var errorText ="Ошибка заполнения одного из возможных полей: id/partnerId/accountId/unifiedId поле обязательно для заполнения";
+        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors("" ,partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithBadUnifiedId() {
-        var errorText ="Проверьте заполненное значение на корректность. Максимальное количество символов 36";
+        var errorText ="размер должен находиться в диапазоне от 36 до 36";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(RandomStringUtils.randomAlphanumeric(37) ,partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(response.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
@@ -348,7 +348,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         );
         assertThat(documentError.getCode())
             .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(documentError.getDescriptionErrors().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(documentError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }

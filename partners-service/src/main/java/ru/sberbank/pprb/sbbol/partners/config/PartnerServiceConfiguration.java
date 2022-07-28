@@ -10,7 +10,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyAsynchReplicationAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
-import ru.sberbank.pprb.sbbol.partners.aspect.validation.ValidationAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.config.props.ReplicationKafkaProducerProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
@@ -105,11 +104,6 @@ public class PartnerServiceConfiguration {
     @Bean
     LoggerAspect loggedAspect() {
         return new LoggerAspect();
-    }
-
-    @Bean
-    ValidationAspect validationAspect(ApplicationContext applicationContext) {
-        return new ValidationAspect(applicationContext);
     }
 
     @Bean
@@ -307,9 +301,20 @@ public class PartnerServiceConfiguration {
 
     @Bean
     ContactService contactService(
-        ContactRepository contactRepository
+        ContactRepository contactRepository,
+        EmailRepository emailRepository,
+        PhoneRepository phoneRepository,
+        AddressRepository addressRepository,
+        DocumentRepository documentRepository
     ) {
-        return new ContactServiceImpl(contactRepository, contactMapper());
+        return new ContactServiceImpl(
+            contactRepository,
+            emailRepository,
+            phoneRepository,
+            addressRepository,
+            documentRepository,
+            contactMapper())
+            ;
     }
 
     @Bean

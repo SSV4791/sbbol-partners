@@ -1,8 +1,0 @@
-{
-  "type": "string",
-  "title": "Тип удостоверяющего сотрудника",
-  "enum": [
-    "NOTARY",
-    "UNKNOWN"
-  ]
-}

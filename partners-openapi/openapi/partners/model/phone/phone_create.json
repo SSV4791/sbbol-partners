@@ -1,20 +1,26 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.PhoneCreate",
   "type": "object",
   "title": "Телефон",
   "properties": {
     "unifiedId": {
       "type": "string",
-      "title": "Идентификатор партнера или контакта"
+      "title": "Идентификатор партнера или контакта",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета клиента"
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "phone": {
       "type": "string",
-      "title": "Номер телефона"
+      "title": "Номер телефона",
+      "x-extra-annotation": "@PhoneValidation"
     }
   }
 }

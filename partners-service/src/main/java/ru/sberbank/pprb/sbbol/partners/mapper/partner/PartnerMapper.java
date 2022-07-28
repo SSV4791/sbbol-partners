@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
-import org.mapstruct.InheritConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -66,6 +65,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "search", ignore = true)
     PartnerEntity toPartner(PartnerCreate partner);
 
     default List<PartnerEmailEntity> toEmail(Set<String> emails, String digitalId) {
@@ -105,6 +105,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "search", ignore = true)
     PartnerEntity toPartner(PartnerCreateFullModel partner);
 
     @Named("toCitizenshipType")
@@ -118,6 +119,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "search", ignore = true)
     PartnerEntity toPartner(Partner partner);
 
     @Named("toLegalType")
@@ -131,10 +133,22 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "search", ignore = true)
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
+        var join = String.join(
+            ",",
+            partner.getDigitalId(),
+            partner.getInn(),
+            partner.getKpp(),
+            partner.getOrgName(),
+            partner.getFirstName(),
+            partner.getMiddleName(),
+            partner.getSecondName()
+        );
+        partner.setSearch(join);
         var phones = partner.getPhones();
         if (phones != null) {
             for (var phone : phones) {

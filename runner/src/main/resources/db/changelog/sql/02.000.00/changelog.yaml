@@ -66,6 +66,12 @@ databaseChangeLog:
       file: 1648723867914_drop_funcion_generate_uuid.sql
       relativeToChangelogFile: true
   - include:
+      file: 1657775422524_create_column_search_account_table.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1657775488669_create_column_search_partner_table.sql
+      relativeToChangelogFile: true
+  - include:
       file: 1658239352706_add_new_primery_key_crtj_clientlockevent.sql
       relativeToChangelogFile: true
   - include:

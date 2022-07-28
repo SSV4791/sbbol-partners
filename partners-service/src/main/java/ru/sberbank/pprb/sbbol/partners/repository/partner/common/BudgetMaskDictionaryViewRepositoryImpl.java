@@ -24,6 +24,11 @@ public class BudgetMaskDictionaryViewRepositoryImpl implements BudgetMaskDiction
         predicates.add(builder.equal(root.get("type"), BudgetMaskType.valueOf(filter.getMaskType().name())));
         criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));
         var query = entityManager.createQuery(criteria);
+        if (filter.getPagination() != null) {
+            var pagination = filter.getPagination();
+            query.setFirstResult(pagination.getOffset());
+            query.setMaxResults(pagination.getCount() + 1);
+        }
         return query.getResultList();
     }
 }

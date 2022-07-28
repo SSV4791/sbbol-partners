@@ -69,6 +69,10 @@ public class AccountEntity extends BaseEntity {
     @Column(name = "comment", length = 50)
     private String comment;
 
+    @Column(name = "search", length = 500)
+    private String search;
+
+
     public Boolean getPriorityAccount() {
         if (priorityAccount == null) {
             return Boolean.FALSE;
@@ -130,8 +134,17 @@ public class AccountEntity extends BaseEntity {
     public void setBank(BankEntity bank) {
         this.bank = bank;
     }
+
     public String getComment() {
         return comment;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 
     public void setComment(String comment) {

@@ -1,9 +1,0 @@
-{
-  "type": "string",
-  "title": "Гражданство партнера",
-  "enum": [
-    "UNKNOWN",
-    "RUSSIA",
-    "ANOTHER_COUNTRY"
-  ]
-}

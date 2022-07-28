@@ -2,12 +2,13 @@
 'https://plantuml.com/sequence-diagram
 autonumber
 ==GET/VIEW==
+alt request PPRB
 Клиент -> ППРБ.Партнеры: GET/VIEW /partner/...
 ППРБ.Партнеры -> СББОЛ: /counterparty/check-migration/{digitalId}
 alt#Gold #lightblue appobj UfsCounterpartiesDictionaryMigratedToPartners = false
 СББОЛ --> ППРБ.Партнеры: Клиент не мигрирован в ППРБ
 break#Gold #Pink Ошибка. Прерывание операции
-ППРБ.Партнеры --> Клиент: Error 403 [клиент не мигрирован]
+ППРБ.Партнеры --> Клиент: Error 400 [клиент не мигрирован]
 end
 else #white appobj UfsCounterpartiesDictionaryMigratedToPartners = true
 СББОЛ --> ППРБ.Партнеры: Клиент мигрирован в ППРБ
@@ -19,5 +20,10 @@ break#Gold #pink Нет записи, прерывание операции
 ППРБ.Партнеры --> Клиент: 404 ошибка
 end
 end
+end
+end
+alt request SBBOL appobj true
+Клиент -> СББОЛ: GET/VIEW /counterparty/...
+СББОЛ --> Клиент: 200
 end
 @enduml

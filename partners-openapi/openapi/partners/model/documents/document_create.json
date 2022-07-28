@@ -1,28 +1,38 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.DocumentCreate",
   "type": "object",
   "title": "Документ",
   "properties": {
     "unifiedId": {
       "type": "string",
-      "title": "Идентификатор партнера или контакта"
+      "title": "Идентификатор партнера или контакта",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "digitalId": {
       "type": "string",
-      "title": "Идентификатор личного кабинета клиента"
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
     },
     "documentTypeId": {
       "type": "string",
-      "title": "Идентификатор типа документа"
+      "title": "Идентификатор типа документа",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "series": {
       "type": "string",
-      "title": "Серия документа"
+      "title": "Серия документа",
+      "maxLength": 50
     },
     "number": {
       "type": "string",
-      "title": "Номер документа"
+      "title": "Номер документа",
+      "maxLength": 50
     },
     "dateIssue": {
       "type": "string",
@@ -31,23 +41,32 @@
     },
     "divisionIssue": {
       "type": "string",
-      "title": "Место выдачи документа"
+      "title": "Место выдачи документа",
+      "maxLength": 250
     },
     "divisionCode": {
       "type": "string",
-      "title": "Код документа"
+      "title": "Код документа",
+      "maxLength": 50
     },
     "certifierName": {
       "type": "string",
-      "title": "Имя удостоверяющего сотрудника"
+      "title": "Имя удостоверяющего сотрудника",
+      "maxLength": 100
     },
     "positionCertifier": {
       "type": "string",
-      "title": "Должность удостоверяющего сотрудника"
+      "title": "Должность удостоверяющего сотрудника",
+      "maxLength": 100
     },
     "certifierType": {
       "$ref": "../common/certifier_type.json"
     }
-  }
+  },
+  "required": [
+    "unifiedId",
+    "digitalId",
+    "documentTypeId"
+  ]
 }
 

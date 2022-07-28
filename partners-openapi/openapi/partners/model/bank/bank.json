@@ -1,16 +1,21 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "ru.sberbank.pprb.partners.model.Bank",
   "type": "object",
   "title": "Банк",
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор"
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "accountId": {
       "type": "string",
-      "title": "Идентификатор счёта партнера"
+      "title": "Идентификатор счёта партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
     },
     "version": {
       "type": "integer",
@@ -19,11 +24,15 @@
     },
     "bic": {
       "type": "string",
-      "title": "БИК"
+      "title": "БИК",
+      "minLength": 9,
+      "maxLength": 9,
+      "x-not-empty": true
     },
     "name": {
       "type": "string",
-      "title": "Наименование"
+      "title": "Наименование",
+      "maxLength": 160
     },
     "mediary": {
       "type": "boolean",
@@ -34,5 +43,9 @@
       "$ref": "bank_account.json",
       "title": "Корреспондентский счёт"
     }
-  }
+  },
+  "required": [
+    "name",
+    "bic"
+  ]
 }
