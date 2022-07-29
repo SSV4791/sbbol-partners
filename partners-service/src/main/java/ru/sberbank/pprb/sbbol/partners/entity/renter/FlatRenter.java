@@ -45,6 +45,9 @@ public class FlatRenter implements Serializable, HashKeyProvider {
     @Column(name = "partner_uuid", nullable = false)
     private UUID partnerUuid;
 
+    @Column(name = "digital_id")
+    private String digitalId;
+
     @Column(name = "document_uuid")
     private UUID documentUuid;
 
@@ -105,6 +108,14 @@ public class FlatRenter implements Serializable, HashKeyProvider {
 
     public void setPhoneUuid(UUID phoneUuid) {
         this.phoneUuid = phoneUuid;
+    }
+
+    public String getDigitalId() {
+        return digitalId;
+    }
+
+    public void setDigitalId(String digitalId) {
+        this.digitalId = digitalId;
     }
 
     public UUID getLegalAddressUuid() {
@@ -193,7 +204,7 @@ public class FlatRenter implements Serializable, HashKeyProvider {
 
     @Override
     public String getHashKey() {
-        return getPartnerUuid().toString();
+        return getDigitalId();
     }
 }
 
