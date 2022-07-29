@@ -20,7 +20,7 @@
     "phone": {
       "type": "string",
       "title": "Номер телефона",
-      "x-extra-annotation": "@PhoneValidation"
+      "x-extra-field-annotation": "@PhoneValidation"
     }
   }
 }

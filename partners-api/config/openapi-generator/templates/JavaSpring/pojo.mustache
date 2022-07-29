@@ -112,9 +112,9 @@ public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{#ha
   {{/maximum}}
    * @return {{name}}
   */
- {{#vendorExtensions.x-extra-annotation}}
- {{{vendorExtensions.x-extra-annotation}}}
- {{/vendorExtensions.x-extra-annotation}}
+ {{#vendorExtensions.x-extra-field-annotation}}
+ {{{vendorExtensions.x-extra-field-annotation}}}
+ {{/vendorExtensions.x-extra-field-annotation}}
  {{#vendorExtensions.x-not-empty}}
  {{#required}}@NotEmpty{{/required}}
  {{/vendorExtensions.x-not-empty}}

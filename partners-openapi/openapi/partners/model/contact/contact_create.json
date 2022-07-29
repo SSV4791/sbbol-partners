@@ -52,7 +52,7 @@
       "title": "Номера телефона контакта",
       "items": {
         "type": "string",
-        "x-extra-annotation": "@PhoneValid"
+        "x-extra-field-annotation": "@PhoneValid"
       },
       "uniqueItems": true
     },
