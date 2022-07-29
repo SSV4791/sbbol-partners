@@ -2,9 +2,11 @@ package ru.sberbank.pprb.sbbol.partners.config.props;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+@Component
 @EnableConfigurationProperties({
     ReplicationKafkaSecurityProperties.class,
     ValidationInterceptorProperties.class

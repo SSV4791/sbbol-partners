@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,8 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
+@ConditionalOnProperty(value = "replication.kafka.producer.enable", havingValue = "true")
 @Configuration
-@EnableConfigurationProperties(ReplicationKafkaProducerProperties.class)
 public class ReplicationKafkaProducerConfiguration {
 
     private static final String SECURITY_PROTOCOL = "security.protocol";

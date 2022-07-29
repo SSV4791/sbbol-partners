@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -229,7 +229,7 @@ public class PartnerServiceConfiguration {
     @Bean
     AsynchReplicationService asynchReplicationService(
         ReplicationKafkaProducerProperties kafkaProperties,
-        KafkaTemplate<String, String> kafkaTemplate,
+        @Autowired(required = false)  KafkaTemplate<String, String> kafkaTemplate,
         AsynchReplicationCounterpartyMapper asynchReplicationCounterpartyMapper,
         ObjectMapper objectMapper
     ) {
