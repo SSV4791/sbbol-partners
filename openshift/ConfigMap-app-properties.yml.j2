@@ -59,6 +59,8 @@ data:
     standin.cloud.client.groupId=group_1
     standin.cloud.client.kafka-retry=10
     standin.cloud.client.retry-timeout=10000
+    standin.cloud.client.zoneId={{ appjournal_zone_id }}
+    standin.cloud.client.kafka.producerConfig."[max.request.size]"=4500000
     standin.cloud.client.kafka.producerConfig."[security.protocol]"=SSL
     standin.cloud.client.kafka.producerConfig."[ssl.keystore.location]"=/opt/keystore/kafka/server.keystore.jks
     standin.cloud.client.kafka.producerConfig."[ssl.truststore.location]"=/opt/keystore/kafka/trust.jks

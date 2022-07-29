@@ -59,8 +59,8 @@ os_project:
     kafka:
       producer:
         enable: false
-        server:
-        topic:
+        server: replication-kafka-server
+        topic: replication-kafka-topic
         security:
           enable: false
         interceptor:
@@ -87,3 +87,5 @@ fluentbit:
 
 app_journal:
   secret: secret-appjournalstubsettings
+
+appjournal_zone_id: PARTNERS

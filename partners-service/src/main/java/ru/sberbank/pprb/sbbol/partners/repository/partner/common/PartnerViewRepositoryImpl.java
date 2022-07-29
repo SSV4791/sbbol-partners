@@ -44,26 +44,13 @@ public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, Par
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getSearch() != null) {
             var search = filter.getSearch();
+            var searchPattern = search.getSearch()
+                .replace(" ", "")
+                    .toLowerCase();
             predicates.add(
-                builder.or(
-                    builder.like(
-                        builder.concat(
-                            builder.concat(
-                                builder.concat(
-                                    builder.concat(
-                                        root.get("secondName"),
-                                        " "
-                                    ),
-                                    root.get("firstName")
-                                ),
-                                " "
-                            ),
-                            root.get("middleName")
-                        ),
-                        "%" + search.getSearch() + "%"
-                    ),
-                    builder.like(root.get("orgName"), "%" + search.getSearch() + "%"),
-                    builder.like(root.get("inn"), "%" + search.getSearch() + "%")
+                builder.like(
+                    builder.lower(root.get("search")),
+                    "%" + searchPattern + "%"
                 )
             );
         }

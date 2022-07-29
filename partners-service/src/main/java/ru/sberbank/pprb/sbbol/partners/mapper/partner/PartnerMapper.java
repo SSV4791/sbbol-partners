@@ -138,17 +138,17 @@ public interface PartnerMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
-        var join = String.join(
-            ",",
+        var searchSubString = String.join(
+            "",
             partner.getDigitalId(),
             partner.getInn(),
             partner.getKpp(),
             partner.getOrgName(),
+            partner.getSecondName(),
             partner.getFirstName(),
-            partner.getMiddleName(),
-            partner.getSecondName()
+            partner.getMiddleName()
         );
-        partner.setSearch(join);
+        partner.setSearch(searchSubString);
         var phones = partner.getPhones();
         if (phones != null) {
             for (var phone : phones) {

@@ -73,12 +73,12 @@ public class ReplicationKafkaProducerConfiguration {
     }
 
     @Bean
-    ProducerFactory<String, String> kafkaPoducerFactory() {
+    ProducerFactory<String, String> kafkaProducerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
     KafkaTemplate<String, String> kafkaTemplate() {
-        return new KafkaTemplate<>(kafkaPoducerFactory());
+        return new KafkaTemplate<>(kafkaProducerFactory());
     }
 }
