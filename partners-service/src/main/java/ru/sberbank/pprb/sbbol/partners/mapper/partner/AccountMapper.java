@@ -138,19 +138,20 @@ public interface AccountMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var join =
-            String.join(",", account.getDigitalId(), account.getPartnerUuid().toString(), account.getAccount());
+        var emptyDelimiter = "";
+        var searchSubString =
+            String.join(emptyDelimiter, account.getDigitalId(), account.getPartnerUuid().toString(), account.getAccount());
 
         var bank = account.getBank();
         if (bank != null) {
             bank.setAccount(account);
-            join = String.join(",", join, bank.getBic());
+            searchSubString = String.join(emptyDelimiter, searchSubString, bank.getBic());
             var bankAccount = bank.getBankAccount();
             if (bankAccount != null) {
-                join = String.join(",", join, bankAccount.getAccount());
+                searchSubString = String.join(emptyDelimiter, searchSubString, bankAccount.getAccount());
             }
         }
-        account.setSearch(join);
+        account.setSearch(searchSubString);
     }
 
     @AfterMapping

@@ -46,8 +46,14 @@ public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, Acc
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getSearch() != null) {
             var search = filter.getSearch();
+            var searchPattern = search.getSearch()
+                .replace(" ", "")
+                .toLowerCase();
             predicates.add(
-                builder.like(root.get(ACCOUNT_ATTRIBUTE), "%" + search.getSearch() + "%")
+                builder.like(
+                    builder.lower(root.get("search")),
+                    "%" + searchPattern + "%"
+                )
             );
         }
         if (filter.getPartnerIds() != null) {

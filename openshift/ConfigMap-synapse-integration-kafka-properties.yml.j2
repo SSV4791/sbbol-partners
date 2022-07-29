@@ -6,11 +6,11 @@ metadata:
 data:
   application.properties: |-
     # Asynchronous replication Counterparty to Legacy Sbbol
-    replication.kafka.producer.enable={{os_project.replication.kafka.producer.enable}}
-    replication.kafka.producer.server={{os_project.replication.kafka.producer.server}}
+    replication.kafka.producer.enable={{ os_project.replication.kafka.producer.enable }}
+    replication.kafka.producer.server={{ os_project.replication.kafka.producer.server | default('replication-kafka-server') }}
     replication.kafka.producer.producer-id=counterparty-producer
-    replication.kafka.producer.topic={{os_project.replication.kafka.producer.topic}}
-    replication.kafka.producer.security.enable={{os_project.replication.kafka.producer.security.enable}}
+    replication.kafka.producer.topic={{ os_project.replication.kafka.producer.topic | default('replication-kafka-topic') }}
+    replication.kafka.producer.security.enable={{ os_project.replication.kafka.producer.security.enable }}
     replication.kafka.producer.security.protocol=SSL
     replication.kafka.producer.security.ssl-keystore-location=/opt/keystore/kafka/server.keystore.jks
     replication.kafka.producer.security.ssl-truststore-location=/opt/keystore/kafka/trust.jks
@@ -18,7 +18,7 @@ data:
     replication.kafka.producer.security.ssl-truststore-type=JKS
     replication.kafka.producer.security.ssl-protocol=TLS
     replication.kafka.producer.security.ssl-enabled-protocols=TLSv1.2
-    replication.kafka.producer.interceptor.validator.enable={{os_project.replication.kafka.producer.interceptor.validator.enable}}
+    replication.kafka.producer.interceptor.validator.enable={{ os_project.replication.kafka.producer.interceptor.validator.enable }}
     replication.kafka.producer.interceptor.validator.classes=ru.sbt.ss.kafka.validator.interceptor.ValidatorProducerInterceptor
     replication.kafka.producer.interceptor.validator.config=synapse-replication-kafka/counterparty-validator.conf
   jvm-arguments: |-

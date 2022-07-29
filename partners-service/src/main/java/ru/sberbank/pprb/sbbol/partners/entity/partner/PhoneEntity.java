@@ -39,7 +39,7 @@ public class PhoneEntity extends PhoneBaseEntity {
 
     @Override
     public String getHashKey() {
-        return getUnifiedUuid().toString();
+        return getDigitalId();
     }
 
     @Override

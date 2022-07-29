@@ -318,6 +318,54 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testGetSearchByOrgName_whenDifferentWordCase() {
+        var digitalId = randomAlphabetic(10);
+        var partnerCreate = getValidPartner(digitalId);
+        partnerCreate.setOrgName(partnerCreate.getOrgName().toLowerCase());
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner1)
+            .isNotNull();
+
+        partnerCreate.setOrgName(partnerCreate.getOrgName().toUpperCase());
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.search(
+            new SearchPartners()
+                .search(partnerCreate.getOrgName())
+        );
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(2)
+        );
+
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners())
+            .hasSize(2);
+    }
+
+    @Test
     @AllureId("34127")
     void testGetSearchLegalPersonPartners() {
         var digitalId = randomAlphabetic(10);
