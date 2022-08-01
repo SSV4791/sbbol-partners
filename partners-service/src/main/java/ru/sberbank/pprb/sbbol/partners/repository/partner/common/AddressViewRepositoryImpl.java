@@ -27,7 +27,13 @@ public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, Add
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<AddressEntity> criteria, List<Predicate> predicates, Root<AddressEntity> root, AddressesFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<AddressEntity> criteria,
+        List<Predicate> predicates,
+        Root<AddressEntity> root,
+        AddressesFilter filter
+    ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
             predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));

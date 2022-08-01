@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
+import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
@@ -23,7 +24,8 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
-public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, AccountsFilter> implements AccountViewRepository {
+public class AccountViewRepositoryImpl
+    extends BaseRepository<AccountEntity, AccountsFilter> implements AccountViewRepository {
 
     private static final String ACCOUNT_ATTRIBUTE = "account";
     private static final String PARTNER_ATTRIBUTE = "partner";
@@ -42,13 +44,19 @@ public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, Acc
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<AccountEntity> criteria, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<AccountEntity> criteria,
+        List<Predicate> predicates,
+        Root<AccountEntity> root,
+        AccountsFilter filter
+    ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        if (filter.getSearch() != null) {
-            var search = filter.getSearch();
-            var searchPattern = search.getSearch()
+        var filterSearch = filter.getSearch();
+        if (filterSearch != null && StringUtils.hasText(filterSearch.getSearch())) {
+            var searchPattern = filterSearch.getSearch()
                 .replace(" ", "")
-                .toLowerCase();
+                .toLowerCase(Locale.getDefault());
             predicates.add(
                 builder.like(
                     builder.lower(root.get("search")),
@@ -69,7 +77,13 @@ public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, Acc
             var masks = budgetMaskDictionaryRepository.findAll();
             List<Predicate> maskPredicate = new ArrayList<>(masks.size());
             for (BudgetMaskEntity mask : masks) {
-                maskPredicate.add(builder.or(builder.like(builder.upper(root.get(ACCOUNT_ATTRIBUTE)), mask.getCondition().toLowerCase(Locale.getDefault()))));
+                maskPredicate.add(
+                    builder.or(
+                        builder.like(
+                            builder.upper(root.get(ACCOUNT_ATTRIBUTE)), mask.getCondition().toLowerCase(Locale.getDefault())
+                        )
+                    )
+                );
             }
             predicates.add(builder.or(maskPredicate.toArray(Predicate[]::new)));
         }
@@ -86,7 +100,10 @@ public class AccountViewRepositoryImpl extends BaseRepository<AccountEntity, Acc
             var expression4 = builder.concat(expression3, partner.get("inn"));
             var expression5 = builder.concat(expression4, partner.get("kpp"));
             var expression = builder.concat(expression5, root.get(ACCOUNT_ATTRIBUTE));
-            predicates.add(builder.like(builder.upper(expression), "%" + filter.getPartnerSearch().toUpperCase() + "%"));
+            predicates.add(
+                builder.like(
+                    builder.upper(expression), "%" + filter.getPartnerSearch().toUpperCase(Locale.getDefault()) + "%")
+            );
         }
     }
 

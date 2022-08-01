@@ -26,7 +26,13 @@ public class DocumentDictionaryViewRepositoryImpl
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<DocumentTypeEntity> criteria, List<Predicate> predicates, Root<DocumentTypeEntity> root, DocumentTypeFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<DocumentTypeEntity> criteria,
+        List<Predicate> predicates,
+        Root<DocumentTypeEntity> root,
+        DocumentTypeFilter filter
+    ) {
         if (!CollectionUtils.isEmpty(filter.getLegalForms())) {
             Join<DocumentTypeEntity, DocumentTypeLegalFormEntity> legalForm = root.join("legalForms");
             predicates.add(legalForm.get("legalForm").in(filter.getLegalForms().stream().map(LegalForm::getValue).collect(toList())));

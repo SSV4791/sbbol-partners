@@ -26,7 +26,13 @@ public class ContactViewRepositoryImpl extends BaseRepository<ContactEntity, Con
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<ContactEntity> criteria, List<Predicate> predicates, Root<ContactEntity> root, ContactsFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<ContactEntity> criteria,
+        List<Predicate> predicates,
+        Root<ContactEntity> root,
+        ContactsFilter filter
+    ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         predicates.add(builder.equal(root.get("partnerUuid"), UUID.fromString(filter.getPartnerId())));
         if (filter.getIds() != null) {
