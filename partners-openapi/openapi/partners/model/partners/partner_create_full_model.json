@@ -44,7 +44,8 @@
     "ogrn": {
       "type": "string",
       "title": "ОГРН",
-      "maxLength": 13,
+      "minLength": 13,
+      "maxLength": 15,
       "x-extra-field-annotation": "@OgrnValidation"
     },
     "okpo": {

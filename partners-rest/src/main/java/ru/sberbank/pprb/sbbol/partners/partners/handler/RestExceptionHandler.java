@@ -38,8 +38,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 @ControllerAdvice
@@ -88,6 +89,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponsesEntity(
+            HttpStatus.BAD_REQUEST.name(),
             ex.getErrors(),
             ex.getText(),
             httpRequest.getRequestURL()
@@ -101,6 +103,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
         return buildResponsesEntity(
+            ex.getText(),
             ex.getErrors(),
             ex.getText(),
             httpRequest.getRequestURL()
@@ -179,6 +182,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             Stream.concat(errorsField.entrySet().stream(), errorsGlobal.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return buildResponsesEntity(
+            "PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION",
             errors,
             MessagesTranslator.toLocale("error.message.check.validation"),
             ((ServletWebRequest) request).getRequest().getRequestURL()
@@ -229,6 +233,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> buildResponsesEntity(
+        String errorCode,
         Map<String, List<String>> errors,
         String text,
         StringBuffer requestUrl
@@ -237,7 +242,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .map(value -> new Descriptions().field(value.getKey()).message(value.getValue()))
             .collect(toList());
         var errorData = new Error()
-            .code(HttpStatus.BAD_REQUEST.name())
+            .code(errorCode)
             .descriptions(descriptions)
             .text(Collections.singletonList(text));
         String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");

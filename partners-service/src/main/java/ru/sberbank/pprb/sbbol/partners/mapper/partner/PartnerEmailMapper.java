@@ -9,7 +9,10 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 
 @Loggable
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface PartnerEmailMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
