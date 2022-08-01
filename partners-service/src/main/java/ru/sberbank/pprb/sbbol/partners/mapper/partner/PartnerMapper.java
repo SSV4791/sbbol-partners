@@ -15,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.StringMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Citizenship;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -33,7 +34,8 @@ import java.util.stream.Collectors;
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
         PartnerEmailMapper.class,
-        PartnerPhoneMapper.class
+        PartnerPhoneMapper.class,
+        StringMapper.class
     },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
@@ -59,6 +61,10 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "orgName", source = "orgName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "firstName", source = "firstName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "secondName", source = "secondName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "middleName", source = "middleName", qualifiedByName = "toTrimmed")
     @Mapping(target = "emails", expression = "java(toEmail(partner.getEmails(), partner.getDigitalId()))")
     @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), partner.getDigitalId()))")
     @Mapping(target = "type", constant = "PARTNER")
@@ -99,6 +105,10 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "orgName", source = "orgName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "firstName", source = "firstName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "secondName", source = "secondName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "middleName", source = "middleName", qualifiedByName = "toTrimmed")
     @Mapping(target = "emails", expression = "java(toEmail(partner.getEmails(), partner.getDigitalId()))")
     @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), partner.getDigitalId()))")
     @Mapping(target = "type", constant = "PARTNER")
@@ -116,6 +126,10 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
+    @Mapping(target = "orgName", source = "orgName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "firstName", source = "firstName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "secondName", source = "secondName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "middleName", source = "middleName", qualifiedByName = "toTrimmed")
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")

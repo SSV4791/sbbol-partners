@@ -7,5 +7,4 @@ public interface BaseMapper {
     default UUID mapUuid(final String id) {
         return id != null ? UUID.fromString(id) : null;
     }
-
 }

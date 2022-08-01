@@ -5,7 +5,6 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
@@ -40,22 +39,30 @@ public interface DocumentTypeMapper extends BaseMapper {
 
     @Mapping(target = "uuid", expression = "java(mapUuid(documentType.getId()))")
     @Mapping(target = "systemName", source = "documentType")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     DocumentTypeEntity toDocumentType(DocumentType documentType);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(documentType.getId()))")
     @Mapping(target = "systemName", source = "documentType")
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     DocumentTypeEntity toDocumentType(DocumentTypeChange documentType);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "systemName", source = "documentType")
     @Mapping(target = "deleted", constant = "false")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     DocumentTypeEntity toDocumentType(DocumentTypeCreate documentType);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(documentType.getId()))")
     @Mapping(target = "systemName", source = "documentType")
     @Mapping(target = "legalForms", expression = "java(updateLegalForms(documentType, documentEntity))")
     @Mapping(target = "deleted", constant = "false")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     void updateDocument(DocumentTypeChange documentType, @MappingTarget() DocumentTypeEntity documentEntity);
 
     default List<DocumentTypeLegalFormEntity> updateLegalForms(DocumentTypeChange documentTypeChange, DocumentTypeEntity documentEntity) {
