@@ -28,7 +28,13 @@ public class DocumentViewRepositoryImpl extends BaseRepository<DocumentEntity, D
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<DocumentEntity> criteria, List<Predicate> predicates, Root<DocumentEntity> root, DocumentsFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<DocumentEntity> criteria,
+        List<Predicate> predicates,
+        Root<DocumentEntity> root,
+        DocumentsFilter filter
+    ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
             predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));

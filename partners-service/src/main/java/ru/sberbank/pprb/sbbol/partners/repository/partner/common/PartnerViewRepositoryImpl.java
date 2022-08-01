@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
+import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
@@ -7,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
-import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
@@ -21,14 +21,20 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, PartnersFilter> implements PartnerViewRepository {
+public class PartnerViewRepositoryImpl
+    extends BaseRepository<PartnerEntity, PartnersFilter> implements PartnerViewRepository {
 
     private final AccountRepository accountRepository;
     private final BudgetMaskDictionaryRepository dictionaryRepository;
 
-    public PartnerViewRepositoryImpl(EntityManager entityManager, AccountRepository accountRepository, BudgetMaskDictionaryRepository dictionaryRepository) {
+    public PartnerViewRepositoryImpl(
+        EntityManager entityManager,
+        AccountRepository accountRepository,
+        BudgetMaskDictionaryRepository dictionaryRepository
+    ) {
         super(entityManager, PartnerEntity.class);
         this.accountRepository = accountRepository;
         this.dictionaryRepository = dictionaryRepository;
@@ -40,13 +46,19 @@ public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, Par
     }
 
     @Override
-    void createPredicate(CriteriaBuilder builder, CriteriaQuery<PartnerEntity> criteria, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
+    void createPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<PartnerEntity> criteria,
+        List<Predicate> predicates,
+        Root<PartnerEntity> root,
+        PartnersFilter filter
+    ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        if (filter.getSearch() != null) {
-            var search = filter.getSearch();
-            var searchPattern = search.getSearch()
+        var filterSearch = filter.getSearch();
+        if (filterSearch != null && StringUtils.hasText(filterSearch.getSearch())) {
+            var searchPattern = filterSearch.getSearch()
                 .replace(" ", "")
-                    .toLowerCase();
+                .toLowerCase(Locale.getDefault());
             predicates.add(
                 builder.like(
                     builder.lower(root.get("search")),
@@ -57,13 +69,14 @@ public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, Par
         if (filter.getAccountSignType() != null) {
             var accounts = switch (filter.getAccountSignType()) {
                 case SIGNED ->
-                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(SignType.SIGNED.name()));
+                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.SIGNED);
                 case NOT_SIGNED ->
-                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.valueOf(SignType.NOT_SIGNED.name()));
+                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.NOT_SIGNED);
             };
             predicates.add(root.get("uuid").in(accounts.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
         }
         if (filter.getPartnersFilter() != null) {
+            final var legalTypeFieldName = "legalType";
             switch (filter.getPartnersFilter()) {
                 case GKU -> {
                     Join<PartnerEntity, GkuInnEntity> join = root.join("inn", JoinType.LEFT);
@@ -75,9 +88,12 @@ public class PartnerViewRepositoryImpl extends BaseRepository<PartnerEntity, Par
                     var budgetAccount = accountRepository.findBudgetAccounts(filter.getDigitalId(), masks);
                     predicates.add(root.get("uuid").in(budgetAccount.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
                 }
-                case ENTREPRENEUR -> predicates.add(builder.equal(root.get("legalType"), LegalType.ENTREPRENEUR));
-                case PHYSICAL_PERSON -> predicates.add(builder.equal(root.get("legalType"), LegalType.PHYSICAL_PERSON));
-                case LEGAL_ENTITY -> predicates.add(builder.equal(root.get("legalType"), LegalType.LEGAL_ENTITY));
+                case ENTREPRENEUR ->
+                    predicates.add(builder.equal(root.get(legalTypeFieldName), LegalType.ENTREPRENEUR));
+                case PHYSICAL_PERSON ->
+                    predicates.add(builder.equal(root.get(legalTypeFieldName), LegalType.PHYSICAL_PERSON));
+                case LEGAL_ENTITY ->
+                    predicates.add(builder.equal(root.get(legalTypeFieldName), LegalType.LEGAL_ENTITY));
             }
         }
     }
