@@ -69,7 +69,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
@@ -82,7 +82,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
@@ -95,7 +95,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
@@ -108,7 +108,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
@@ -121,7 +121,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
@@ -134,7 +134,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
@@ -186,7 +186,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         for (var text : errorTexts) {
             assertThat(errorTexts.contains(text)).isTrue();
         }

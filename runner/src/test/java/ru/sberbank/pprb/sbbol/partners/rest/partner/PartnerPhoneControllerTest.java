@@ -57,7 +57,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var filter2 = new EmailsFilter()
             .digitalId(partner.getDigitalId())
@@ -75,7 +75,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var filter3 = new EmailsFilter()
             .digitalId(partner.getDigitalId())
@@ -95,7 +95,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
@@ -177,7 +177,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone1)
             .isNotNull();
         assertThat(newUpdatePhone1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var phone2 = createPhone(partner.getId(), partner.getDigitalId());
         updatePhone(phone2);
@@ -191,7 +191,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone2)
             .isNotNull();
         assertThat(newUpdatePhone2.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var phone3 = createPhone(partner.getId(), partner.getDigitalId());
         updatePhone(phone3);
@@ -205,7 +205,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone3)
             .isNotNull();
         assertThat(newUpdatePhone3.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var phone4 = createPhone(partner.getId(), partner.getDigitalId());
         updatePhone(phone4);
@@ -219,7 +219,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone4)
             .isNotNull();
         assertThat(newUpdatePhone4.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
