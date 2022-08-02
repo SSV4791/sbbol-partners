@@ -121,7 +121,8 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Transactional
     public void deleteAccountsSign(String digitalId, List<String> accountIds) {
         for (String accountId : accountIds) {
-            var sign = accountSignRepository.getByAccountUuid(UUID.fromString(accountId))
+            var accountUuid = accountSingMapper.mapUuid(accountId);
+            var sign = accountSignRepository.getByAccountUuid(accountUuid)
                 .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
             try {
                 accountSignRepository.delete(sign);

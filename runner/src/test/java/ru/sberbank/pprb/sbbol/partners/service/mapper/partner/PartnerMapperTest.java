@@ -24,6 +24,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +44,15 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34381")
+    void mapUuid() {
+        var expected = UUID.randomUUID();
+        var value = "[[[" + expected + "]]]";
+        var actual = mapper.mapUuid(value);
+        assertThat(expected)
+            .isEqualTo(actual);
+    }
+
+    @Test
     void toPartner() {
         Partner expected = factory.manufacturePojo(Partner.class);
         PartnerEntity partnerEntity = mapper.toPartner(expected);
@@ -58,7 +67,6 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34102")
     @SuppressWarnings("unchecked")
     void testToPartnerPhoneString() {
         Set<String> phones = factory.manufacturePojo(HashSet.class, String.class);
@@ -88,7 +96,6 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34381")
     void toPartnerCreate() {
         PartnerCreate expected = factory.manufacturePojo(PartnerCreate.class);
         PartnerEntity partnerEntity = mapper.toPartner(expected);
@@ -121,7 +128,6 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34102")
     void toLegalType() {
         LegalForm typeEnum = factory.manufacturePojo(LegalForm.class);
         LegalType legalType = PartnerMapper.toLegalType(typeEnum);
@@ -130,7 +136,6 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34071")
     void toPartnerCitizenshipType() {
         Citizenship typeEnum = factory.manufacturePojo(Citizenship.class);
         PartnerCitizenshipType citizenshipType = PartnerMapper.toCitizenshipType(typeEnum);

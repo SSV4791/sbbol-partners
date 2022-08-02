@@ -117,7 +117,7 @@ public class AccountServiceImpl implements AccountService {
         accountMapper.updateAccount(account, foundAccount);
         if (AccountStateType.SIGNED == foundAccount.getState()) {
             throw new CheckValidationException(Map.of(
-                "account",
+                DOCUMENT_NAME,
                 List.of(
                     MessagesTranslator.toLocale("account.account.sign.is_true")
                 )
@@ -145,7 +145,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public void deleteAccounts(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+            var uuid = accountMapper.mapUuid(id);
+            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
             try {
                 accountRepository.delete(foundAccount);

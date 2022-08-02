@@ -79,7 +79,8 @@ abstract class PhoneServiceImpl implements PhoneService {
     @Transactional
     public void deletePhones(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            var uuid = phoneMapper.mapUuid(id);
+            var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundPhone.isEmpty()) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }

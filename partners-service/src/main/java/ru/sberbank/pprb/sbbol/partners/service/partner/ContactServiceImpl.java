@@ -103,7 +103,7 @@ public class ContactServiceImpl implements ContactService {
     @Transactional
     public void deleteContacts(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var contactUuid = UUID.fromString(id);
+            var contactUuid = contactMapper.mapUuid(id);
             var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactUuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
             contactRepository.delete(foundContact);

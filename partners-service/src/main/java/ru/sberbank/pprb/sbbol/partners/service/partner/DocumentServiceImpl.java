@@ -103,7 +103,8 @@ abstract class DocumentServiceImpl implements DocumentService {
     @Transactional
     public void deleteDocuments(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            var uuid = documentMapper.mapUuid(id);
+            var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundDocument.isEmpty()) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }

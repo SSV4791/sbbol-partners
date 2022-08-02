@@ -70,7 +70,8 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     @Transactional
     public void deleteDocuments(List<String> ids) {
         for (String id : ids) {
-            DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(id))
+            var uuid = documentTypeMapper.mapUuid(id);
+            DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(uuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, id));
             foundDocument.setDeleted(Boolean.TRUE);
             dictionaryRepository.save(foundDocument);

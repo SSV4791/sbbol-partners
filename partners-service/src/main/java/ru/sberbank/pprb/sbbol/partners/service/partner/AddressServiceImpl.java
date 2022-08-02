@@ -85,7 +85,8 @@ abstract class AddressServiceImpl implements AddressService {
     @Transactional
     public void deleteAddresses(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+            var uuid = addressMapper.mapUuid(id);
+            var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, uuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
             addressRepository.delete(foundAddress);
         }
