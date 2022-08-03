@@ -31,11 +31,8 @@ public class AppJournalConfiguration {
 
     @Bean
     @Primary
-    public StandinResourceHelper<DataSource> standInResourceHelper(
-        @Qualifier("mainDataSource") DataSource masterDataSource,
-        @Qualifier("standInDataSource") DataSource standInDataSource
-    ) {
-        return new StandinResourceHelper<>(masterDataSource, standInDataSource);
+    public StandinResourceHelper<String> standInResourceHelper() {
+        return new StandinResourceHelper<>("main", "standIn");
     }
 
     /**
@@ -80,7 +77,8 @@ public class AppJournalConfiguration {
         // Стратегия репликации - с блокировками или без
         configurator.setReplicationStrategy(ReplicationStrategy.STANDIN_LOCKS);
         // Тип сериализатора
-        configurator.setSerializerType(SerializerType.BINARY_KRYO);
+        //TODO обязательно изменить тип на BINARY_KRYO
+        configurator.setSerializerType(SerializerType.JSON_GSON);
         // Сериализация отправки в ПЖ по hashKey
         configurator.setPartitionLockMode(PartitionLockMode.NONE);
         // Стратегия контроля порядка применения векторов
