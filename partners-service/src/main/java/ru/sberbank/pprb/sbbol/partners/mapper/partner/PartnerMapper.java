@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -25,8 +26,10 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Loggable
 @Mapper(
@@ -152,16 +155,18 @@ public interface PartnerMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
-        var searchSubString = String.join(
-            "",
-            partner.getDigitalId(),
-            partner.getInn(),
-            partner.getKpp(),
-            partner.getOrgName(),
-            partner.getSecondName(),
-            partner.getFirstName(),
-            partner.getMiddleName()
-        );
+        var searchSubString =
+            Stream.of(
+                    partner.getDigitalId(),
+                    partner.getInn(),
+                    partner.getKpp(),
+                    partner.getOrgName(),
+                    partner.getSecondName(),
+                    partner.getFirstName(),
+                    partner.getMiddleName()
+                )
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(StringUtils.EMPTY));
         partner.setSearch(searchSubString);
         var phones = partner.getPhones();
         if (phones != null) {
