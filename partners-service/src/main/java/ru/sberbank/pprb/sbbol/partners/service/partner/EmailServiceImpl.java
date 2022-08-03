@@ -79,7 +79,8 @@ abstract class EmailServiceImpl implements EmailService {
     @Transactional
     public void deleteEmails(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id));
+            var uuid = emailMapper.mapUuid(id);
+            var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundEmail.isEmpty()) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }

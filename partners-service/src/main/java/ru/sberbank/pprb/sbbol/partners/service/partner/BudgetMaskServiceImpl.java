@@ -69,7 +69,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     @Transactional
     public void deleteBudgetMasks(List<String> ids) {
         var uuids = ids.stream()
-            .map(UUID::fromString)
+            .map(budgetMaskMapper::mapUuid)
             .collect(Collectors.toList());
         for (UUID uuid : uuids) {
             var foundMask = budgetMaskDictionaryRepository.getByUuid(uuid);

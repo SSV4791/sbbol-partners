@@ -190,7 +190,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     public void deletePartners(String digitalId, List<String> ids) {
         for (String partnerId : ids) {
-            var partnerUuid = UUID.fromString(partnerId);
+            var partnerUuid = partnerMapper.mapUuid(partnerId);
             PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
             partnerRepository.delete(foundPartner);
