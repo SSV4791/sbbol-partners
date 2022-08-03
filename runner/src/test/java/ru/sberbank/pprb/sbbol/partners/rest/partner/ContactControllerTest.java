@@ -71,7 +71,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var filter2 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
@@ -88,7 +88,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var filter3 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
@@ -113,7 +113,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(response3)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test

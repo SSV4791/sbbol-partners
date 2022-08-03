@@ -105,7 +105,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .legalForms(Collections.emptyList());
         var error = post(baseRoutePath, HttpStatus.BAD_REQUEST, documentTypeCreate, Error.class);
         assertThat(error.getCode())
-            .isEqualTo("BAD_REQUEST");
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
@@ -116,7 +116,7 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
             .description("Описание для создания");
         var error = post(baseRoutePath, HttpStatus.BAD_REQUEST, documentTypeCreate, Error.class);
         assertThat(error.getCode())
-            .isEqualTo("BAD_REQUEST");
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test

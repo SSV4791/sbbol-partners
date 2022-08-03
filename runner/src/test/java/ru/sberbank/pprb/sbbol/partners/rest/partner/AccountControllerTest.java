@@ -108,7 +108,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
         assertThat(response.getDescriptions().stream().map(Descriptions::getField).findAny().orElse(null))
@@ -135,7 +135,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
         assertThat(response.getDescriptions().stream().map(Descriptions::getField).findAny().orElse(null))
@@ -175,7 +175,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         for (var text : errorTexts) {
             assertThat(errorTexts.contains(text)).isTrue();
         }
@@ -572,15 +572,15 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response0)
             .isNotNull();
         assertThat(response0.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
@@ -734,7 +734,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
@@ -775,7 +775,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(updateAccount)
             .isNotNull();
         assertThat(updateAccount.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var acc2 = updateAccount(account)
             .account("12345678901234567890");
@@ -786,7 +786,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount2.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var acc3 = updateAccount(account)
             .bank(account.getBank()
@@ -798,7 +798,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount3.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var acc4 = updateAccount(account)
             .bank(account.getBank()
@@ -810,7 +810,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount4.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
@@ -989,7 +989,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(accountVersion1)
             .isNotNull();
         assertThat(accountVersion1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         updateAccount(account);
         account.setAccount("40702810600000009222");
@@ -1005,7 +1005,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(accountVersion2)
             .isNotNull();
         assertThat(accountVersion2.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         updateAccount(account);
         account.setVersion(accountVersion.getVersion() + 1);
@@ -1108,7 +1108,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:CHECK_VALIDATION_EXCEPTION");
     }
 
     private static String getBic() {

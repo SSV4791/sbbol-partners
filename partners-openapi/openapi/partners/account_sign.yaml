@@ -1,8 +1,8 @@
 openapi: "3.0.3"
 info:
-  title: Request for documents
+  title: Request for account sign
   version: 1.0.0
-  description: OpenAPI Specification for partner document
+  description: OpenAPI Specification for partner account sign
 
 servers:
   - url: /

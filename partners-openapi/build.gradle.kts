@@ -1,6 +1,5 @@
 plugins {
     id("dependency-locking-conventions")
-    id("jacoco-conventions")
     id("java-conventions")
 }
 

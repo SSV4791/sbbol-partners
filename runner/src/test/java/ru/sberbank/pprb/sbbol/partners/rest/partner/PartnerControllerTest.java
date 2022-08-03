@@ -790,7 +790,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var filter1 = new PartnersFilter();
         filter.setDigitalId(digitalId);
@@ -806,7 +806,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         var filter2 = new PartnersFilter();
         filter.setDigitalId(digitalId);
@@ -822,7 +822,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
@@ -901,7 +901,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
