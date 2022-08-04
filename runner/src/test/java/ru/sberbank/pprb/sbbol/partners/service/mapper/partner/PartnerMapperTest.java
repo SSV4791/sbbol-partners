@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +80,6 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34382")
     @SuppressWarnings("unchecked")
     void testToPartnerEmailString() {
         Set<String> emails = factory.manufacturePojo(HashSet.class, String.class);

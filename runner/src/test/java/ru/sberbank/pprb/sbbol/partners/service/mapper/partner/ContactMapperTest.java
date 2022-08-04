@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,6 @@ class ContactMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34384")
     void testToContact() {
         Contact expected = factory.manufacturePojo(Contact.class);
         for (Email email : expected.getEmails()) {
@@ -59,7 +57,6 @@ class ContactMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34384")
     @SuppressWarnings("unchecked")
     void testToContactPhoneString() {
         Set<String> phones = factory.manufacturePojo(HashSet.class, String.class);
@@ -74,7 +71,6 @@ class ContactMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34379")
     @SuppressWarnings("unchecked")
     void testToContactEmailString() {
         Set<String> emails = factory.manufacturePojo(HashSet.class, String.class);

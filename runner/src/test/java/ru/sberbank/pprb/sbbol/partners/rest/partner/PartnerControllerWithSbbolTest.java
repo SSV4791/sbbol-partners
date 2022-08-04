@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,6 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
-    @AllureId("34191")
     void testGetPartner() {
         var response = get(
             "/partners/{digitalId}" + "/{id}",
@@ -39,7 +37,6 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34187")
     void testPartners() {
         var filter = new PartnersFilter();
         filter.setDigitalId(RandomStringUtils.randomAlphabetic(10));
@@ -61,7 +58,6 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34156")
     void testCreatePartner() {
         var response = post(baseRoutePath, HttpStatus.NOT_FOUND, PartnerControllerTest.getValidPartner(), Error.class);
         assertThat(response)
@@ -71,7 +67,6 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34194")
     void testUpdatePartner() {
         var partner = new Partner()
             .id(UUID.randomUUID().toString())
@@ -95,7 +90,6 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34114")
     void testDeletePartner() {
         var response = delete(
             "/partners/{digitalId}",

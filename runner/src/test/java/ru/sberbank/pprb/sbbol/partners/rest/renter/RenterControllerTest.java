@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.renter;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.entity.renter.DulType;
@@ -22,7 +21,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
     private static final String baseRoutePath = "/sbbol-partners/renter";
 
     @Test
-    @AllureId("34155")
     void version() {
         Version version = given()
             .spec(requestSpec)
@@ -39,7 +37,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34183")
     void testCreateValidRenter() {
         Renter renter = getValidRenter();
         Renter result = given()
@@ -61,7 +58,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34153")
     void testCreateInvalidRenter() {
         Renter renter = getValidRenter();
         renter.setOgrn("1");
@@ -81,7 +77,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34147")
     void testUpdateValidRenter() {
         Renter renter = getValidRenter();
         Renter createdRenter = given()
@@ -111,7 +106,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34206")
     void testUpdateInvalidRenter() {
         Renter renter = getValidRenter();
         Renter createdRenter = given()
@@ -141,7 +135,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34189")
     void testGetRenter() {
         Renter renter = getValidRenter();
         Renter createdRenter = given()
@@ -169,7 +162,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34129")
     void getGetRentersList() {
         RenterFilter filter = new RenterFilter().digitalId(randomAlphabetic(10));
         RenterListResponse response = given()

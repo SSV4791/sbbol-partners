@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -50,7 +49,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
-    @AllureId("34209")
     void testGetPartner() {
         var partner = getValidPartner();
         var createdPartner = post(
@@ -77,7 +75,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34174")
     void testGetOnePartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -118,7 +115,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testCreateContact2() {
         var partner = getValidPartner(randomAlphabetic(10));
         partner.setEmails(null);
@@ -137,7 +133,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
 
     @Test
-    @AllureId("34151")
     void testGetSearchInnPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -183,7 +178,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34141")
     void testGetSearchBudgetPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -227,7 +221,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34124")
     void testGetSearchOrgNamePartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -272,7 +265,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34186")
     void testGetSearchFIOPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -366,7 +358,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34127")
     void testGetSearchLegalPersonPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -409,7 +400,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34128")
     void testGetSearchPhysicalPersonPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -451,7 +441,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34199")
     void testGetSearchEntrepreneurPersonPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -494,7 +483,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34209")
     void testGetPartnersNotSignedAccount() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -538,7 +526,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34132")
     void testGetPartnersSignedAccount() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -748,7 +735,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
 
     @Test
-    @AllureId("")
     void testNegativeGetAllPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -826,7 +812,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34148")
     void testGetAllPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -879,7 +864,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34178")
     void testCreatePartner() {
         var partner = createValidPartner();
         assertThat(partner)
@@ -895,7 +879,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34165")
     void testCreateNotValidPartner() {
         var error = createNotValidPartner();
         assertThat(error)
@@ -905,7 +888,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34207")
     void testUpdatePartner() {
         var partner = getValidPartner();
         var createdPartner = post(
@@ -930,7 +912,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testUpdatePartner2() {
         var partner = getValidPartner();
         var createdPartner = post(
@@ -957,7 +938,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36943")
     void negativeTestUpdatePartnerVersion() {
         var partner = createValidPartner();
         Long version = partner.getVersion() + 1;
@@ -976,7 +956,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36944")
     void positiveTestUpdatePartnerVersion() {
         var partner = createValidPartner();
         var updatePartner = put(
@@ -999,7 +978,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34197")
     void testDeletePartner() {
         var createdPartner = post(
             baseRoutePath,

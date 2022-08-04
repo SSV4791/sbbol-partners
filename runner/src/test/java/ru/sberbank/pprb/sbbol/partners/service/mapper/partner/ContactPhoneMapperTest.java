@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
@@ -16,7 +15,6 @@ class ContactPhoneMapperTest extends BaseUnitConfiguration {
     private static final ContactPhoneMapper mapper = Mappers.getMapper(ContactPhoneMapper.class);
 
     @Test
-    @AllureId("34093")
     void testToContactPhone() {
         Phone expected = factory.manufacturePojo(Phone.class);
         ContactPhoneEntity actual = mapper.toPhone(expected);
@@ -28,7 +26,6 @@ class ContactPhoneMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34093")
     void testToContactPhoneReverse() {
         ContactPhoneEntity expected = factory.manufacturePojo(ContactPhoneEntity.class);
         expected.setContact(factory.manufacturePojo(ContactEntity.class));

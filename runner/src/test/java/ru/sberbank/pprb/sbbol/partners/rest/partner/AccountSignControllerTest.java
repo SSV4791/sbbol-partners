@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 public class AccountSignControllerTest extends BaseAccountSignControllerTest {
 
     @Test
-    @AllureId("34175")
     void testViewSignAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         List<String> account = new ArrayList<>();
@@ -83,7 +81,6 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
     }
 
     @Test
-    @AllureId("34190")
     void testCreateSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -93,7 +90,6 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
     }
 
     @Test
-    @AllureId("34203")
     void testGetSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -119,7 +115,6 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
     }
 
     @Test
-    @AllureId("34135")
     void testDeleteSignAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());

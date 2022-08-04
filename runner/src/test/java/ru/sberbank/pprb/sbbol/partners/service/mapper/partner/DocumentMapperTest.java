@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,7 +27,6 @@ class DocumentMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34050")
     void testToDocument() {
         var document = factory.manufacturePojo(DocumentCreate.class);
         DocumentEntity actual = mapper.toDocument(document);
@@ -47,7 +45,6 @@ class DocumentMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34067")
     void toCertifierType() {
         CertifierType typeEnum = factory.manufacturePojo(CertifierType.class);
         DocumentCertifierType documentType = DocumentMapper.toCertifierType(typeEnum);

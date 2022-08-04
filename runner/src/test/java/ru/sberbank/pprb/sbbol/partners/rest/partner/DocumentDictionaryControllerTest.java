@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +50,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36481")
     void testGetDocumentsWhenLegalFormNotDefined() {
         var response = post(baseRoutePath + "/view", HttpStatus.OK, defaultFilter, DocumentsTypeResponse.class);
         assertThat(response)
@@ -61,7 +59,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36480")
     void testGetDocumentsWhenLegalFormIsMatched() {
         var filter = new DocumentTypeFilter()
             .deleted(false)
@@ -75,7 +72,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36482")
     void testCreateDocuments() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON);
         var documentTypeCreate = new DocumentTypeCreate()
@@ -97,7 +93,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36484")
     void testCreateDocumentsWhenLegalFormIsEmpty() {
         var documentTypeCreate = new DocumentTypeCreate()
             .documentType("NEW_CREATE_TYPE_WITH_LEGAL_FORM_IS_EMPTY")
@@ -109,7 +104,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36485")
     void testCreateDocumentsWithLegalFormIsNull() {
         var documentTypeCreate = new DocumentTypeCreate()
             .documentType("NEW_CREATE_TYPE_WITH_LEGAL_FORM_IS_EMPTY")
@@ -120,7 +114,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36478")
     void testUpdateDocumentsWhenLegalFormNotChange() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON);
         var documentTypeCreate = new DocumentTypeCreate()
@@ -151,7 +144,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36486")
     void testUpdateDocumentsWhenLegalFormIsDeleted() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON);
         var documentTypeCreate = new DocumentTypeCreate()
@@ -183,7 +175,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36479")
     void testUpdateDocumentsWhenLegalFormIsEmpty() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON);
         var documentTypeCreate = new DocumentTypeCreate()
@@ -219,7 +210,6 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36345")
     void testDeleteDocuments() {
         var legalForms = List.of(ENTREPRENEUR, PHYSICAL_PERSON);
         var documentTypeCreate = new DocumentTypeCreate()

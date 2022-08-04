@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.counterparty;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.sberbank.pprb.sbbol.counterparties.model.CheckPayeeRequisitesResult;
@@ -26,7 +25,6 @@ class CounterpartyControllerTest extends AbstractIntegrationTest {
     private LegacySbbolAdapter legacySbbolAdapter;
 
     @Test
-    @AllureId("34200")
     void getNotFoundCheckRequisites() {
         var request = new CounterpartySearchRequest();
         request.setBankBic("123456789");
@@ -49,7 +47,6 @@ class CounterpartyControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34138")
     void getNotSignedCheckRequisites() {
         String guid = UUID.randomUUID().toString();
         var request = new CounterpartySearchRequest();
@@ -73,7 +70,6 @@ class CounterpartyControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34125")
     void getSignedCheckRequisites() {
         String guid = UUID.randomUUID().toString();
         var request = new CounterpartySearchRequest();

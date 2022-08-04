@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.counterparty;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
@@ -21,7 +20,6 @@ class CounterpartyMapperTest extends BaseUnitConfiguration {
     private static final CounterpartyMapper mapper = Mappers.getMapper(CounterpartyMapper.class);
 
     @Test
-    @AllureId("34054")
     void toCounterpartyCheckRequisites() {
         var searchRequest = factory.manufacturePojo(CounterpartySearchRequest.class);
         CounterpartyCheckRequisites response = mapper.toCounterpartyCheckRequisites(searchRequest);
@@ -35,7 +33,6 @@ class CounterpartyMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34045")
     void toCounterpartyTest() {
         var partner = factory.manufacturePojo(PartnerEntity.class);
         var account = factory.manufacturePojo(AccountEntity.class);

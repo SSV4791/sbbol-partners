@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,6 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34157")
     void testViewBudgetMasks() {
         var filter1 = new BudgetMaskFilter()
             .maskType(BudgetMaskForm.BUDGET_ACCOUNT)
@@ -57,7 +55,6 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34205")
     void testCreateBudgetMasks() {
         var mask = getBudgetMask(BudgetMaskForm.BIC);
         budgetMask = post(
@@ -82,7 +79,6 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34193")
     void testDeleteBudgetMasks() {
         var budgetMask = getBudgetMask(BudgetMaskForm.BUDGET_CORR_ACCOUNT);
         var saveDocument = post(baseRoutePath, HttpStatus.CREATED, budgetMask, BudgetMask.class);

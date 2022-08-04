@@ -9,7 +9,6 @@ credentials:
   checkmarx: DS_CAB-SA-CI000825-checkmarx
   openshift: DS_CAB-SA-CI000825-openshift
 
-allure_project_id: '154'
 project_name: &project_name sbbol-partners
 
 pr_check:
@@ -77,9 +76,8 @@ pr_check:
       -Dsonar.pullrequest.key=${params.pullRequestId}
       -Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}
       -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}
-      -Dtest.results.enabled=true
       -Dtest-layer=unit,api,configuration,cdcConsumer
-      -Dallure.link=${Const.ALLURE_ENTRYPOINT_URL}jobrun/${launch.jobRunId}
+      -Dallure.jobrunId=${launch.jobRunId}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=prCheck
       -Pspring.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_MAIN}/${env.POSTGRES_DB_NAME}
@@ -88,7 +86,7 @@ pr_check:
       -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
       -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
       -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
-      sonarCoverage --info
+      qaReporterUpload sonarCoverage --info
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
@@ -108,18 +106,18 @@ release:
       -PnexusPassword=${env.NEXUS_PWD}
       -Pversion=${env.VERSION}
       -Dtest-layer=unit,configuration,cdcConsumer,cdcProvider
-      -Dpact.url=${env.PACT_BROKER_URL}
+      -Dpactbroker.url=${env.PACT_BROKER_URL}
       -Dpactbroker.auth.username=${env.PACT_USER}
       -Dpactbroker.auth.password='${env.PACT_PASSWORD}'
       -Dpact.pacticipant.version=${env.VERSION}
       -Dpact.pacticipant.tag=${params.branch}
-      -Dpactbroker.consumerversionselectors.tags=${settings.release.artifact_id}:${params.branch}
+      -Dpactbroker.consumerversionselectors.tags=${settings.project_name}:${params.branch}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=release
-      -Dallure.link=${Const.ALLURE_ENTRYPOINT_URL}jobrun/${launch.jobRunId}
+      -Dallure.jobrunId=${launch.jobRunId}
       -Dsonar.login=${env.SONAR_TOKEN}
       -Dsonar.branch.name=${params.branch}
-      build -x test sonarCoverage --parallel --info
+      build qaReporterUpload sonarCoverage --parallel --info
   skip_istio: false
   default_values:
     params_branch: master

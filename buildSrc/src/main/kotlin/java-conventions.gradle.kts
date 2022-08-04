@@ -5,6 +5,10 @@ plugins {
     id("repositories-conventions")
 }
 
+subprojects {
+    apply(plugin = "java-library")
+}
+
 group = "ru.sberbank.pprb.sbbol.partners"
 
 java {

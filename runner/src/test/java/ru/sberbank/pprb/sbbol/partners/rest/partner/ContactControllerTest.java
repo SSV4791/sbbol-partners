@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,7 +32,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
-    @AllureId("34164")
     void testGetContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -50,7 +48,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testNegativeViewContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
@@ -117,7 +114,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34144")
     void testViewContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
@@ -191,7 +187,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34143")
     void testCreateContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var expected = getValidContact(partner.getId(), partner.getDigitalId());
@@ -208,7 +203,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testCreateContact2() {
         var partner = createValidPartner(randomAlphabetic(10));
         var expected = getValidContact(partner.getId(), partner.getDigitalId());
@@ -227,7 +221,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testNegativeUpdateChildContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -310,7 +303,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testUpdateChildContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -395,7 +387,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34170")
     void testUpdateContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -414,7 +405,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("")
     void testUpdateContact2() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -436,7 +426,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36932")
     void negativeTestUpdateContactVersion() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -456,7 +445,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36934")
     void positiveTestUpdateContactVersion() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -478,7 +466,6 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34201")
     void testDeleteContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
