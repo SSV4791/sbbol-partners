@@ -85,9 +85,9 @@ public interface DocumentMapper extends BaseMapper {
         return certifierType != null ? DocumentCertifierType.valueOf(certifierType.getValue()) : null;
     }
 
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(document.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")

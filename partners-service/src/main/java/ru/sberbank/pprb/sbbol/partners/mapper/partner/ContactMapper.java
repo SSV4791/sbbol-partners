@@ -121,9 +121,9 @@ public interface ContactMapper extends BaseMapper {
         return legalType != null ? LegalType.valueOf(legalType.getValue()) : null;
     }
 
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
     void updateContact(Contact contact, @MappingTarget() ContactEntity contactEntity);
 

@@ -95,3 +95,6 @@ databaseChangeLog:
   - include:
       file: 1658994826692_add_new_field_for_sign.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1659595273123_add_new_field_for_crtj_clientlock.sql
+      relativeToChangelogFile: true

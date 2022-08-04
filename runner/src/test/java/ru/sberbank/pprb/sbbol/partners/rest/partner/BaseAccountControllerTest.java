@@ -1,12 +1,13 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.restassured.response.ResponseBody;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
+import ru.sberbank.pprb.sbbol.partners.model.Bank;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
@@ -63,10 +64,10 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             .id(account.getId())
             .partnerId(account.getPartnerId())
             .account(ACCOUNT_FOR_TEST_PARTNER)
-            .bank(account.getBank()
+            .bank(new Bank()
                 .bic("044525411")
                 .name(account.getBank().getName())
-                .bankAccount(account.getBank().getBankAccount()
+                .bankAccount(new BankAccount()
                     .bankAccount("30101810145250000411")));
     }
 
@@ -121,7 +122,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         );
     }
 
-    public static Account changeAccount(AccountChange account) {
+    public static void changeAccount(AccountChange account) {
         var updatedAccount = put(
             baseRoutePath + "/account",
             HttpStatus.OK,
@@ -130,10 +131,9 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         );
         assertThat(updatedAccount)
             .isNotNull();
-        return updatedAccount;
     }
 
-    public static ResponseBody deleteAccount(String digitalId, String accountId) {
+    public static void deleteAccount(String digitalId, String accountId) {
         var deleteAccount =
             delete(
                 baseRoutePath + "/accounts" + "/{digitalId}",
@@ -143,6 +143,5 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             ).getBody();
         assertThat(deleteAccount)
             .isNotNull();
-        return deleteAccount;
     }
 }

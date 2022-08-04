@@ -120,7 +120,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "account", source = "bankAccount")
     BankAccountEntity toBankAccount(BankAccount bankAccount);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(account.getId()))")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
@@ -129,12 +129,12 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "search", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget() AccountEntity accountEntity);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updateBank(Bank bank, @MappingTarget() BankEntity bankEntity);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(bankAccount.getId()))")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "account", source = "bankAccount")
     void updateBankAccount(BankAccount bankAccount, @MappingTarget() BankAccountEntity bankAccountEntity);

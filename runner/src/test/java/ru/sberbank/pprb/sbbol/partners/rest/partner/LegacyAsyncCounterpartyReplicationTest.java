@@ -24,7 +24,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountSignContro
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountSignControllerTest.deleteAccountSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
-class LegacyAsynchCounterpartyReplicationTest extends BaseAccountControllerTest {
+class LegacyAsyncCounterpartyReplicationTest extends BaseAccountControllerTest {
 
     @Autowired
     private ReplicationKafkaProducerProperties replicationKafkaProducerProperties;
@@ -45,7 +45,7 @@ class LegacyAsynchCounterpartyReplicationTest extends BaseAccountControllerTest 
     }
 
     @Test
-    void testAsynchCounterpartyReplication() {
+    void testAsyncCounterpartyReplication() {
         doReturn(false)
             .when(legacySbbolAdapter)
             .checkNotMigration(any());

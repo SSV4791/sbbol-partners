@@ -2,7 +2,7 @@ docker:
   images:
     java: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-alpine:15.0.2-10-sber-certs
     postgres: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/postgres:13-alpine
-
+    liquibase: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/liquibase/liquibase:3.10.3
 credentials:
   sonar: DS_CAB-SA-CI000825-sonar-token
   nexus: DS_CAB-SA-CI000825
@@ -17,12 +17,11 @@ pr_check:
     match:
       files:
         - 'runner/src/main/resources/db/changelog'
-    executable:
-      download_uri: https://nexus.sigma.sbrf.ru/nexus/service/local/repositories/SBT_CI_distr_repo/content/SBBOL_UFS/liquibase/3.7.0-postgres/liquibase-3.7.0-postgres-bin.tar.gz
     changelog:
       path: runner/src/main/resources/db/changelog/changelog.yaml
     defaults_file:
       path: jenkins/resources/liquibase/liquibase.properties
+    command_type: update
   openshift:
     workdir: openshift
     match:
