@@ -79,7 +79,7 @@ public interface AddressMapper extends BaseMapper {
     AddressEntity toAddress(Address address);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
     void updateAddress(Address address, @MappingTarget() AddressEntity addressEntity);
 }

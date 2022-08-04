@@ -144,7 +144,7 @@ public interface PartnerMapper extends BaseMapper {
         return legalType != null ? LegalType.valueOf(legalType.getValue()) : null;
     }
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)

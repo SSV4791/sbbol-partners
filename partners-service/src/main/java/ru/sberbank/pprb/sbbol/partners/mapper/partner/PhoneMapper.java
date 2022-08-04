@@ -30,8 +30,8 @@ public interface PhoneMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     PhoneEntity toPhone(Phone phone);
 
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(phone.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(phone.getUnifiedId()))")
     void updatePhone(Phone phone, @MappingTarget() PhoneEntity foundPhone);
 }

@@ -30,7 +30,7 @@ public interface EmailMapper extends BaseMapper {
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
     EmailEntity toEmail(Email email);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updateEmail(Email email, @MappingTarget() EmailEntity foundEmail);

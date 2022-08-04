@@ -57,7 +57,7 @@ public interface DocumentTypeMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     DocumentTypeEntity toDocumentType(DocumentTypeCreate documentType);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(documentType.getId()))")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "systemName", source = "documentType")
     @Mapping(target = "legalForms", expression = "java(updateLegalForms(documentType, documentEntity))")
     @Mapping(target = "deleted", constant = "false")
