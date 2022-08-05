@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
@@ -15,7 +14,6 @@ class EmailMapperTest extends BaseUnitConfiguration {
     private static final EmailMapper mapper = Mappers.getMapper(EmailMapper.class);
 
     @Test
-    @AllureId("34385")
     void toEmail() {
         var expected = factory.manufacturePojo(Email.class);
         var actual = mapper.toEmail(expected);
@@ -25,7 +23,6 @@ class EmailMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34385")
     void toEmailCreate() {
         var expected = factory.manufacturePojo(EmailCreate.class);
         var actual = mapper.toEmail(expected);

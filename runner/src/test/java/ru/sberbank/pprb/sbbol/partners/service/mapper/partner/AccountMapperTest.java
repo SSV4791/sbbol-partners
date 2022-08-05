@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
@@ -51,7 +50,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34097")
     void testToAccountCreate() {
         var expected = factory.manufacturePojo(AccountCreate.class);
         var account = mapper.toAccount(expected);
@@ -70,7 +68,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34078")
     void testToBank() {
         var expected = factory.manufacturePojo(Bank.class);
         var actual = mapper.toBank(expected);
@@ -89,7 +86,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34060")
     void testToBankReverse() {
         var expected = factory.manufacturePojo(BankEntity.class);
         var actual = mapper.toBank(expected);
@@ -106,7 +102,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34059")
     void testToBankAccount() {
         var expected = factory.manufacturePojo(BankAccount.class)
             .id(UUID.randomUUID().toString());
@@ -121,7 +116,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34078")
     void testToBankAccountReverse() {
         var expected = factory.manufacturePojo(BankAccountEntity.class);
         var actual = mapper.toBankAccount(expected);

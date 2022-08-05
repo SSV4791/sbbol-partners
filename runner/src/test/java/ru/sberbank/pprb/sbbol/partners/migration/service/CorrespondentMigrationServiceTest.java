@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.migration.service;
 
-import io.qameta.allure.AllureId;
 import io.restassured.common.mapper.TypeRef;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
     );
 
     @Test
-    @AllureId("34177")
     void migrateAndCreateFewCorrespondentsTest() {
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, generateCorrespondents(GENERATE_COUNTERPARTIES_COUNT)));
         JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
@@ -57,7 +55,6 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34162")
     void migrateAndCreateCorrespondentTest() {
         MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondent();
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));
@@ -76,7 +73,6 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("35873")
     void migrateAndUpdateCorrespondentTest() {
         MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondent();
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));
@@ -105,7 +101,6 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34116")
     void migrateInvalidCorrespondentTest() {
         MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondentWithLongInn();
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));

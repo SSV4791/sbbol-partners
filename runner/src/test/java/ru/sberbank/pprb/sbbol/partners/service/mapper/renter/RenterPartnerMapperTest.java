@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.renter;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -18,7 +17,6 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     private static final RenterPartnerMapper mapper = Mappers.getMapper(RenterPartnerMapper.class);
 
     @Test
-    @AllureId("34055")
     void toPartner() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var renter = mapper.toPartner(expected);
@@ -45,7 +43,6 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34106")
     void toPhones() {
         String phone = RandomStringUtils.randomAlphabetic(10);
         String digitalId = RandomStringUtils.randomAlphabetic(10);
@@ -56,7 +53,6 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34091")
     void toEmails() {
         String email = RandomStringUtils.randomAlphabetic(10);
         String digitalId = RandomStringUtils.randomAlphabetic(10);
@@ -67,7 +63,6 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34074")
     void toAccount() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var account = mapper.toAccount(expected);
@@ -90,7 +85,6 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34086")
     void toBanks() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var bank = RenterPartnerMapper.toBank(expected);
@@ -105,7 +99,6 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34065")
     void toAddress() {
         var partnerUuid = factory.manufacturePojo(UUID.class);
         var digitalId = factory.manufacturePojo(String.class);
@@ -118,7 +111,6 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34098")
     void toDocument() {
         var partnerUuid = factory.manufacturePojo(UUID.class);
         Renter expected = factory.manufacturePojo(Renter.class);

@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.adapter.legacy;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#checkNotMigration(String)}
      */
     @Test
-    @AllureId("34036")
     @DisplayName("Сббол Адаптер контрагенты. Проверка миграции организации")
     void checkMigrationTest() {
         assertFalse(adapter.checkNotMigration(DIGITAL_ID));
@@ -51,7 +49,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#checkRequisites(CounterpartyCheckRequisites)}
      */
     @Test
-    @AllureId("34041")
     @DisplayName("Сббол Адаптер контрагенты. Проверка реквизитов контрагента")
     void checkRequisitesTest() {
         var request = factory.manufacturePojo(CounterpartyCheckRequisites.class);
@@ -65,7 +62,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#update(String, Counterparty)}
      */
     @Test
-    @AllureId("34035")
     @DisplayName("Сббол Адаптер контрагенты. Проверка обновления контрагента")
     void updateTest() {
         var request = factory.manufacturePojo(Counterparty.class);
@@ -77,7 +73,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#create(String, Counterparty)}
      */
     @Test
-    @AllureId("34042")
     @DisplayName("Сббол Адаптер контрагенты. Проверка создания контрагента")
     void createTest() {
         var request = factory.manufacturePojo(Counterparty.class);
@@ -89,7 +84,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#getByPprbGuid(String, String)}
      */
     @Test
-    @AllureId("34040")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения контрагента по ППРБ гуиду")
     void getByPprbGuidTest() {
         Counterparty result = adapter.getByPprbGuid(DIGITAL_ID, PPRB_GUID);
@@ -100,7 +94,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#delete(String, String)}
      */
     @Test
-    @AllureId("34034")
     @DisplayName("Сббол Адаптер контрагенты. Проверка удаления по ППРБ гуиду")
     void deleteTest() {
         assertDoesNotThrow(() -> adapter.delete(DIGITAL_ID, PPRB_GUID));
@@ -111,7 +104,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#list(String)}
      */
     @Test
-    @AllureId("34038")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка по ППРБ гуиду")
     void listTest() {
         List<CounterpartyView> result = adapter.list(DIGITAL_ID);
@@ -122,7 +114,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#saveSign(String, CounterpartySignData)}
      */
     @Test
-    @AllureId("34043")
     @DisplayName("Сббол Адаптер контрагенты. Проверка сохранения подписи")
     void saveSignTest() {
         var request = factory.manufacturePojo(CounterpartySignData.class);
@@ -133,7 +124,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#removeSign(String, String)}
      */
     @Test
-    @AllureId("34039")
     @DisplayName("Сббол Адаптер контрагенты. Проверка удаления подписи")
     void removeSignTest() {
         assertDoesNotThrow(() -> adapter.removeSign(DIGITAL_USER_ID, PPRB_GUID));
@@ -143,7 +133,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#getHousingInn(String, Set)}
      */
     @Test
-    @AllureId("34037")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка ИНН контрагентов")
     void getHousingInnTest() {
         Set<String> request = Set.of(randomNumeric(11), randomNumeric(11), randomNumeric(11), randomNumeric(11), randomNumeric(13));
@@ -155,7 +144,6 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
      * {@link LegacySbbolAdapter#viewRequest(String, CounterpartyFilter)}
      */
     @Test
-    @AllureId("34033")
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения списка по ППРБ гуиду и фильтру")
     void viewTest() {
         var request = factory.manufacturePojo(CounterpartyFilter.class);

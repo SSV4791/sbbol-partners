@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.migration.mapper;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -18,7 +17,6 @@ public class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     private static final String DIGITAL_ID = RandomStringUtils.random(20);
 
     @Test
-    @AllureId("34029")
     void toMigrationPartnerEntityTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         MigrationPartnerEntity migrationPartnerEntity = mapper.toMigrationPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
@@ -46,7 +44,6 @@ public class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34027")
     void toMigrationPartnerEntityWithoutInnerEntitiesTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setAccount(null);
@@ -62,7 +59,6 @@ public class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34031")
     void toPartnerEntityWithLegalEntityTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setLegalType(MigrationLegalType.LEGAL_ENTITY);
@@ -72,7 +68,6 @@ public class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34028")
     void toPartnerEntityWithEntrepreneurTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setLegalType(MigrationLegalType.ENTREPRENEUR);
@@ -82,7 +77,6 @@ public class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34030")
     void toPartnerEntityWithPhysicalPersonTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setLegalType(MigrationLegalType.PHYSICAL_PERSON);
@@ -92,7 +86,6 @@ public class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("37973")
     void toUpdateEmptyMigrationPartnerEntityTest() {
         MigrationCorrespondentCandidate migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         var migrationPartnerEntity = new MigrationPartnerEntity();

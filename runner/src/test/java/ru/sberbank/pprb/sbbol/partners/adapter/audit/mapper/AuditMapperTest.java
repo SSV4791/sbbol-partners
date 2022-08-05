@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.adapter.audit.mapper;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.audit.model.AuditEventParams;
@@ -18,7 +17,6 @@ class AuditMapperTest extends BaseUnitConfiguration {
     private static final AuditMapper mapper = Mappers.getMapper(AuditMapper.class);
 
     @Test
-    @AllureId("34054")
     void toAuditEvent() {
         var moduleName = randomAlphabetic(20);
         var metamodelVersion = randomAlphabetic(20);

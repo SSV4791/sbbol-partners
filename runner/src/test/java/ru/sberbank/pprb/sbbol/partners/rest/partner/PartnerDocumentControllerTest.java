@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -31,7 +30,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
-    @AllureId("34184")
     void testCreatePartnerDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var expected = getValidPartnerDocument(partner.getId(), partner.getDigitalId());
@@ -193,7 +191,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34115")
     void testGetPartnerDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
@@ -212,7 +209,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34113")
     void testViewPartnerDocumentWithExpectedQuantity() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         createValidPartnerDocument(partner.getId(), partner.getDigitalId());
@@ -314,7 +310,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34145")
     void testUpdatePartnerDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
@@ -334,7 +329,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36945")
     void negativeTestUpdateDocumentVersion() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
@@ -354,7 +348,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("36946")
     void positiveTestUpdateDocumentVersion() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());
@@ -376,7 +369,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34134")
     void testDeletePartnerDocument() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var document = createValidPartnerDocument(partner.getId(), partner.getDigitalId());

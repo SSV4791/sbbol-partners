@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,7 +26,6 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
-    @AllureId("34208")
     void testGetAccount() {
         var response = get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
@@ -42,7 +40,6 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34111")
     void testViewAccount() {
         var filter = new AccountsFilter()
             .digitalId(randomAlphabetic(10))
@@ -59,7 +56,6 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34122")
     void testCreateAccount() {
         var account = getValidAccount("bcd979a0-47ab-4337-84b8-8b4160448391", randomAlphabetic(10));
         var response = post(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
@@ -70,7 +66,6 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34152")
     void testUpdateAccount() {
         var account = new AccountChange()
             .id(UUID.randomUUID().toString())
@@ -94,7 +89,6 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @AllureId("34159")
     void testDeleteAccount() {
         var response = delete(
             baseRoutePath + "/accounts" + "/{digitalId}",

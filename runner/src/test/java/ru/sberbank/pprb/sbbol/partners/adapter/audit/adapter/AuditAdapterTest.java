@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.adapter.audit.adapter;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ class AuditAdapterTest extends BaseUnitConfiguration {
      * {@link ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter#send(Event)}
      */
     @Test
-    @AllureId("34036")
     @DisplayName("Адаптер Аудит. Проверка отправки Event")
     void checkMigrationTest() {
         var event = factory.manufacturePojo(Event.class);

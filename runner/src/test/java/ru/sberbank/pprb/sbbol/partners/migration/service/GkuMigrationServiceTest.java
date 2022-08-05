@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.migration.service;
 
-import io.qameta.allure.AllureId;
 import io.restassured.common.mapper.TypeRef;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,6 @@ public class GkuMigrationServiceTest extends AbstractIntegrationTest {
     );
 
     @Test
-    @AllureId("34430")
     void migrationGKU() {
         @SuppressWarnings("unchecked")
         Collection<MigrationGkuCandidate> collection = podamFactory.manufacturePojo(Collection.class, MigrationGkuCandidate.class);

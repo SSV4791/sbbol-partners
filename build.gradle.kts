@@ -57,6 +57,11 @@ tasks {
         finalizedBy(sonarqube)
     }
 
+    test {
+        dependsOn(":runner:test")
+
+    }
+
     qaReporterUpload {
         jacocoExcludes.addAll(coverageExclusions)
     }
@@ -126,8 +131,4 @@ meta {
         set("analyzeJava", false)
         set("failBuildOnError", true)
     }
-}
-
-qaReporter {
-    projectKey.set("sbbol-partners")
 }

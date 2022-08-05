@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.renter;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
@@ -17,7 +16,6 @@ public class RenterMapperTest extends BaseUnitConfiguration {
     private static final RenterMapper mapper = Mappers.getMapper(RenterMapper.class);
 
     @Test
-    @AllureId("34064")
     void toRenter() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var renter = mapper.toRenter(expected);
@@ -29,7 +27,6 @@ public class RenterMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34083")
     void toRenterLegalAddress() {
         LegalAddress expected = factory.manufacturePojo(LegalAddress.class);
         var renter = mapper.toRentalAddress(expected);
@@ -44,7 +41,6 @@ public class RenterMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("34076")
     void toRenterPhysicalAddress() {
         PhysicalAddress expected = factory.manufacturePojo(PhysicalAddress.class);
         var renter = mapper.toRentalAddress(expected);

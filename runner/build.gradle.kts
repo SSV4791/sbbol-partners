@@ -65,7 +65,6 @@ dependencies {
     testImplementation(liveLibs.mapstruct.core)
     testImplementation(testLibs.bundles.pact)
     testImplementation(testLibs.dcb.allure.annotations)
-    testImplementation(testLibs.junit5.allure)
     // заглушка для тестирования репликации между БД
     testImplementation(testLibs.orm.tests.common) {
         exclude("com.vaadin.external.google", "android-json")

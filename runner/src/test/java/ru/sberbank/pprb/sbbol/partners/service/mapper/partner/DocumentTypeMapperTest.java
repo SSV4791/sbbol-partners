@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import io.qameta.allure.AllureId;
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
@@ -22,7 +21,6 @@ class DocumentTypeMapperTest extends BaseUnitConfiguration {
     private final DocumentTypeMapper mapper = new DocumentTypeMapperImpl(new LegalFormMapperImpl());
 
     @Test
-    @AllureId("34107")
     void testToDocumentTypeEntity() {
         DocumentType expected = factory.manufacturePojo(DocumentType.class);
         DocumentTypeEntity actual = mapper.toDocumentType(expected);
@@ -32,7 +30,6 @@ class DocumentTypeMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("36690")
     void testToDocumentTypeCreateEntity() {
         DocumentTypeCreate expected = factory.manufacturePojo(DocumentTypeCreate.class);
         DocumentTypeEntity actual = mapper.toDocumentType(expected);
@@ -43,7 +40,6 @@ class DocumentTypeMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("36694")
     void testUpdateDocumentWhenLegalFormsIsNotChanged() {
         DocumentTypeChange expected = factory.manufacturePojo(DocumentTypeChange.class);
         DocumentTypeEntity actual = mapper.toDocumentType(expected);
@@ -54,7 +50,6 @@ class DocumentTypeMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("36693")
     void testUpdateDocumentWhenLegalFormsIsDeleted() {
         DocumentTypeChange expected = factory.manufacturePojo(DocumentTypeChange.class);
         expected.setLegalForms(List.of(LEGAL_ENTITY, PHYSICAL_PERSON));
@@ -67,7 +62,6 @@ class DocumentTypeMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    @AllureId("36695")
     void testUpdateDocumentWhenLegalFormsIsAdded() {
         DocumentTypeChange expected = factory.manufacturePojo(DocumentTypeChange.class);
         expected.setLegalForms(List.of(LEGAL_ENTITY));
