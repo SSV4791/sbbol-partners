@@ -31,7 +31,7 @@ public class AuditAdapterConfiguration {
     RestTemplate auditRestTemplate;
 
     @PostConstruct
-    public void initMock() {
+    void initMock() {
 
         when(auditRestTemplate.exchange(ArgumentMatchers.<RequestEntity<Object>>any(), ArgumentMatchers.<ParameterizedTypeReference<BaseResponse>>any()))
             .thenReturn(new ResponseEntity<>(new BaseResponse(), HttpStatus.CREATED));

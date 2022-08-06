@@ -78,7 +78,9 @@ abstract class AddressServiceImpl implements AddressService {
         }
         addressMapper.updateAddress(address, foundAddress);
         var saveContact = addressRepository.save(foundAddress);
-        return addressMapper.toAddress(saveContact);
+        var response = addressMapper.toAddress(saveContact);
+        response.setVersion(response.getVersion() + 1);
+        return response;
     }
 
     @Override

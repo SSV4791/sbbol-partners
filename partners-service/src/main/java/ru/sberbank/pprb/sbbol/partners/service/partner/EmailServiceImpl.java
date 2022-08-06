@@ -72,7 +72,9 @@ abstract class EmailServiceImpl implements EmailService {
         }
         emailMapper.updateEmail(email, foundEmail);
         var savedEmail = emailRepository.save(foundEmail);
-        return emailMapper.toEmail(savedEmail);
+        var response = emailMapper.toEmail(savedEmail);
+        response.setVersion(response.getVersion() + 1);
+        return response;
     }
 
     @Override

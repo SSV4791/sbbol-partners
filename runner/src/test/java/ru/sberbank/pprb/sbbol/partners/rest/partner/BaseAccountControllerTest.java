@@ -16,12 +16,13 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.getBic;
 
 @SuppressWarnings("java:S2187")
 public class BaseAccountControllerTest extends AbstractIntegrationTest {
 
-    public static final String baseRoutePath = "/partner";
-    public static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
+    protected static final String baseRoutePath = "/partner";
+    protected static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
 
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
         return new AccountCreate()
@@ -30,7 +31,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             .account(ACCOUNT_FOR_TEST_PARTNER)
             .comment("Это тестовый комментарий")
             .bank(new BankCreate()
-                .bic("044525411")
+                .bic(getBic())
                 .name(randomAlphabetic(10))
                 .bankAccount(
                     new BankAccountCreate()

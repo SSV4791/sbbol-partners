@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.partners.handler;
 import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,8 +30,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +39,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 @ControllerAdvice
@@ -49,17 +47,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
     private static final String FILL_OBJECT_MESSAGE_EXCEPTION = "Ошибка заполнения объекта";
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler({
+        DataIntegrityViolationException.class
+    })
     protected ResponseEntity<?> handleConstraintViolationException(
-        ConstraintViolationException ex,
+        DataIntegrityViolationException ex,
         HttpServletRequest httpRequest
     ) {
         LOG.error("Нарушение ограничений уникальности в БД", ex);
         return buildResponseEntity(
             HttpStatus.BAD_REQUEST,
-            ex.getConstraintViolations().stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(joining(". ")),
+            "PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION",
+            MessagesTranslator.toLocale("error.message.check.validation"),
             httpRequest.getRequestURL()
         );
     }
@@ -211,19 +210,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String errorDesc,
         StringBuffer requestUrl
     ) {
-        return buildResponseEntity(
-            status,
-            Collections.singletonList(errorDesc),
-            requestUrl
+        var errorData = new Error().code(status.name()).text(Collections.singletonList(errorDesc));
+        String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
+        LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
+        return new ResponseEntity<>(
+            errorData,
+            status
         );
     }
 
     private ResponseEntity<Object> buildResponseEntity(
         HttpStatus status,
-        List<String> errorsDesc,
+        String errorCode,
+        String errorDesc,
         StringBuffer requestUrl
     ) {
-        var errorData = new Error().code(status.name()).text(errorsDesc);
+        var errorData = new Error().code(errorCode).text(Collections.singletonList(errorDesc));
         String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
         LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
         return new ResponseEntity<>(

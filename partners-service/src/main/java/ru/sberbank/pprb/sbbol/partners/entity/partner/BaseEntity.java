@@ -68,4 +68,6 @@ public abstract class BaseEntity implements Serializable, HashKeyProvider {
     public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+
 }

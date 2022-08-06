@@ -56,8 +56,9 @@ public interface AccountRepository
     /**
      * Поиск счетов Партнера по ключевым полям
      *
-     * @param search Данный для поиска
-     * */
+     * @param digitalId Идентификатор личного кабинета
+     * @param search    Данный для поиска
+     */
 
-    List<AccountEntity> findBySearch(String search);
+    AccountEntity findByDigitalIdAndSearch(String digitalId, String search);
 }

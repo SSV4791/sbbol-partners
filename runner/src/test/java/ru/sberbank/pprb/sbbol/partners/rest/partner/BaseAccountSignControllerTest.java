@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("java:S2187")
 public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
 
-    public static final String baseRoutePath = "/partner/accounts/sign";
+    protected static final String baseRoutePath = "/partner/accounts/sign";
 
     public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, String accountId) {
         var createAccountSign = post(

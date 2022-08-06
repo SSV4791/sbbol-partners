@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.migration.gku.entity;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationBaseEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BaseEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +20,7 @@ import java.util.Objects;
         @Index(name = "i_gku_inn_dictionary_inn", columnList = "inn")
     }
 )
-public class MigrationGkuInnEntity extends MigrationBaseEntity {
+public class MigrationGkuInnEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1;

@@ -72,7 +72,9 @@ abstract class PhoneServiceImpl implements PhoneService {
         }
         phoneMapper.updatePhone(phone, foundPhone);
         var savedPhone = phoneRepository.save(foundPhone);
-        return phoneMapper.toPhone(savedPhone);
+        var response = phoneMapper.toPhone(savedPhone);
+        response.setVersion(response.getVersion() + 1);
+        return response;
     }
 
     @Override

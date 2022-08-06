@@ -96,7 +96,9 @@ public class ContactServiceImpl implements ContactService {
         }
         contactMapper.updateContact(contact, foundContact);
         var saveContact = contactRepository.save(foundContact);
-        return contactMapper.toContact(saveContact);
+        var response = contactMapper.toContact(saveContact);
+        response.setVersion(response.getVersion() + 1);
+        return response;
     }
 
     @Override

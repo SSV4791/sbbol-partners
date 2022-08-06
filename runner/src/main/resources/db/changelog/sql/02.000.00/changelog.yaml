@@ -98,3 +98,9 @@ databaseChangeLog:
   - include:
       file: 1659595273123_add_new_field_for_crtj_clientlock.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1659699736830_add_unique_index_for_partner.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1659699847762_add_unique_index_for_account.sql
+      relativeToChangelogFile: true

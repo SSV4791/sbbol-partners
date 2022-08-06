@@ -9,7 +9,7 @@ credentials:
   checkmarx: DS_CAB-SA-CI000825-checkmarx
   openshift: DS_CAB-SA-CI000825-openshift
 
-project_name: &project_name sbbol-partners
+project_name: sbbol-partners
 
 pr_check:
   liquibase:

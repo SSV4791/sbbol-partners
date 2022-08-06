@@ -31,9 +31,10 @@ public interface PartnerRepository extends CrudRepository<PartnerEntity, UUID>, 
     List<PartnerEntity> findAllByUuid(UUID uuid);
 
     /**
-    * Поиск партнера по ключевым параметрам
+     * Поиск партнера по ключевым параметрам
      *
-     * @param search Данные для поиска партнера
+     * @param digitalId Идентификатор личного кабинета
+     * @param search    Данные для поиска партнера
      */
-    int countBySearch(String search);
+    PartnerEntity findByDigitalIdAndSearch(String digitalId, String search);
 }

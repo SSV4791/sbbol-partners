@@ -18,4 +18,11 @@ public enum AccountStateType {
     public String getDesc() {
         return desc;
     }
+
+    public static AccountStateType of(Boolean isSigned) {
+        if (isSigned != null) {
+            return isSigned ? SIGNED : NOT_SIGNED;
+        }
+        return NOT_SIGNED;
+    }
 }

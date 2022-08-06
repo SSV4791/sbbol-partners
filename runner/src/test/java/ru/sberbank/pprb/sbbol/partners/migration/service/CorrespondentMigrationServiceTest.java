@@ -16,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,6 +40,37 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
     @Test
     void migrateAndCreateFewCorrespondentsTest() {
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, generateCorrespondents(GENERATE_COUNTERPARTIES_COUNT)));
+        JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
+        });
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(JSON_RPC_REQUEST_ID);
+        assertThat(response.getJsonrpc()).isEqualTo(JSON_RPC_VERSION);
+        List<MigratedCorrespondentData> correspondentsData = response.getResult();
+        assertThat(CollectionUtils.isEmpty(correspondentsData)).isFalse();
+        assertThat(correspondentsData.size()).isEqualTo(GENERATE_COUNTERPARTIES_COUNT);
+        correspondentsData.forEach(data -> {
+            assertThat(data.getPprbGuid()).isNotNull();
+            assertThat(data.getSbbolReplicationGuid()).isNotNull();
+            assertThat(data.getVersion()).isNotNull();
+        });
+    }
+
+    @Test
+    void migrateAndCreateFewDuplicationCorrespondentsTest() {
+        String kpp = RandomStringUtils.randomAlphanumeric(8);
+        String name = RandomStringUtils.randomAlphanumeric(8);
+        String inn = RandomStringUtils.randomAlphanumeric(8);
+        var correspondents = generateCorrespondents(GENERATE_COUNTERPARTIES_COUNT).stream()
+            .peek(value -> {
+                value.setInn(inn);
+                value.setName(name);
+                value.setKpp(kpp);
+                value.setAccount(RandomStringUtils.randomAlphanumeric(20));
+                value.setBic(RandomStringUtils.randomAlphanumeric(9));
+                value.setBankAccount(RandomStringUtils.randomAlphanumeric(20));
+            })
+            .collect(Collectors.toList());
+        request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, correspondents));
         JsonRpcResponse<List<MigratedCorrespondentData>> response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
         });
         assertThat(response).isNotNull();
@@ -119,20 +151,19 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
 
     private List<MigrationCorrespondentCandidate> generateCorrespondents(int count) {
         List<MigrationCorrespondentCandidate> generatedCorrespondents = new ArrayList<>(count);
-        String eightSymbolsRandomString = RandomStringUtils.randomAlphanumeric(8);
         for (int i = 0; i < count; i++) {
             String randomReplicationGuid = RandomStringUtils.randomAlphanumeric(8);
             MigrationCorrespondentCandidate correspondent = new MigrationCorrespondentCandidate();
-            correspondent.setName(eightSymbolsRandomString);
-            correspondent.setInn(eightSymbolsRandomString);
-            correspondent.setKpp(eightSymbolsRandomString);
-            correspondent.setAccount(eightSymbolsRandomString);
-            correspondent.setBic(eightSymbolsRandomString);
-            correspondent.setDescription(eightSymbolsRandomString);
+            correspondent.setName(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setInn(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setKpp(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setAccount(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setBic(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setDescription(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setReplicationGuid(randomReplicationGuid);
-            correspondent.setCorrPhoneNumber(eightSymbolsRandomString);
-            correspondent.setCorrEmail(eightSymbolsRandomString);
-            correspondent.setBankAccount(eightSymbolsRandomString);
+            correspondent.setCorrPhoneNumber(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setCorrEmail(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setBankAccount(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setVersion(0);
             correspondent.setSigned(false);
             correspondent.setLegalType(MigrationLegalType.LEGAL_ENTITY);

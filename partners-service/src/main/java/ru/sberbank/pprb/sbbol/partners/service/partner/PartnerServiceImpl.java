@@ -182,6 +182,7 @@ public class PartnerServiceImpl implements PartnerService {
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
         var response = partnerMapper.toPartner(savePartner);
+        response.setVersion(response.getVersion() + 1);
         response.setGku(getGku(response.getInn()));
         return response;
     }
