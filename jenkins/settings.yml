@@ -117,7 +117,7 @@ release:
       -Dallure.jobrunId=${launch.jobRunId}
       -Dsonar.login=${env.SONAR_TOKEN}
       -Dsonar.branch.name=${params.branch}
-      build qaReporterUpload sonarCoverage --parallel --info
+      build -x test qaReporterUpload sonarCoverage --parallel --info
   skip_istio: false
   default_values:
     params_branch: master
