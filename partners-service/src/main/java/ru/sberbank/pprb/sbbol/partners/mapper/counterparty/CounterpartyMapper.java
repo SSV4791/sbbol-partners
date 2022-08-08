@@ -10,10 +10,11 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisites;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 
 import java.util.StringJoiner;
 
@@ -37,7 +38,7 @@ public interface CounterpartyMapper extends BaseMapper {
     @Mapping(target = "kpp", source = "partner.kpp")
     @Mapping(target = "description", source = "partner.comment")
     @Mapping(target = "account", source = "account.account")
-    @Mapping(target = "signed", constant = "true")
+    @Mapping(target = "signed", source = "account.state", qualifiedByName = "toSign")
     @Mapping(target = "bankName", source = "account.bank", qualifiedByName = "toBankName")
     @Mapping(target = "bankBic", source = "account.bank", qualifiedByName = "toBankBic")
     @Mapping(target = "corrAccount", source = "account.bank", qualifiedByName = "toCorrAccount")
@@ -54,7 +55,7 @@ public interface CounterpartyMapper extends BaseMapper {
     @Mapping(target = "kpp", source = "partner.kpp")
     @Mapping(target = "description", source = "partner.comment")
     @Mapping(target = "account", source = "account.account")
-    @Mapping(target = "signed", constant = "true")
+    @Mapping(target = "signed", source = "account.state", qualifiedByName = "toSign")
     @Mapping(target = "bankName", source = "account.bank", qualifiedByName = "toBankName")
     @Mapping(target = "bankBic", source = "account.bank", qualifiedByName = "toBankBic")
     @Mapping(target = "corrAccount", source = "account.bank", qualifiedByName = "toCorrAccount")
@@ -104,5 +105,16 @@ public interface CounterpartyMapper extends BaseMapper {
             return null;
         }
         return bank.getBankAccount().getAccount();
+    }
+
+    @Named("toSign")
+    static Boolean toSign(AccountStateType sign) {
+        if (sign == null) {
+            return false;
+        }
+        return switch (sign) {
+            case SIGNED -> true;
+            case NOT_SIGNED -> false;
+        };
     }
 }
