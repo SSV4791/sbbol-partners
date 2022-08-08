@@ -11,7 +11,7 @@ import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Deprecated(forRemoval = true)
-public class RenterMapperTest extends BaseUnitConfiguration {
+class RenterMapperTest extends BaseUnitConfiguration {
 
     private static final RenterMapper mapper = Mappers.getMapper(RenterMapper.class);
 

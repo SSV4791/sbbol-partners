@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MigrationGkuMapperTest extends BaseUnitConfiguration {
+class MigrationGkuMapperTest extends BaseUnitConfiguration {
 
     private static final MigrationGkuMapper mapper = Mappers.getMapper(MigrationGkuMapper.class);
 

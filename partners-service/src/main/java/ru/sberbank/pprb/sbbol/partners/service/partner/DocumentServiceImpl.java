@@ -96,7 +96,9 @@ abstract class DocumentServiceImpl implements DocumentService {
         }
         documentMapper.updateDocument(document, foundDocument);
         var saveContact = documentRepository.save(foundDocument);
-        return documentMapper.toDocument(saveContact);
+        var response = documentMapper.toDocument(saveContact);
+        response.setVersion(response.getVersion() + 1);
+        return response;
     }
 
     @Override

@@ -27,7 +27,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
 
-    public static final String baseRoutePath = "/partner/phone";
+    private static final String baseRoutePath = "/partner/phone";
 
     @Test
     void testNegativeViewPartnerPhone() {
@@ -353,7 +353,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         return phoneResponse;
     }
 
-    public static Phone updatePhone(Phone phone) {
+    static Phone updatePhone(Phone phone) {
         return new Phone()
             .phone(RandomStringUtils.randomNumeric(12))
             .id(phone.getId())

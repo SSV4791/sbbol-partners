@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapper;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapperImpl;
-import ru.sberbank.pprb.sbbol.migration.correspondents.repository.MigrationPartnerRepository;
 import ru.sberbank.pprb.sbbol.migration.correspondents.service.CorrespondentMigrationService;
 import ru.sberbank.pprb.sbbol.migration.correspondents.service.CorrespondentMigrationServiceImpl;
 import ru.sberbank.pprb.sbbol.migration.gku.mapper.MigrationGkuMapper;
@@ -13,6 +12,8 @@ import ru.sberbank.pprb.sbbol.migration.gku.mapper.MigrationGkuMapperImpl;
 import ru.sberbank.pprb.sbbol.migration.gku.repository.MigrationGkuRepository;
 import ru.sberbank.pprb.sbbol.migration.gku.service.GkuMigrationService;
 import ru.sberbank.pprb.sbbol.migration.gku.service.GkuMigrationServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 @Configuration
 public class MigrationServiceConfiguration {
@@ -29,11 +30,13 @@ public class MigrationServiceConfiguration {
 
     @Bean
     CorrespondentMigrationService correspondentMigrationService(
-        MigrationPartnerRepository migrationPartnerRepository
+        PartnerRepository partnerRepository,
+        AccountRepository accountRepository
     ) {
         return new CorrespondentMigrationServiceImpl(
             migrationPartnerMapper(),
-            migrationPartnerRepository
+            partnerRepository,
+            accountRepository
         );
     }
 

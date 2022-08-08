@@ -157,7 +157,6 @@ public interface PartnerMapper extends BaseMapper {
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
         var searchSubString =
             Stream.of(
-                    partner.getDigitalId(),
                     partner.getInn(),
                     partner.getKpp(),
                     partner.getOrgName(),

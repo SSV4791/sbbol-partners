@@ -59,7 +59,6 @@ tasks {
 
     test {
         dependsOn(":runner:test")
-
     }
 
     qaReporterUpload {

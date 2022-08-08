@@ -64,7 +64,7 @@ public abstract class AbstractIntegrationTest {
     protected static ResponseSpecification internalServerErrorResponseSpec;
 
     @BeforeAll
-    public final void setup() {
+    final void setup() {
         initTest();
 
         requestSpec = new RequestSpecBuilder()

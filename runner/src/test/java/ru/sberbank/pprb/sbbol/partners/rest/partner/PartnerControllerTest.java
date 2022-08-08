@@ -119,8 +119,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidPartner(randomAlphabetic(10));
         partner.setEmails(null);
         partner.setPhones(null);
-        var CreatePartner = createValidPartner1(partner);
-        assertThat(CreatePartner)
+        var createPartner = createValidPartner(partner);
+        assertThat(createPartner)
             .usingRecursiveComparison()
             .ignoringFields(
                 "id",
@@ -128,7 +128,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 "phones",
                 "emails"
             )
-            .isEqualTo(CreatePartner);
+            .isEqualTo(createPartner);
     }
 
 
@@ -879,6 +879,22 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testCreatePartner_unique() {
+        var partner = getValidPartner();
+        createValidPartner(partner);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+    }
+
+    @Test
     void testCreateNotValidPartner() {
         var error = createNotValidPartner();
         assertThat(error)
@@ -935,6 +951,26 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
         assertThat(newUpdatePartner.getKpp())
             .isEqualTo(newKpp);
+    }
+
+    @Test
+    void testUpdatePartner_unique() {
+        var partner = getValidPartner();
+        String newKpp = "999999999";
+        var createdPartner1 = createValidPartner(partner);
+        partner.setKpp(newKpp);
+        createValidPartner(partner);
+        var errorUpdatePartner = createdPartner1.kpp(newKpp);
+        var error = put(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            errorUpdatePartner,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
     }
 
     @Test
@@ -1156,7 +1192,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
     }
 
-    protected static Partner createValidPartner1(PartnerCreate partner) {
+    protected static Partner createValidPartner(PartnerCreate partner) {
         return post(
             baseRoutePath,
             HttpStatus.CREATED,

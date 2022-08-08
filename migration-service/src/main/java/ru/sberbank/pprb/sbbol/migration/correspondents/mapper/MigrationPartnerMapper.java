@@ -1,232 +1,188 @@
 package ru.sberbank.pprb.sbbol.migration.correspondents.mapper;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationBankAccountEntity;
-import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationBankEntity;
-import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationPartnerAccountEntity;
-import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationPartnerEmailEntity;
-import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationPartnerEntity;
-import ru.sberbank.pprb.sbbol.migration.correspondents.entity.MigrationPartnerPhoneEntity;
-import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationAccountStateType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 
-import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Mapper(componentModel = "spring", imports = {MigrationLegalType.class, OffsetDateTime.class})
+@Mapper(
+    componentModel = "spring",
+    imports = {
+        AccountMapper.class,
+        PartnerMapper.class,
+        MigrationLegalType.class
+    }
+)
 public interface MigrationPartnerMapper {
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "type", constant = "PARTNER")
+    @Mapping(target = "citizenship", constant = "UNKNOWN")
+    @Mapping(target = "comment", source = "source.description")
+    @Mapping(target = "legalType", source = "source.legalType")
+    @Mapping(target = "version", source = "source.version")
+    @Mapping(target = "phones", expression = "java(toPhone(source.getCorrPhoneNumber(), digitalId))")
+    @Mapping(target = "emails", expression = "java(toEmail(source.getCorrEmail(), digitalId))")
+    @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "firstName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    PartnerEntity toPartnerEntity(String digitalId, MigrationCorrespondentCandidate source);
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "digitalId", source = "digitalId")
+    @Mapping(target = "partnerUuid", source = "partnerUuid")
+    @Mapping(target = "account", source = "source.account")
+    @Mapping(target = "bank.name", source = "source.bankName")
+    @Mapping(target = "bank.bic", source = "source.bic")
+    @Mapping(target = "bank.intermediary", constant = "false")
+    @Mapping(target = "bank.bankAccount.account", source = "source.bankAccount")
+    @Mapping(target = "priorityAccount", constant = "false")
+    @Mapping(target = "state", expression = "java(toSigned(source.isSigned()))")
+    @Mapping(target = "search", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    AccountEntity toAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source);
+
+    default AccountStateType toSigned(boolean signed) {
+        return AccountStateType.of(signed);
+    }
+
+    default List<PartnerEmailEntity> toEmail(String email, String digitalId) {
+        if (ObjectUtils.isEmpty(email)) {
+            return Collections.emptyList();
+        } else {
+            var partnerEmail = new PartnerEmailEntity();
+            partnerEmail.setEmail(email);
+            partnerEmail.setDigitalId(digitalId);
+            return Collections.singletonList(partnerEmail);
+        }
+    }
+
+    default List<PartnerPhoneEntity> toPhone(String phone, String digitalId) {
+        if (ObjectUtils.isEmpty(phone)) {
+            return Collections.emptyList();
+        } else {
+            var partnerPhone = new PartnerPhoneEntity();
+            partnerPhone.setPhone(phone);
+            partnerPhone.setDigitalId(digitalId);
+            return Collections.singletonList(partnerPhone);
+        }
+    }
 
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "citizenship", constant = "UNKNOWN")
     @Mapping(target = "comment", source = "source.description")
     @Mapping(target = "legalType", source = "source.legalType")
     @Mapping(target = "version", source = "source.version")
-    @Mapping(target = "phone", expression = "java(toMigrationPartnerPhoneEntity(source.getCorrPhoneNumber(), source.getVersion(), digitalId))")
-    @Mapping(target = "email", expression = "java(toMigrationPartnerEmailEntity(source.getCorrEmail(), source.getVersion(), digitalId))")
-    @Mapping(target = "account", expression = "java(toMigrationPartnerAccountEntity(digitalId, source))")
+    @Mapping(target = "phones", expression = "java(toPhone(source.getCorrPhoneNumber(), digitalId))")
+    @Mapping(target = "emails", expression = "java(toEmail(source.getCorrEmail(), digitalId))")
     @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
     @Mapping(target = "firstName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "createDate", expression = "java(OffsetDateTime.now())")
-    @Mapping(target = "lastModifiedDate", expression = "java(OffsetDateTime.now())")
-    MigrationPartnerEntity toMigrationPartnerEntity(String digitalId, MigrationCorrespondentCandidate source);
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    void updatePartnerEntity(String digitalId, MigrationCorrespondentCandidate source, @MappingTarget PartnerEntity partner);
 
-    @Mapping(target = "type", constant = "PARTNER")
-    @Mapping(target = "citizenship", ignore = true)
-    @Mapping(target = "comment", source = "source.description")
-    @Mapping(target = "legalType", source = "source.legalType")
-    @Mapping(target = "version", source = "source.version")
-    @Mapping(target = "phone",
-        expression = "java(toMigrationPartnerPhoneEntity(source.getCorrPhoneNumber(), source.getVersion(), digitalId, partner))")
-    @Mapping(target = "email",
-        expression = "java(toMigrationPartnerEmailEntity(source.getCorrEmail(), source.getVersion(), digitalId, partner))")
-    @Mapping(target = "account", expression = "java(toUpdateMigrationPartnerAccountEntity(digitalId, source, partner))")
-    @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "firstName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "createDate", expression = "java(OffsetDateTime.now())")
-    @Mapping(target = "lastModifiedDate", expression = "java(OffsetDateTime.now())")
-    void toMigrationPartnerEntity(String digitalId, MigrationCorrespondentCandidate source, @MappingTarget MigrationPartnerEntity partner);
+    @Mapping(target = "digitalId", source = "digitalId")
+    @Mapping(target = "partnerUuid", source = "partnerUuid")
+    @Mapping(target = "account", source = "source.account")
+    @Mapping(target = "bank.name", source = "source.bankName")
+    @Mapping(target = "bank.bic", source = "source.bic")
+    @Mapping(target = "bank.bankAccount.account", source = "source.bankAccount")
+    @Mapping(target = "priorityAccount", constant = "false")
+    @Mapping(target = "state", expression = "java(toSigned(source.isSigned()))")
+    @Mapping(target = "search", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    void updateAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source, @MappingTarget AccountEntity account);
 
-    default MigrationPartnerAccountEntity toMigrationPartnerAccountEntity(String digitalId, MigrationCorrespondentCandidate source) {
-        var account = source.getAccount();
-        var bic = source.getBic();
-        var bankName = source.getBankName();
-        var bankAccount = source.getBankAccount();
-        if (StringUtils.isAllEmpty(account, bic, bankName, bankAccount)) {
-            return null;
-        }
-        MigrationPartnerAccountEntity accountEntity = new MigrationPartnerAccountEntity();
-        accountEntity.setAccount(account);
-        accountEntity.setDigitalId(digitalId);
-        accountEntity.setState(MigrationAccountStateType.of(source.isSigned()));
-        accountEntity.setBank(toMigrationBankEntities(bic, bankName, bankAccount, source.getVersion()));
-        accountEntity.setVersion(source.getVersion());
-        mapBidirectional(accountEntity);
-        return accountEntity;
-    }
-
-    default MigrationPartnerAccountEntity toUpdateMigrationPartnerAccountEntity(
-        String digitalId,
-        MigrationCorrespondentCandidate source,
-        MigrationPartnerEntity partner
-    ) {
-        String account = source.getAccount();
-        if (StringUtils.isEmpty(account)) {
-            return null;
-        }
-        MigrationPartnerAccountEntity accountEntity;
-        if (partner.getAccount() != null) {
-            accountEntity = partner.getAccount();
-            if (source.getAccount() != null) {
-                accountEntity.setAccount(source.getAccount());
+    @AfterMapping
+    default void mapBidirectional(@MappingTarget PartnerEntity partner) {
+        var searchSubString =
+            Stream.of(
+                    partner.getInn(),
+                    partner.getKpp(),
+                    partner.getOrgName(),
+                    partner.getSecondName(),
+                    partner.getFirstName(),
+                    partner.getMiddleName()
+                )
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(StringUtils.EMPTY));
+        partner.setSearch(searchSubString);
+        var phones = partner.getPhones();
+        if (phones != null) {
+            for (var phone : phones) {
+                if (phone != null) {
+                    phone.setPartner(partner);
+                }
             }
-            MigrationBankEntity bankEntity;
-            if (accountEntity.getBank() == null) {
-                bankEntity = new MigrationBankEntity();
-            } else {
-                bankEntity = accountEntity.getBank();
+        }
+        var emails = partner.getEmails();
+        if (emails != null) {
+            for (var email : emails) {
+                if (email != null) {
+                    email.setPartner(partner);
+                }
             }
-            if (source.getBic() != null) {
-                bankEntity.setBic(source.getBic());
-            }
-            if (source.getBankName() != null) {
-                bankEntity.setName(source.getBankName());
-            }
-            MigrationBankAccountEntity bankAccountEntity;
-            if (bankEntity.getBankAccount() == null) {
-                bankAccountEntity = new MigrationBankAccountEntity();
-            } else {
-                bankAccountEntity = bankEntity.getBankAccount();
-            }
-            if (source.getBankAccount() != null) {
-                bankAccountEntity.setAccount(source.getBankAccount());
-            }
-        } else {
-            accountEntity = new MigrationPartnerAccountEntity();
-            accountEntity.setAccount(account);
-            accountEntity.setDigitalId(digitalId);
-            accountEntity.setState(MigrationAccountStateType.of(source.isSigned()));
-            accountEntity.setBank(toMigrationBankEntities(source.getBic(), source.getBankName(), source.getBankAccount(), source.getVersion()));
-            accountEntity.setVersion(source.getVersion());
-            mapBidirectional(accountEntity);
         }
-        return accountEntity;
-    }
-
-    default MigrationBankEntity toMigrationBankEntities(String bic, String bankName, String bankAccount, Long version) {
-        if (StringUtils.isAllEmpty(bic, bankAccount)) {
-            return null;
-        }
-        MigrationBankEntity migrationBankEntity = new MigrationBankEntity();
-        migrationBankEntity.setBankAccount(toMigrationBankAccountEntity(bankAccount, version));
-        migrationBankEntity.setName(bankName);
-        migrationBankEntity.setBic(bic);
-        migrationBankEntity.setIntermediary(Boolean.FALSE);
-        migrationBankEntity.setVersion(version);
-        mapBidirectional(migrationBankEntity);
-        return migrationBankEntity;
-    }
-
-    default MigrationBankAccountEntity toMigrationBankAccountEntity(String account, Long version) {
-        if (account == null || version == null) {
-            return null;
-        }
-        MigrationBankAccountEntity migrationBankAccountEntity = new MigrationBankAccountEntity();
-        migrationBankAccountEntity.setAccount(account);
-        migrationBankAccountEntity.setVersion(version);
-        return migrationBankAccountEntity;
-    }
-
-    default MigrationPartnerPhoneEntity toMigrationPartnerPhoneEntity(String phone, Long version, String digitalId) {
-        if (phone == null || version == null) {
-            return null;
-        }
-        MigrationPartnerPhoneEntity migrationPartnerPhoneEntity = new MigrationPartnerPhoneEntity();
-        migrationPartnerPhoneEntity.setPhone(phone);
-        migrationPartnerPhoneEntity.setDigitalId(digitalId);
-        migrationPartnerPhoneEntity.setVersion(version);
-        return migrationPartnerPhoneEntity;
-    }
-
-    default MigrationPartnerPhoneEntity toMigrationPartnerPhoneEntity(String phone, Long version, String digitalId, MigrationPartnerEntity partner) {
-        if (phone == null || version == null) {
-            return null;
-        }
-        MigrationPartnerPhoneEntity migrationPartnerPhoneEntity;
-        if (partner.getPhone() != null) {
-            migrationPartnerPhoneEntity = partner.getPhone();
-        } else {
-            migrationPartnerPhoneEntity = new MigrationPartnerPhoneEntity();
-        }
-        migrationPartnerPhoneEntity.setPhone(phone);
-        migrationPartnerPhoneEntity.setDigitalId(digitalId);
-        migrationPartnerPhoneEntity.setVersion(version);
-        return migrationPartnerPhoneEntity;
-    }
-
-    default MigrationPartnerEmailEntity toMigrationPartnerEmailEntity(String email, Long version, String digitalId) {
-        if (email == null || version == null) {
-            return null;
-        }
-        MigrationPartnerEmailEntity migrationPartnerEmailEntity = new MigrationPartnerEmailEntity();
-        migrationPartnerEmailEntity.setEmail(email);
-        migrationPartnerEmailEntity.setDigitalId(digitalId);
-        migrationPartnerEmailEntity.setVersion(version);
-        return migrationPartnerEmailEntity;
-    }
-
-    default MigrationPartnerEmailEntity toMigrationPartnerEmailEntity(String email, Long version, String digitalId, MigrationPartnerEntity partner) {
-        if (email == null || version == null) {
-            return null;
-        }
-        MigrationPartnerEmailEntity migrationPartnerEmailEntity;
-        if (partner.getEmail() != null) {
-            migrationPartnerEmailEntity = partner.getEmail();
-        } else {
-            migrationPartnerEmailEntity = new MigrationPartnerEmailEntity();
-        }
-        migrationPartnerEmailEntity.setEmail(email);
-        migrationPartnerEmailEntity.setDigitalId(digitalId);
-        migrationPartnerEmailEntity.setVersion(version);
-        return migrationPartnerEmailEntity;
     }
 
     @AfterMapping
-    default void mapBidirectional(@MappingTarget MigrationPartnerEntity partner) {
-        OffsetDateTime currentDate = OffsetDateTime.now();
-        partner.setCreateDate(currentDate);
-        partner.setLastModifiedDate(currentDate);
-        MigrationPartnerPhoneEntity phone = partner.getPhone();
-        if (phone != null) {
-            phone.setPartner(partner);
+    default void mapBidirectional(@MappingTarget AccountEntity account) {
+        var searchSubString = Stream.of(
+                account.getPartnerUuid().toString(),
+                account.getAccount()
+            )
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(StringUtils.EMPTY));
+        var bank = account.getBank();
+        if (bank != null) {
+            bank.setAccount(account);
+            searchSubString = Stream.of(
+                    searchSubString,
+                    bank.getBic()
+                )
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(StringUtils.EMPTY));
+            var bankAccount = bank.getBankAccount();
+            if (bankAccount != null) {
+                searchSubString = Stream.of(
+                        searchSubString,
+                        bankAccount.getAccount()
+                    )
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(StringUtils.EMPTY));
+            }
         }
-        MigrationPartnerEmailEntity email = partner.getEmail();
-        if (email != null) {
-            email.setPartner(partner);
-        }
-        MigrationPartnerAccountEntity account = partner.getAccount();
-        if (account != null) {
-            account.setPartner(partner);
-        }
+        account.setSearch(searchSubString);
     }
 
-    default void mapBidirectional(MigrationBankEntity bank) {
+    @AfterMapping
+    default void mapBidirectional(@MappingTarget BankEntity bank) {
         var bankAccount = bank.getBankAccount();
         if (bankAccount != null) {
             bankAccount.setBank(bank);
         }
     }
 
-    default void mapBidirectional(MigrationPartnerAccountEntity account) {
-        OffsetDateTime currentDate = OffsetDateTime.now();
-        account.setCreateDate(currentDate);
-        account.setLastModifiedDate(currentDate);
-        MigrationBankEntity bank = account.getBank();
-        if (bank != null) {
-            bank.setAccount(account);
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
@@ -97,6 +98,8 @@ public class AccountServiceImpl implements AccountService {
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             replicationService.saveCounterparty(response);
             return response;
+        } catch (DataIntegrityViolationException e) {
+            throw e;
         } catch (RuntimeException e) {
             auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_CREATE_ERROR)
@@ -130,8 +133,11 @@ public class AccountServiceImpl implements AccountService {
                 .eventParams(accountMapper.toEventParams(foundAccount))
             );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
+            response.setVersion(response.getVersion() + 1);
             replicationService.saveCounterparty(response);
             return response;
+        } catch (DataIntegrityViolationException e) {
+            throw e;
         } catch (RuntimeException e) {
             auditAdapter.send(new Event()
                 .eventType(EventType.ACCOUNT_UPDATE_ERROR)

@@ -142,7 +142,6 @@ public interface AccountMapper extends BaseMapper {
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
         var searchSubString = Stream.of(
-                account.getDigitalId(),
                 account.getPartnerUuid().toString(),
                 account.getAccount()
             )

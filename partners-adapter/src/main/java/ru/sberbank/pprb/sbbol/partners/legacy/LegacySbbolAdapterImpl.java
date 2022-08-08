@@ -31,7 +31,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     private static final String BY_PPRB_GUID = ROOT_URL + "/{digitalId}/{pprbGuid}";
     private static final String DELETE = ROOT_URL + "/delete/{digitalId}/{pprbGuid}";
     private static final String COUNTERPARTY_BY_DIGITAL_ID = ROOT_URL + "/list/{digitalId}";
-    private static final String SIGN_SAVE = ROOT_URL + "/sign/save/{digitalUserId}";
+    private static final String SIGN_SAVE = ROOT_URL + "/sign/save/{digitalId}";
     private static final String SIGN_REMOVE = ROOT_URL + "/sign/remove/{digitalId}/{pprbGuid}";
     private static final String VIEW = ROOT_URL + "/view/{digitalId}";
     private static final String CHECK_MIGRATION = ROOT_URL + "/check-migration/{digitalId}";
@@ -143,14 +143,14 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
-    public void saveSign(String digitalUserId, CounterpartySignData signData) {
+    public void saveSign(String digitalId, CounterpartySignData signData) {
         try {
             restTemplate.exchange(
                 SIGN_SAVE,
                 HttpMethod.POST,
                 new HttpEntity<>(signData, httpHeaders),
                 Void.class,
-                digitalUserId);
+                digitalId);
         } catch (HttpClientErrorException e) {
             throw new SbbolException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {

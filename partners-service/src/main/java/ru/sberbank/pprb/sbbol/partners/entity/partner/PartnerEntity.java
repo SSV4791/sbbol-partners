@@ -27,7 +27,8 @@ import java.util.Objects;
 @Table(
     name = "partner",
     indexes = {
-        @Index(name = "i_partner_uuid", columnList = "digital_id")
+        @Index(name = "i_partner_uuid", columnList = "digital_id"),
+        @Index(name = "idx_partner_digital_id_search", columnList = "digital_id, search", unique = true)
     }
 )
 @DynamicUpdate

@@ -8,6 +8,8 @@ plugins {
 dependencies {
     annotationProcessor(liveLibs.mapstruct.processor)
 
+    implementation(project(":partners-service"))
+
     implementation(platform(liveLibs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     // решает ошибку при старте приложения: java.lang.ClassNotFoundException: javax.jws.WebParam

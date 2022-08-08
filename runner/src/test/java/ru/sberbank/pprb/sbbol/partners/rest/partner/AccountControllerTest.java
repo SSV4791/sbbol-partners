@@ -720,6 +720,23 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    void testCreateAccount_unique() {
+        var partner = createValidPartner();
+        var expected = getValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(expected);
+        var error = post(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            expected,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+    }
+
+    @Test
     void testCreateNotValidAccount() {
         var partner = createValidPartner();
         var error = createNotValidAccount(partner.getId(), partner.getDigitalId());
@@ -745,6 +762,30 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotEqualTo(account.getComment());
         assertThat(updateAccount.getComment())
             .isNotNull();
+    }
+
+    @Test
+    void testUpdateAccount_unique() {
+        var partner = createValidPartner();
+        var account1 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var updateAccount = updateAccount(account2);
+        updateAccount
+            .account(account1.getAccount())
+            .getBank()
+            .bic(account1.getBank().getBic())
+            .getBankAccount()
+            .bankAccount(account1.getBank().getBankAccount().getBankAccount());
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccount,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
     }
 
     @Test
@@ -996,7 +1037,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
 
         updateAccount(account);
-        account.setVersion(accountVersion.getVersion() + 1);
+        account.setVersion(accountVersion.getVersion());
         account.setAccount("40101810600000010006");
         account.getBank().setBic("048602001");
         account.getBank().getBankAccount().setBankAccount("40102810945370000073");
@@ -1014,7 +1055,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(checkAccount3)
             .isNotNull();
         assertThat(checkAccount3.getVersion())
-            .isEqualTo(accountVersion3.getVersion() + 1);
+            .isEqualTo(accountVersion3.getVersion());
     }
 
     @Test
@@ -1096,7 +1137,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isEqualTo("PPRB:PARTNER:CHECK_VALIDATION_EXCEPTION");
     }
 
-    private static String getBic() {
+    public static String getBic() {
         String bic = "525411";
         var key = randomNumeric(3);
         return key + bic;
