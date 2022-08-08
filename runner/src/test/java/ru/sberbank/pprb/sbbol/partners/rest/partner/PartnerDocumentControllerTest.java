@@ -139,36 +139,36 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithBadRequest() {
-        List<Descriptions> errorTexts = List.of(
+        List<Descriptions> errorDescriptions = List.of(
             new Descriptions()
                 .field("positionCertifier")
                 .message(
-                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 100")
+                    List.of("размер должен находиться в диапазоне от 0 до 100")
                 ),
             new Descriptions()
                 .field("number")
                 .message(
-                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 50")
+                    List.of("размер должен находиться в диапазоне от 0 до 50")
                 ),
             new Descriptions()
                 .field("divisionCode")
                 .message(
-                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 50")
+                    List.of("размер должен находиться в диапазоне от 0 до 50")
                 ),
             new Descriptions()
                 .field("series")
                 .message(
-                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 50")
+                    List.of("размер должен находиться в диапазоне от 0 до 50")
                 ),
             new Descriptions()
                 .field("divisionIssue")
                 .message(
-                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 250")
+                    List.of("размер должен находиться в диапазоне от 0 до 250")
                 ),
             new Descriptions()
                 .field("certifierName")
                 .message(
-                    List.of("Проверьте заполненное значение на корректность. Максимальное количество символов 100")
+                    List.of("размер должен находиться в диапазоне от 0 до 100")
                 )
         );
 
@@ -185,8 +185,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
-        for (var text : errorTexts) {
-            assertThat(errorTexts.contains(text)).isTrue();
+        for (var description : response.getDescriptions()) {
+            assertThat(errorDescriptions).contains(description);
         }
     }
 

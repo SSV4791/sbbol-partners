@@ -26,8 +26,9 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class AccountControllerTest extends BaseAccountControllerTest {
 
-    public static final String INN_WITHOUT_ACCOUNT = "3522329000";
-    public static final String PART_ACCOUNT_FOR_TEST_PARTNER = "40802810500";
+    private static final String INN_WITHOUT_ACCOUNT = "3522329000";
+    private static final String KPP_WITHOUT_ACCOUNT = "618243879";
+    private static final String PART_ACCOUNT_FOR_TEST_PARTNER = "40802810500";
 
     @Test
     void testViewFilter_whenGkuAttributeIsDefinedAndIsTrue() {
@@ -86,12 +87,14 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testViewFilter_whenPaginationIsNull() {
-        var errorText = "Поле не может быть равно null";
-        var field = "pagination";
+    void testNegativeViewFilter_whenPaginationIsNull() {
+        Descriptions descriptions = new Descriptions()
+            .field("pagination")
+            .message(
+                List.of("Поле не может быть равно null")
+            );
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        List<String> account = new ArrayList<>();
-        account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
 
         var accountsFilter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
@@ -108,41 +111,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
-        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .contains(errorText);
-        assertThat(response.getDescriptions().stream().map(Descriptions::getField).findAny().orElse(null))
-            .contains(field);
+        assertThat(response.getDescriptions())
+            .contains(descriptions);
     }
 
     @Test
-    void testViewFilterWithoutPagination() {
-        var errorText ="Поле не может быть равно null";
-        var field = "pagination";
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        List<String> account = new ArrayList<>();
-        account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
-        var accountsFilter = new AccountsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerIds(List.of(partner.getId()))
-            .accountIds(account)
-            .isHousingServicesProvider(false);
-        var response = post(
-            baseRoutePath + "/accounts/view",
-            HttpStatus.BAD_REQUEST,
-            accountsFilter,
-            Error.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
-        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .contains(errorText);
-        assertThat(response.getDescriptions().stream().map(Descriptions::getField).findAny().orElse(null))
-            .contains(field);
-    }
-
-    @Test
-    void testViewFilter_whenPaginationCountAndOffsetIsNull() {
+    void testNegativeViewFilter_whenPaginationCountAndOffsetIsNull() {
         List<Descriptions> errorTexts = List.of(
             new Descriptions()
                 .field("pagination.count")
@@ -156,8 +130,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 )
         );
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        List<String> account = new ArrayList<>();
-        account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
         var accountsFilter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
@@ -271,6 +244,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedInn() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var partnerWithoutAccount = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         List<String> account = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
@@ -280,6 +254,64 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .partnerIds(List.of(partner.getId()))
             .accountIds(account)
             .partnerSearch(INN_WITHOUT_ACCOUNT)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .isEmpty();
+        assertThat(response.getPagination().getHasNextPage())
+            .isFalse();
+    }
+
+    @Test
+    void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedKpp() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .partnerSearch(partner.getKpp())
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .hasSize(4);
+        assertThat(response.getPagination().getHasNextPage())
+            .isTrue();
+    }
+
+    @Test
+    void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedKpp() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        }
+        var accountsFilter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
+            .partnerSearch(KPP_WITHOUT_ACCOUNT)
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -443,6 +475,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .hasSize(4);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
+        for (var accounts : response.getAccounts()) {
+            assertThat(accounts.getState()).isEqualTo(SignType.SIGNED);
+        }
     }
 
     @Test
@@ -462,49 +497,55 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .pagination(new Pagination()
                 .count(5)
                 .offset(0));
-        var response2 = post(
+        var response = post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         );
-        assertThat(response2)
+        assertThat(response)
             .isNotNull();
-        assertThat(response2.getAccounts())
+        assertThat(response.getAccounts())
             .hasSize(1);
-        assertThat(response2.getPagination().getHasNextPage())
+        assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.FALSE);
+        for (var accounts : response.getAccounts()) {
+            assertThat(accounts.getState()).isEqualTo(SignType.NOT_SIGNED);
+        }
     }
 
     @Test
     void testViewFilterSignFourAccount() {
-        var partner3 = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        List<String> account3 = new ArrayList<>();
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        List<String> account = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            account3.add(createValidAccount(partner3.getId(), partner3.getDigitalId()).getId());
+            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
         }
-        createValidAccountsSign(partner3.getDigitalId(), account3);
-        account3.add(createValidAccount(partner3.getId(), partner3.getDigitalId()).getId());
-        var filter3 = new AccountsFilter()
-            .digitalId(partner3.getDigitalId())
-            .partnerIds(List.of(partner3.getId()))
-            .accountIds(account3)
+        createValidAccountsSign(partner.getDigitalId(), account);
+        account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+        var filter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .accountIds(account)
             .state(SignType.SIGNED)
             .pagination(new Pagination()
                 .count(5)
                 .offset(0));
-        var response3 = post(
+        var response = post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
-            filter3,
+            filter,
             AccountsResponse.class
         );
-        assertThat(response3)
+        assertThat(response)
             .isNotNull();
-        assertThat(response3.getAccounts())
+        assertThat(response.getAccounts())
             .hasSize(4);
-        assertThat(response3.getPagination().getHasNextPage())
+        assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.FALSE);
+        for (var accounts : response.getAccounts()) {
+            assertThat(accounts.getState()).isEqualTo(SignType.SIGNED);
+        }
     }
 
     @Test
@@ -525,69 +566,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testNegativeViewAccount() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccount(partner.getId(), partner.getDigitalId());
-
-        var filter0 = new AccountsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerIds(List.of(partner.getId()))
-            .pagination(new Pagination()
-                .offset(0));
-        var response0 = post(
-            baseRoutePath + "/accounts/view",
-            HttpStatus.BAD_REQUEST,
-            filter0,
-            Error.class
-        );
-
-        var filter1 = new AccountsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerIds(List.of(partner.getId()))
-            .pagination(new Pagination()
-                .count(4));
-        var response1 = post(
-            baseRoutePath + "/accounts/view",
-            HttpStatus.BAD_REQUEST,
-            filter1,
-            Error.class
-        );
-
-        var filter2 = new AccountsFilter()
-            .digitalId(null)
-            .partnerIds(List.of(partner.getId()));
-        var response2 = post(
-            baseRoutePath + "/accounts/view",
-            HttpStatus.BAD_REQUEST,
-            filter2,
-            Error.class
-        );
-        assertThat(response1)
-            .isNotNull();
-        assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
-        assertThat(response0)
-            .isNotNull();
-        assertThat(response0.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
-        assertThat(response2)
-            .isNotNull();
-        assertThat(response2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
-    }
-
-    @Test
     void testViewAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var acc1 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var acc2 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var acc3 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var acc4 = createValidAccount(partner.getId(), partner.getDigitalId());
-        var acc5 = createValidAccount(partner.getId(), partner.getDigitalId());
+        for (int i = 0; i < 5; i++) {
+            createValidAccount(partner.getId(), partner.getDigitalId());
+        }
 
         var filter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
@@ -607,45 +590,65 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .hasSize(4);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
+    }
 
-        var filter1 = new AccountsFilter()
+    @Test
+    void testViewAccountWithTwoAccountId() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var acc1 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var acc2 = createValidAccount(partner.getId(), partner.getDigitalId());
+        for (int i = 0; i < 5; i++) {
+            createValidAccount(partner.getId(), partner.getDigitalId());
+        }
+
+        var filter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
-            .accountIds(List.of(acc1.getId(), acc3.getId()))
+            .accountIds(List.of(acc1.getId(), acc2.getId()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
-        var response1 = post(
+        var response = post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
-            filter1,
+            filter,
             AccountsResponse.class
         );
-        assertThat(response1)
+        assertThat(response)
             .isNotNull();
-        assertThat(response1.getAccounts())
+        assertThat(response.getAccounts())
             .hasSize(2);
-        assertThat(response1.getPagination().getHasNextPage())
+        assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.FALSE);
-        assertThat(response1.getAccounts().stream().map(Account::getId)).contains(acc1.getId(), acc3.getId());
+        assertThat(response.getAccounts().stream().map(Account::getId)).contains(acc1.getId(), acc2.getId());
+    }
 
-        var filter2 = new AccountsFilter()
+    @Test
+    void testViewAccountWithAllAccountsId() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var account1 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account3 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account4 = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account5 = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var filter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
-            .accountIds(List.of(acc1.getId(), acc2.getId(), acc3.getId(), acc4.getId(), acc5.getId()))
+            .accountIds(List.of(account1.getId(), account2.getId(), account3.getId(), account4.getId(), account5.getId()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
-        var response2 = post(
+        var response = post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
-            filter2,
+            filter,
             AccountsResponse.class
         );
-        assertThat(response2)
+        assertThat(response)
             .isNotNull();
-        assertThat(response2.getAccounts())
+        assertThat(response.getAccounts())
             .hasSize(4);
-        assertThat(response2.getPagination().getHasNextPage())
+        assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
 
@@ -661,6 +664,33 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
             .search(new SearchAccounts().search(account.getAccount().substring(6)))
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .hasSize(4);
+    }
+
+    @Test
+    void testViewSearchAccountWithFullNumber() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var filter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .search(new SearchAccounts().search(account.getAccount()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
