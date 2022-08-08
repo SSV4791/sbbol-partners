@@ -9,10 +9,13 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,13 +25,67 @@ class AccountMapperTest extends BaseUnitConfiguration {
     private static final AccountMapper mapper = Mappers.getMapper(AccountMapper.class);
 
     @Test
+    void testToAccounts() {
+        List<AccountEntity> expected = factory.manufacturePojo(ArrayList.class, AccountEntity.class);
+        var actual = mapper.toAccounts(expected);
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected)
+            .hasSameSizeAs(actual);
+        for(int i = 0; i < expected.size(); i++) {
+            assertThat(expected.get(i).getDigitalId())
+                .isEqualTo(actual.get(i).getDigitalId());
+            assertThat(expected.get(i).getAccount())
+                .isEqualTo(actual.get(i).getAccount());
+            assertThat(actual.get(i).getBank())
+                .isNotNull();
+            assertThat(expected.get(i).getBank().getBic())
+                .isEqualTo(actual.get(i).getBank().getBic());
+            assertThat(expected.get(i).getBank().getName())
+                .isEqualTo(actual.get(i).getBank().getName());
+            assertThat(expected.get(i).getComment())
+                .isEqualTo(actual.get(i).getComment());
+            assertThat(expected.get(i).getPartnerUuid())
+                .hasToString(actual.get(i).getPartnerId());
+        }
+    }
+
+    @Test
+    void testToAccountWithAccountCreateFullModel() {
+        var expected = factory.manufacturePojo(AccountCreateFullModel.class);
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedUuid = factory.manufacturePojo(UUID.class);
+        var actual = mapper.toAccount(expected, digitalId, unifiedUuid);
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected.getAccount())
+            .isEqualTo(actual.getAccount());
+        assertThat(actual.getBank())
+            .isNotNull();
+        assertThat(expected.getBank().getBic())
+            .isEqualTo(actual.getBank().getBic());
+        assertThat(expected.getBank().getName())
+            .isEqualTo(actual.getBank().getName());
+        assertThat(expected.getBank().getMediary())
+            .isEqualTo(actual.getBank().getIntermediary());
+        assertThat(expected.getComment())
+            .isEqualTo(actual.getComment());
+        assertThat(digitalId)
+            .isEqualTo(actual.getDigitalId());
+        assertThat(unifiedUuid)
+            .isEqualTo(actual.getPartnerUuid());
+    }
+
+    @Test
     void testToAccount() {
         var expected = factory.manufacturePojo(AccountEntity.class);
         var actual = mapper.toAccount(expected);
-        assertThat(expected.getPartnerUuid().toString())
-            .isEqualTo(actual.getPartnerId());
-        assertThat(expected.getUuid().toString())
-            .isEqualTo(actual.getId());
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected.getPartnerUuid())
+            .hasToString(actual.getPartnerId());
+        assertThat(expected.getUuid())
+            .hasToString(actual.getId());
         assertThat(expected.getDigitalId())
             .isEqualTo(actual.getDigitalId());
         assertThat(expected.getAccount())
@@ -41,6 +98,8 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isEqualTo(actual.getComment());
         assertThat(expected.getBank().getName())
             .isEqualTo(actual.getBank().getName());
+        assertThat(actual.getBank())
+            .isNotNull();
         assertThat(expected.getBank().getBic())
             .isEqualTo(actual.getBank().getBic());
         assertThat(expected.getBank().getIntermediary())

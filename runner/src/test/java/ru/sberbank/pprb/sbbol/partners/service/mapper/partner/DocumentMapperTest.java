@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -11,6 +12,10 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
+
+import java.util.HashSet;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,6 +29,42 @@ class DocumentMapperTest extends BaseUnitConfiguration {
     @BeforeEach
     void before() {
         mapper = new DocumentMapperImpl(documentTypeMapper);
+    }
+
+    @Test
+    void testToDocuments() {
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedUuid = factory.manufacturePojo(UUID.class);
+        HashSet<DocumentCreateFullModel> expected = factory.manufacturePojo(HashSet.class, DocumentCreateFullModel.class);
+        var actual = mapper.toDocuments(expected, digitalId, unifiedUuid);
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected)
+            .hasSameSizeAs(actual);
+        for(var actualObj: actual) {
+            assertThat(actualObj.getDigitalId())
+                .isEqualTo(digitalId);
+            assertThat(unifiedUuid)
+                .isEqualTo(actualObj.getUnifiedUuid());
+        }
+    }
+
+    @Test
+    void testToDocumentWithDocumentCreateFullModel() {
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedUuid = factory.manufacturePojo(UUID.class);
+        var expected = factory.manufacturePojo(DocumentCreateFullModel.class);
+        var actual = mapper.toDocument(expected, digitalId, unifiedUuid);
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "documentTypeId"
+            )
+            .isEqualTo(actual);
+        assertThat(actual.getTypeUuid())
+            .hasToString(expected.getDocumentTypeId());
     }
 
     @Test

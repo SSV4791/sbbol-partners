@@ -13,12 +13,14 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactPhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,6 +56,63 @@ class ContactMapperTest extends BaseUnitConfiguration {
                 "emails"
             )
             .isEqualTo(mapper.toContact(actual));
+    }
+
+    @Test
+    void testToContacts() {
+        Set<ContactCreateFullModel> expected = factory.manufacturePojo(HashSet.class, ContactCreateFullModel.class);
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedUuid = factory.manufacturePojo(UUID.class);
+        var actual = mapper.toContacts(expected, digitalId, unifiedUuid);
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected)
+            .hasSameSizeAs(actual);
+        for(var actualEntity: actual) {
+            assertThat(digitalId)
+                .isEqualTo(actualEntity.getDigitalId());
+            assertThat(unifiedUuid)
+                .isEqualTo(actualEntity.getPartnerUuid());
+        }
+    }
+
+    @Test
+    void testToContractWithContactCreateFullModel() {
+        var expected = factory.manufacturePojo(ContactCreateFullModel.class);
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedUuid = factory.manufacturePojo(UUID.class);
+        var actual = mapper.toContact(expected, digitalId, unifiedUuid);
+
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "emails",
+                "phones",
+                "legalForm"
+            )
+            .isEqualTo(actual);
+        assertThat(digitalId)
+            .isEqualTo(actual.getDigitalId());
+        assertThat(unifiedUuid)
+            .isEqualTo(actual.getPartnerUuid());
+        assertThat(ContactMapper.toLegalType(expected.getLegalForm()))
+            .isEqualTo(actual.getType());
+
+        assertThat(actual.getEmails())
+            .isNotNull();
+        for(var email: actual.getEmails()) {
+            assertThat(expected.getEmails())
+                .contains(email.getEmail());
+        }
+
+        assertThat(actual.getPhones())
+            .isNotNull();
+        for(var phone: actual.getPhones()) {
+            assertThat(expected.getPhones())
+                .contains(phone.getPhone());
+        }
     }
 
     @Test
