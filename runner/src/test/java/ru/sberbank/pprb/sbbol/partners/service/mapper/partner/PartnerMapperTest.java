@@ -66,6 +66,80 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
+    void toPartnerWithPartnerCreateFullModel() {
+        var expected = factory.manufacturePojo(PartnerCreateFullModel.class);
+        var actual = mapper.toPartner(expected);
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "address",
+                "documents",
+                "legalForm",
+                "accounts",
+                "contacts",
+                "emails",
+                "phones"
+            )
+            .isEqualTo(actual);
+        assertThat(PartnerMapper.toLegalType(expected.getLegalForm()))
+            .isEqualTo(actual.getLegalType());
+
+        assertThat(actual.getEmails())
+            .isNotNull();
+        for(var email: actual.getEmails()) {
+            assertThat(expected.getEmails())
+                .contains(email.getEmail());
+        }
+
+        assertThat(actual.getPhones())
+            .isNotNull();
+        for(var phone: actual.getPhones()) {
+            assertThat(expected.getPhones())
+                .contains(phone.getPhone());
+        }
+    }
+
+    @Test
+    void testToPartnerMullResponse() {
+        var expected = factory.manufacturePojo(PartnerEntity.class);
+        var actual = mapper.toPartnerMullResponse(expected);
+        assertThat(actual)
+            .isNotNull();
+        assertThat(expected)
+            .usingRecursiveComparison()
+            .ignoringFields(
+                "legalType",
+                "lastModifiedDate",
+                "type",
+                "gkuInnEntity",
+                "uuid",
+                "search",
+                "createDate",
+                "phones",
+                "emails"
+            )
+            .isEqualTo(actual);
+        assertThat(PartnerMapper.toLegalType(expected.getLegalType()))
+            .isEqualTo(actual.getLegalForm());
+
+        assertThat(actual.getPhones())
+            .isNotNull();
+        for(var phoneEntity: expected.getPhones()) {
+            assertThat(actual.getPhones())
+                .contains(partnerPhoneMapper.toPhone(phoneEntity));
+        }
+
+        assertThat(actual.getEmails())
+            .isNotNull();
+        for(var email: expected.getEmails()) {
+            assertThat(actual.getEmails())
+                .contains(partnerEmailMapper.toEmail(email));
+        }
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void testToPartnerPhoneString() {
         Set<String> phones = factory.manufacturePojo(HashSet.class, String.class);
