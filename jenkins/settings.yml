@@ -123,7 +123,7 @@ release:
     params_branch: master
     istio_tag: '1.6'
     commit_or_tag: '01.002.00_0053'
-    release_key:
+    release_key: DCBBRAIN-1847
     checkmarx: false
     reverse_and_publish: false
     type: develop
