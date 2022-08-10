@@ -6,6 +6,7 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
@@ -94,13 +95,43 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "comment", source = "source.description")
     @Mapping(target = "legalType", source = "source.legalType")
     @Mapping(target = "version", source = "source.version")
-    @Mapping(target = "phones", expression = "java(toPhone(source.getCorrPhoneNumber(), digitalId))")
-    @Mapping(target = "emails", expression = "java(toEmail(source.getCorrEmail(), digitalId))")
+    @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), source.getCorrPhoneNumber(), digitalId))")
+    @Mapping(target = "emails", expression = "java(toEmail(partner.getEmails(), source.getCorrEmail(), digitalId))")
     @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
     @Mapping(target = "firstName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updatePartnerEntity(String digitalId, MigrationCorrespondentCandidate source, @MappingTarget PartnerEntity partner);
+
+    default List<PartnerEmailEntity> toEmail(List<PartnerEmailEntity> emails, String email, String digitalId) {
+        if (ObjectUtils.isEmpty(email)) {
+            return emails;
+        } else if (CollectionUtils.isEmpty(emails)) {
+            var partnerEmail = new PartnerEmailEntity();
+            partnerEmail.setEmail(email);
+            partnerEmail.setDigitalId(digitalId);
+            return Collections.singletonList(partnerEmail);
+        }
+        var partnerEmail = emails.get(0);
+        partnerEmail.setEmail(email);
+        partnerEmail.setDigitalId(digitalId);
+        return emails;
+    }
+
+    default List<PartnerPhoneEntity> toPhone(List<PartnerPhoneEntity> phones, String phone, String digitalId) {
+        if (ObjectUtils.isEmpty(phone)) {
+            return phones;
+        } else if (CollectionUtils.isEmpty(phones)) {
+            var partnerPhone = new PartnerPhoneEntity();
+            partnerPhone.setPhone(phone);
+            partnerPhone.setDigitalId(digitalId);
+            return Collections.singletonList(partnerPhone);
+        }
+        var partnerPhone = phones.get(0);
+        partnerPhone.setPhone(phone);
+        partnerPhone.setDigitalId(digitalId);
+        return phones;
+    }
 
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "partnerUuid", source = "partnerUuid")

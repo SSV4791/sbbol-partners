@@ -84,7 +84,7 @@ abstract class PhoneServiceImpl implements PhoneService {
             var uuid = phoneMapper.mapUuid(id);
             var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundPhone.isEmpty()) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
             }
             phoneRepository.delete(foundPhone.get());
         }

@@ -73,9 +73,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                         migrationPartnerMapper.updateAccountEntity(digitalId, searchPartner.getUuid(), correspondent, foundAccount);
                         savedAccount = accountRepository.save(foundAccount);
                     }
-                    if (correspondent.isSigned()) {
-                        migrationPartnerMapper.updatePartnerEntity(digitalId, correspondent, searchPartner);
-                    }
+                    migrationPartnerMapper.updatePartnerEntity(digitalId, correspondent, searchPartner);
                     partnerRepository.save(searchPartner);
                 }
             } catch (Exception ex) {

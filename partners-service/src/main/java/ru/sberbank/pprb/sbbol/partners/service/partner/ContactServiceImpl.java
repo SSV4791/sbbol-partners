@@ -107,7 +107,7 @@ public class ContactServiceImpl implements ContactService {
         for (String id : ids) {
             var contactUuid = contactMapper.mapUuid(id);
             var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactUuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactUuid));
             contactRepository.delete(foundContact);
             emailRepository.deleteAll(emailRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
             phoneRepository.deleteAll(phoneRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
