@@ -62,10 +62,10 @@ public interface LegacySbbolAdapter {
     /**
      * Сохранение подписи контрагента
      *
-     * @param digitalId идентификатор пользователя подписавшего документ
+     * @param digitalUserId идентификатор пользователя подписавшего документ
      * @param signData      данные подписи контрагента
      */
-    void saveSign(String digitalId, CounterpartySignData signData);
+    void saveSign(String digitalUserId, CounterpartySignData signData);
 
     /**
      * Удаление подписи контрагента

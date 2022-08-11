@@ -86,7 +86,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
             try {
                 var savedSign = accountSignRepository.save(sign);
-                replicationService.saveSign(accountsSign.getDigitalId(), sign);
+                replicationService.saveSign(accountsSign.getDigitalId(), accountsSign.getDigitalUserId(), sign);
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(savedSign))
@@ -123,10 +123,10 @@ public class AccountSignServiceImpl implements AccountSignService {
         for (String accountId : accountIds) {
             var accountUuid = accountSingMapper.mapUuid(accountId);
             var sign = accountSignRepository.getByAccountUuid(accountUuid)
-                .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
+                .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountUuid));
             try {
                 accountSignRepository.delete(sign);
-                replicationService.deleteSign(digitalId, accountId);
+                replicationService.deleteSign(digitalId, accountUuid);
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(sign))
@@ -138,8 +138,8 @@ public class AccountSignServiceImpl implements AccountSignService {
                 );
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
-            var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountId))
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
+            var account = accountRepository.getByDigitalIdAndUuid(digitalId, accountUuid)
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountUuid));
             try {
                 account.setState(AccountStateType.NOT_SIGNED);
                 var saveAccount = accountRepository.save(account);
@@ -163,10 +163,10 @@ public class AccountSignServiceImpl implements AccountSignService {
         var uuid = UUID.fromString(accountId);
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
         if (foundAccount.isEmpty()) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId);
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
         }
         var sign = accountSignRepository.getByAccountUuid(uuid)
-            .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
+            .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, uuid));
         return accountSingMapper.toSignAccount(sign, digitalId);
     }
 }

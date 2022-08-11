@@ -1,14 +1,14 @@
 package ru.sberbank.pprb.sbbol.partners.service.replication;
 
-import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
-import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
+import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
+import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
-import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
@@ -85,20 +85,21 @@ public class ReplicationServiceImpl implements ReplicationService {
     }
 
     @Override
-    public void saveSign(String digitalId, SignEntity sign) {
+    public void saveSign(String digitalId, String digitalUserId, SignEntity sign) {
         var accountId = sign.getAccountUuid().toString();
         var counterparty = legacySbbolAdapter.getByPprbGuid(digitalId, accountId);
         if (counterparty != null) {
             var counterpartySignData = accountSingMapper.toCounterpartySignData(sign);
-            legacySbbolAdapter.saveSign(digitalId, counterpartySignData);
+            legacySbbolAdapter.saveSign(digitalUserId, counterpartySignData);
         }
     }
 
     @Override
-    public void deleteSign(String digitalId, String counterpartyId) {
-        var counterparty = legacySbbolAdapter.getByPprbGuid(digitalId, counterpartyId);
+    public void deleteSign(String digitalId, UUID accountUuid) {
+        var accountId = accountUuid.toString();
+        var counterparty = legacySbbolAdapter.getByPprbGuid(digitalId, accountId);
         if (counterparty != null) {
-            legacySbbolAdapter.removeSign(digitalId, counterpartyId);
+            legacySbbolAdapter.removeSign(digitalId, accountId);
         }
     }
 }

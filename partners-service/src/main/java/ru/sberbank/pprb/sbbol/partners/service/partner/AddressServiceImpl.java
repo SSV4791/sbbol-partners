@@ -89,7 +89,7 @@ abstract class AddressServiceImpl implements AddressService {
         for (String id : ids) {
             var uuid = addressMapper.mapUuid(id);
             var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, uuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
             addressRepository.delete(foundAddress);
         }
     }

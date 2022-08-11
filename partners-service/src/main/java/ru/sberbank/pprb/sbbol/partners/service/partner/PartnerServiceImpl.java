@@ -193,7 +193,7 @@ public class PartnerServiceImpl implements PartnerService {
         for (String partnerId : ids) {
             var partnerUuid = partnerMapper.mapUuid(partnerId);
             PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerUuid));
             partnerRepository.delete(foundPartner);
             emailRepository.deleteAll(emailRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
             phoneRepository.deleteAll(phoneRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));

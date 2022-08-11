@@ -108,7 +108,7 @@ abstract class DocumentServiceImpl implements DocumentService {
             var uuid = documentMapper.mapUuid(id);
             var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundDocument.isEmpty()) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
             }
             documentRepository.delete(foundDocument.get());
         }

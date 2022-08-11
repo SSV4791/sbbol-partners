@@ -143,14 +143,15 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
-    public void saveSign(String digitalId, CounterpartySignData signData) {
+    public void saveSign(String digitalUserId, CounterpartySignData signData) {
         try {
             restTemplate.exchange(
                 SIGN_SAVE,
                 HttpMethod.POST,
                 new HttpEntity<>(signData, httpHeaders),
                 Void.class,
-                digitalId);
+                digitalUserId
+            );
         } catch (HttpClientErrorException e) {
             throw new SbbolException(e.getStatusCode(), e.getMessage(), e);
         } catch (Exception e) {

@@ -5,6 +5,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ReplicationService {
 
@@ -42,14 +43,14 @@ public interface ReplicationService {
      * @param digitalId Цифровой идентификатор клиента
      * @param sign Подпись по контрагенту
      */
-    void saveSign(String digitalId, SignEntity sign);
+    void saveSign(String digitalId, String digitalUserId, SignEntity sign);
 
     /**
      * Удаление подписи контрагента в СББОЛ
      *
      * @param digitalId Цифровой идентификатор клиента
-     * @param counterpartyId Идентификатор контрагента
+     * @param accountUuid Идентификатор контрагента
      */
-    void deleteSign(String digitalId, String counterpartyId);
+    void deleteSign(String digitalId, UUID accountUuid);
 }
 

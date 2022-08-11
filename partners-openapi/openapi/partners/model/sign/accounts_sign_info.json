@@ -7,6 +7,10 @@
       "type": "string",
       "title": "Идентификатор личного кабинета клиента"
     },
+    "digitalUserId": {
+      "type": "string",
+      "title": "Идентификатор клиента"
+    },
     "accountsSignDetail": {
       "type": "array",
       "items": {

@@ -27,4 +27,8 @@ public class EntryNotFoundException extends RuntimeException {
     public EntryNotFoundException(String entity, String digitalId, String id) {
         super(MessagesTranslator.toLocale(MESSAGE_ERROR, entity, id, digitalId));
     }
+
+    public EntryNotFoundException(String entity, String digitalId, UUID uuid) {
+        super(MessagesTranslator.toLocale(MESSAGE_ERROR, entity, uuid, digitalId));
+    }
 }

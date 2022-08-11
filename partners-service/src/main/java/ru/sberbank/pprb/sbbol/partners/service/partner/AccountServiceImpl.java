@@ -153,7 +153,7 @@ public class AccountServiceImpl implements AccountService {
         for (String id : ids) {
             var uuid = accountMapper.mapUuid(id);
             var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
             try {
                 accountRepository.delete(foundAccount);
                 auditAdapter.send(new Event()
