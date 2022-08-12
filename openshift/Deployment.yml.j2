@@ -39,7 +39,7 @@ spec:
         vault.hashicorp.com/agent-limits-mem: 128Mi
         vault.hashicorp.com/role: '{{ secman.openshift.role }}'
         vault.hashicorp.com/namespace: '{{ secman.openshift.tenant }}'
-{% for secret in secman.openshift.inject_secrets.app.values() if secret.condition is not defined or secret.condition %}
+{% for secret in (secman.openshift.inject_secrets.app | default({})).values() if secret.condition is not defined or secret.condition %}
 {% set index = loop.index %}
 {% for file_name, secret_key in secret.secrets.items() %}
         vault.hashicorp.com/agent-inject-secret-{{ index }}{{ loop.index }}: 'true'
