@@ -1,0 +1,29 @@
+---
+secman:
+  openshift:
+    address: ift.secrets.sigma.sbrf.ru
+    role: ci00908578_ci00986346_a_pprb_osh_dev_ac
+    tenant: CI00908578_CI00986346
+    inject_secrets:
+      app:
+        pgdb-si-secret:
+          type: file
+          volume:
+            mount: /deployments/credentials/si_db
+          path: CI00908578_CI00986346/A/PPRB/OSH/DEV/KV/ci00908578-edevgen2-pprb-kib-sbbol-dev-test59/pgdb-si-secret
+          secrets:
+            secret.properties: secret.properties
+        pgdb-main-secret:
+          type: file
+          volume:
+            mount: /deployments/credentials/main_db
+          path: CI00908578_CI00986346/A/PPRB/OSH/DEV/KV/ci00908578-edevgen2-pprb-kib-sbbol-dev-test59/pgdb-main-secret
+          secrets:
+            secret.properties: secret.properties
+        secret-appjournalstubsettings:
+          type: file
+          volume:
+            mount: /deployments/config/app_journal
+          path: CI00908578_CI00986346/A/PPRB/OSH/DEV/KV/ci00908578-edevgen2-pprb-kib-sbbol-dev-test59/secret-appjournalstubsettings
+          secrets:
+            appJournal.properties: appJournal.properties

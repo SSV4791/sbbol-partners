@@ -32,7 +32,7 @@ public class AppJournalConfiguration {
     @Bean
     @Primary
     public StandinResourceHelper<String> standInResourceHelper() {
-        return new StandinResourceHelper<>("main", "standIn");
+        return new StandinResourceHelper<>("main", "standin");
     }
 
     /**
@@ -52,7 +52,7 @@ public class AppJournalConfiguration {
      *
      * @param moduleId идентификатор модуля, по которому фабрика зарегистрирована в ПЖ
      * @param masterDataSource основной датасорс
-     * @param standInDataSource датасорс базы SI
+     * @param standinDataSource датасорс базы SI
      * @param entityManagerFactory фабрика EntityManager
      * @param journalClient клиент для работы с Kafka ПЖ
      * @return плагин с конфигурацией для отправки векторов в ПЖ
@@ -61,13 +61,13 @@ public class AppJournalConfiguration {
     public StandinPlugin standinPlugin(
         @Value("${appjournal.moduleId}") String moduleId,
         @Qualifier("mainDataSource") DataSource masterDataSource,
-        @Qualifier("standInDataSource") DataSource standInDataSource,
+        @Qualifier("standInDataSource") DataSource standinDataSource,
         EntityManagerFactory entityManagerFactory,
         JournalCreatorClientApi journalClient
     ) {
         StandinPlugin.Configurator configurator = StandinPlugin.configurator(entityManagerFactory);
         configurator.setMasterDataSource(masterDataSource);
-        configurator.setStandinDataSource(standInDataSource);
+        configurator.setStandinDataSource(standinDataSource);
         configurator.setJournalClient(journalClient);
 
         // HashKey функция. В данном случае используется определение хэша по интерфейсу HashKeyProvider

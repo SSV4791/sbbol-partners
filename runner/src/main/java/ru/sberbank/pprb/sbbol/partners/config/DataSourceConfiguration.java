@@ -96,14 +96,14 @@ public class DataSourceConfiguration {
 
     /**
      * HealthCheck для датасорсов.
-     *
+     * <p>
      * По умолчанию Spring включает в HC все объявленные датасорсы. В таком случае при недоступности второй БД
      * приложение целиком становится недоступно.
-     *
+     * <p>
      * В данном случае HC переопределен. Определяется доступность только текущей БД, с которой работает приложение.
      *
-     * @param mainDataSource источник данных
-     * @param sessionFactory фабрика соединений
+     * @param mainDataSource     источник данных
+     * @param sessionFactory     фабрика соединений
      * @param transactionManager менеджер транзакций
      * @return HealthCheck для проверки доступности БД
      */

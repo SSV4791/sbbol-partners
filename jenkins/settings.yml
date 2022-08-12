@@ -121,7 +121,7 @@ release:
   skip_istio: false
   default_values:
     params_branch: master
-    istio_tag: '1.6'
+    istio_tag: '2.0'
     commit_or_tag: '01.002.00_0053'
     release_key: DCBBRAIN-1847
     checkmarx: false

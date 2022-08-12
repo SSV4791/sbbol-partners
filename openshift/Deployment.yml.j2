@@ -1,6 +1,6 @@
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   annotations:
     app.openshift.io/connects-to: istio-system,{{ openshift.io_control_panel }}
@@ -11,33 +11,54 @@ metadata:
     app.kubernetes.io/part-of: istio
 spec:
   strategy:
-    type: Rolling
-    rollingParams:
-      updatePeriodSeconds: {{ os_project.rollingParams.updatePeriodSeconds | default('1') }}
-      intervalSeconds: {{ os_project.rollingParams.intervalSeconds | default('1') }}
-      timeoutSeconds: {{ os_project.rollingParams.timeoutSeconds | default('600') }}
+    type: RollingUpdate
+    rollingUpdate:
       maxUnavailable: {{ os_project.rollingParams.maxUnavailable | default('25%') }}
       maxSurge: {{ os_project.rollingParams.maxSurge | default('25%') }}
-    resources: {}
-    activeDeadlineSeconds: 21600
-  triggers:
-    - type: ConfigChange
   replicas: {{ os_project.pods | default('1') }}
   revisionHistoryLimit: 2
   selector:
+    matchLabels:
       app: {{ os_project.name }}-{{ suffix_app_label }}
       version: {{ version | default('v1') }}
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: 'true'
+        sidecar.istio.io/rewriteAppHTTPProbers: 'true'
         sidecar.istio.io/proxyCPULimit: {{ os_project.istio.sidecar.limits.cpu | default("200m") }}
         sidecar.istio.io/proxyMemoryLimit: {{ os_project.istio.sidecar.limits.memory | default("300Mi") }}
         sidecar.istio.io/proxyCPU: {{ os_project.istio.sidecar.requests.cpu | default("50m") }}
         sidecar.istio.io/proxyMemory: {{ os_project.istio.sidecar.requests.memory | default("150Mi") }}
+{% if secman.openshift.enabled is not defined or secman.openshift.enabled | bool %}
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/agent-init-first: 'false'
+        vault.hashicorp.com/agent-pre-populate-only: 'false'
+        vault.hashicorp.com/agent-pre-populate: 'false'
+        vault.hashicorp.com/agent-limits-cpu: 400m
+        vault.hashicorp.com/agent-limits-mem: 128Mi
+        vault.hashicorp.com/role: '{{ secman.openshift.role }}'
+        vault.hashicorp.com/namespace: '{{ secman.openshift.tenant }}'
+{% for secret in secman.openshift.inject_secrets.app.values() if secret.condition is not defined or secret.condition %}
+{% set index = loop.index %}
+{% for file_name, secret_key in secret.secrets.items() %}
+        vault.hashicorp.com/agent-inject-secret-{{ index }}{{ loop.index }}: 'true'
+        vault.hashicorp.com/agent-inject-file-{{ index }}{{ loop.index }}: '{{ file_name }}'
+        vault.hashicorp.com/agent-inject-template-{{ index }}{{ loop.index }}: |
+          {{ '{{-' }} with secret "{{ secret.path }}" {{ '-}}' }}
+            {{ file_name + '=' if secret.type == 'environment' }}{{ '{{' }} index .Data "{{ secret_key }}" | base64Decode {{ '}}' }}
+          {{ '{{-' }} end {{ '}}' }}
+        vault.hashicorp.com/secret-volume-path-{{ index }}{{ loop.index }}: '{{ "/vault/secrets/environments" if secret.type == "environment" else secret.volume.mount }}'
+        vault.hashicorp.com/agent-inject-perms-{{ index }}{{ loop.index }}: '{{ secret.defaultMode | default("0400") }}'
+{% endfor %}
+{% endfor %}
+{% endif %}
       labels:
         app: {{ os_project.name }}-{{ suffix_app_label }}
         version: {{ version | default('v1') }}
+{% if secman.openshift.enabled is not defined or secman.openshift.enabled | bool %}
+        secman-injector: enabled
+{% endif %}
     spec:
       affinity:
         podAntiAffinity:
@@ -65,16 +86,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-            - name: POD_NAMESPACE    #добавление имени неймспейса в переменные среды пода
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
             - name: POD_NAME        #добавление имени пода в переменные среды пода
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: NODEID
-              value: ${MODULE_NAME}
             - name: RUN_DEBUG
               value: 'false'
           ports:
@@ -94,6 +109,7 @@ spec:
               readOnly: true
             - name: logsshare
               mountPath: /app/logs
+{% if secman.openshift.enabled is defined and not secman.openshift.enabled | bool %}
             - name: main-db-secret
               mountPath: /deployments/credentials/main_db
               readOnly: true
@@ -106,8 +122,11 @@ spec:
             - name: kafka-ssl-secret
               mountPath: /opt/keystore/kafka
               readOnly: true
+{% endif %}
             - name: java-tmp-dir
               mountPath: /tmp
+            - name: waiting-secrets
+              mountPath: /tmp/secman/config
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -211,6 +230,7 @@ spec:
             name: cm-ds-fluentbit-{{ canary_suffix }}
         - name: logsshare
           emptyDir: {}
+{% if secman.openshift.enabled is defined and not secman.openshift.enabled | bool %}
         - name: main-db-secret
           secret:
             secretName: pgdb-main-secret
@@ -230,5 +250,10 @@ spec:
             secretName: kafka-ssl-secret
             defaultMode: 0400
             optional: true
+{% endif %}
         - name: java-tmp-dir
           emptyDir: {}
+        - name: waiting-secrets
+          configMap:
+            name: waiting-secrets-{{ canary_suffix }}
+            defaultMode: 0400

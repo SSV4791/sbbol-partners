@@ -78,4 +78,10 @@ data:
     standin.cloud.client.kafka.consumerConfig."[ssl.protocol]"=TLS
     standin.cloud.client.kafka.consumerConfig."[ssl.enabled.protocols]"=TLSv1.2
     standin.cloud.client.kafka.consumerConfig."[ssl.endpoint.identification.algorithm]"=
+
+{% for entry in integration_entries | flatten %}
+{% if entry.ci is defined and entry.health_path is defined %}
+    health.http.endpoint[{{ entry.ci }}_{{ entry.name }}].url=http://{{ entry.host }}{{ ':' ~ entry.istio_mesh_port if entry.istio_mesh_port is defined }}{{ entry.health_path }}
+{% endif %}
+{% endfor %}
   jvm-arguments: |-
