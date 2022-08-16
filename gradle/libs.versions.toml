@@ -5,6 +5,7 @@ spring-boot = "2.5.5"
 
 [libraries]
 apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.9" }
+aspectjrt = { module = "org.aspectj:aspectjrt", version = "1.9.7" }
 ehcache-net-core = { module = "net.sf.ehcache:ehcache", version = "2.10.4" }
 ehcache-org-core = { module = "org.ehcache:ehcache", version = "3.9.2" }
 hibernate-jcache = { module = "org.hibernate:hibernate-jcache", version = "5.4.29.Final" }
