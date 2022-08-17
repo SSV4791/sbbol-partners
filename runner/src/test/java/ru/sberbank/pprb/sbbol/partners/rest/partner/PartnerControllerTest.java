@@ -580,7 +580,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 newPhone.setId(phone.getId());
                 newPhone.setUnifiedId(phone.getUnifiedId());
                 newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
+                newPhone.setPhone(randomNumeric(13));
                 newPhones.add(newPhone);
             }
         }
@@ -619,7 +619,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 newPhone.setId(phone.getId());
                 newPhone.setUnifiedId(phone.getUnifiedId());
                 newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
+                newPhone.setPhone(randomNumeric(13));
                 newPhones1.add(newPhone);
             }
         }
@@ -661,7 +661,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 newPhone.setId(phone.getId());
                 newPhone.setUnifiedId(phone.getUnifiedId());
                 newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
+                newPhone.setPhone(randomNumeric(13));
                 newPhones.add(newPhone);
             }
         }
@@ -700,7 +700,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 newPhone.setId(phone.getId());
                 newPhone.setUnifiedId(phone.getUnifiedId());
                 newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
+                newPhone.setPhone(randomNumeric(13));
                 newPhones1.add(newPhone);
             }
         }
@@ -1070,7 +1070,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .okpo("12345678")
             .phones(
                 Set.of(
-                    "79241111111"
+                    "0079241111111"
                 ))
             .emails(
                 Set.of(
@@ -1122,7 +1122,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                     .position("Должность")
                     .phones(
                         Set.of(
-                            "79241111111"
+                            "0079241111111"
                         ))
                     .emails(
                         Set.of(
@@ -1158,7 +1158,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .okpo("12345678")
             .phones(
                 Set.of(
-                    "79241111111"
+                    "0079241111111"
                 ))
             .emails(
                 Set.of(

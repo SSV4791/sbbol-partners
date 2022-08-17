@@ -27,8 +27,9 @@
     "phone": {
       "type": "string",
       "title": "Номер телефона",
-      "maxLength": 12,
-      "x-extra-field-annotation": "@PhoneValidation"
+      "minLength": 13,
+      "maxLength": 13,
+      "pattern": "^\\d{13}$"
     },
     "version": {
       "type": "integer",

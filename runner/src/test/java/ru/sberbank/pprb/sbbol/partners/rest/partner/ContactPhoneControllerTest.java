@@ -135,7 +135,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
         var phone = createPhone(contact.getId(), contact.getDigitalId());
-        phone.setPhone("+" + (randomNumeric(11)));
+        phone.setPhone(randomNumeric(13));
         var newUpdatePhone = put(
             baseRoutePath,
             HttpStatus.OK,
@@ -344,7 +344,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         return new PhoneCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
-            .phone(randomNumeric(10));
+            .phone(randomNumeric(13));
     }
 
     private static Phone createPhone(String partnerUuid, String digitalId) {
@@ -357,7 +357,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
 
     public static Phone updatePhone(Phone phone) {
         return new Phone()
-            .phone(randomNumeric(12))
+            .phone(randomNumeric(13))
             .id(phone.getId())
             .version(phone.getVersion())
             .unifiedId(phone.getUnifiedId())

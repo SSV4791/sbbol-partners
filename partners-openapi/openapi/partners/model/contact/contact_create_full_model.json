@@ -38,7 +38,10 @@
       "title": "Номера телефона контакта",
       "items": {
         "type": "string",
-        "x-extra-field-annotation": "@PhoneValid"
+        "title": "Номер телефона",
+        "minLength": 13,
+        "maxLength": 13,
+        "pattern": "^\\d{13}$"
       },
       "uniqueItems": true
     },
