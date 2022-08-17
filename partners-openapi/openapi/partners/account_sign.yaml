@@ -131,9 +131,9 @@ paths:
           required: true
           schema:
             type: array
-            items: {
+            items:
               type: string
-            }
+              maxItems: 200
           description: Идентификатор счёта
       responses:
         204:

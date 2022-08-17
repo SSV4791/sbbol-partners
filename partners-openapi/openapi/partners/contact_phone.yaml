@@ -59,9 +59,9 @@ paths:
           required: true
           schema:
             type: array
-            items: {
+            items:
               type: string
-            }
+              maxItems: 200
           description: Идентефикатор номера телефона
       responses:
         204:
