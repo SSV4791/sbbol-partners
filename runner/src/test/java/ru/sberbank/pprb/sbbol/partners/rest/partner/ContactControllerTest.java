@@ -221,6 +221,23 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testCreateInvalidContactButValidLength() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var expected = getValidContact(partner.getId(), partner.getDigitalId());
+        var contact = createValidContact(expected);
+        contact.getPhones().stream()
+                .forEach(value -> value.setPhone("ABC" + randomAlphabetic(10)));
+        var createContact = post(
+            baseRoutePath + "/contact",
+            HttpStatus.BAD_REQUEST,
+            contact,
+            Error.class
+        );
+        assertThat(createContact)
+            .isNotNull();
+    }
+
+    @Test
     void testNegativeUpdateChildContact() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -232,7 +249,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 newPhone.setId(phone.getId());
                 newPhone.setUnifiedId(phone.getUnifiedId());
                 newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
+                newPhone.setPhone(randomNumeric(13));
                 newPhones.add(newPhone);
             }
         }
@@ -299,7 +316,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdateContact1)
             .isNotNull();
         assertThat(newUpdateContact1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
     }
 
     @Test
@@ -314,7 +331,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 newPhone.setId(phone.getId());
                 newPhone.setUnifiedId(phone.getUnifiedId());
                 newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
+                newPhone.setPhone(randomNumeric(13));
                 newPhones.add(newPhone);
             }
         }
@@ -353,7 +370,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 newPhone.setId(phone.getId());
                 newPhone.setUnifiedId(phone.getUnifiedId());
                 newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
+                newPhone.setPhone(randomNumeric(13));
                 newPhones1.add(newPhone);
             }
         }
@@ -517,7 +534,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             .position("Должность")
             .phones(
                 Set.of(
-                    "79241111111"
+                    "0079241111111"
                 ))
             .emails(
                 Set.of(

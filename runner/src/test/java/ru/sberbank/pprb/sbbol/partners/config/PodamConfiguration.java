@@ -20,7 +20,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 @TestConfiguration
 public class PodamConfiguration {
 
-    public static final int PHONE_LENGTH = 10;
+    public static final int PHONE_LENGTH = 13;
 
     @Bean
     PodamFactory podamFactory() {
@@ -55,7 +55,7 @@ public class PodamConfiguration {
                     "accountId",
                     "bankId",
                     "documentTypeId" -> UUID.randomUUID().toString();
-                case "phone" -> "07" + randomNumeric(PHONE_LENGTH);
+                case "phone" -> randomNumeric(PHONE_LENGTH);
                 default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
             };
         }

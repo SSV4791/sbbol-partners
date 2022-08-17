@@ -61,7 +61,11 @@
       "type": "array",
       "title": "Номера телефонов партнера",
       "items": {
-        "type": "string"
+        "type": "string",
+        "title": "Номер телефона",
+        "minLength": 13,
+        "maxLength": 13,
+        "pattern": "^\\d{13}$"
       },
       "uniqueItems": true
     },
