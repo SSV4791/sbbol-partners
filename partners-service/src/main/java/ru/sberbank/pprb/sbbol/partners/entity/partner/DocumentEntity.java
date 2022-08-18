@@ -40,7 +40,7 @@ public class DocumentEntity extends BaseEntity {
     private String digitalId;
 
     @OneToOne
-    @JoinColumn(name = "type_uuid", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "type_uuid", insertable = false, updatable = false)
     private DocumentTypeEntity type;
 
     @Column(name = "type_uuid", nullable = false)
