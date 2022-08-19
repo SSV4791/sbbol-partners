@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
@@ -12,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -24,11 +26,41 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     protected static final String baseRoutePath = "/partner";
     protected static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
 
+    /**
+     * Алгоритм расчета контрольного ключа:
+     * Значение контрольного ключа приравнивается нулю (К = 0).
+     * Рассчитываются произведения значений разрядов на соответствующие весовые коэффициенты.
+     * Рассчитывается сумма значений младших разрядов полученных произведений.
+     * Младший разряд вычисленной суммы умножается на 3.
+     * Значение контрольного ключа (К) принимается равным младшему разряду полученного произведения.
+     */
+    public static String getValidAccountNumber() {
+
+        String staticAccountPart = "40702810";
+        String accountKey = "0";
+        String randomAccountPart = RandomStringUtils.randomNumeric(11);
+        String accountForCalculate = staticAccountPart + accountKey + randomAccountPart;
+        String stringForCalculate = getBic().substring(6) + accountForCalculate;
+        int[] numberForCalculate = Arrays.stream(stringForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
+        int[] weightFactor = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
+        int[] result = new int[numberForCalculate.length];
+        for (int i = 0; i<weightFactor.length; i++) {
+            result[i] = numberForCalculate[i] * weightFactor[i];
+        }
+        int resulSumma = 0;
+        for (int i = 0; i<result.length; i++) {
+            resulSumma += result[i]%10;
+        }
+        System.out.println(staticAccountPart + resulSumma*3%10 + randomAccountPart);
+
+       return  staticAccountPart + resulSumma*3%10 + randomAccountPart;
+    }
+
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
         return new AccountCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
-            .account(ACCOUNT_FOR_TEST_PARTNER)
+            .account(getValidAccountNumber())
             .comment("Это тестовый комментарий")
             .bank(new BankCreate()
                 .bic(getBic())
