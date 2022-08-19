@@ -51,7 +51,6 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         for (int i = 0; i<result.length; i++) {
             resulSumma += result[i]%10;
         }
-        System.out.println(staticAccountPart + resulSumma*3%10 + randomAccountPart);
 
        return  staticAccountPart + resulSumma*3%10 + randomAccountPart;
     }
