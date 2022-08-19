@@ -1,7 +1,5 @@
 dependencyLocking {
     lockAllConfigurations()
-    ignoredDependencies.add("ru.dcbqa.allureee.*:*")
-    ignoredDependencies.add("ru.dcbqa.swagger.*:*")
     lockFile.set(file("${rootDir}/gradle/dependency-locks/gradle-${project.name}.lockfile"))
 }
 

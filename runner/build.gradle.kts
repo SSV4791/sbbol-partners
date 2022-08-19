@@ -6,13 +6,6 @@ plugins {
     id("test-conventions")
 }
 
-apply(plugin = "io.spring.dependency-management")
-the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
-    imports {
-        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    }
-}
-
 tasks {
     jar {
         enabled = false
@@ -37,6 +30,8 @@ tasks {
 }
 
 dependencies {
+    implementation(platform(liveLibs.spring.boot.dependencies))
+
     implementation(project(":partners-adapter"))
     implementation(project(":partners-api"))
     implementation(project(":partners-rest"))
@@ -48,6 +43,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(liveLibs.hibernate.jcache)
     implementation(liveLibs.liquibase.core)
     implementation(liveLibs.logstash.logback.encoder)
     implementation(liveLibs.sbp.hibernate.standin)
@@ -62,6 +58,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude("com.vaadin.external.google", "android-json")
     }
+    testImplementation(liveLibs.aspectjrt)
     testImplementation(liveLibs.mapstruct.core)
     testImplementation(testLibs.bundles.pact)
     testImplementation(testLibs.dcb.allure.annotations)

@@ -4,7 +4,7 @@ mockserver = "5.11.2"
 pact = "4.1.31"
 
 [libraries]
-dcb-allure-annotations = { module = "ru.dcbqa.allureee.annotations:dcb-allure-annotations", version = "1.3.+" }
+dcb-allure-annotations = { module = "ru.dcbqa.allureee.annotations:dcb-allure-annotations", version = "1.3.3" }
 junit5-consumer = { module = "au.com.dius.pact.consumer:junit5", version.ref = "pact" }
 junit5-provider = { module = "au.com.dius.pact.provider:junit5", version.ref = "pact" }
 mockserver-client-java = { module = "org.mock-server:mockserver-client-java", version.ref = "mockserver" }
@@ -14,7 +14,7 @@ orm-tests-common = { module = "sbp.integration.orm:orm-tests-common", version = 
 podam-core = { module = "uk.co.jemos.podam:podam", version = "7.2.7.RELEASE" }
 rest-assured = { module = "io.rest-assured:rest-assured", version.ref = "assured" }
 rest-assured-common = { module = "io.rest-assured:rest-assured-common", version.ref = "assured" }
-swagger-coverage-reporter = { module = "ru.dcbqa.swagger.coverage.reporter:swagger-coverage-reporter", version = "2.3.+" }
+swagger-coverage-reporter = { module = "ru.dcbqa.swagger.coverage.reporter:swagger-coverage-reporter", version = "2.3.0" }
 
 [bundles]
 mockserver = ["mockserver-client-java", "mockserver-netty", "mockserver-spring-test-listener"]

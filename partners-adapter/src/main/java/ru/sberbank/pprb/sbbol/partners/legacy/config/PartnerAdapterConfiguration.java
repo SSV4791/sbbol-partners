@@ -40,7 +40,6 @@ public class PartnerAdapterConfiguration {
     @Bean
     RestTemplate restTemplate(
         @Value("${sbbol.url}") String rootLegacyUrl,
-        @Value("${sbbol.url.synapse.system.session}") String synapseSystemSession,
         @Value("${sbbol.time_out:5000}") long timeOut,
         RestTemplateBuilder restTemplateBuilder
     ) {
@@ -49,7 +48,7 @@ public class PartnerAdapterConfiguration {
             .setConnectTimeout(Duration.ofMillis(timeOut))
             .messageConverters(mappingJacksonHttpMessageConverter())
             .uriTemplateHandler(
-                new DefaultUriBuilderFactory("http://" + rootLegacyUrl + synapseSystemSession)
+                new DefaultUriBuilderFactory("http://" + rootLegacyUrl)
             )
             .build();
     }
