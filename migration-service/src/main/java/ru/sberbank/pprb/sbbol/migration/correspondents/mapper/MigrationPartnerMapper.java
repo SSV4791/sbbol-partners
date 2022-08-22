@@ -15,8 +15,10 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,23 +30,26 @@ import java.util.stream.Stream;
 @Mapper(
     componentModel = "spring",
     imports = {
+        LegalType.class,
         AccountMapper.class,
         PartnerMapper.class,
         MigrationLegalType.class
     }
 )
-public interface MigrationPartnerMapper {
+public interface MigrationPartnerMapper extends BaseMapper {
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "citizenship", constant = "UNKNOWN")
     @Mapping(target = "comment", source = "source.description")
-    @Mapping(target = "legalType", source = "source.legalType")
+    @Mapping(target = "legalType", expression = "java(toLegalType(source.getInn(), source.getAccount()))")
     @Mapping(target = "version", source = "source.version")
     @Mapping(target = "phones", expression = "java(toPhone(source.getCorrPhoneNumber(), digitalId))")
     @Mapping(target = "emails", expression = "java(toEmail(source.getCorrEmail(), digitalId))")
-    @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "firstName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "orgName",
+        expression = "java(toLegalType(source.getInn(), source.getAccount()) != LegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "firstName",
+        expression = "java(toLegalType(source.getInn(), source.getAccount()) == LegalType.PHYSICAL_PERSON ? source.getName() : null)")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerEntity toPartnerEntity(String digitalId, MigrationCorrespondentCandidate source);
@@ -90,15 +95,31 @@ public interface MigrationPartnerMapper {
         }
     }
 
+    default LegalType toLegalType(String inn, String account) {
+        if (StringUtils.isNotEmpty(account) && StringUtils.isNotEmpty(inn)) {
+            if (inn.length() == 12) {
+                if (account.startsWith("407")) {
+                    return LegalType.ENTREPRENEUR;
+                }
+                if (account.startsWith("408")) {
+                    return LegalType.PHYSICAL_PERSON;
+                }
+            }
+        }
+        return LegalType.LEGAL_ENTITY;
+    }
+
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "citizenship", constant = "UNKNOWN")
     @Mapping(target = "comment", source = "source.description")
-    @Mapping(target = "legalType", source = "source.legalType")
+    @Mapping(target = "legalType", expression = "java(toLegalType(source.getInn(), source.getAccount()))")
     @Mapping(target = "version", source = "source.version")
     @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), source.getCorrPhoneNumber(), digitalId))")
     @Mapping(target = "emails", expression = "java(toEmail(partner.getEmails(), source.getCorrEmail(), digitalId))")
-    @Mapping(target = "orgName", expression = "java(source.getLegalType() != MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "firstName", expression = "java(source.getLegalType() == MigrationLegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "orgName",
+        expression = "java(toLegalType(source.getInn(), source.getAccount()) != LegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "firstName",
+        expression = "java(toLegalType(source.getInn(), source.getAccount()) == LegalType.PHYSICAL_PERSON ? source.getName() : null)")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updatePartnerEntity(String digitalId, MigrationCorrespondentCandidate source, @MappingTarget PartnerEntity partner);
@@ -216,4 +237,37 @@ public interface MigrationPartnerMapper {
         }
     }
 
+    @Mapping(target = "name", expression = "java(toName(partner))")
+    @Mapping(target = "inn", source = "partner.inn")
+    @Mapping(target = "kpp", source = "partner.kpp")
+    @Mapping(target = "account", source = "account.account")
+    @Mapping(target = "bic", source = "account.bank.bic")
+    @Mapping(target = "description", source = "partner.comment")
+    @Mapping(target = "pprbGuid", source = "account.uuid")
+    @Mapping(target = "bankAccount", source = "account.bank.bankAccount.account")
+    @Mapping(target = "replicationGuid", source = "account.uuid")
+    @Mapping(target = "signed", expression = "java(toSigned(account.getState()))")
+    @Mapping(target = "version", source = "account.version")
+    @Mapping(target = "bankName", source = "account.bank.name")
+    MigrationCorrespondentCandidate toCounterparty(PartnerEntity partner, AccountEntity account);
+
+    default String toName(PartnerEntity partner) {
+        if (partner == null) {
+            return null;
+        }
+        if (partner.getLegalType() != LegalType.PHYSICAL_PERSON) {
+            return partner.getOrgName();
+        }
+        return Stream.of(
+                partner.getSecondName(),
+                partner.getFirstName(),
+                partner.getMiddleName()
+            )
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(StringUtils.SPACE));
+    }
+
+    default boolean toSigned(AccountStateType signed) {
+        return signed == AccountStateType.SIGNED;
+    }
 }

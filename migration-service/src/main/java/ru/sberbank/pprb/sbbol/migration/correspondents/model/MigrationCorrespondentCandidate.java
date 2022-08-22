@@ -1,7 +1,5 @@
 package ru.sberbank.pprb.sbbol.migration.correspondents.model;
 
-import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
-
 import java.io.Serializable;
 
 /**
@@ -60,10 +58,6 @@ public class MigrationCorrespondentCandidate implements Serializable {
      * Признак подписи контрагента
      */
     private boolean signed;
-    /**
-     * Тип правовой формы
-     */
-    private MigrationLegalType legalType;
 
     /**
      * Наименование банка
@@ -172,14 +166,6 @@ public class MigrationCorrespondentCandidate implements Serializable {
 
     public void setSigned(boolean signed) {
         this.signed = signed;
-    }
-
-    public MigrationLegalType getLegalType() {
-        return legalType;
-    }
-
-    public void setLegalType(MigrationLegalType legalType) {
-        this.legalType = legalType;
     }
 
     public String getBankName() {

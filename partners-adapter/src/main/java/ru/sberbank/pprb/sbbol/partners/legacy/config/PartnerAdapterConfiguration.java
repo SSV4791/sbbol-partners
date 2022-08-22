@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySupplier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,13 +41,14 @@ public class PartnerAdapterConfiguration {
     @Bean
     RestTemplate restTemplate(
         @Value("${sbbol.url}") String rootLegacyUrl,
-        @Value("${sbbol.time_out:5000}") long timeOut,
+        @Value("${sbbol.time_out:10000}") long timeOut,
         RestTemplateBuilder restTemplateBuilder
     ) {
         return restTemplateBuilder
             .setReadTimeout(Duration.ofMillis(timeOut))
             .setConnectTimeout(Duration.ofMillis(timeOut))
             .messageConverters(mappingJacksonHttpMessageConverter())
+            .requestFactory(new ClientHttpRequestFactorySupplier())
             .uriTemplateHandler(
                 new DefaultUriBuilderFactory("http://" + rootLegacyUrl)
             )

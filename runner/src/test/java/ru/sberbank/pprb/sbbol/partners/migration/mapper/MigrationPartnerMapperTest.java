@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.migration.mapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapper;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
@@ -29,8 +28,6 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
             .isEqualTo(migrationCorrespondentCandidate.getCorrEmail());
         assertThat(migrationPartnerEntity.getPhones().get(0).getPhone())
             .isEqualTo(migrationCorrespondentCandidate.getCorrPhoneNumber());
-        assertThat(migrationPartnerEntity.getLegalType().name())
-            .isEqualTo(migrationCorrespondentCandidate.getLegalType().name());
         assertThat(migrationPartnerEntity.getPhones().get(0).getPartner()).isNotNull();
         assertThat(migrationPartnerEntity.getEmails().get(0).getPartner()).isNotNull();
     }
@@ -83,7 +80,6 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     @Test
     void toPartnerEntityWithLegalEntityTest() {
         var migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
-        migrationCorrespondentCandidate.setLegalType(MigrationLegalType.LEGAL_ENTITY);
         var migrationPartnerEntity = mapper.toPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
         assertThat(migrationPartnerEntity.getOrgName()).
             isEqualTo(migrationCorrespondentCandidate.getName());
@@ -94,7 +90,8 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     void toPartnerEntityWithEntrepreneurTest() {
         var migrationCorrespondentCandidate =
             factory.manufacturePojo(MigrationCorrespondentCandidate.class);
-        migrationCorrespondentCandidate.setLegalType(MigrationLegalType.ENTREPRENEUR);
+        migrationCorrespondentCandidate.setInn("012345678912");
+        migrationCorrespondentCandidate.setAccount("40700000000000000001");
         var migrationPartnerEntity = mapper.toPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
         assertThat(migrationPartnerEntity.getOrgName()).isEqualTo(migrationCorrespondentCandidate.getName());
         assertThat(migrationPartnerEntity.getFirstName()).isNull();
@@ -104,7 +101,8 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
     void toPartnerEntityWithPhysicalPersonTest() {
         var migrationCorrespondentCandidate =
             factory.manufacturePojo(MigrationCorrespondentCandidate.class);
-        migrationCorrespondentCandidate.setLegalType(MigrationLegalType.PHYSICAL_PERSON);
+        migrationCorrespondentCandidate.setInn("012345678912");
+        migrationCorrespondentCandidate.setAccount("40800000000000000001");
         var migrationPartnerEntity = mapper.toPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
         assertThat(migrationPartnerEntity.getFirstName()).isEqualTo(migrationCorrespondentCandidate.getName());
         assertThat(migrationPartnerEntity.getOrgName()).isNull();
@@ -122,8 +120,6 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
             .isEqualTo(migrationCorrespondentCandidate.getCorrEmail());
         assertThat(migrationPartnerEntity.getPhones().get(0).getPhone())
             .isEqualTo(migrationCorrespondentCandidate.getCorrPhoneNumber());
-        assertThat(migrationPartnerEntity.getLegalType().name())
-            .isEqualTo(migrationCorrespondentCandidate.getLegalType().name());
         assertThat(migrationPartnerEntity.getPhones().get(0).getPartner()).isNotNull();
         assertThat(migrationPartnerEntity.getEmails().get(0).getPartner()).isNotNull();
     }

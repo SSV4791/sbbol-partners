@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
 
-    public static final String DOCUMENT_NAME = "partner";
+    private static final String DOCUMENT_NAME = "partner";
 
     private final AccountRepository accountRepository;
     private final DocumentRepository documentRepository;
