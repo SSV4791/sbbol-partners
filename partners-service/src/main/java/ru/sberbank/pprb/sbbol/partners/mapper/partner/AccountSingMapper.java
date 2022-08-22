@@ -5,11 +5,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
-import ru.sberbank.pprb.sbbol.partners.model.AccountSign;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 
@@ -26,9 +24,6 @@ import java.util.UUID;
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface AccountSingMapper extends BaseMapper {
-
-    @Mapping(target = "accountId", expression = "java(account.getUuid().toString())")
-    AccountSign toSignAccount(AccountEntity account);
 
     @Named("toSignAccount")
     @Mapping(target = "entityId", expression = "java(sign.getEntityUuid().toString())")

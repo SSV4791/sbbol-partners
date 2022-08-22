@@ -11,5 +11,8 @@ import java.util.List;
 public interface MigrationGkuMapper {
 
     @Mapping(target = "inn", source = "candidate.inn")
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     List<MigrationGkuInnEntity> toDictionary(List<MigrationGkuCandidate> candidate);
 }

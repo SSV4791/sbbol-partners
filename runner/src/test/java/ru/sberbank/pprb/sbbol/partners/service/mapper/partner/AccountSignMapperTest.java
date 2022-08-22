@@ -4,7 +4,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
@@ -18,17 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AccountSignMapperTest extends BaseUnitConfiguration {
 
     private static final AccountSingMapper mapper = Mappers.getMapper(AccountSingMapper.class);
-
-    @Test
-    void testToAccount() {
-        var expected = factory.manufacturePojo(AccountEntity.class);
-        var actual = mapper.toSignAccount(expected);
-
-        assertThat(expected.getUuid())
-            .isEqualTo(UUID.fromString(actual.getAccountId()));
-        assertThat(expected.getState().name())
-            .isEqualTo(actual.getState().name());
-    }
 
     @Test
     void testToSignAccount() {

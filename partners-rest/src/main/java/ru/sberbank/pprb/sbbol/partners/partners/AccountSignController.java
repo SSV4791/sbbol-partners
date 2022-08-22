@@ -4,10 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.AccountsSignApi;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
 
 import java.util.List;
@@ -35,10 +33,5 @@ public class AccountSignController implements AccountsSignApi {
     @Override
     public ResponseEntity<AccountSignInfo> getById(String digitalId, String accountId) {
         return ResponseEntity.ok(accountSignService.getAccountSign(digitalId, accountId));
-    }
-
-    @Override
-    public ResponseEntity<AccountsSignResponse> list(AccountsSignFilter accountsSignFilter) {
-        return ResponseEntity.ok(accountSignService.getAccountsSign(accountsSignFilter));
     }
 }

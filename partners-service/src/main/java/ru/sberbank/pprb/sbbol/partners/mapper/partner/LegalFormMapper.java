@@ -16,6 +16,8 @@ import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 public interface LegalFormMapper extends BaseMapper {
 
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "documentType", ignore = true)
     DocumentTypeLegalFormEntity toDocumentTypeLegalFormEntity(LegalForm legalForm);
 

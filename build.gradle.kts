@@ -58,7 +58,7 @@ tasks {
     }
 
     test {
-        dependsOn(":runner:test")
+        dependsOn(subprojects.flatMap { it.tasks.withType<Test>() })
     }
 
     qaReporterUpload {

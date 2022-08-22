@@ -1,19 +1,13 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,63 +16,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 public class AccountSignControllerTest extends BaseAccountSignControllerTest {
-
-    @Test
-    void testViewSignAccount() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        List<String> account = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
-        }
-        createValidAccountsSign(partner.getDigitalId(), account);
-
-        var filter1 = new AccountsSignFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerId(partner.getId())
-            .accountsId(account)
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0));
-        var response = post(
-            baseRoutePath + "/view",
-            HttpStatus.OK,
-            filter1,
-            AccountsSignResponse.class
-        );
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getAccountsSign().size())
-            .isEqualTo(4);
-        assertThat(response.getPagination().getHasNextPage())
-            .isEqualTo(Boolean.TRUE);
-
-        var partner2 = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        List<String> account2 = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            account2.add(createValidAccount(partner2.getId(), partner2.getDigitalId()).getId());
-        }
-        createValidAccountsSign(partner2.getDigitalId(), account2);
-        account2.add(createValidAccount(partner2.getId(), partner2.getDigitalId()).getId());
-        var filter2 = new AccountsSignFilter()
-            .digitalId(partner2.getDigitalId())
-            .partnerId(partner2.getId())
-            .accountsId(account2)
-            .pagination(new Pagination()
-                .count(5)
-                .offset(0));
-        var response2 = post(
-            baseRoutePath + "/view",
-            HttpStatus.OK,
-            filter2,
-            AccountsSignResponse.class
-        );
-        assertThat(response2)
-            .isNotNull();
-        assertThat(response2.getAccountsSign().size())
-            .isEqualTo(4);
-        assertThat(response2.getPagination().getHasNextPage())
-            .isEqualTo(Boolean.FALSE);
-    }
 
     @Test
     void testCreateSignAccount() {
