@@ -22,6 +22,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class AccountServiceImpl implements AccountService {
     public static final String DOCUMENT_NAME = "account";
 
     private final AccountRepository accountRepository;
+    private final AccountSignRepository accountSignRepository;
     private final ReplicationService replicationService;
     private final BudgetMaskService budgetMaskService;
     private final AuditAdapter auditAdapter;
@@ -42,12 +44,14 @@ public class AccountServiceImpl implements AccountService {
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
+        AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper
     ) {
         this.accountRepository = accountRepository;
+        this.accountSignRepository =accountSignRepository;
         this.replicationService = replicationService;
         this.budgetMaskService = budgetMaskService;
         this.auditAdapter = auditAdapter;
@@ -160,6 +164,8 @@ public class AccountServiceImpl implements AccountService {
                     .eventType(EventType.ACCOUNT_DELETE_SUCCESS)
                     .eventParams(accountMapper.toEventParams(foundAccount))
                 );
+                var accountSignEntity = accountSignRepository.getByAccountUuid(foundAccount.getUuid());
+                accountSignEntity.ifPresent(accountSignRepository::delete);
                 replicationService.deleteCounterparty(foundAccount);
             } catch (RuntimeException e) {
                 auditAdapter.send(new Event()

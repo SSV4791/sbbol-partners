@@ -243,12 +243,14 @@ public class PartnerServiceConfiguration {
     @Bean
     AccountService accountService(
         AccountRepository accountRepository,
+        AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter
     ) {
         return new AccountServiceImpl(
             accountRepository,
+            accountSignRepository,
             replicationService,
             budgetMaskService,
             auditAdapter,

@@ -8,6 +8,7 @@ plugins {
 dependencies {
     annotationProcessor(liveLibs.mapstruct.processor)
 
+    implementation(project(":partners-api"))
     implementation(project(":partners-service"))
 
     implementation(platform(liveLibs.spring.boot.dependencies))

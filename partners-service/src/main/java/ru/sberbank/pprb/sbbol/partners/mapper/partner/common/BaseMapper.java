@@ -13,4 +13,8 @@ public interface BaseMapper {
         }
         return null;
     }
+
+    default String mapUuid(final UUID uuid) {
+        return uuid == null ? null : uuid.toString();
+    }
 }
