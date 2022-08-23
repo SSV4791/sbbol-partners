@@ -7,9 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
-import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
-import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -18,8 +16,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRe
 import javax.swing.text.MaskFormatter;
 import java.text.ParseException;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Loggable
 public class BudgetMaskServiceImpl implements BudgetMaskService {
@@ -33,14 +29,6 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     ) {
         this.budgetMaskDictionaryRepository = budgetMaskDictionaryRepository;
         this.budgetMaskMapper = budgetMaskMapper;
-    }
-
-    @Override
-    @Transactional
-    public BudgetMask saveBudgetMask(BudgetMask budgetMask) {
-        var budgetMaskEntity = budgetMaskMapper.toBudgetMask(budgetMask);
-        var saved = budgetMaskDictionaryRepository.save(budgetMaskEntity);
-        return budgetMaskMapper.toBudgetMask(saved);
     }
 
     @Override
@@ -63,21 +51,6 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
             budgetMasksResponse.getMasks().remove(size - 1);
         }
         return budgetMasksResponse;
-    }
-
-    @Override
-    @Transactional
-    public void deleteBudgetMasks(List<String> ids) {
-        var uuids = ids.stream()
-            .map(budgetMaskMapper::mapUuid)
-            .collect(Collectors.toList());
-        for (UUID uuid : uuids) {
-            var foundMask = budgetMaskDictionaryRepository.getByUuid(uuid);
-            if (foundMask.isEmpty()) {
-                throw new EntryNotFoundException("budget_mask", uuid);
-            }
-            budgetMaskDictionaryRepository.delete(foundMask.get());
-        }
     }
 
     @Override

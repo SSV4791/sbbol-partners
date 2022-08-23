@@ -5,7 +5,9 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -18,6 +20,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Loggable
@@ -57,6 +60,14 @@ public class AccountSignServiceImpl implements AccountSignService {
         for (var accountSign : accountsSign.getAccountsSignDetail()) {
             var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountSign.getAccountId()))
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountSign.getAccountId()));
+            if (account.getState() == AccountStateType.SIGNED) {
+                throw new CheckValidationException(Map.of(
+                    DOCUMENT_NAME,
+                    List.of(
+                        MessagesTranslator.toLocale("account.account.sign.is_true", account.getAccount())
+                    )
+                ));
+            }
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
             try {
                 var savedSign = accountSignRepository.save(sign);
@@ -96,7 +107,7 @@ public class AccountSignServiceImpl implements AccountSignService {
     public void deleteAccountsSign(String digitalId, List<String> accountIds) {
         for (String accountId : accountIds) {
             var accountUuid = accountSingMapper.mapUuid(accountId);
-            var sign = accountSignRepository.getByAccountUuid(accountUuid)
+            var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountUuid)
                 .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountUuid));
             try {
                 accountSignRepository.delete(sign);
@@ -139,7 +150,7 @@ public class AccountSignServiceImpl implements AccountSignService {
         if (foundAccount.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
         }
-        var sign = accountSignRepository.getByAccountUuid(uuid)
+        var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, uuid)
             .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, uuid));
         return accountSingMapper.toSignAccount(sign, digitalId);
     }

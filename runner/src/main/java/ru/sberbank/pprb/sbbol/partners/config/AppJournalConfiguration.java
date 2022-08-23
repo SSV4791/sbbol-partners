@@ -1,12 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
-import com.sbt.pprb.integration.changevector.serialization.SerializerType;
 import com.sbt.pprb.integration.hibernate.standin.StandinPlugin;
-import com.sbt.pprb.integration.replication.OrderingControlStrategy;
-import com.sbt.pprb.integration.replication.PartitionLockMode;
-import com.sbt.pprb.integration.replication.PartitionMultiplyingMode;
-import com.sbt.pprb.integration.replication.ReplicationStrategy;
-import com.sbt.pprb.integration.replication.hashkey.InterfaceBasedHashKeyResolver;
 import com.sbt.pprb.integration.replication.transport.JournalSubscriptionImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +56,7 @@ public class AppJournalConfiguration {
         @Value("${appjournal.moduleId}") String moduleId,
         @Qualifier("mainDataSource") DataSource masterDataSource,
         @Qualifier("standInDataSource") DataSource standinDataSource,
+        StandInPluginConfiguration configuration,
         EntityManagerFactory entityManagerFactory,
         JournalCreatorClientApi journalClient
     ) {
@@ -71,21 +66,20 @@ public class AppJournalConfiguration {
         configurator.setJournalClient(journalClient);
 
         // HashKey функция. В данном случае используется определение хэша по интерфейсу HashKeyProvider
-        configurator.setJournalHashKeyResolver(new InterfaceBasedHashKeyResolver());
+        configurator.setJournalHashKeyResolver(configuration.getJournalHashKeyResolver().instance());
         // Идентификатор модуля
         configurator.setModuleIdProvider(() -> moduleId);
         // Стратегия репликации - с блокировками или без
-        configurator.setReplicationStrategy(ReplicationStrategy.STANDIN_LOCKS);
+        configurator.setReplicationStrategy(configuration.getReplicationStrategy());
         // Тип сериализатора
-        //TODO обязательно изменить тип на BINARY_KRYO
-        configurator.setSerializerType(SerializerType.JSON_GSON);
+        configurator.setSerializerType(configuration.getSerializerType());
         // Сериализация отправки в ПЖ по hashKey
-        configurator.setPartitionLockMode(PartitionLockMode.NONE);
+        configurator.setPartitionLockMode(configuration.getPartitionLockMode());
         // Стратегия контроля порядка применения векторов
-        configurator.setOrderingControlStrategy(OrderingControlStrategy.OPTIMISTIC_LOCK_VERSION_CONTROL);
+        configurator.setOrderingControlStrategy(configuration.getOrderingControlStrategy());
         // Стратегия работы с несколькими hashKey в одной транзакции. В одной транзакции могут быть только сущности с
         // одинаковым hashKey
-        configurator.setPartitionMultiplyingMode(PartitionMultiplyingMode.FORBIDDEN);
+        configurator.setPartitionMultiplyingMode(configuration.getPartitionMultiplyingMode());
 
         return configurator.configure();
     }

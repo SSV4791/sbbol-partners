@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
 import com.sbt.pprb.integration.replication.HashKeyProvider;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -23,13 +22,8 @@ public abstract class BaseEntity implements Serializable, HashKeyProvider {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(
         name = "uuid",
-        strategy = "uuid2",
-        parameters = {
-            @Parameter(
-                name = "uuid_gen_strategy_class",
-                value = "org.hibernate.id.uuid.CustomVersionOneStrategy"
-            )
-        })
+        strategy = "uuid2"
+    )
     private UUID uuid;
 
     @Version

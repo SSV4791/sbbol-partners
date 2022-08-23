@@ -51,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
         AccountMapper accountMapper
     ) {
         this.accountRepository = accountRepository;
-        this.accountSignRepository =accountSignRepository;
+        this.accountSignRepository = accountSignRepository;
         this.replicationService = replicationService;
         this.budgetMaskService = budgetMaskService;
         this.auditAdapter = auditAdapter;
@@ -126,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
             throw new CheckValidationException(Map.of(
                 DOCUMENT_NAME,
                 List.of(
-                    MessagesTranslator.toLocale("account.account.sign.is_true")
+                    MessagesTranslator.toLocale("account.account.sign.is_true", account.getAccount())
                 )
             ));
         }
@@ -164,7 +164,8 @@ public class AccountServiceImpl implements AccountService {
                     .eventType(EventType.ACCOUNT_DELETE_SUCCESS)
                     .eventParams(accountMapper.toEventParams(foundAccount))
                 );
-                var accountSignEntity = accountSignRepository.getByAccountUuid(foundAccount.getUuid());
+                var accountSignEntity =
+                    accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccount.getUuid());
                 accountSignEntity.ifPresent(accountSignRepository::delete);
                 replicationService.deleteCounterparty(foundAccount);
             } catch (RuntimeException e) {
