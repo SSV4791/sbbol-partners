@@ -5,18 +5,14 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
@@ -50,28 +46,6 @@ public class AccountSignServiceImpl implements AccountSignService {
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
         this.accountSingMapper = accountSingMapper;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public AccountsSignResponse getAccountsSign(AccountsSignFilter filter) {
-        var foundSignedAccounts = accountRepository.findByFilter(filter);
-        var accountsSignResponse = new AccountsSignResponse();
-        for (AccountEntity account : foundSignedAccounts) {
-            accountsSignResponse.addAccountsSignItem(accountSingMapper.toSignAccount(account));
-        }
-        var pagination = filter.getPagination();
-        accountsSignResponse.setPagination(
-            new Pagination()
-                .offset(pagination.getOffset())
-                .count(pagination.getCount())
-        );
-        var size = foundSignedAccounts.size();
-        if (pagination.getCount() < size) {
-            accountsSignResponse.getPagination().hasNextPage(Boolean.TRUE);
-            accountsSignResponse.getAccountsSign().remove(size - 1);
-        }
-        return accountsSignResponse;
     }
 
     @Override

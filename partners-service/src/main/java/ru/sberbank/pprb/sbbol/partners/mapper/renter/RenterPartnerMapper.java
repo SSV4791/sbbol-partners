@@ -61,6 +61,8 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "citizenship", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "search", ignore = true)
+    @Mapping(target = "gkuInnEntity", ignore = true)
     PartnerEntity toPartner(Renter renter);
 
     @Named("toPhones")
@@ -110,6 +112,8 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "state", constant = "NOT_SIGNED")
     @Mapping(target = "bank", source = "renter", qualifiedByName = "toBank")
     @Mapping(target = "priorityAccount", ignore = true)
+    @Mapping(target = "search", ignore = true)
+    @Mapping(target = "partner", ignore = true)
     AccountEntity toAccount(Renter renter);
 
     @Named("toBank")
@@ -360,10 +364,12 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "citizenship", ignore = true)
     @Mapping(target = "orgName", source = "legalName")
     @Mapping(target = "secondName", source = "lastName")
+    @Mapping(target = "search", ignore = true)
     @Mapping(target = "phones", ignore = true)
     @Mapping(target = "emails", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "gkuInnEntity", ignore = true)
     void updatePartner(Renter renter, @MappingTarget PartnerEntity partnerEntity);
 
     @Named("toLegalType")

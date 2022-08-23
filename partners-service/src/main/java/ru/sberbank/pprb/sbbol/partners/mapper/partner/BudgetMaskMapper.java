@@ -26,6 +26,8 @@ public interface BudgetMaskMapper extends BaseMapper {
 
     @Mapping(target = "uuid", expression = "java(mapUuid(budgetMask.getId()))")
     @Mapping(target = "type", source = "maskType", qualifiedByName = "toBudgetMaskType")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     BudgetMaskEntity toBudgetMask(BudgetMask budgetMask);
 
     @Named("toBudgetMaskType")

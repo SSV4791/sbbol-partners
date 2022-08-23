@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountBudgetViewRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountSignViewRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountViewRepository;
 
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.UUID;
 
 @Repository
 public interface AccountRepository
-    extends CrudRepository<AccountEntity, UUID>, AccountViewRepository, AccountSignViewRepository, AccountBudgetViewRepository {
+    extends CrudRepository<AccountEntity, UUID>, AccountViewRepository, AccountBudgetViewRepository {
 
     /**
      * Получение счёта Партнера
