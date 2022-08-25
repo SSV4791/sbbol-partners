@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,8 +33,12 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import static io.restassured.RestAssured.given;
 
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -904,6 +909,44 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testCreatePartnerEmptyOrgName() {
+        var partner = getValidPartner();
+        partner.setOrgName("");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Введите наименование");
+    }
+
+    @Test
+    void testCreatePartnerInvalidCharsInOrgName() {
+        var partner = getValidPartner();
+        partner.setOrgName("[Наименование] [§±]");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Наименование содержит недопустимые символы: [][§±]");
+    }
+
+    @Test
     void testUpdatePartner() {
         var partner = getValidPartner();
         var createdPartner = post(
@@ -1057,7 +1100,108 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
     @Test
     void savePartnerFullModel() {
-        var request = new PartnerCreateFullModel()
+        var request = getValidFullModelPartner();
+        var createdPartner = post(
+            baseRoutePath + "/full-model",
+            HttpStatus.CREATED,
+            request,
+            PartnerCreateFullModelResponse.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+    }
+
+    @Test
+    void savePartnerFullModelEmptyOrgName() {
+        var partner = getValidFullModelPartner();
+            partner.setOrgName("");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Введите наименование");
+    }
+
+    @Test
+    void savePartnerFullModelInvalidOrgName() {
+        var partner = getValidFullModelPartner();
+            partner.setOrgName("[Наименование] §±`~><");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Наименование содержит недопустимые символы: []§±");
+    }
+
+    @Test
+    void savePhysicalPartnerInvalidName() {
+        var partner = getValidPhysicalPersonPartner();
+            partner.setFirstName("[Имя] §±`~><");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Имя содержит недопустимые символы: []§±");
+    }
+
+    public static PartnerCreate getValidPartner() {
+        return getValidPartner(randomAlphabetic(10));
+    }
+
+    public static PartnerCreate getValidPartner(String digitalId) {
+        var partner = new PartnerCreate()
+            .legalForm(LegalForm.LEGAL_ENTITY)
+            .orgName(randomAlphabetic(10))
+            .firstName(randomAlphabetic(10))
+            .secondName(randomAlphabetic(10))
+            .middleName(randomAlphabetic(10))
+            .inn("4139314257")
+            .kpp("123456789")
+            .ogrn("1035006110083")
+            .okpo("12345678")
+            .phones(
+                Set.of(
+                    "0079241111111"
+                ))
+            .emails(
+                Set.of(
+                    "a.a.a@sberbank.ru"
+                ))
+            .comment("555555");
+        partner.setDigitalId(digitalId);
+        return partner;
+    }
+
+    public static PartnerCreateFullModel getValidFullModelPartner() {
+        return getValidFullModelPartner(randomAlphabetic(10));
+    }
+
+    public static PartnerCreateFullModel getValidFullModelPartner(String digitalId) {
+        var partner = new PartnerCreateFullModel()
             .digitalId(randomAlphabetic(10))
             .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName(randomAlphabetic(10))
@@ -1130,43 +1274,11 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                         ))
                 )
             );
-
-        var createdPartner = post(
-            baseRoutePath + "/full-model",
-            HttpStatus.CREATED,
-            request,
-            PartnerCreateFullModelResponse.class
-        );
-        assertThat(createdPartner)
-            .isNotNull();
-    }
-
-    public static PartnerCreate getValidPartner() {
-        return getValidPartner(randomAlphabetic(10));
-    }
-
-    public static PartnerCreate getValidPartner(String digitalId) {
-        var partner = new PartnerCreate()
-            .legalForm(LegalForm.LEGAL_ENTITY)
-            .orgName(randomAlphabetic(10))
-            .firstName(randomAlphabetic(10))
-            .secondName(randomAlphabetic(10))
-            .middleName(randomAlphabetic(10))
-            .inn("4139314257")
-            .kpp("123456789")
-            .ogrn("1035006110083")
-            .okpo("12345678")
-            .phones(
-                Set.of(
-                    "0079241111111"
-                ))
-            .emails(
-                Set.of(
-                    "a.a.a@sberbank.ru"
-                ))
-            .comment("555555");
-        partner.setDigitalId(digitalId);
         return partner;
+    }
+
+    public static PartnerCreate getValidPhysicalPersonPartner() {
+        return getValidPhysicalPersonPartner(randomAlphabetic(10));
     }
 
     private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {
