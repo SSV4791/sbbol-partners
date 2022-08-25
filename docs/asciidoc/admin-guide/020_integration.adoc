@@ -1,178 +1,22 @@
 ==	Интеграции
 
-=== Интеграции с внешними АС-потребителями
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ППРБ ЮЛ DigitalApi`
-+++ </summary><div> +++
 
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
+===	Интеграции с внешними потребителями
 
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ЕФС.ЮЛ СберБизнес ЭДО. Web`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ЕФС.ЮЛ СберБизнес ЭДО. Mobile`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`SBBOL`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ЕФС.ЮЛ.СберБизнес.Контрагенты MOBILE`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ЕФС.ЮЛ.СберБизнес.Контрагенты WEB`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ЕФС.ЮЛ.СберБизнес.Аренда недвижимости`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ЕФС.ЮЛ.СберБизнес.Транспорт`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-
-+++ </div>
-</details> +++
-+++ <details><summary> +++
-`ППРБ ЮЛ DigitalContract Отраслевые решения Транспорт`
-+++ </summary><div> +++
-
-----
-Протокол: `HTTPS`
-OTT: да
-Формат сообщений: JSON
-----
-
-+++ </div>
-</details> +++
-
-=== ACL (Access Lists)
-
-Нет
+[options="header"]
+|=======================
+| Подсистема|Тип интеграции| Протокол
+| ППРБ ЮЛ DigitalAPI | Rest/json | https/mtls+ott
+| ЕФС ЮЛ СберБизнес ЭДО Web | Rest/json | https/mtls+ott
+| ЕФС ЮЛ СберБизнес ЭДО Mobile| Rest/json | https/mtls+ott
+| ЕФС ЮЛ СберБизнес Контрагенты Web | Rest/json | https/mtls+ott
+| ЕФС ЮЛ СберБизнес Контрагенты Mobile | Rest/json | https/mtls+ott
+| SBBOL | Rest/json | https/mtls+ott
+|=======================
 
 ===	Интеграции с платформенными сервисами
 
-+++ <details><summary> +++
-`Аудит`
-+++ </summary><div> +++
-----
-Аудит ППРБ ЮЛ Платформа.SYS604.10.01 Аудит используется для сбора событий аудита
-Транспорт: REST
-Протокол: HTTP
-Компоненты: sbbol-partners
-Мануал: https://confluence.sberbank.ru/pages/viewpage.action?pageId=1239420806
-----
-+++ </div></details> +++
-
-+++ <details><summary> +++
-`Прикладной журнал`
-+++ </summary><div> +++
-
-----
-Прикладной журнал используется для репликации данных main-stanin и для асинхронной репликации в АС СББОЛ
-
-Транспорт: kafka
-Протокол: TCP
-Компоненты: dataspace-core (запись), dataspace-gigabas (чтение), sbbol-partners (чтение)
-Мануал: https://sbtatlas.sigma.sbrf.ru/wiki/pages/viewpage.action?pageId=3111688701,
-https://sbtatlas.sigma.sbrf.ru/wiki/display/SPD/DataSpace+DevOps (пункт интеграция с Прикладным журналом)
-----
-
-+++ </div></details> +++
-
-+++ <details><summary> +++
-`Журналирование`
-+++ </summary><div> +++
-
-----
-Журналирование используется для сбора логов со всех компонентов приложения через вызов сервиса FluentBit
-по средствам REST-взаимодействия
-
-Транспорт: REST
-Протокол: HTTPS
-Компоненты: dataspace-core, dataspace-gigabas, sbbol-partners
-Мануал: https://sbtatlas.sigma.sbrf.ru/wiki/pages/viewpage.action?pageId=3667271151
-----
-
-+++ </div></details> +++
-
-+++ <details><summary> +++
-`Мониторинг`
-+++ </summary><div> +++
-
-----
-АС Мониторинг используется компонентом sbbol-partners для мониторнига состояния компонента приложения
-по средствам REST-взаимодействия с Prometeus.
-
-Транспорт: REST
-Протокол: HTTP
-Компоненты: sbbol-partners
-Мануал: https://sbtatlas.sigma.sbrf.ru/wiki/display/CBCLOUD/Monitoring#expand-1
-----
-
-+++ </div></details> +++
+* ФП СУП
+* ФП Журналирование
+* ФП Аудит
+* ФП Мониторинг
