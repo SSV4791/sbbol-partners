@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Партнер",
-  "x-extra-class-annotation": "@LegalFormAttributePartnerFullModelDtoValidation @InnLengthAttributePartnerFullModelDtoValidation",
+  "x-extra-class-annotation": "@NameAttributePartnerFullModelDtoValidation @InnLengthAttributePartnerFullModelDtoValidation @NamePatternPartnerCreateFullModelDtoValidation",
   "properties": {
     "digitalId": {
       "type": "string",
@@ -13,22 +13,27 @@
     },
     "orgName": {
       "type": "string",
-      "title": "Наименование организации партнера"
+      "title": "Наименование организации партнера",
+      "maxLength": 160,
+      "x-length-message": "{validation.partner.orgName.max_symbols}"
     },
     "firstName": {
       "type": "string",
       "title": "Имя партнера",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.firstName.max_symbols}"
     },
     "secondName": {
       "type": "string",
       "title": "Фамилия партнера",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.secondName.max_symbols}"
     },
     "middleName": {
       "type": "string",
       "title": "Отчество партнера",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.middleName.max_symbols}"
     },
     "inn": {
       "type": "string",
