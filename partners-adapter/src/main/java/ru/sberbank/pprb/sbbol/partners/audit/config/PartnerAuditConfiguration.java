@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.web.client.RestTemplate;
 import ru.sberbank.pprb.sbbol.audit.api.DefaultApi;
 import ru.sberbank.pprb.sbbol.audit.invoker.ApiClient;
@@ -52,10 +51,9 @@ public class PartnerAuditConfiguration {
     @Bean
     AuditAdapter auditAdapter(
         @Value("${audit.enabled}") boolean auditEnabled,
-        @Value("classpath:/audit/auditMetamodel.json") Resource metaModel,
         @Value("${audit.x-node-id}") String defaultXNodeId,
         DefaultApi auditApi
     ) {
-        return new AuditAdapterImpl(auditEnabled, metaModel, defaultXNodeId, auditApi, auditMapper());
+        return new AuditAdapterImpl(auditEnabled, defaultXNodeId, auditApi, auditMapper());
     }
 }

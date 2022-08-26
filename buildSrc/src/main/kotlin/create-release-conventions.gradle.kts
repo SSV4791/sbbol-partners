@@ -16,4 +16,7 @@ tasks.register<Zip>("fullDistrib") {
     from("${project(":runner").projectDir}/src/main/resources/db/changelog/") {
         into("liquibase")
     }
+    from("${project(":partners-adapter").projectDir}/src/main/resources/audit/") {
+        into("package/conf/data/audit_metamodel/")
+    }
 }

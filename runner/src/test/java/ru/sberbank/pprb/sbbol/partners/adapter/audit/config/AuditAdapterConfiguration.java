@@ -1,12 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.adapter.audit.config;
 
 import org.mockito.ArgumentMatchers;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -53,9 +51,7 @@ public class AuditAdapterConfiguration {
     }
 
     @Bean
-    AuditAdapter auditAdapter(
-        @Value("classpath:/audit/auditMetamodelTest.json") Resource metaModel
-    ) {
-        return new AuditAdapterImpl(true, metaModel, "local", auditApi(), auditMapper());
+    AuditAdapter auditAdapter() {
+        return new AuditAdapterImpl(true, "local", auditApi(), auditMapper());
     }
 }
