@@ -1,12 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeChange;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
-
-import java.util.List;
 
 /**
  * Сервис по работе с типами документов
@@ -20,27 +15,4 @@ public interface DocumentTypeService {
      * @return список типов документов, удовлетворяющих заданному фильтру
      */
     DocumentsTypeResponse getDocuments(DocumentTypeFilter filter);
-
-    /**
-     * Создание нового типа документа
-     *
-     * @param document типы документа Контакта
-     * @return Документ
-     */
-    DocumentType saveDocument(DocumentTypeCreate document);
-
-    /**
-     * Обновление типа документа Контакта
-     *
-     * @param document новые данные документа Контакта
-     * @return Документ
-     */
-    DocumentType updateDocument(DocumentTypeChange document);
-
-    /**
-     * Удаление документа Контакта
-     *
-     * @param ids уникальные идентификаторы документов Контакта
-     */
-    void deleteDocuments(List<String> ids);
 }

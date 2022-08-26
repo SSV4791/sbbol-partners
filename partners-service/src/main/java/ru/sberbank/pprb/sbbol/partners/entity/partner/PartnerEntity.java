@@ -92,10 +92,10 @@ public class PartnerEntity extends BaseEntity {
     @Column(name = "citizenship", length = 20)
     private PartnerCitizenshipType citizenship;
 
-    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL)
     private List<PartnerPhoneEntity> phones;
 
-    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL)
     private List<PartnerEmailEntity> emails;
 
 

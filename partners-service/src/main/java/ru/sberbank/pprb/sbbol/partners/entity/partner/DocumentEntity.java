@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -39,7 +40,7 @@ public class DocumentEntity extends BaseEntity {
     @Column(name = "digital_id", nullable = false)
     private String digitalId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_uuid", insertable = false, updatable = false)
     private DocumentTypeEntity type;
 

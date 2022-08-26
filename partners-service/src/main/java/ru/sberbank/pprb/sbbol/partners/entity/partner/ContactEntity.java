@@ -59,10 +59,10 @@ public class ContactEntity extends BaseEntity {
     @Column(name = "position", length = 100)
     private String position;
 
-    @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL)
     private List<ContactPhoneEntity> phones;
 
-    @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL)
     private List<ContactEmailEntity> emails;
 
     public UUID getPartnerUuid() {

@@ -2,23 +2,14 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
-import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeChange;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 
-import java.util.List;
-import java.util.UUID;
-
 @Loggable
 public class DocumentTypeServiceImpl implements DocumentTypeService {
-    private static final String DOCUMENT_TYPE = "document_type";
 
     private final DocumentDictionaryRepository dictionaryRepository;
     private final DocumentTypeMapper documentTypeMapper;
@@ -46,35 +37,5 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
             documentsTypeResponse.getDocumentType().remove(size - 1);
         }
         return documentsTypeResponse;
-    }
-
-    @Override
-    @Transactional
-    public DocumentType saveDocument(DocumentTypeCreate document) {
-        DocumentTypeEntity saveDocument = documentTypeMapper.toDocumentType(document);
-        DocumentTypeEntity response = dictionaryRepository.save(saveDocument);
-        return documentTypeMapper.toDocumentType(response);
-    }
-
-    @Override
-    @Transactional
-    public DocumentType updateDocument(DocumentTypeChange documentTypeChange) {
-        DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(UUID.fromString(documentTypeChange.getId()))
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, documentTypeChange.getId()));
-        documentTypeMapper.updateDocument(documentTypeChange, foundDocument);
-        dictionaryRepository.save(foundDocument);
-        return documentTypeMapper.toDocumentType(foundDocument);
-    }
-
-    @Override
-    @Transactional
-    public void deleteDocuments(List<String> ids) {
-        for (String id : ids) {
-            var uuid = documentTypeMapper.mapUuid(id);
-            DocumentTypeEntity foundDocument = dictionaryRepository.getByUuid(uuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_TYPE, id));
-            foundDocument.setDeleted(Boolean.TRUE);
-            dictionaryRepository.save(foundDocument);
-        }
     }
 }

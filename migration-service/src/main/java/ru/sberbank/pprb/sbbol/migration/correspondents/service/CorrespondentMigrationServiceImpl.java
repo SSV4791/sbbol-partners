@@ -99,7 +99,8 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         if (foundAccount.isPresent()) {
             var accountEntity = foundAccount.get();
             accountRepository.delete(accountEntity);
-            var accountSignEntity = accountSignRepository.getByAccountUuid(accountEntity.getUuid());
+            var accountSignEntity =
+                accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountEntity.getUuid());
             accountSignEntity.ifPresent(accountSignRepository::delete);
         }
 
