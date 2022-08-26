@@ -15,7 +15,6 @@ import static ru.sberbank.pprb.sbbol.partners.model.LegalForm.ENTREPRENEUR;
 class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/dictionary/documents";
-
     private static final DocumentTypeFilter defaultFilter = new DocumentTypeFilter()
         .deleted(false)
         .pagination(

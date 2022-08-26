@@ -20,6 +20,10 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -29,7 +33,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
     private static final String INN_WITHOUT_ACCOUNT = "3522329000";
     private static final String KPP_WITHOUT_ACCOUNT = "618243879";
     private static final String PART_ACCOUNT_FOR_TEST_PARTNER = "40802810500";
-
     @Test
     void testViewFilter_whenGkuAttributeIsDefinedAndIsTrue() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
@@ -110,7 +113,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions())
             .contains(descriptions);
     }
@@ -147,7 +150,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         for (var text : errorTexts) {
             assertThat(errorTexts.contains(text)).isTrue();
         }
@@ -244,7 +247,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedInn() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var partnerWithoutAccount = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         List<String> account = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
@@ -763,7 +765,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -773,7 +775,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -815,7 +817,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -837,7 +839,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(updateAccount)
             .isNotNull();
         assertThat(updateAccount.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var acc2 = updateAccount(account)
             .account("12345678901234567890");
@@ -848,7 +850,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var acc3 = updateAccount(account)
             .bank(account.getBank()
@@ -860,7 +862,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount3.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var acc4 = updateAccount(account)
             .bank(account.getBank()
@@ -872,7 +874,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount4.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -985,7 +987,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(accountError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(accountError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (account.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
@@ -1048,7 +1050,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(accountVersion1)
             .isNotNull();
         assertThat(accountVersion1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         updateAccount(account);
         account.setAccount("40702810600000009222");
@@ -1064,7 +1066,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(accountVersion2)
             .isNotNull();
         assertThat(accountVersion2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         updateAccount(account);
         account.setVersion(accountVersion.getVersion());
@@ -1121,7 +1123,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(searchAccount)
             .isNotNull();
         assertThat(searchAccount.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     @Test
@@ -1164,7 +1166,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:CHECK_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     public static String getBic() {

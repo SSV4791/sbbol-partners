@@ -33,16 +33,17 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
-
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.ACCOUNT_FOR_TEST_PARTNER;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
@@ -652,7 +653,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePartner1)
             .isNotNull();
         assertThat(newUpdatePartner1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
     }
 
     @Test
@@ -781,7 +782,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter1 = new PartnersFilter();
         filter.setDigitalId(digitalId);
@@ -797,7 +798,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter2 = new PartnersFilter();
         filter.setDigitalId(digitalId);
@@ -813,7 +814,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -896,7 +897,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -905,7 +906,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -1013,7 +1014,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -1028,7 +1029,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(partnerError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (partner.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
@@ -1095,7 +1096,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         assertThat(searchPartner.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     @Test
@@ -1114,7 +1115,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void savePartnerFullModelEmptyOrgName() {
         var partner = getValidFullModelPartner();
-            partner.setOrgName("");
+        partner.setOrgName("");
         var error = given()
             .spec(requestSpec)
             .body(partner)
@@ -1133,7 +1134,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void savePartnerFullModelInvalidOrgName() {
         var partner = getValidFullModelPartner();
-            partner.setOrgName("[Наименование] §±`~><");
+        partner.setOrgName("[Наименование] §±`~><");
         var error = given()
             .spec(requestSpec)
             .body(partner)
@@ -1152,7 +1153,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void savePhysicalPartnerInvalidName() {
         var partner = getValidPhysicalPersonPartner();
-            partner.setFirstName("[Имя] §±`~><");
+        partner.setFirstName("[Имя] §±`~><");
         var error = given()
             .spec(requestSpec)
             .body(partner)
@@ -1201,8 +1202,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     public static PartnerCreateFullModel getValidFullModelPartner(String digitalId) {
-        var partner = new PartnerCreateFullModel()
-            .digitalId(randomAlphabetic(10))
+        return new PartnerCreateFullModel()
+            .digitalId(digitalId)
             .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName(randomAlphabetic(10))
             .firstName(randomAlphabetic(10))
@@ -1274,7 +1275,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                         ))
                 )
             );
-        return partner;
     }
 
     public static PartnerCreate getValidPhysicalPersonPartner() {

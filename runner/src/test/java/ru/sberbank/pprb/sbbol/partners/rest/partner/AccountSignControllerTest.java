@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -92,6 +93,6 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
         assertThat(searchAccountSign)
             .isNotNull();
         assertThat(searchAccountSign.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 }
