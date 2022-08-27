@@ -4,10 +4,10 @@ docker:
     postgres: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/postgres:13-alpine
     liquibase: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/liquibase/liquibase:3.10.3
 credentials:
-  sonar: DS_CAB-SA-CI000825-sonar-token
-  nexus: DS_CAB-SA-CI000825
-  checkmarx: DS_CAB-SA-CI000825-checkmarx
-  openshift: DS_CAB-SA-CI000825-openshift
+  sonar: SA-SDVO0000346-sonar-token
+  nexus: SA-SDVO0000346-nexus
+  checkmarx: SA-SDVO0000346-checkmarx
+  openshift: SA-SDVO0000346-openshift
 
 project_name: sbbol-partners
 
@@ -27,8 +27,8 @@ pr_check:
       files:
         - 'openshift/'
         - 'jenkins/resources/openshift/'
-    server: dev-gen2
-    namespace: ci02281165-edevgen2-efs-kib-sbbol-dev-test6
+    server: dev-terra000006-idm.ocp
+    namespace: ci02281165-sbbol-partners
   build_gradle:
     match:
       files:

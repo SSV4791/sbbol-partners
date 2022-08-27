@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.NamePatternPartnerCreateFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.AccountAttributeAccountChangeDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.AccountAttributeAccountCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.AccountAttributeAccountFullModelDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -17,9 +19,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = NamePatternPartnerCreateFullModelDtoValidator.class)
-public @interface NamePatternPartnerCreateFullModelDtoValidation {
-    String message() default "{error.message.check.validation}";
+@Constraint(
+    validatedBy = {
+        AccountAttributeAccountChangeDtoValidator.class,
+        AccountAttributeAccountCreateDtoValidator.class,
+        AccountAttributeAccountFullModelDtoValidator.class
+    }
+)
+public @interface AccountAttributeValidation {
+
+    String message() default "{account.account.control_number}";
 
     Class<?>[] groups() default {};
 

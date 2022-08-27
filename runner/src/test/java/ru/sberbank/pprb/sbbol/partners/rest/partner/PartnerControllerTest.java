@@ -944,7 +944,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Наименование содержит недопустимые символы: [][§±]");
+            .contains("Поле содержит недопустимые символы: [][§±]");
     }
 
     @Test
@@ -1147,7 +1147,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Наименование содержит недопустимые символы: []§±");
+            .contains("Поле содержит недопустимые символы: []§±");
     }
 
     @Test
@@ -1166,7 +1166,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Имя содержит недопустимые символы: []§±");
+            .contains("Поле содержит недопустимые символы: []§±");
     }
 
     public static PartnerCreate getValidPartner() {
@@ -1342,6 +1342,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .phones(partner.getPhones())
             .emails(partner.getEmails())
             .firstName(randomAlphabetic(10))
-            .version(partner.getVersion());
+            .version(partner.getVersion())
+            .inn(partner.getInn());
     }
 }

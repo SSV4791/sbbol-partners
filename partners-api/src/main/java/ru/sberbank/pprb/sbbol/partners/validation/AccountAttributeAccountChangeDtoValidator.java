@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import ru.sberbank.pprb.sbbol.partners.model.AccountAttributeAccountChangeDtoValidation;
+import ru.sberbank.pprb.sbbol.partners.model.AccountAttributeValidation;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidator;
 
@@ -10,7 +10,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class AccountAttributeAccountChangeDtoValidator
-    implements ConstraintValidator<AccountAttributeAccountChangeDtoValidation, AccountChange> {
+    implements ConstraintValidator<AccountAttributeValidation, AccountChange> {
 
 
     @Override

@@ -2,15 +2,15 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import ru.sberbank.pprb.sbbol.partners.model.AccountAttributeValidation;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.AccountAttributeAccountFullModelDtoValidation;
 import ru.sberbank.pprb.sbbol.partners.validation.common.AccountValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class AccountAttributeAccountFullModelDtoValidator
-    implements ConstraintValidator<AccountAttributeAccountFullModelDtoValidation, AccountCreateFullModel> {
+    implements ConstraintValidator<AccountAttributeValidation, AccountCreateFullModel> {
 
     @Override
     public boolean isValid(AccountCreateFullModel value, ConstraintValidatorContext context) {
