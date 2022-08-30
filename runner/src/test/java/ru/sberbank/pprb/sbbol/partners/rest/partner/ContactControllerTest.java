@@ -24,6 +24,9 @@ import java.util.Set;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -68,7 +71,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter2 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
@@ -85,7 +88,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter3 = new ContactsFilter()
             .digitalId(partner.getDigitalId())
@@ -110,7 +113,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(response3)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -225,9 +228,9 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         var partner = createValidPartner(randomAlphabetic(10));
         var expected = getValidContact(partner.getId(), partner.getDigitalId());
         var contact = createValidContact(expected);
-        contact.getPhones().stream()
-                .forEach(value -> value.setPhone("ABC" + randomAlphabetic(10)));
-        var createContact = post(
+        contact.getPhones()
+            .forEach(value -> value.setPhone("ABC" + randomAlphabetic(10)));
+        var createContact = put(
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
             contact,
@@ -316,7 +319,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdateContact1)
             .isNotNull();
         assertThat(newUpdateContact1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -455,7 +458,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(contactError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(contactError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (contact.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
@@ -519,7 +522,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         assertThat(searchContact.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     public static ContactCreate getValidContact(String partnerUuid, String digitalId) {

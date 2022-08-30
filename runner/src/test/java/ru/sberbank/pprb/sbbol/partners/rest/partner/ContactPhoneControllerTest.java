@@ -21,6 +21,8 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -56,7 +58,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter2 = new PhonesFilter()
             .digitalId(partner.getDigitalId())
@@ -74,7 +76,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter3 = new PhonesFilter()
             .digitalId(partner.getDigitalId())
@@ -94,7 +96,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -161,7 +163,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone1)
             .isNotNull();
         assertThat(newUpdatePhone1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var phone2 = createPhone(contact.getId(), contact.getDigitalId());
         updatePhone(phone2);
@@ -175,7 +177,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone2)
             .isNotNull();
         assertThat(newUpdatePhone2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var phone3 = createPhone(contact.getId(), contact.getDigitalId());
         updatePhone(phone3);
@@ -189,7 +191,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone3)
             .isNotNull();
         assertThat(newUpdatePhone3.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var phone4 = createPhone(contact.getId(), contact.getDigitalId());
         updatePhone(phone4);
@@ -203,7 +205,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone4)
             .isNotNull();
         assertThat(newUpdatePhone4.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -254,7 +256,7 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(phoneError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(phoneError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (phone.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
