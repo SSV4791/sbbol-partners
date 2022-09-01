@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
+import org.apache.commons.lang3.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.PatternValidation;
 
 import javax.validation.ConstraintValidator;
@@ -21,6 +22,9 @@ public class PatternValidator extends BaseValidator
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (StringUtils.isEmpty(value)) {
+            return true;
+        }
         if (!pattern.matcher(value).matches()) {
             var invalidCharsArray = pattern.split(value);
             var invalidChars = new StringBuilder();
