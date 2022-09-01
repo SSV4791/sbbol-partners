@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
+import org.apache.commons.lang3.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.model.NameAttributePartnerValidation;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
@@ -11,7 +12,7 @@ public class NameAttributePartnerDtoValidator extends BaseNameAttributeValidator
 
     @Override
     public boolean isValid(Partner value, ConstraintValidatorContext context) {
-        if (value != null) {
+        if (!ObjectUtils.isEmpty(value)) {
             return isValid(context, value.getLegalForm(), value.getOrgName(), value.getFirstName());
         }
         return true;
