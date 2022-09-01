@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
@@ -39,7 +41,7 @@ import java.util.Set;
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_VALIDATION_EXCEPTION;
@@ -359,7 +361,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        assertThat(response.getPartners())
+        Assertions.assertThat(response.getPartners())
             .hasSize(2);
     }
 
@@ -923,7 +925,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(Error.class);
 
-        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Введите наименование");
     }
@@ -942,7 +944,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(Error.class);
 
-        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Поле содержит недопустимые символы: [][§±]");
     }
@@ -1030,7 +1032,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(partnerError.getCode())
             .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
-        assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        Assertions.assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (partner.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }
@@ -1126,7 +1128,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(Error.class);
 
-        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Введите наименование");
     }
@@ -1145,7 +1147,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(Error.class);
 
-        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Поле содержит недопустимые символы: []§±");
     }
@@ -1164,9 +1166,75 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(Error.class);
 
-        AssertionsForClassTypes.assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Поле содержит недопустимые символы: []§±");
+    }
+
+    @Test
+    void testSavePartnerWithInvalidKpp() {
+        var partner = getValidPartner();
+        partner.setKpp("1234567890");
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 9");
+
+        partner.setKpp("[АБВ1234]");
+        var error1 = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимые символы: [АБВ]")
+            .contains("Введён неверный КПП");
+
+        partner.setKpp("003456789");
+        var error2 = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error2.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Введён неверный КПП");
+    }
+
+    @Test
+    void testSavePartnerWithNullOrEmptyKpp() {
+        var partner = getValidPartner();
+        partner.setKpp(null);
+        var response = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            Partner.class
+        );
+        assertThat(response)
+                .isNotNull();
+        assertThat(response.getKpp())
+            .isNull();
+
+        partner.setKpp("0");
+        var response1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            Partner.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getKpp())
+            .isEqualTo("0");
     }
 
     public static PartnerCreate getValidPartner() {
