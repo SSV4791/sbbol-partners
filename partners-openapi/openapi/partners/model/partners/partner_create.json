@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Партнер",
-  "x-extra-class-annotation": "@NameAttributePartnerCreateDtoValidation @InnLengthAttributePartnerCreateDtoValidation @NamePatternPartnerCreateDtoValidation",
+  "x-extra-class-annotation": "@InnAttributeLengthPartnerValidation @InnAttributeExistPartnerValidation @NameAttributePartnerValidation",
   "properties": {
     "digitalId": {
       "type": "string",
@@ -17,31 +17,41 @@
     "orgName": {
       "type": "string",
       "title": "Наименование организации партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\\\r\\\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 160,
-      "x-length-message": "{validation.partner.orgName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "firstName": {
       "type": "string",
       "title": "Имя партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\\\r\\\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 50,
-      "x-length-message": "{validation.partner.firstName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "secondName": {
       "type": "string",
       "title": "Фамилия партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\\\r\\\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 50,
-      "x-length-message": "{validation.partner.secondName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "middleName": {
       "type": "string",
       "title": "Отчество партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\\\r\\\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 50,
-      "x-length-message": "{validation.partner.middleName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "inn": {
       "type": "string",
+      "pattern": "[0-9]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
       "title": "ИНН",
-      "x-extra-field-annotation": "@InnValidation"
+      "x-extra-field-annotation": "@InnControlNumberValidation"
     },
     "kpp": {
       "type": "string",
@@ -70,7 +80,9 @@
         "title": "Номер телефона",
         "minLength": 13,
         "maxLength": 13,
-        "pattern": "^\\d{13}$"
+        "x-length-message": "{validation.partner.max_symbols}",
+        "pattern": "\\d{13}",
+        "x-pattern-message": "{validation.partner.illegal_symbols}"
       },
       "uniqueItems": true
     },

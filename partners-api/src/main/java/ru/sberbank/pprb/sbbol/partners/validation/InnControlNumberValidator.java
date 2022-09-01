@@ -1,12 +1,15 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
-import org.springframework.util.StringUtils;
-import ru.sberbank.pprb.sbbol.partners.model.InnValidation;
+import ru.sberbank.pprb.sbbol.partners.model.InnControlNumberValidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class InnValidator implements ConstraintValidator<InnValidation, String> {
+import static org.apache.commons.lang3.StringUtils.isNumeric;
+import static org.springframework.util.StringUtils.hasText;
+
+public class InnControlNumberValidator extends BaseValidator
+    implements ConstraintValidator<InnControlNumberValidation, String> {
 
     private static final int INN_5_VALID_LENGTH = 5;
     private static final int INN_10_VALID_LENGTH = 10;
@@ -14,12 +17,23 @@ public class InnValidator implements ConstraintValidator<InnValidation, String> 
     private static final int[] INN_12_SYMBOL_CONTROL_KEY_ONE = {7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
     private static final int[] INN_12_SYMBOL_CONTROL_KEY_TWO = {3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
     private static final int[] INN_10_SYMBOL_CONTROL_KEY = {2, 4, 10, 3, 5, 9, 4, 6, 8};
+    private String message;
 
     @Override
+    public void initialize(InnControlNumberValidation constraintAnnotation) {
+        message = constraintAnnotation.message();
+    }
+
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (!StringUtils.hasText(value)) {
+        if (!hasText(value)) {
             return true;
         }
+
+        buildMessage(context, message);
+        if (!isNumeric(value)) {
+            return false;
+        }
+
         return switch (value.length()) {
             /*
               1. Вычисляется контрольная сумма со следующими весовыми коэффициентами: (2,4,10,3,5,9,4,6,8) на 9 первых чисел ИНН
@@ -37,8 +51,7 @@ public class InnValidator implements ConstraintValidator<InnValidation, String> 
               6. Если контрольное число(2) больше 9, то контрольное число(2) вычисляется как остаток от деления контрольного числа(2) на 10
               7. Контрольное число(1) проверяется с одиннадцатым знаком ИНН и контрольное число(2) проверяется с двенадцатым знаком ИНН.
              */
-            case INN_12_VALID_LENGTH ->
-                checkInn(value, INN_12_SYMBOL_CONTROL_KEY_ONE) && checkInn(value, INN_12_SYMBOL_CONTROL_KEY_TWO);
+            case INN_12_VALID_LENGTH -> checkInn(value, INN_12_SYMBOL_CONTROL_KEY_ONE) && checkInn(value, INN_12_SYMBOL_CONTROL_KEY_TWO);
             // Валидация для КИО
             case INN_5_VALID_LENGTH -> true;
             default -> false;

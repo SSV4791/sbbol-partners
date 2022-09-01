@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeLengthPartnerCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.BankAccountAttributeAccountChangeDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.BankAccountAttributeAccountCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.BankAccountAttributeAccountFullModelDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -17,10 +19,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = InnAttributeLengthPartnerCreateDtoValidator.class)
-public @interface InnLengthAttributePartnerCreateDtoValidation {
+@Constraint(
+    validatedBy = {
+        BankAccountAttributeAccountChangeDtoValidator.class,
+        BankAccountAttributeAccountCreateDtoValidator.class,
+        BankAccountAttributeAccountFullModelDtoValidator.class
+    }
+)
+public @interface BankAccountAttributeValidation {
 
-    String message() default "{partner.inn_length}";
+    String message() default "{account.account.bank_account.control_number}";
 
     Class<?>[] groups() default {};
 

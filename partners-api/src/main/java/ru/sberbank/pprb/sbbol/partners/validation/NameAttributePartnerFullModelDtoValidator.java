@@ -1,13 +1,13 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
-import ru.sberbank.pprb.sbbol.partners.model.NameAttributePartnerFullModelDtoValidation;
+import ru.sberbank.pprb.sbbol.partners.model.NameAttributePartnerValidation;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class NameAttributePartnerFullModelDtoValidator extends BaseNameAttributeValidator
-    implements ConstraintValidator<NameAttributePartnerFullModelDtoValidation, PartnerCreateFullModel> {
+    implements ConstraintValidator<NameAttributePartnerValidation, PartnerCreateFullModel> {
 
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {

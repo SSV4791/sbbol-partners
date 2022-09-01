@@ -2,16 +2,16 @@ package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.apache.commons.lang3.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.model.InnAttributeLengthPartnerValidation;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class InnAttributeLengthPartnerCreateDtoValidator extends BaseInnLengthValidator
-    implements ConstraintValidator<InnAttributeLengthPartnerValidation, PartnerCreate> {
+public class InnAttributeLengthPartnerCreateFullModelDtoValidator extends BaseInnLengthValidator
+    implements ConstraintValidator<InnAttributeLengthPartnerValidation, PartnerCreateFullModel> {
 
     @Override
-    public boolean isValid(PartnerCreate value, ConstraintValidatorContext context) {
+    public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
         if (ObjectUtils.isEmpty(value)) {
             return true;
         }

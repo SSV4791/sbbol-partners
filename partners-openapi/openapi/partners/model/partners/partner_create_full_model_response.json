@@ -26,25 +26,25 @@
       "type": "string",
       "title": "Наименование организации партнера",
       "maxLength": 160,
-      "x-length-message": "{validation.partner.orgName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "firstName": {
       "type": "string",
       "title": "Имя партнера",
       "maxLength": 50,
-      "x-length-message": "{validation.partner.firstName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "secondName": {
       "type": "string",
       "title": "Фамилия партнера",
       "maxLength": 50,
-      "x-length-message": "{validation.partner.secondName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "middleName": {
       "type": "string",
       "title": "Отчество партнера",
       "maxLength": 50,
-      "x-length-message": "{validation.partner.middleName.max_symbols}"
+      "x-length-message": "{validation.partner.max_symbols}"
     },
     "inn": {
       "type": "string",
