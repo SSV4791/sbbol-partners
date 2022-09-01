@@ -41,7 +41,9 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "citizenship", constant = "UNKNOWN")
-    @Mapping(target = "comment", source = "source.description")
+    @Mapping(target = "inn", expression = "java(stringNotEmpty(source.getInn()))")
+    @Mapping(target = "kpp", expression = "java(stringNotEmpty(source.getKpp()))")
+    @Mapping(target = "comment", expression = "java(stringNotEmpty(source.getDescription()))")
     @Mapping(target = "legalType", expression = "java(toLegalType(source.getInn(), source.getAccount()))")
     @Mapping(target = "version", source = "source.version")
     @Mapping(target = "phones", expression = "java(toPhone(source.getCorrPhoneNumber(), digitalId))")
@@ -112,6 +114,8 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "citizenship", constant = "UNKNOWN")
     @Mapping(target = "comment", source = "source.description")
+    @Mapping(target = "inn", expression = "java(stringNotEmpty(source.getInn()))")
+    @Mapping(target = "kpp", expression = "java(stringNotEmpty(source.getKpp()))")
     @Mapping(target = "legalType", expression = "java(toLegalType(source.getInn(), source.getAccount()))")
     @Mapping(target = "version", source = "source.version")
     @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), source.getCorrPhoneNumber(), digitalId))")
@@ -269,5 +273,9 @@ public interface MigrationPartnerMapper extends BaseMapper {
 
     default boolean toSigned(AccountStateType signed) {
         return signed == AccountStateType.SIGNED;
+    }
+
+    default String stringNotEmpty(final String value) {
+        return StringUtils.isEmpty(value) ? null : value;
     }
 }
