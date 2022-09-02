@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Партнер",
-  "x-extra-class-annotation": "@InnAttributeLengthPartnerValidation @InnAttributeExistPartnerValidation @NameAttributePartnerValidation",
+  "x-extra-class-annotation": "@InnAttributeLengthPartnerValidation @InnAttributeExistPartnerValidation @NameAttributePartnerValidation @OgrnAttributeLengthPartnerValidation",
   "properties": {
     "digitalId": {
       "type": "string",
@@ -64,7 +64,7 @@
       "title": "ОГРН",
       "minLength": 13,
       "maxLength": 15,
-      "x-extra-field-annotation": "@OgrnValidation"
+      "x-extra-field-annotation": "@OgrnKeyValidation"
     },
     "okpo": {
       "type": "string",

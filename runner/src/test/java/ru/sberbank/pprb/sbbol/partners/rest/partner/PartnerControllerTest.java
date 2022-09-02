@@ -2,11 +2,11 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
@@ -14,7 +14,6 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
@@ -1237,6 +1236,43 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isEqualTo("0");
     }
 
+    @Test
+    void testSavePartner_whenInvalidOgrnLength() {
+        var partner = getValidPartner();
+        partner.setOgrn("11");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.legal_entity.ogrn.length"))
+            .contains(MessagesTranslator.toLocale("validation.partner.ogrn.control_number"));
+    }
+
+    @Test
+    void testSavePartner_whenInvalidOgrnKey() {
+        var partner = getValidPartner();
+        partner.setOgrn("1234567890123");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.ogrn.control_number"));
+    }
+
     public static PartnerCreate getValidPartner() {
         return getValidPartner(randomAlphabetic(10));
     }
@@ -1360,6 +1396,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidPartner(digitalId);
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
         partner.setInn("521031961500");
+        partner.setOgrn("314505309900027");
         return partner;
     }
 
