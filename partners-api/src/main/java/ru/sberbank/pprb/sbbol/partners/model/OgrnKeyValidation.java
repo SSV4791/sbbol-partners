@@ -1,6 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.OgrnValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.OgrnKeyValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -16,10 +16,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, PARAMETER})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = OgrnValidator.class)
-public @interface OgrnValidation {
+@Constraint(validatedBy = OgrnKeyValidator.class)
+public @interface OgrnKeyValidation {
 
-    String message() default "{partner.ogrn.control_number}";
+    String message() default "{validation.partner.ogrn.control_number}";
 
     Class<?>[] groups() default {};
 

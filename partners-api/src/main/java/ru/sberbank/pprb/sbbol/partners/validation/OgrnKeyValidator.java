@@ -1,12 +1,13 @@
 package ru.sberbank.pprb.sbbol.partners.validation;
 
 import org.springframework.util.StringUtils;
+import ru.sberbank.pprb.sbbol.partners.model.OgrnKeyValidation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class OgrnValidator
-    implements ConstraintValidator<ru.sberbank.pprb.sbbol.partners.model.OgrnValidation, String> {
+public class OgrnKeyValidator
+    implements ConstraintValidator<OgrnKeyValidation, String> {
 
     private static final int OGRN_13_VALID_LENGTH = 13;
     private static final int OGRN_15_VALID_LENGTH = 15;
