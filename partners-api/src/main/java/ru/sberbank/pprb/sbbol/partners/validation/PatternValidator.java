@@ -26,6 +26,10 @@ public class PatternValidator extends BaseValidator
             return true;
         }
         if (!pattern.matcher(value).matches()) {
+            if ("{javax.validation.constraints.Pattern.message}".equals(message)) {
+                buildMessage(context, message);
+                return false;
+            }
             var invalidCharsArray = pattern.split(value);
             var invalidChars = new StringBuilder();
             Arrays.stream(invalidCharsArray).forEach(invalidChars::append);

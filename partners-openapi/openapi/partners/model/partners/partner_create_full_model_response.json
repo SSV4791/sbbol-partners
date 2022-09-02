@@ -55,8 +55,11 @@
     "kpp": {
       "type": "string",
       "title": "КПП",
-      "minLength": 9,
-      "maxLength": 9
+      "pattern": "[0-9A-Z]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 9,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "x-extra-field-annotation": "@KppValidation"
     },
     "ogrn": {
       "type": "string",
