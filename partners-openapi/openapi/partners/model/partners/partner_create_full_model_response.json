@@ -55,11 +55,7 @@
     "kpp": {
       "type": "string",
       "title": "КПП",
-      "pattern": "[0-9A-Z]+",
-      "x-pattern-message": "{validation.partner.illegal_symbols}",
-      "maxLength": 9,
-      "x-length-message": "{validation.partner.max_symbols}",
-      "x-extra-field-annotation": "@KppValidation"
+      "maxLength": 9
     },
     "ogrn": {
       "type": "string",
@@ -69,9 +65,7 @@
     },
     "okpo": {
       "type": "string",
-      "title": "ОКПО",
-      "minLength": 8,
-      "maxLength": 10
+      "title": "ОКПО"
     },
     "accounts": {
       "type": "array",
