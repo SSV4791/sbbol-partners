@@ -945,7 +945,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Поле содержит недопустимые символы: [][§±]");
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [][§±]");
     }
 
     @Test
@@ -1148,7 +1148,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Поле содержит недопустимые символы: []§±");
+            .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
     }
 
     @Test
@@ -1167,7 +1167,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Поле содержит недопустимые символы: []§±");
+            .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
     }
 
     @Test
@@ -1193,7 +1193,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Поле содержит недопустимые символы: [АБВ]")
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [АБВ]")
             .contains("Введён неверный КПП");
 
         partner.setKpp("003456789");
@@ -1271,6 +1271,57 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains(MessagesTranslator.toLocale("validation.partner.ogrn.control_number"));
+    }
+
+    @Test
+    void testSavePartner_whenInvalidOkpoLength() {
+        var partner = getValidPartner();
+        partner.setOkpo("1234567890123");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.legal_entity.okpo.length"));
+
+        var partner1 = getValidEntrepreneurPartner(randomAlphabetic(10));
+        partner1.setOkpo("123");
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner1)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.entrepreneur.okpo.length"));
+    }
+
+    @Test
+    void testSavePartner_whenInvalidCharsOkpo() {
+        var partner = getValidPartner();
+        partner.setOkpo("12345АБВ");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): АБВ");
     }
 
     public static PartnerCreate getValidPartner() {
@@ -1395,6 +1446,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     private static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
         var partner = getValidPartner(digitalId);
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
+        partner.setOkpo("1234567890");
         partner.setInn("521031961500");
         partner.setOgrn("314505309900027");
         return partner;
