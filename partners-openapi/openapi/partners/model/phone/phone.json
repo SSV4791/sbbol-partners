@@ -40,7 +40,6 @@
   },
   "required": [
     "id",
-    "digitalId",
     "unifiedId",
     "phone",
     "version"
