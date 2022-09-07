@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeExistPartnerCreateDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeExistPartnerCreateFullModelDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeExistPartnerDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeExistPartnerCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeExistPartnerCreateFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeExistPartnerDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -25,7 +25,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 )
 public @interface InnAttributeExistPartnerValidation {
 
-    String message() default "{validation.partner.inn.is_null}";
+    String message() default "{javax.validation.constraints.NotEmpty.message}";
 
     Class<?>[] groups() default {};
 

@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.OgrnAttributeLengthPartnerCreateDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.OgrnAttributeLengthPartnerCreateFullModelDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.OgrnAttributeLengthPartnerDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnAttributeLengthPartnerCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnAttributeLengthPartnerCreateFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnAttributeLengthPartnerDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

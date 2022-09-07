@@ -926,7 +926,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Введите наименование");
+            .contains("Поле обязательно для заполнения");
     }
 
     @Test
@@ -1129,7 +1129,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Введите наименование");
+            .contains("Поле обязательно для заполнения");
     }
 
     @Test

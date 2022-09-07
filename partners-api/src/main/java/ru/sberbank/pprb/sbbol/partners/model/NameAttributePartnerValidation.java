@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.NameAttributePartnerCreateDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.NameAttributePartnerDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.NameAttributePartnerFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerFullModelDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -25,7 +25,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 )
 public @interface NameAttributePartnerValidation {
 
-    String message() default "{partner.legal_form}";
+    String message() default "{javax.validation.constraints.NotEmpty.message}";
 
     Class<?>[] groups() default {};
 

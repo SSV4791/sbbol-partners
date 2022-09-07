@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeLengthPartnerCreateDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeLengthPartnerCreateFullModelDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.InnAttributeLengthPartnerDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeLengthPartnerCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeLengthPartnerCreateFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeLengthPartnerDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -25,7 +25,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 )
 public @interface InnAttributeLengthPartnerValidation {
 
-    String message() default "{partner.inn_length}";
+    String message() default "{validation.partner.inn.length}";
 
     Class<?>[] groups() default {};
 

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Счёт партнера",
-  "x-extra-class-annotation": "@AccountAttributeValidation @BankAccountAttributeValidation",
+  "x-extra-class-annotation": "@AccountAttributeKeyValidation @AccountAttributeBalanceValidation",
   "properties": {
     "partnerId": {
       "type": "string",
@@ -21,7 +21,8 @@
     "account": {
       "type": "string",
       "title": "Счёт",
-      "maxLength": 20
+      "pattern": "^\\d{20}$",
+      "x-pattern-message": "{validation.account.account.pattern}"
     },
     "bank": {
       "title": "Банк",
