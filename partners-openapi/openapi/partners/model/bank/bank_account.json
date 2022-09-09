@@ -25,7 +25,8 @@
     "bankAccount": {
       "type": "string",
       "title": "Корреспондентский счёт",
-      "maxLength": 20,
+      "pattern": "^\\d{20}$",
+      "x-pattern-message": "{validation.account.account.pattern}",
       "x-not-empty": true
     }
   }

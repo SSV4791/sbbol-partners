@@ -64,7 +64,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithoutDigitalId() {
-        var errorText = "Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), null);
         assertThat(response)
@@ -77,7 +77,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithEmptyDigitalId() {
-        var errorText = "Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), "");
         assertThat(response)
@@ -103,7 +103,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithoutUnifiedId() {
-        var errorText = "Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(null, partner.getDigitalId());
         assertThat(response)
@@ -116,7 +116,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithEmptyUnifiedId() {
-        var errorText = "Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors("", partner.getDigitalId());
         assertThat(response)

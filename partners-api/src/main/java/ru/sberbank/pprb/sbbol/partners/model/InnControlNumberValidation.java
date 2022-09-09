@@ -1,6 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.InnControlNumberValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnControlNumberValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

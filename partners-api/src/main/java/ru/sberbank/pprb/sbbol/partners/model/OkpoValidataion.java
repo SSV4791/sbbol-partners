@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.OkpoPartnerCreateDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.OkpoPartnerCreateFullModelDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.OkpoPartnerDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.okpo.OkpoLengthPartnerCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.okpo.OkpoLengthPartnerCreateFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.okpo.OkpoLengthPartnerDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -18,9 +18,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Constraint(
     validatedBy = {
-        OkpoPartnerDtoValidator.class,
-        OkpoPartnerCreateDtoValidator.class,
-        OkpoPartnerCreateFullModelDtoValidator.class
+        OkpoLengthPartnerDtoValidator.class,
+        OkpoLengthPartnerCreateDtoValidator.class,
+        OkpoLengthPartnerCreateFullModelDtoValidator.class
     }
 )
 public @interface OkpoValidataion {

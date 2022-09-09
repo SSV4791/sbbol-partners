@@ -1,6 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.OgrnKeyValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnKeyValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
