@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Банк",
-  "x-extra-class-annotation": "@BankAccountAttributeValidation",
+  "x-extra-class-annotation": "@BankAccountValidation",
   "properties": {
     "id": {
       "type": "string",

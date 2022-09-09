@@ -23,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         OgrnAttributeLengthPartnerCreateFullModelDtoValidator.class
     }
 )
-public @interface OgrnAttributeLengthPartnerValidation {
+public @interface OgrnLengthValidation {
 
     String message() default "";
 

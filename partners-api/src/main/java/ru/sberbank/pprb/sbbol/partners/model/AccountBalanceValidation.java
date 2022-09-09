@@ -24,7 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         AccountsAttributeBalancePhysicalPersonPartnerCreateFullModelDtoValidator.class
     }
 )
-public @interface AccountAttributeBalanceValidation {
+public @interface AccountBalanceValidation {
     String message() default "";
 
     Class<?>[] groups() default {};

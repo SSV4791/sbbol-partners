@@ -1,14 +1,14 @@
 package ru.sberbank.pprb.sbbol.partners.validation.partner.inn;
 
 import org.apache.commons.lang3.ObjectUtils;
-import ru.sberbank.pprb.sbbol.partners.model.InnAttributeExistPartnerValidation;
+import ru.sberbank.pprb.sbbol.partners.model.InnExistValidation;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class InnAttributeExistPartnerDtoValidator extends BaseInnExistValidator
-    implements ConstraintValidator<InnAttributeExistPartnerValidation, Partner> {
+    implements ConstraintValidator<InnExistValidation, Partner> {
 
     @Override
     public boolean isValid(Partner value, ConstraintValidatorContext context) {

@@ -26,7 +26,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         AccountAttributeKeyAccountCreateFullModelDtoValidator.class,
     }
 )
-public @interface AccountAttributeKeyValidation {
+public @interface AccountKeyValidation {
 
     String message() default "{validation.account.control_number}";
 

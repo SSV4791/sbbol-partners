@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.validation.account.bankaccount;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccountAttributeValidation;
+import ru.sberbank.pprb.sbbol.partners.model.BankAccountValidation;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.validation.account.BaseAccountKeyValidator;
 
@@ -10,12 +10,12 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class BankAccountAttributeKeyBankCreateDtoValidator extends BaseAccountKeyValidator
-    implements ConstraintValidator<BankAccountAttributeValidation, BankCreate> {
+    implements ConstraintValidator<BankAccountValidation, BankCreate> {
 
     private String message;
 
     @Override
-    public void initialize(BankAccountAttributeValidation constraintAnnotation) {
+    public void initialize(BankAccountValidation constraintAnnotation) {
         message = constraintAnnotation.message();
     }
 

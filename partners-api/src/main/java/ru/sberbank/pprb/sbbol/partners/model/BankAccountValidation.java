@@ -24,7 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         BankAccountAttributeKeyBankCreateDtoValidator.class,
     }
 )
-public @interface BankAccountAttributeValidation {
+public @interface BankAccountValidation {
 
     String message() default "{account.account.bank_account.control_number}";
 

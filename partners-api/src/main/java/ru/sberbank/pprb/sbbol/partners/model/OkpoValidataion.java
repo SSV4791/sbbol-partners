@@ -23,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         OkpoLengthPartnerCreateFullModelDtoValidator.class
     }
 )
-public @interface OkpoAttributePartnerValidataion {
+public @interface OkpoValidataion {
 
     String message() default "";
 

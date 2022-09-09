@@ -23,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         InnAttributeLengthPartnerCreateFullModelDtoValidator.class
     }
 )
-public @interface InnAttributeLengthPartnerValidation {
+public @interface InnLengthValidation {
 
     String message() default "{validation.partner.inn.length}";
 

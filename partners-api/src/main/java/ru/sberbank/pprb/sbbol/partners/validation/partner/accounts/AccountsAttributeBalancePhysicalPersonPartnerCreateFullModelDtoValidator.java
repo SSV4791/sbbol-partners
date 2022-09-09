@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.validation.partner.accounts;
 
 import org.apache.commons.lang3.ObjectUtils;
-import ru.sberbank.pprb.sbbol.partners.model.AccountAttributeBalanceValidation;
+import ru.sberbank.pprb.sbbol.partners.model.AccountBalanceValidation;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Set;
 
 public class AccountsAttributeBalancePhysicalPersonPartnerCreateFullModelDtoValidator extends BaseBalanceAccountValidator
-    implements ConstraintValidator<AccountAttributeBalanceValidation, PartnerCreateFullModel> {
+    implements ConstraintValidator<AccountBalanceValidation, PartnerCreateFullModel> {
 
     public AccountsAttributeBalancePhysicalPersonPartnerCreateFullModelDtoValidator(PartnerService partnerService) {
         super(partnerService);

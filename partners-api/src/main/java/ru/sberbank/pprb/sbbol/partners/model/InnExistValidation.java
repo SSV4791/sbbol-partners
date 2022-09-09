@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
-import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerCreateDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeExistPartnerCreateDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeExistPartnerCreateFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeExistPartnerDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -18,12 +18,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Constraint(
     validatedBy = {
-        NameAttributePartnerDtoValidator.class,
-        NameAttributePartnerCreateDtoValidator.class,
-        NameAttributePartnerFullModelDtoValidator.class
+        InnAttributeExistPartnerDtoValidator.class,
+        InnAttributeExistPartnerCreateDtoValidator.class,
+        InnAttributeExistPartnerCreateFullModelDtoValidator.class
     }
 )
-public @interface NameAttributePartnerValidation {
+public @interface InnExistValidation {
 
     String message() default "{javax.validation.constraints.NotEmpty.message}";
 
