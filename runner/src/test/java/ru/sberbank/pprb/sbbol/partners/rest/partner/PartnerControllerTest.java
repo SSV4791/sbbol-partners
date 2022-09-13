@@ -33,9 +33,12 @@ import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
@@ -1101,6 +1104,270 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testCreatePartnerWithContacts() {
+        var partnerCreate = getValidPartner();
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        var expectedPhones = partnerCreate.getPhones();
+        var expectedEmails = partnerCreate.getEmails();
+        var actualPhones = createdPartner.getPhones()
+            .stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var actualEmails = createdPartner.getEmails()
+            .stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(actualPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedPhones);
+        assertThat(actualEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_updateExistContacts() {
+        var partnerCreate = getValidPartner();
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones().size() > 0 )
+            .isTrue();
+        assertThat(createdPartner.getEmails().size() > 0 )
+            .isTrue();
+        var updatePhone = createdPartner.getPhones().stream().findFirst().orElse(null);
+        assertThat(updatePhone)
+            .isNotNull();
+        updatePhone.setPhone("0070987654321");
+        var updateEmail = createdPartner.getEmails().stream().findFirst().orElse(null);
+        assertThat(updateEmail)
+            .isNotNull();
+        updateEmail.setEmail("12345@mail.ru");
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .isNotNull();
+        var updatePhones = createdPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var updatedPhones = updatedPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        assertThat(updatedPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updatePhones);
+        var updateEmails = createdPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        var updatedEmails = updatedPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(updatedEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updateEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_addNewContacts() {
+        var partnerCreate = getValidPartner();
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        createdPartner.getPhones().add(new Phone().phone("0071234567890"));
+        createdPartner.getEmails().add(new Email().email("007@mail.ru"));
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .isNotNull();
+        var updatePhones = createdPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var updatedPhones = updatedPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        assertThat(updatedPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updatePhones);
+        var updateEmails = createdPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        var updatedEmails = updatedPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(updatedEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updateEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_deleteAnyContacts() {
+        var partnerCreate = getValidPartner();
+        partnerCreate.getPhones().add("0071234567890");
+        partnerCreate.getEmails().add("123@mail.ru");
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        var phones = createdPartner.getPhones().stream().skip(1).collect(Collectors.toSet());
+        var emails = createdPartner.getEmails().stream().skip(1).collect(Collectors.toSet());
+        createdPartner.setPhones(phones);
+        createdPartner.setEmails(emails);
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .isNotNull();
+        var updatePhones = createdPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var updatedPhones = updatedPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        assertThat(updatedPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updatePhones);
+        var updateEmails = createdPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        var updatedEmails = updatedPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(updatedEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updateEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_deleteAllContacts() {
+        var partnerCreate = getValidPartner();
+        partnerCreate.getPhones().add("0071234567890");
+        partnerCreate.getEmails().add("123@mail.ru");
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        createdPartner.setPhones(Collections.emptySet());
+        createdPartner.setEmails(Collections.emptySet());
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                    .isEqualTo(Collections.emptySet());
+
+        assertThat(updatedPartner.getEmails())
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(Collections.emptySet());
+    }
+
+    @Test
     void savePartnerFullModel() {
         var request = getValidFullModelPartner();
         var createdPartner = post(
@@ -1339,14 +1606,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .kpp("123456789")
             .ogrn("1035006110083")
             .okpo("12345678")
-            .phones(
-                Set.of(
-                    "0079241111111"
-                ))
-            .emails(
-                Set.of(
-                    "a.a.a@sberbank.ru"
-                ))
+            .phones( new HashSet<>(List.of("0079241111111")))
+            .emails( new HashSet<>(List.of("a.a.a@sberbank.ru")))
             .comment("555555");
         partner.setDigitalId(digitalId);
         return partner;

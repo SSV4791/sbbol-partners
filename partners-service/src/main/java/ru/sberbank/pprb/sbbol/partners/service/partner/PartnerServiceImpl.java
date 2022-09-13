@@ -22,10 +22,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -42,8 +40,6 @@ public class PartnerServiceImpl implements PartnerService {
     private final DocumentRepository documentRepository;
     private final ContactRepository contactRepository;
     private final AddressRepository addressRepository;
-    private final PhoneRepository phoneRepository;
-    private final EmailRepository emailRepository;
     private final PartnerRepository partnerRepository;
     private final GkuInnDictionaryRepository gkuInnDictionaryRepository;
     private final BudgetMaskService budgetMaskService;
@@ -59,8 +55,6 @@ public class PartnerServiceImpl implements PartnerService {
         DocumentRepository documentRepository,
         ContactRepository contactRepository,
         AddressRepository addressRepository,
-        PhoneRepository phoneRepository,
-        EmailRepository emailRepository,
         PartnerRepository partnerRepository,
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
         BudgetMaskService budgetMaskService,
@@ -75,8 +69,6 @@ public class PartnerServiceImpl implements PartnerService {
         this.documentRepository = documentRepository;
         this.contactRepository = contactRepository;
         this.addressRepository = addressRepository;
-        this.phoneRepository = phoneRepository;
-        this.emailRepository = emailRepository;
         this.partnerRepository = partnerRepository;
         this.gkuInnDictionaryRepository = gkuInnDictionaryRepository;
         this.budgetMaskService = budgetMaskService;
