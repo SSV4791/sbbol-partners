@@ -176,6 +176,7 @@ public interface PartnerMapper extends BaseMapper {
             for (var phone : phones) {
                 if (phone != null) {
                     phone.setPartner(partner);
+                    phone.setDigitalId(partner.getDigitalId());
                 }
             }
         }
@@ -184,6 +185,7 @@ public interface PartnerMapper extends BaseMapper {
             for (var email : emails) {
                 if (email != null) {
                     email.setPartner(partner);
+                    email.setDigitalId(partner.getDigitalId());
                 }
             }
         }
