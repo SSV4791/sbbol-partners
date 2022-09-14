@@ -34,6 +34,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1416,6 +1417,58 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
+    }
+
+    @Test
+    void savePartnerFullModelInvalidBankName() {
+        var partner = getValidFullModelPartner();
+        partner.getAccounts().forEach(x -> x.getBank().setName(""));
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotNull.message"));
+
+        var partner1 = getValidFullModelPartner();
+        partner1.getAccounts().forEach(x -> x.getBank().setName("Наименование банка [§±]"));
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner1)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols")+" [§±]");
+
+        var str = "0123456789";
+        var partner2 = getValidFullModelPartner();
+        partner2.getAccounts().forEach(x -> x.getBank().setName(str.repeat(17)));
+        var error2 = given()
+            .spec(requestSpec)
+            .body(partner2)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error2.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 160");
     }
 
     @Test
