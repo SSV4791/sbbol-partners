@@ -781,6 +781,22 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    void testCreateWithEmptyAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var  account = createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId());
+        assertThat(account)
+            .isNotNull();
+    }
+
+    @Test
+    void testCreateWithNullAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var  account = createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId());
+        assertThat(account)
+            .isNotNull();
+    }
+
+    @Test
     void testUpdateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -796,6 +812,42 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotEqualTo(account.getComment());
         assertThat(updateAccount.getComment())
             .isNotNull();
+    }
+
+    @Test
+    void testUpdateAccountEntityWithEmptyAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var updateAccount = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            updateAccountEntityWithEmptyAccountAndBankAccount(account),
+            Account.class
+        );
+        assertThat(updateAccount)
+            .isNotNull();
+        assertThat(updateAccount.getAccount())
+            .isEmpty();
+        assertThat(updateAccount.getBank().getBankAccount().getBankAccount())
+            .isEmpty();
+    }
+
+    @Test
+    void testUpdateAccountEntityWithNullAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var updateAccount = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            updateAccountEntityWithNullAccountAndBankAccount(account),
+            Account.class
+        );
+        assertThat(updateAccount)
+            .isNotNull();
+        assertThat(updateAccount.getAccount())
+            .isEqualTo(account.getAccount());
+        assertThat(updateAccount.getBank().getBankAccount().getBankAccount())
+            .isEqualTo(account.getBank().getBankAccount().getBankAccount());
     }
 
     @Test
