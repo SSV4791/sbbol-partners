@@ -1,9 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
@@ -94,7 +96,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         Descriptions descriptions = new Descriptions()
             .field("pagination")
             .message(
-                List.of("Поле не может быть равно null")
+                List.of(MessagesTranslator.toLocale("javax.validation.constraints.NotNull.message"))
             );
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
@@ -840,6 +842,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(updateAccount.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        AssertionsForClassTypes.assertThat(updateAccount.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
 
         var acc2 = updateAccount(account)
             .account("12345678901234567890");
@@ -866,7 +871,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
 
         var acc4 = updateAccount(account)
             .bank(account.getBank()
-                .bic(""));
+                .bic("ABC123456789"));
         var updateAccount4 = put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
@@ -875,6 +880,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
         );
         assertThat(updateAccount4.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        AssertionsForClassTypes.assertThat(updateAccount4.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols")+" ABC")
+            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
     }
 
     @Test

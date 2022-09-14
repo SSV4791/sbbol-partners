@@ -26,9 +26,11 @@
     "bic": {
       "type": "string",
       "title": "БИК",
+      "pattern": "[0-9]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
       "minLength": 9,
       "maxLength": 9,
-      "x-not-empty": true
+      "x-length-message": "{validation.account.bank.bic.length}"
     },
     "name": {
       "type": "string",
