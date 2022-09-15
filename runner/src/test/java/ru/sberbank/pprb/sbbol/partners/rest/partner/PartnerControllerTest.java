@@ -1491,6 +1491,76 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void savePhysicalPartnerInvalidComment() {
+        var partner = getValidPhysicalPersonPartner();
+        partner.setComment("[Коммент Ёё §±]");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [§±]");
+
+        var str = "0123456789";
+        partner.setComment(str.repeat(26));
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 255");
+    }
+
+    @Test
+    void saveFullModelPartnerInvalidAccountComment() {
+        var partner = getValidFullModelPartner();
+        partner.getAccounts().forEach(x -> x.setComment("[Comment §± Ёё]"));
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [§±]");
+
+        var str = "0123456789";
+        partner.getAccounts().forEach(x -> x.setComment(str.repeat(6)));
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 50");
+    }
+
+    @Test
     void testSavePartnerWithInvalidKpp() {
         var partner = getValidPartner();
         partner.setKpp("1234567890");

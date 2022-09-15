@@ -104,7 +104,10 @@
     "comment": {
       "type": "string",
       "title": "Комментарий пользователя",
-      "maxLength": 255
+      "maxLength": 255,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\\\r\\\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
     },
     "gku": {
       "type": "boolean",
