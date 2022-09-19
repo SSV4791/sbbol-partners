@@ -169,6 +169,7 @@ public interface PartnerMapper extends BaseMapper {
                     partner.getMiddleName()
                 )
                 .filter(Objects::nonNull)
+                .map(it -> it.replace(StringUtils.SPACE, StringUtils.EMPTY))
                 .collect(Collectors.joining(StringUtils.EMPTY));
         partner.setSearch(searchSubString);
         var phones = partner.getPhones();
