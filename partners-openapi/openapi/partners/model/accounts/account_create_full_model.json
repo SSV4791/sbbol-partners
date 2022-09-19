@@ -18,7 +18,7 @@
       "title": "Комментарий счета",
       "maxLength": 50,
       "x-length-message": "{validation.partner.max_symbols}",
-      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\\\r\\\\n]*",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]*",
       "x-pattern-message": "{validation.partner.illegal_symbols}"
     }
   },
