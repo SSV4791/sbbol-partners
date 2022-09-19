@@ -34,7 +34,6 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -264,6 +263,42 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 .count(1)
         );
 
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchOrgNamePartnersWithQuotesAndSpaceSymbol() {
+        var digitalId = randomAlphabetic(10);
+        var orgName = "ОАО \"Ромашка\"";
+        var createPartner = getValidPartner(digitalId);
+        createPartner.setOrgName(orgName);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            createPartner,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.search(
+            new SearchPartners()
+                .search(orgName)
+        );
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
         var response = post(
             "/partners/view",
             HttpStatus.OK,
