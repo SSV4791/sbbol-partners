@@ -18,11 +18,14 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
+import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
+import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
+import ru.sberbank.pprb.sbbol.partners.exception.common.BaseException;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
@@ -38,14 +41,13 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ENTRY_SAVE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.CRITICAL;
-import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.ENTRY_SAVE_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_VALIDATION_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -92,32 +94,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(OptimisticLockException.class)
-    protected ResponseEntity<Object> handleObjectModelValidationException(
-        OptimisticLockException ex,
+    @ExceptionHandler({
+        AccountPriorityOneMoreException.class,
+        AccountAlreadySignedException.class,
+        OptimisticLockException.class,
+        CheckValidationException.class
+    })
+    protected ResponseEntity<Object> handleBusinessException(
+        BaseException ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
+        LOG.error(ex.getLogMessage(), ex);
         return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
-            BUSINESS,
-            OPTIMISTIC_LOCK_EXCEPTION.getValue(),
-            ex.getText(),
-            ex.getErrors(),
-            httpRequest.getRequestURL()
-        );
-    }
-
-    @ExceptionHandler(CheckValidationException.class)
-    protected ResponseEntity<Object> handleObjectModelValidationException(
-        CheckValidationException ex,
-        HttpServletRequest httpRequest
-    ) {
-        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
-        return buildResponsesEntity(
-            HttpStatus.BAD_REQUEST,
-            BUSINESS,
-            MODEL_VALIDATION_EXCEPTION.getValue(),
+            ex.getType(),
+            ex.getErrorCodeValue(),
             ex.getText(),
             ex.getErrors(),
             httpRequest.getRequestURL()
@@ -143,13 +134,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(
         Exception ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error("Необработанное исключение", ex);
+        LOG.error("При выполнении операции произошла ошибка", ex);
         return buildResponsesEntity(
             HttpStatus.INTERNAL_SERVER_ERROR,
             null,
@@ -161,8 +151,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @NotNull
-    @Override
-    protected @NonNull ResponseEntity<Object> handleExceptionInternal(
+    @Override protected @NonNull
+    ResponseEntity<Object> handleExceptionInternal(
         Exception ex,
         Object body,
         @NonNull HttpHeaders headers,
@@ -180,8 +170,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @NotNull
-    @Override
-    protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(
+    @Override protected @NonNull
+    ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         @NonNull HttpHeaders headers,
         @NonNull HttpStatus status,

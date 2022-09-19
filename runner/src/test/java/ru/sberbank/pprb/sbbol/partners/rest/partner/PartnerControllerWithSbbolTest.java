@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.sberbank.pprb.sbbol.partners.partners.handler.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 
 @ContextConfiguration(classes = SbbolIntegrationWithSbbolConfiguration.class)
 class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
