@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners.partners.handler;
+package ru.sberbank.pprb.sbbol.partners.exception.common;
 
 public enum ErrorCode {
 
@@ -6,7 +6,9 @@ public enum ErrorCode {
     EXCEPTION(22),
     MODEL_DUPLICATE_EXCEPTION(23),
     OPTIMISTIC_LOCK_EXCEPTION(24),
-    MODEL_NOT_FOUND_EXCEPTION(25),
+    ACCOUNT_ALREADY_SIGNED_EXCEPTION(25),
+    PRIORITY_ACCOUNT_MORE_ONE(26),
+    MODEL_NOT_FOUND_EXCEPTION(27),
     ENTRY_SAVE_EXCEPTION(28);
 
     private final Integer value;

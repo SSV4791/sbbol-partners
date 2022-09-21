@@ -7,9 +7,9 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
-import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
-import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
+import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
+import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
@@ -26,7 +26,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -123,12 +122,7 @@ public class AccountServiceImpl implements AccountService {
         }
         accountMapper.updateAccount(account, foundAccount);
         if (AccountStateType.SIGNED == foundAccount.getState()) {
-            throw new CheckValidationException(Map.of(
-                DOCUMENT_NAME,
-                List.of(
-                    MessagesTranslator.toLocale("account.account.sign.is_true", account.getAccount())
-                )
-            ));
+            throw new AccountAlreadySignedException(account.getAccount());
         }
         try {
             var savedAccount = accountRepository.save(foundAccount);
@@ -187,12 +181,7 @@ public class AccountServiceImpl implements AccountService {
         var foundPriorityAccounts = accountRepository
             .findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(digitalId, foundAccount.getPartnerUuid());
         if (!CollectionUtils.isEmpty(foundPriorityAccounts)) {
-            throw new CheckValidationException(Map.of(
-                "account.priorityAccount",
-                List.of(
-                    MessagesTranslator.toLocale("account.priority_account.more.one", foundAccount.getDigitalId(), foundAccount.getUuid())
-                )
-            ));
+            throw new AccountPriorityOneMoreException(foundAccount.getDigitalId(), foundAccount.getUuid());
         }
         foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());
         var savedAccount = accountRepository.save(foundAccount);
