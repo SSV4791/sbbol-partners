@@ -17,8 +17,10 @@ import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +38,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     private static final String INN_WITHOUT_ACCOUNT = "3522329000";
     private static final String KPP_WITHOUT_ACCOUNT = "618243879";
     private static final String PART_ACCOUNT_FOR_TEST_PARTNER = "40802810500";
+
     @Test
     void testViewFilter_whenGkuAttributeIsDefinedAndIsTrue() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
@@ -798,6 +801,75 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    void testCreateUsdAccount() {
+        var partner = createValidPartner();
+        var expected = getValidAccount(partner.getId(), partner.getDigitalId());
+        expected.setAccount("40817840100000000001");
+        var error = createInvalidAccount(expected);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getDescriptions())
+            .isNotEmpty();
+        var messages = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(messages)
+            .contains(MessagesTranslator.toLocale("validation.account.rub_code_currency"));
+    }
+
+    @Test
+    void testCreateBudgetAccount_whenInvalidCodeCurrency() {
+        var partner = createValidPartner();
+        var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
+        expectedAccount.setAccount("00817810100000000001");
+        var error = createInvalidAccount(expectedAccount);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getDescriptions())
+            .isNotEmpty();
+        var messages = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(messages)
+            .contains(MessagesTranslator.toLocale("validation.account.treasure_code_currency"));
+    }
+
+    @Test
+    void testCreateBudgetAccount_whenInvalidBalance() {
+        var partner = createValidPartner();
+        var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
+        expectedAccount.setAccount("10817643100000000001");
+        var error = createInvalidAccount(expectedAccount);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getDescriptions())
+            .isNotEmpty();
+        var messages = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(messages)
+            .contains(MessagesTranslator.toLocale("validation.account.treasure_balance"));
+    }
+
+    @Test
+    void testCreateValidBudgetAccount() {
+        var partner = createValidPartner();
+        var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
+        var actualAccount = createValidAccount(expectedAccount);
+        assertThat(actualAccount)
+            .isNotNull();
+    }
+
+    @Test
     void testUpdateAccount() {
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -1132,7 +1204,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
 
         updateAccount(account);
         account.setVersion(accountVersion.getVersion());
-        account.setAccount("40101810600000010006");
+        account.setAccount("00101643600000010006");
         account.getBank().setBic("048602001");
         account.getBank().getBankAccount().setBankAccount("40102810945370000073");
         var accountVersion3 = put(

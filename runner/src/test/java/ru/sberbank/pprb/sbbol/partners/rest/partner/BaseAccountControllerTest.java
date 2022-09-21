@@ -23,6 +23,8 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
 
     protected static final String baseRoutePath = "/partner";
     protected static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
+    protected static final String BUDGET_ACCOUNT_VALID = "03010643100000000001";
+    protected static final String BUDGET_CORR_ACCOUNT_VALID = "40102810300000000001";
 
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
         return new AccountCreate()
@@ -54,6 +56,15 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             HttpStatus.CREATED,
             account,
             Account.class
+        );
+    }
+
+    public static Error createInvalidAccount(AccountCreate account) {
+        return post(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            account,
+            Error.class
         );
     }
 
@@ -102,9 +113,10 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
                     .bankAccount(null)));
     }
 
-    private static AccountCreate getValidBudgetAccount(String partnerUuid, String digitalId) {
+    protected static AccountCreate getValidBudgetAccount(String partnerUuid, String digitalId) {
         var account = getValidAccount(partnerUuid, digitalId);
-        account.setAccount("40601810300490014209");
+        account.setAccount(BUDGET_ACCOUNT_VALID);
+        account.getBank().getBankAccount().setBankAccount(BUDGET_CORR_ACCOUNT_VALID);
         return account;
     }
 
