@@ -183,6 +183,7 @@ public interface MigrationPartnerMapper extends BaseMapper {
                     partner.getMiddleName()
                 )
                 .filter(Objects::nonNull)
+                .map(it -> it.replace(StringUtils.SPACE, StringUtils.SPACE))
                 .collect(Collectors.joining(StringUtils.EMPTY));
         partner.setSearch(searchSubString);
         var phones = partner.getPhones();
