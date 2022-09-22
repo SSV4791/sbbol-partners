@@ -5,8 +5,10 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryDeleteException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -100,21 +102,24 @@ public class AccountSignServiceImpl implements AccountSignService {
     public void deleteAccountsSign(String digitalId, List<String> accountIds) {
         for (String accountId : accountIds) {
             var accountUuid = accountSingMapper.mapUuid(accountId);
-            var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountUuid)
-                .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountUuid));
-            try {
-                accountSignRepository.delete(sign);
-                replicationService.deleteSign(digitalId, accountUuid);
-                auditAdapter.send(new Event()
-                    .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
-                    .eventParams(accountSingMapper.toEventParams(sign))
-                );
-            } catch (RuntimeException e) {
-                auditAdapter.send(new Event()
-                    .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
-                    .eventParams(accountSingMapper.toEventParams(sign))
-                );
-                throw new EntrySaveException(DOCUMENT_NAME, e);
+            var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountUuid);
+            // Сделанно в рамках поддержания миграции чтоб не создавать пустушку для мигрированных подписанных счетов
+            if (sign.isPresent()) {
+                SignEntity signEntity = sign.get();
+                try {
+                    accountSignRepository.delete(signEntity);
+                    replicationService.deleteSign(digitalId, accountUuid);
+                    auditAdapter.send(new Event()
+                        .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
+                        .eventParams(accountSingMapper.toEventParams(signEntity))
+                    );
+                } catch (RuntimeException e) {
+                    auditAdapter.send(new Event()
+                        .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
+                        .eventParams(accountSingMapper.toEventParams(signEntity))
+                    );
+                    throw new EntryDeleteException(DOCUMENT_NAME, signEntity.getEntityUuid(), e);
+                }
             }
             var account = accountRepository.getByDigitalIdAndUuid(digitalId, accountUuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountUuid));
