@@ -27,6 +27,9 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     protected static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
     protected static final String BUDGET_ACCOUNT_VALID = "03010643100000000001";
     protected static final String BUDGET_CORR_ACCOUNT_VALID = "40102810300000000001";
+    protected static final int[] WEIGHT_FACTOR = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
+    protected static final String STATIC_ACCOUNT_PART = "40702810";
+    protected static final String ACCOUNT_KEY = "0";
 
     /**
      * Алгоритм расчета контрольного ключа:
@@ -38,23 +41,20 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
      */
     public static String getValidAccountNumber() {
 
-        String staticAccountPart = "40702810";
-        String accountKey = "0";
         String randomAccountPart = RandomStringUtils.randomNumeric(11);
-        String accountForCalculate = staticAccountPart + accountKey + randomAccountPart;
+        String accountForCalculate = STATIC_ACCOUNT_PART + ACCOUNT_KEY + randomAccountPart;
         String stringForCalculate = getBic().substring(6) + accountForCalculate;
         int[] numberForCalculate = Arrays.stream(stringForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
-        int[] weightFactor = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
         int[] result = new int[numberForCalculate.length];
-        for (int i = 0; i<weightFactor.length; i++) {
-            result[i] = numberForCalculate[i] * weightFactor[i];
+        for (int i = 0; i < WEIGHT_FACTOR.length; i++) {
+            result[i] = numberForCalculate[i] * WEIGHT_FACTOR[i];
         }
         int resulSumma = 0;
-        for (int i = 0; i<result.length; i++) {
-            resulSumma += result[i]%10;
+        for (int i = 0; i < result.length; i++) {
+            resulSumma += result[i] % 10;
         }
 
-       return  staticAccountPart + resulSumma*3%10 + randomAccountPart;
+        return STATIC_ACCOUNT_PART + resulSumma * 3 % 10 + randomAccountPart;
     }
 
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
