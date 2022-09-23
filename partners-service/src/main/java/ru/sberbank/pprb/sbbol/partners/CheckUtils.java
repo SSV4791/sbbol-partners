@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 public class CheckUtils {
 
     public static final String DIGIT_CHAR = "1234567890";
-    public static final String LEGAL_NAME_PATTERN = "^[A-Za-zА-Яа-я0-9Ёё!\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+$";
     private static final String WHITESPACE = " ";
     private static final String AT_CHAR = "@";
     /**

@@ -23,6 +23,8 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -142,7 +144,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(documentError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(documentError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
@@ -208,7 +210,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         assertThat(searchDocument.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     public static DocumentCreate getValidContactDocument(String partnerUuid, String digitalId) {

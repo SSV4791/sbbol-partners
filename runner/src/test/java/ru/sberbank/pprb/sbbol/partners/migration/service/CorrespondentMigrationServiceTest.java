@@ -5,7 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.CollectionUtils;
-import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
@@ -166,7 +165,6 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
             correspondent.setBankAccount(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setVersion(0);
             correspondent.setSigned(false);
-            correspondent.setLegalType(MigrationLegalType.LEGAL_ENTITY);
             generatedCorrespondents.add(correspondent);
         }
         return generatedCorrespondents;

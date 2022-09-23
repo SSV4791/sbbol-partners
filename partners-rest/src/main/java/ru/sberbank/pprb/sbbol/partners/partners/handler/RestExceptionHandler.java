@@ -9,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,12 +18,14 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
-import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
+import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
+import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
+import ru.sberbank.pprb.sbbol.partners.exception.common.BaseException;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
@@ -40,6 +41,13 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ENTRY_SAVE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
+import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.CRITICAL;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -55,10 +63,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpServletRequest httpRequest
     ) {
         LOG.error("Нарушение ограничений уникальности в БД", ex);
-        return buildResponseEntity(
+        return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
-            "PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION",
+            BUSINESS,
+            MODEL_DUPLICATE_EXCEPTION.getValue(),
             MessagesTranslator.toLocale("error.message.check.validation"),
+            Collections.emptyMap(),
             httpRequest.getRequestURL()
         );
     }
@@ -74,43 +84,38 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpServletRequest httpRequest
     ) {
         LOG.error("Объект не найден", ex);
-        return buildResponseEntity(
+        return buildResponsesEntity(
             HttpStatus.NOT_FOUND,
+            BUSINESS,
+            MODEL_NOT_FOUND_EXCEPTION.getValue(),
             ex.getLocalizedMessage(),
-            httpRequest.getRequestURL()
-        );
-    }
-
-    @ExceptionHandler(OptimisticLockException.class)
-    protected ResponseEntity<Object> handleObjectModelValidationException(
-        OptimisticLockException ex,
-        HttpServletRequest httpRequest
-    ) {
-        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
-        return buildResponsesEntity(
-            HttpStatus.BAD_REQUEST.name(),
-            ex.getErrors(),
-            ex.getText(),
-            httpRequest.getRequestURL()
-        );
-    }
-
-    @ExceptionHandler(CheckValidationException.class)
-    protected ResponseEntity<Object> handleObjectModelValidationException(
-        CheckValidationException ex,
-        HttpServletRequest httpRequest
-    ) {
-        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
-        return buildResponsesEntity(
-            ex.getText(),
-            ex.getErrors(),
-            ex.getText(),
+            Collections.emptyMap(),
             httpRequest.getRequestURL()
         );
     }
 
     @ExceptionHandler({
-        BadRequestException.class,
+        AccountPriorityOneMoreException.class,
+        AccountAlreadySignedException.class,
+        OptimisticLockException.class,
+        CheckValidationException.class
+    })
+    protected ResponseEntity<Object> handleBusinessException(
+        BaseException ex,
+        HttpServletRequest httpRequest
+    ) {
+        LOG.error(ex.getLogMessage(), ex);
+        return buildResponsesEntity(
+            HttpStatus.BAD_REQUEST,
+            ex.getType(),
+            ex.getErrorCodeValue(),
+            ex.getText(),
+            ex.getErrors(),
+            httpRequest.getRequestURL()
+        );
+    }
+
+    @ExceptionHandler({
         EntrySaveException.class,
         OptimisticLockingFailureException.class
     })
@@ -119,42 +124,54 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpServletRequest httpRequest
     ) {
         LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
-        return buildResponseEntity(
+        return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
+            null,
+            ENTRY_SAVE_EXCEPTION.getValue(),
             ex.getLocalizedMessage(),
+            Collections.emptyMap(),
             httpRequest.getRequestURL()
         );
     }
-
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(
         Exception ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error("Необработанное исключение", ex);
-        return buildResponseEntity(
+        LOG.error("При выполнении операции произошла ошибка", ex);
+        return buildResponsesEntity(
             HttpStatus.INTERNAL_SERVER_ERROR,
+            null,
+            EXCEPTION.getValue(),
             ex.getLocalizedMessage(),
-            httpRequest.getRequestURL()
-        );
-    }
-
-    @ExceptionHandler(HibernateOptimisticLockingFailureException.class)
-    protected ResponseEntity<Object> handleObjectBadRequestExceptionHibernate(
-        HibernateOptimisticLockingFailureException ex,
-        HttpServletRequest httpRequest) {
-        LOG.error("Версия записи в базе данных не равна версии в запросе", ex);
-        return buildResponseEntity(
-            HttpStatus.BAD_REQUEST, "Версия записи в базе данных не равна версии в запросе: "
-                + ex.getLocalizedMessage(),
+            Collections.emptyMap(),
             httpRequest.getRequestURL()
         );
     }
 
     @NotNull
-    @Override
-    protected @NonNull ResponseEntity<Object> handleMethodArgumentNotValid(
+    @Override protected @NonNull
+    ResponseEntity<Object> handleExceptionInternal(
+        Exception ex,
+        Object body,
+        @NonNull HttpHeaders headers,
+        @NonNull HttpStatus status,
+        @NonNull WebRequest request
+    ) {
+        return buildResponsesEntity(
+            status,
+            CRITICAL,
+            EXCEPTION.getValue(),
+            ex.getLocalizedMessage(),
+            Collections.emptyMap(),
+            ((ServletWebRequest) request).getRequest().getRequestURL()
+        );
+    }
+
+    @NotNull
+    @Override protected @NonNull
+    ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         @NonNull HttpHeaders headers,
         @NonNull HttpStatus status,
@@ -181,77 +198,36 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             Stream.concat(errorsField.entrySet().stream(), errorsGlobal.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return buildResponsesEntity(
-            "PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION",
-            errors,
+            HttpStatus.BAD_REQUEST,
+            BUSINESS,
+            MODEL_VALIDATION_EXCEPTION.getValue(),
             MessagesTranslator.toLocale("error.message.check.validation"),
+            errors,
             ((ServletWebRequest) request).getRequest().getRequestURL()
-        );
-    }
-
-    @NotNull
-    @Override
-    protected @NonNull
-    ResponseEntity<Object> handleExceptionInternal(
-        Exception ex,
-        Object body,
-        @NonNull HttpHeaders headers,
-        @NonNull HttpStatus status,
-        @NonNull WebRequest request
-    ) {
-        return buildResponseEntity(
-            status,
-            ex.getLocalizedMessage(),
-            ((ServletWebRequest) request).getRequest().getRequestURL()
-        );
-    }
-
-    private ResponseEntity<Object> buildResponseEntity(
-        HttpStatus status,
-        String errorDesc,
-        StringBuffer requestUrl
-    ) {
-        var errorData = new Error().code(status.name()).text(Collections.singletonList(errorDesc));
-        String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
-        LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
-        return new ResponseEntity<>(
-            errorData,
-            status
-        );
-    }
-
-    private ResponseEntity<Object> buildResponseEntity(
-        HttpStatus status,
-        String errorCode,
-        String errorDesc,
-        StringBuffer requestUrl
-    ) {
-        var errorData = new Error().code(errorCode).text(Collections.singletonList(errorDesc));
-        String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
-        LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
-        return new ResponseEntity<>(
-            errorData,
-            status
         );
     }
 
     private ResponseEntity<Object> buildResponsesEntity(
-        String errorCode,
+        HttpStatus httpStatus,
+        Error.TypeEnum type,
+        int errorCode,
+        String message,
         Map<String, List<String>> errors,
-        String text,
         StringBuffer requestUrl
     ) {
         var descriptions = errors.entrySet().stream()
             .map(value -> new Descriptions().field(value.getKey()).message(value.getValue()))
             .collect(toList());
         var errorData = new Error()
+            .type(type)
             .code(errorCode)
-            .descriptions(descriptions)
-            .text(Collections.singletonList(text));
+            .message(message)
+            .descriptions(descriptions);
         String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
         LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
         return new ResponseEntity<>(
             errorData,
-            HttpStatus.BAD_REQUEST
+            httpStatus
         );
     }
 }

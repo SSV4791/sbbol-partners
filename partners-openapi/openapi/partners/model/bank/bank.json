@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Банк",
+  "x-extra-class-annotation": "@BankAccountValidation",
   "properties": {
     "id": {
       "type": "string",
@@ -25,14 +26,20 @@
     "bic": {
       "type": "string",
       "title": "БИК",
+      "pattern": "[0-9]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
       "minLength": 9,
       "maxLength": 9,
-      "x-not-empty": true
+      "x-length-message": "{validation.account.bank.bic.length}"
     },
     "name": {
       "type": "string",
       "title": "Наименование",
-      "maxLength": 160
+      "maxLength": 160,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "x-not-empty": true
     },
     "mediary": {
       "type": "boolean",

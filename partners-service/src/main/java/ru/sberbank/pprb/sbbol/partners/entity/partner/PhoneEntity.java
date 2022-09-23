@@ -38,11 +38,6 @@ public class PhoneEntity extends PhoneBaseEntity {
     }
 
     @Override
-    public String getHashKey() {
-        return getDigitalId();
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -60,5 +55,10 @@ public class PhoneEntity extends PhoneBaseEntity {
     @Override
     public int hashCode() {
         return getUuid() == null ? super.hashCode() : Objects.hash(getUuid());
+    }
+
+    @Override
+    public String getHashKey() {
+        return getDigitalId();
     }
 }

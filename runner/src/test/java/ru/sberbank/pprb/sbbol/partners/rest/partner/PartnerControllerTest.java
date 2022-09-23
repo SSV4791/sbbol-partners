@@ -1,10 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
@@ -31,13 +33,21 @@ import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.ACCOUNT_FOR_TEST_PARTNER;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
@@ -265,6 +275,42 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testGetSearchOrgNamePartnersWithQuotesAndSpaceSymbol() {
+        var digitalId = randomAlphabetic(10);
+        var orgName = "ОАО \"Ромашка\"";
+        var createPartner = getValidPartner(digitalId);
+        createPartner.setOrgName(orgName);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            createPartner,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.search(
+            new SearchPartners()
+                .search(orgName)
+        );
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class);
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
     void testGetSearchFIOPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -353,7 +399,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        assertThat(response.getPartners())
+        Assertions.assertThat(response.getPartners())
             .hasSize(2);
     }
 
@@ -647,7 +693,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePartner1)
             .isNotNull();
         assertThat(newUpdatePartner1.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
     }
 
     @Test
@@ -776,7 +822,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter1 = new PartnersFilter();
         filter.setDigitalId(digitalId);
@@ -792,7 +838,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter2 = new PartnersFilter();
         filter.setDigitalId(digitalId);
@@ -808,7 +854,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -891,7 +937,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -900,7 +946,45 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+    }
+
+    @Test
+    void testCreatePartnerEmptyOrgName() {
+        var partner = getValidPartner();
+        partner.setOrgName("");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле обязательно для заполнения");
+    }
+
+    @Test
+    void testCreatePartnerInvalidCharsInOrgName() {
+        var partner = getValidPartner();
+        partner.setOrgName("[Наименование] [§±]");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [][§±]");
     }
 
     @Test
@@ -970,7 +1054,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -985,8 +1069,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(partnerError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
-        assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
+        Assertions.assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (partner.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }
@@ -1052,13 +1136,648 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         assertThat(searchPartner.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+    }
+
+    @Test
+    void testCreatePartnerWithContacts() {
+        var partnerCreate = getValidPartner();
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        var expectedPhones = partnerCreate.getPhones();
+        var expectedEmails = partnerCreate.getEmails();
+        var actualPhones = createdPartner.getPhones()
+            .stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var actualEmails = createdPartner.getEmails()
+            .stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(actualPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedPhones);
+        assertThat(actualEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_updateExistContacts() {
+        var partnerCreate = getValidPartner();
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones().size() > 0 )
+            .isTrue();
+        assertThat(createdPartner.getEmails().size() > 0 )
+            .isTrue();
+        var updatePhone = createdPartner.getPhones().stream().findFirst().orElse(null);
+        assertThat(updatePhone)
+            .isNotNull();
+        updatePhone.setPhone("0070987654321");
+        var updateEmail = createdPartner.getEmails().stream().findFirst().orElse(null);
+        assertThat(updateEmail)
+            .isNotNull();
+        updateEmail.setEmail("12345@mail.ru");
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .isNotNull();
+        var updatePhones = createdPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var updatedPhones = updatedPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        assertThat(updatedPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updatePhones);
+        var updateEmails = createdPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        var updatedEmails = updatedPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(updatedEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updateEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_addNewContacts() {
+        var partnerCreate = getValidPartner();
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        createdPartner.getPhones().add(new Phone().phone("0071234567890"));
+        createdPartner.getEmails().add(new Email().email("007@mail.ru"));
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .isNotNull();
+        var updatePhones = createdPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var updatedPhones = updatedPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        assertThat(updatedPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updatePhones);
+        var updateEmails = createdPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        var updatedEmails = updatedPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(updatedEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updateEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_deleteAnyContacts() {
+        var partnerCreate = getValidPartner();
+        partnerCreate.getPhones().add("0071234567890");
+        partnerCreate.getEmails().add("123@mail.ru");
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        var phones = createdPartner.getPhones().stream().skip(1).collect(Collectors.toSet());
+        var emails = createdPartner.getEmails().stream().skip(1).collect(Collectors.toSet());
+        createdPartner.setPhones(phones);
+        createdPartner.setEmails(emails);
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .isNotNull();
+        var updatePhones = createdPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        var updatedPhones = updatedPartner.getPhones().stream()
+            .map(Phone::getPhone)
+            .collect(Collectors.toList());
+        assertThat(updatedPhones)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updatePhones);
+        var updateEmails = createdPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        var updatedEmails = updatedPartner.getEmails().stream()
+            .map(Email::getEmail)
+            .collect(Collectors.toList());
+        assertThat(updatedEmails)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(updateEmails);
+    }
+
+    @Test
+    void testUpdatePartnerContacts_deleteAllContacts() {
+        var partnerCreate = getValidPartner();
+        partnerCreate.getPhones().add("0071234567890");
+        partnerCreate.getEmails().add("123@mail.ru");
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partnerCreate,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        assertThat(createdPartner.getPhones())
+            .isNotNull();
+        assertThat(createdPartner.getEmails())
+            .isNotNull();
+        createdPartner.setPhones(Collections.emptySet());
+        createdPartner.setEmails(Collections.emptySet());
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            createdPartner,
+            Partner.class
+        );
+        var updatedPartner = get(
+            "/partners/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(updatedPartner)
+            .isNotNull();
+        assertThat(updatedPartner.getPhones())
+            .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                    .isEqualTo(Collections.emptySet());
+
+        assertThat(updatedPartner.getEmails())
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(Collections.emptySet());
     }
 
     @Test
     void savePartnerFullModel() {
-        var request = new PartnerCreateFullModel()
-            .digitalId(randomAlphabetic(10))
+        var request = getValidFullModelPartner();
+        var createdPartner = post(
+            baseRoutePath + "/full-model",
+            HttpStatus.CREATED,
+            request,
+            PartnerCreateFullModelResponse.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+    }
+
+    @Test
+    void savePartnerFullModelEmptyOrgName() {
+        var partner = getValidFullModelPartner();
+        partner.setOrgName("");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле обязательно для заполнения");
+    }
+
+    @Test
+    void savePartnerFullModelInvalidOrgName() {
+        var partner = getValidFullModelPartner();
+        partner.setOrgName("[Наименование] §±`~><");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
+    }
+
+    @Test
+    void savePartnerFullModelInvalidBankName() {
+        var partner = getValidFullModelPartner();
+        partner.getAccounts().forEach(x -> x.getBank().setName(""));
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotNull.message"));
+
+        var partner1 = getValidFullModelPartner();
+        partner1.getAccounts().forEach(x -> x.getBank().setName("Наименование банка [§±]"));
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner1)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols")+" [§±]");
+
+        var str = "0123456789";
+        var partner2 = getValidFullModelPartner();
+        partner2.getAccounts().forEach(x -> x.getBank().setName(str.repeat(17)));
+        var error2 = given()
+            .spec(requestSpec)
+            .body(partner2)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error2.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 160");
+    }
+
+    @Test
+    void savePhysicalPartnerInvalidName() {
+        var partner = getValidPhysicalPersonPartner();
+        partner.setFirstName("[Имя] §±`~><");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
+    }
+
+    @Test
+    void savePhysicalPartnerInvalidComment() {
+        var partner = getValidPhysicalPersonPartner();
+        partner.setComment("[Коммент Ёё §±]");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [§±]");
+
+        var str = "0123456789";
+        partner.setComment(str.repeat(26));
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 255");
+    }
+
+    @Test
+    void saveFullModelPartnerInvalidAccountComment() {
+        var partner = getValidFullModelPartner();
+        partner.getAccounts().forEach(x -> x.setComment("[Comment §± Ёё]"));
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [§±]");
+
+        var str = "0123456789";
+        partner.getAccounts().forEach(x -> x.setComment(str.repeat(6)));
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath+"/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 50");
+    }
+
+    @Test
+    void testSavePartnerWithInvalidKpp() {
+        var partner = getValidPartner();
+        partner.setKpp("1234567890");
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Максимальное количество символов – 9");
+
+        partner.setKpp("[АБВ1234]");
+        var error1 = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): [АБВ]")
+            .contains("Введён неверный КПП");
+
+        partner.setKpp("003456789");
+        var error2 = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error2.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Введён неверный КПП");
+    }
+
+    @Test
+    void testSavePartnerWithNullOrEmptyKpp() {
+        var partner = getValidPartner();
+        partner.setKpp(null);
+        var response = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            Partner.class
+        );
+        assertThat(response)
+                .isNotNull();
+        assertThat(response.getKpp())
+            .isNull();
+
+        partner.setKpp("0");
+        var response1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            Partner.class
+        );
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getKpp())
+            .isEqualTo("0");
+    }
+
+    @Test
+    void testSavePartner_whenInvalidOgrnLength() {
+        var partner = getValidPartner();
+        partner.setOgrn("11");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.legal_entity.ogrn.length"))
+            .contains(MessagesTranslator.toLocale("validation.partner.ogrn.control_number"));
+    }
+
+    @Test
+    void testSavePartner_whenInvalidOgrnKey() {
+        var partner = getValidPartner();
+        partner.setOgrn("1234567890123");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.ogrn.control_number"));
+    }
+
+    @Test
+    void testSavePartner_whenInvalidOkpoLength() {
+        var partner = getValidPartner();
+        partner.setOkpo("1234567890123");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.legal_entity.okpo.length"));
+
+        var partner1 = getValidEntrepreneurPartner(randomAlphabetic(10));
+        partner1.setOkpo("123");
+        var error1 = given()
+            .spec(requestSpec)
+            .body(partner1)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.entrepreneur.okpo.length"));
+    }
+
+    @Test
+    void testSavePartner_whenInvalidCharsOkpo() {
+        var partner = getValidPartner();
+        partner.setOkpo("12345АБВ");
+        var error = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(baseRoutePath)
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains("Поле содержит недопустимый(-е) символ(-ы): АБВ");
+    }
+
+    public static PartnerCreate getValidPartner() {
+        return getValidPartner(randomAlphabetic(10));
+    }
+
+    public static PartnerCreate getValidPartner(String digitalId) {
+        var partner = new PartnerCreate()
+            .legalForm(LegalForm.LEGAL_ENTITY)
+            .orgName(randomAlphabetic(10))
+            .firstName(randomAlphabetic(10))
+            .secondName(randomAlphabetic(10))
+            .middleName(randomAlphabetic(10))
+            .inn("4139314257")
+            .kpp("123456789")
+            .ogrn("1035006110083")
+            .okpo("12345678")
+            .phones( new HashSet<>(List.of("0079241111111")))
+            .emails( new HashSet<>(List.of("a.a.a@sberbank.ru")))
+            .comment("555555");
+        partner.setDigitalId(digitalId);
+        return partner;
+    }
+
+    public static PartnerCreateFullModel getValidFullModelPartner() {
+        return getValidFullModelPartner(randomAlphabetic(10));
+    }
+
+    public static PartnerCreateFullModel getValidFullModelPartner(String digitalId) {
+        return new PartnerCreateFullModel()
+            .digitalId(digitalId)
             .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName(randomAlphabetic(10))
             .firstName(randomAlphabetic(10))
@@ -1130,43 +1849,10 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                         ))
                 )
             );
-
-        var createdPartner = post(
-            baseRoutePath + "/full-model",
-            HttpStatus.CREATED,
-            request,
-            PartnerCreateFullModelResponse.class
-        );
-        assertThat(createdPartner)
-            .isNotNull();
     }
 
-    public static PartnerCreate getValidPartner() {
-        return getValidPartner(randomAlphabetic(10));
-    }
-
-    public static PartnerCreate getValidPartner(String digitalId) {
-        var partner = new PartnerCreate()
-            .legalForm(LegalForm.LEGAL_ENTITY)
-            .orgName(randomAlphabetic(10))
-            .firstName(randomAlphabetic(10))
-            .secondName(randomAlphabetic(10))
-            .middleName(randomAlphabetic(10))
-            .inn("4139314257")
-            .kpp("123456789")
-            .ogrn("1035006110083")
-            .okpo("12345678")
-            .phones(
-                Set.of(
-                    "0079241111111"
-                ))
-            .emails(
-                Set.of(
-                    "a.a.a@sberbank.ru"
-                ))
-            .comment("555555");
-        partner.setDigitalId(digitalId);
-        return partner;
+    public static PartnerCreate getValidPhysicalPersonPartner() {
+        return getValidPhysicalPersonPartner(randomAlphabetic(10));
     }
 
     private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {
@@ -1179,7 +1865,9 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     private static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
         var partner = getValidPartner(digitalId);
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
+        partner.setOkpo("1234567890");
         partner.setInn("521031961500");
+        partner.setOgrn("314505309900027");
         return partner;
     }
 
@@ -1230,6 +1918,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .phones(partner.getPhones())
             .emails(partner.getEmails())
             .firstName(randomAlphabetic(10))
-            .version(partner.getVersion());
+            .version(partner.getVersion())
+            .inn(partner.getInn());
     }
 }

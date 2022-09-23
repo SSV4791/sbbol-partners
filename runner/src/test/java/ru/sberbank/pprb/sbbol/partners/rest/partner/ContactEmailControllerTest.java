@@ -19,6 +19,8 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -54,7 +56,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter2 = new EmailsFilter()
             .digitalId(contact.getDigitalId())
@@ -72,7 +74,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter3 = new EmailsFilter()
             .digitalId(contact.getDigitalId())
@@ -92,7 +94,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -156,7 +158,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             expected,
             Error.class);
         assertThat(emailCreate.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         expected.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(254) + "@");
         var emailCreate1 = post(
@@ -165,7 +167,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             expected,
             Error.class);
         assertThat(emailCreate1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         expected.setEmail(randomAlphabetic(65) + "@" + randomAlphabetic(250));
         var emailCreate2 = post(
@@ -174,7 +176,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             expected,
             Error.class);
         assertThat(emailCreate2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -211,7 +213,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(emailError.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var email1 = createEmail(contact.getId(), contact.getDigitalId());
         updateEmail(email1);
@@ -223,7 +225,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(emailError1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var email2 = createEmail(contact.getId(), contact.getDigitalId());
         updateEmail(email2);
@@ -235,7 +237,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(emailError2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -252,7 +254,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(emailError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(emailError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (email.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
@@ -322,7 +324,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             delete(
                 "/partner/contact/emails/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                Map.of("ids",  actualEmail.getEmails().get(0).getId()),
+                Map.of("ids", actualEmail.getEmails().get(0).getId()),
                 contact.getDigitalId()
             ).getBody();
         assertThat(deleteEmail)

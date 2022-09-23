@@ -29,7 +29,8 @@
       "title": "Номер телефона",
       "minLength": 13,
       "maxLength": 13,
-      "pattern": "^\\d{13}$"
+      "pattern": "\\d{13}",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
     },
     "version": {
       "type": "integer",
@@ -38,10 +39,6 @@
     }
   },
   "required": [
-    "id",
-    "digitalId",
-    "unifiedId",
-    "phone",
-    "version"
+    "phone"
   ]
 }

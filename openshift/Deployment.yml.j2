@@ -30,6 +30,7 @@ spec:
         sidecar.istio.io/proxyMemoryLimit: {{ os_project.istio.sidecar.limits.memory | default("300Mi") }}
         sidecar.istio.io/proxyCPU: {{ os_project.istio.sidecar.requests.cpu | default("50m") }}
         sidecar.istio.io/proxyMemory: {{ os_project.istio.sidecar.requests.memory | default("150Mi") }}
+        openshift.io/scc: restricted
 {% if secman.openshift.enabled is not defined or secman.openshift.enabled | bool %}
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/agent-init-first: 'false'
@@ -60,6 +61,10 @@ spec:
         secman-injector: enabled
 {% endif %}
     spec:
+      serviceAccountName: default
+      securityContext:
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -79,8 +84,6 @@ spec:
 # app_docker_image проставляется при сборке архива с конфигами
           image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/{app_docker_image}
           imagePullPolicy: Always
-          securityContext:
-            readOnlyRootFilesystem: true
           env:
             - name: NODE_NAME       #добавление имени ноды в переменные среды пода
               valueFrom:
@@ -159,8 +162,6 @@ spec:
         - name: fluentbit
           image: {{ registry_area | default("registry.ca.sbrf.ru/sigma") }}/pprb/ci00641491/ci02469991_logger/fluent-bit@sha256:767f20b9246a0209cd3236c2e53419d96df2f4f013ce59d634b1fd581ee8c951
           imagePullPolicy: Always
-          securityContext:
-            readOnlyRootFilesystem: true
           resources:
             limits:
               ## TODO: hardcode now, ${fluentBitEnvCluster} and ${MODULE_NAME} and others

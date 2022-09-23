@@ -1,9 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
@@ -15,11 +17,18 @@ import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PRIORITY_ACCOUNT_MORE_ONE;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
@@ -90,7 +99,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         Descriptions descriptions = new Descriptions()
             .field("pagination")
             .message(
-                List.of("Поле не может быть равно null")
+                List.of(MessagesTranslator.toLocale("javax.validation.constraints.NotNull.message"))
             );
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
@@ -109,7 +118,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions())
             .contains(descriptions);
     }
@@ -146,7 +155,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         for (var text : errorTexts) {
             assertThat(errorTexts.contains(text)).isTrue();
         }
@@ -243,7 +252,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedInn() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var partnerWithoutAccount = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         List<String> account = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
@@ -793,7 +801,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -803,7 +811,92 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+    }
+
+    @Test
+    void testCreateWithEmptyAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var  account = createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId());
+        assertThat(account)
+            .isNotNull();
+    }
+
+    @Test
+    void testCreateWithNullAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var  account = createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId());
+        assertThat(account)
+            .isNotNull();
+    }
+
+    @Test
+    void testCreateUsdAccount() {
+        var partner = createValidPartner();
+        var expected = getValidAccount(partner.getId(), partner.getDigitalId());
+        expected.setAccount("40817840100000000001");
+        var error = createInvalidAccount(expected);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getDescriptions())
+            .isNotEmpty();
+        var messages = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(messages)
+            .contains(MessagesTranslator.toLocale("validation.account.rub_code_currency"));
+    }
+
+    @Test
+    void testCreateBudgetAccount_whenInvalidCodeCurrency() {
+        var partner = createValidPartner();
+        var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
+        expectedAccount.setAccount("00817810100000000001");
+        var error = createInvalidAccount(expectedAccount);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getDescriptions())
+            .isNotEmpty();
+        var messages = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(messages)
+            .contains(MessagesTranslator.toLocale("validation.account.treasure_code_currency"));
+    }
+
+    @Test
+    void testCreateBudgetAccount_whenInvalidBalance() {
+        var partner = createValidPartner();
+        var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
+        expectedAccount.setAccount("10817643100000000001");
+        var error = createInvalidAccount(expectedAccount);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getDescriptions())
+            .isNotEmpty();
+        var messages = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(messages)
+            .contains(MessagesTranslator.toLocale("validation.account.treasure_balance"));
+    }
+
+    @Test
+    void testCreateValidBudgetAccount() {
+        var partner = createValidPartner();
+        var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
+        var actualAccount = createValidAccount(expectedAccount);
+        assertThat(actualAccount)
+            .isNotNull();
     }
 
     @Test
@@ -822,6 +915,42 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotEqualTo(account.getComment());
         assertThat(updateAccount.getComment())
             .isNotNull();
+    }
+
+    @Test
+    void testUpdateAccountEntityWithEmptyAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var updateAccount = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            updateAccountEntityWithEmptyAccountAndBankAccount(account),
+            Account.class
+        );
+        assertThat(updateAccount)
+            .isNotNull();
+        assertThat(updateAccount.getAccount())
+            .isEmpty();
+        assertThat(updateAccount.getBank().getBankAccount().getBankAccount())
+            .isEmpty();
+    }
+
+    @Test
+    void testUpdateAccountEntityWithNullAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var updateAccount = put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            updateAccountEntityWithNullAccountAndBankAccount(account),
+            Account.class
+        );
+        assertThat(updateAccount)
+            .isNotNull();
+        assertThat(updateAccount.getAccount())
+            .isEqualTo(account.getAccount());
+        assertThat(updateAccount.getBank().getBankAccount().getBankAccount())
+            .isEqualTo(account.getBank().getBankAccount().getBankAccount());
     }
 
     @Test
@@ -845,7 +974,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_DUPLICATE_EXCEPTION");
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -867,7 +996,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(updateAccount)
             .isNotNull();
         assertThat(updateAccount.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        AssertionsForClassTypes.assertThat(updateAccount.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
 
         var acc2 = updateAccount(account)
             .account("12345678901234567890");
@@ -878,7 +1010,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var acc3 = updateAccount(account)
             .bank(account.getBank()
@@ -890,11 +1022,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount3.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var acc4 = updateAccount(account)
             .bank(account.getBank()
-                .bic(""));
+                .bic("ABC123456789"));
         var updateAccount4 = put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
@@ -902,7 +1034,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(updateAccount4.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        AssertionsForClassTypes.assertThat(updateAccount4.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols")+" ABC")
+            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
     }
 
     @Test
@@ -1015,7 +1151,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         );
         assertThat(accountError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(accountError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (account.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
@@ -1078,7 +1214,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(accountVersion1)
             .isNotNull();
         assertThat(accountVersion1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         updateAccount(account);
         account.setAccount("40702810600000009222");
@@ -1094,11 +1230,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(accountVersion2)
             .isNotNull();
         assertThat(accountVersion2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         updateAccount(account);
         account.setVersion(accountVersion.getVersion());
-        account.setAccount("40101810600000010006");
+        account.setAccount("00101643600000010006");
         account.getBank().setBic("048602001");
         account.getBank().getBankAccount().setBankAccount("40102810945370000073");
         var accountVersion3 = put(
@@ -1151,7 +1287,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(searchAccount)
             .isNotNull();
         assertThat(searchAccount.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     @Test
@@ -1194,7 +1330,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo("PPRB:PARTNER:CHECK_VALIDATION_EXCEPTION");
+            .isEqualTo(PRIORITY_ACCOUNT_MORE_ONE.getValue());
     }
 
     public static String getBic() {

@@ -75,6 +75,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "search", ignore = true)
+    @Mapping(target = "gkuInnEntity", ignore = true)
     PartnerEntity toPartner(PartnerCreate partner);
 
     default List<PartnerEmailEntity> toEmail(Set<String> emails, String digitalId) {
@@ -119,6 +120,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "search", ignore = true)
+    @Mapping(target = "gkuInnEntity", ignore = true)
     PartnerEntity toPartner(PartnerCreateFullModel partner);
 
     @Named("toCitizenshipType")
@@ -137,6 +139,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "search", ignore = true)
+    @Mapping(target = "gkuInnEntity", ignore = true)
     PartnerEntity toPartner(Partner partner);
 
     @Named("toLegalType")
@@ -151,6 +154,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "search", ignore = true)
+    @Mapping(target = "gkuInnEntity", ignore = true)
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);
 
     @AfterMapping
@@ -165,6 +169,7 @@ public interface PartnerMapper extends BaseMapper {
                     partner.getMiddleName()
                 )
                 .filter(Objects::nonNull)
+                .map(it -> it.replace(StringUtils.SPACE, StringUtils.EMPTY))
                 .collect(Collectors.joining(StringUtils.EMPTY));
         partner.setSearch(searchSubString);
         var phones = partner.getPhones();
@@ -172,6 +177,7 @@ public interface PartnerMapper extends BaseMapper {
             for (var phone : phones) {
                 if (phone != null) {
                     phone.setPartner(partner);
+                    phone.setDigitalId(partner.getDigitalId());
                 }
             }
         }
@@ -180,6 +186,7 @@ public interface PartnerMapper extends BaseMapper {
             for (var email : emails) {
                 if (email != null) {
                     email.setPartner(partner);
+                    email.setDigitalId(partner.getDigitalId());
                 }
             }
         }
@@ -190,5 +197,9 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "id", expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "accounts", ignore = true)
+    @Mapping(target = "documents", ignore = true)
+    @Mapping(target = "address", ignore = true)
+    @Mapping(target = "contacts", ignore = true)
     PartnerCreateFullModelResponse toPartnerMullResponse(PartnerEntity partner);
 }

@@ -22,6 +22,8 @@ import java.util.Map;
 
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -55,7 +57,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter2 = new EmailsFilter()
             .digitalId(partner.getDigitalId())
@@ -73,7 +75,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response1)
             .isNotNull();
         assertThat(response1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var filter3 = new EmailsFilter()
             .digitalId(partner.getDigitalId())
@@ -93,7 +95,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(response2)
             .isNotNull();
         assertThat(response2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -172,11 +174,11 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone1)
             .isNotNull();
         assertThat(newUpdatePhone1.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var phone2 = createPhone(partner.getId(), partner.getDigitalId());
         updatePhone(phone2);
-        phone2.setPhone((randomNumeric(11)) + "+" );
+        phone2.setPhone((randomNumeric(11)) + "+");
         var newUpdatePhone2 = put(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
@@ -186,7 +188,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone2)
             .isNotNull();
         assertThat(newUpdatePhone2.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var phone3 = createPhone(partner.getId(), partner.getDigitalId());
         updatePhone(phone3);
@@ -200,7 +202,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone3)
             .isNotNull();
         assertThat(newUpdatePhone3.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
 
         var phone4 = createPhone(partner.getId(), partner.getDigitalId());
         updatePhone(phone4);
@@ -214,7 +216,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         assertThat(newUpdatePhone4)
             .isNotNull();
         assertThat(newUpdatePhone4.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
     }
 
     @Test
@@ -248,7 +250,7 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(phoneError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(phoneError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (phone.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);

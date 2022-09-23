@@ -109,8 +109,6 @@ public class ContactServiceImpl implements ContactService {
             var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactUuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactUuid));
             contactRepository.delete(foundContact);
-            emailRepository.deleteAll(emailRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
-            phoneRepository.deleteAll(phoneRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
             addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
             documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
         }

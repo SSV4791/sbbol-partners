@@ -1,17 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.partners;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.DocumentTypeDictionaryApi;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentType;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeChange;
-import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsTypeResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeService;
-
-import java.util.List;
 
 @RestController
 public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
@@ -23,23 +17,7 @@ public class DocumentDictionaryController implements DocumentTypeDictionaryApi {
     }
 
     @Override
-    public ResponseEntity<DocumentType> create(DocumentTypeCreate documentTypeCreate) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(documentTypeService.saveDocument(documentTypeCreate));
-    }
-
-    @Override
-    public ResponseEntity<Void> delete(List<String> ids) {
-        documentTypeService.deleteDocuments(ids);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
     public ResponseEntity<DocumentsTypeResponse> list(DocumentTypeFilter filter) {
         return ResponseEntity.ok(documentTypeService.getDocuments(filter));
-    }
-
-    @Override
-    public ResponseEntity<DocumentType> update(DocumentTypeChange documentTypeChange) {
-        return ResponseEntity.ok(documentTypeService.updateDocument(documentTypeChange));
     }
 }

@@ -1,0 +1,25 @@
+{{#pattern}}{{^isByteArray}}@PatternValidation(regexp = "{{{pattern}}}" {{#vendorExtensions.x-pattern-message}}, message = "{{vendorExtensions.x-pattern-message}}" {{/vendorExtensions.x-pattern-message}}) {{/isByteArray}}{{/pattern}}
+{{!
+minLength && maxLength set
+}}{{#minLength}}{{#maxLength}}@Size(min = {{minLength}}, max = {{maxLength}}  {{#vendorExtensions.x-length-message}}, message = "{{vendorExtensions.x-length-message}}" {{/vendorExtensions.x-length-message}}) {{/maxLength}}{{/minLength}}{{!
+minLength set, maxLength not
+}}{{#minLength}}{{^maxLength}}@Size(min = {{minLength}} {{#vendorExtensions.x-length-message}}, message = "{{vendorExtensions.x-length-message}}" {{/vendorExtensions.x-length-message}}) {{/maxLength}}{{/minLength}}{{!
+minLength not set, maxLength set
+}}{{^minLength}}{{#maxLength}}@Size(max = {{.}} {{#vendorExtensions.x-length-message}}, message = "{{vendorExtensions.x-length-message}}" {{/vendorExtensions.x-length-message}}) {{/maxLength}}{{/minLength}}{{!
+@Size: minItems && maxItems set
+}}{{#minItems}}{{#maxItems}}@Size(min = {{minItems}}, max = {{maxItems}} {{#vendorExtensions.x-length-items-message}}, message = "{{vendorExtensions.x-length-items-message}}" {{/vendorExtensions.x-length-items-message}}) {{/maxItems}}{{/minItems}}{{!
+@Size: minItems set, maxItems not
+}}{{#minItems}}{{^maxItems}}@Size(min = {{minItems}} {{#vendorExtensions.x-length-items-message}}, message = "{{vendorExtensions.x-length-items-message}}" {{/vendorExtensions.x-length-items-message}}) {{/maxItems}}{{/minItems}}{{!
+@Size: minItems not set && maxItems set
+}}{{^minItems}}{{#maxItems}}@Size(max = {{.}} {{#vendorExtensions.x-length-items-message}}, message = "{{vendorExtensions.x-length-items-message}}" {{/vendorExtensions.x-length-items-message}}) {{/maxItems}}{{/minItems}}{{!
+@Email: useBeanValidation set && isEmail && java8 set
+}}{{#useBeanValidation}}{{#isEmail}}{{#java8}}@javax.validation.constraints.Email{{/java8}}{{/isEmail}}{{/useBeanValidation}}{{!
+@Email: performBeanValidation set && isEmail && not java8 set
+}}{{#performBeanValidation}}{{#isEmail}}{{^java8}}@org.hibernate.validator.constraints.Email{{/java8}}{{/isEmail}}{{/performBeanValidation}}{{!
+check for integer or long / all others=decimal type with @Decimal*
+isInteger set
+}}{{#isInteger}}{{#minimum}}@Min({{.}}) {{/minimum}}{{#maximum}}@Max({{.}}) {{/maximum}}{{/isInteger}}{{!
+isLong set
+}}{{#isLong}}{{#minimum}}@Min({{.}}L) {{/minimum}}{{#maximum}}@Max({{.}}L) {{/maximum}}{{/isLong}}{{!
+Not Integer, not Long => we have a decimal value!
+}}{{^isInteger}}{{^isLong}}{{#minimum}}@DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}}) {{/minimum}}{{#maximum}}@DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}}) {{/maximum}}{{/isLong}}{{/isInteger}}

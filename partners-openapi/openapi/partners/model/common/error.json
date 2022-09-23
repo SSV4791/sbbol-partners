@@ -4,15 +4,19 @@
   "title": "Ошибка",
   "properties": {
     "code": {
-      "type": "string",
+      "type": "integer",
       "title": "Код ошибки"
     },
-    "text": {
-      "type": "array",
-      "title": "Описание ошибок",
-      "items": {
-        "type": "string"
-      }
+    "message": {
+      "type": "string",
+      "title": "Описание ошибок"
+    },
+    "type":{
+      "type": "string",
+      "enum": [
+        "BUSINESS",
+        "CRITICAL"
+      ]
     },
     "descriptions": {
       "type": "array",

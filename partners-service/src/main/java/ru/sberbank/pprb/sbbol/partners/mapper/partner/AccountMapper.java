@@ -80,6 +80,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
+    @Mapping(target = "partner", ignore = true)
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "account", source = "account.account")
     AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
@@ -92,6 +93,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
+    @Mapping(target = "partner", ignore = true)
     AccountEntity toAccount(AccountCreate account);
 
     @Mapping(target = "intermediary", source = "mediary")
@@ -127,15 +129,18 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "search", ignore = true)
+    @Mapping(target = "partner", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget() AccountEntity accountEntity);
 
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "account", ignore = true)
     @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updateBank(Bank bank, @MappingTarget() BankEntity bankEntity);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "bank", ignore = true)
     @Mapping(target = "account", source = "bankAccount")
     void updateBankAccount(BankAccount bankAccount, @MappingTarget() BankAccountEntity bankAccountEntity);
 

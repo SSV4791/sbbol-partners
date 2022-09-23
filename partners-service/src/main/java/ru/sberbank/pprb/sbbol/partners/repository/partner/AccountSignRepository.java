@@ -13,8 +13,9 @@ public interface AccountSignRepository extends CrudRepository<SignEntity, UUID> 
     /**
      * Получение информации о подписи счёта Партнера
      *
-     * @param accountId идентификатор счёта партнера
+     * @param digitalId Идентификатор личного кабинета
+     * @param accountId Идентификатор счёта партнера
      * @return Информация о подписи
      */
-    Optional<SignEntity> getByAccountUuid(UUID accountId);
+    Optional<SignEntity> getByDigitalIdAndAccountUuid(String digitalId, UUID accountId);
 }

@@ -12,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
@@ -86,13 +85,6 @@ public class LegacyCheckAspect {
 
     @Before(value = "callPartnersController() && args(account)", argNames = "account")
     void check(AccountsSignInfo account) {
-        if (account != null) {
-            legacyCheck(account.getDigitalId());
-        }
-    }
-
-    @Before(value = "callPartnersController() && args(account)", argNames = "account")
-    void check(AccountsSignFilter account) {
         if (account != null) {
             legacyCheck(account.getDigitalId());
         }

@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 
 import javax.persistence.EntityManager;
@@ -32,6 +33,7 @@ public class RenterViewRepositoryImpl extends BaseRepository<PartnerEntity, Rent
         RenterFilter filter
     ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
+        predicates.add(builder.equal(root.get("type"), PartnerType.RENTER));
     }
 
     @Override

@@ -22,6 +22,9 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -61,78 +64,78 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartnerDocumentWithoutDigitalId() {
-        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), null);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithEmptyDigitalId() {
-        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), "");
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithBadDigitalId() {
-        var errorText ="размер должен находиться в диапазоне от 1 до 40";
+        var errorText = "размер должен находиться в диапазоне от 1 до 40";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(partner.getId(), RandomStringUtils.randomAlphanumeric(41));
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithoutUnifiedId() {
-        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var response = createPartnerDocumentWithErrors(null, partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithEmptyUnifiedId() {
-        var errorText ="Ошибка заполнения поля, поле обязательно для заполнения";
+        var errorText = "Поле обязательно для заполнения";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var response = createPartnerDocumentWithErrors("" ,partner.getDigitalId());
+        var response = createPartnerDocumentWithErrors("", partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
 
     @Test
     void testCreatePartnerDocumentWithBadUnifiedId() {
-        var errorText ="размер должен находиться в диапазоне от 36 до 36";
+        var errorText = "размер должен находиться в диапазоне от 36 до 36";
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var response = createPartnerDocumentWithErrors(RandomStringUtils.randomAlphanumeric(37) ,partner.getDigitalId());
+        var response = createPartnerDocumentWithErrors(RandomStringUtils.randomAlphanumeric(37), partner.getDigitalId());
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains(errorText);
     }
@@ -184,7 +187,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo("PPRB:PARTNER:MODEL_VALIDATION_EXCEPTION");
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         for (var description : response.getDescriptions()) {
             assertThat(errorDescriptions).contains(description);
         }
@@ -341,7 +344,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             Error.class
         );
         assertThat(documentError.getCode())
-            .isEqualTo(HttpStatus.BAD_REQUEST.name());
+            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
         assertThat(documentError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
@@ -388,7 +391,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
 
         var deleteDocument =
             delete(
-                baseRoutePath + "/documents" + "/{digitalId}" ,
+                baseRoutePath + "/documents" + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
                 Map.of("ids", actualDocument.getId()),
                 actualDocument.getDigitalId()
@@ -408,7 +411,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         assertThat(searchDocument.getCode())
-            .isEqualTo(HttpStatus.NOT_FOUND.name());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     private static Document createValidPartnerDocument(String partnerUuid, String digitalId) {

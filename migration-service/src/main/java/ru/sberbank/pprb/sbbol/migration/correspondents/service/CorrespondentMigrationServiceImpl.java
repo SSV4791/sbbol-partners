@@ -10,12 +10,15 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMa
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,15 +31,18 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     private final MigrationPartnerMapper migrationPartnerMapper;
     private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
+    private final AccountSignRepository accountSignRepository;
 
     public CorrespondentMigrationServiceImpl(
         MigrationPartnerMapper migrationPartnerMapper,
         PartnerRepository partnerRepository,
-        AccountRepository accountRepository
+        AccountRepository accountRepository,
+        AccountSignRepository accountSignRepository
     ) {
         this.migrationPartnerMapper = migrationPartnerMapper;
         this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
+        this.accountSignRepository = accountSignRepository;
     }
 
     @Override
@@ -47,35 +53,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         AccountEntity savedAccount;
         for (MigrationCorrespondentCandidate correspondent : correspondents) {
             try {
-                var search = Stream.of(correspondent.getInn(), correspondent.getKpp(), correspondent.getName())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining(StringUtils.EMPTY));
-                var searchPartner = partnerRepository.findByDigitalIdAndSearch(digitalId, search);
-                if (searchPartner == null) {
-                    var partnerEntity = migrationPartnerMapper.toPartnerEntity(digitalId, correspondent);
-                    var save = partnerRepository.save(partnerEntity);
-                    var accountEntity = migrationPartnerMapper.toAccountEntity(digitalId, save.getUuid(), correspondent);
-                    savedAccount = accountRepository.save(accountEntity);
-                } else {
-                    var bic = correspondent.getBic();
-                    var account = correspondent.getAccount();
-                    var bankAccount = correspondent.getBankAccount();
-                    var searchAccount = Stream.of(searchPartner.getUuid().toString(), account, bic, bankAccount)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.joining(StringUtils.EMPTY));
-                    var foundAccount =
-                        accountRepository.findByDigitalIdAndSearch(digitalId, searchAccount);
-                    if (foundAccount == null) {
-                        var accountEntity =
-                            migrationPartnerMapper.toAccountEntity(digitalId, searchPartner.getUuid(), correspondent);
-                        savedAccount = accountRepository.save(accountEntity);
-                    } else {
-                        migrationPartnerMapper.updateAccountEntity(digitalId, searchPartner.getUuid(), correspondent, foundAccount);
-                        savedAccount = accountRepository.save(foundAccount);
-                    }
-                    migrationPartnerMapper.updatePartnerEntity(digitalId, correspondent, searchPartner);
-                    partnerRepository.save(searchPartner);
-                }
+                savedAccount = saveOrUpdate(digitalId, correspondent);
             } catch (Exception ex) {
                 LOGGER.error(
                     "В процессе миграции контрагента с sbbolReplicationGuid: {}, произошла ошибка. Причина: {}",
@@ -98,5 +76,82 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         }
         LOGGER.debug("Для организации c digitalId: {}, мигрировано {} контрагентов", digitalId, migratedCorrespondentData.size());
         return migratedCorrespondentData;
+    }
+
+    @Override
+    @Transactional
+    public MigrationCorrespondentCandidate save(String digitalId, MigrationCorrespondentCandidate correspondent) {
+        var accountEntity = saveOrUpdate(digitalId, correspondent);
+        var partnerEntity = partnerRepository.getByDigitalIdAndUuid(digitalId, accountEntity.getPartnerUuid());
+        if (partnerEntity.isEmpty()) {
+            throw new EntryNotFoundException("partner", digitalId, accountEntity.getPartnerUuid());
+        }
+        return migrationPartnerMapper.toCounterparty(partnerEntity.get(), accountEntity);
+    }
+
+    @Override
+    public void delete(String digitalId, String pprbGuid) {
+        if (StringUtils.isEmpty(pprbGuid)) {
+            return;
+        }
+        var uuid = UUID.fromString(pprbGuid);
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
+        if (foundAccount.isPresent()) {
+            var accountEntity = foundAccount.get();
+            accountRepository.delete(accountEntity);
+            var accountSignEntity =
+                accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountEntity.getUuid());
+            accountSignEntity.ifPresent(accountSignRepository::delete);
+        }
+
+    }
+
+    private AccountEntity saveOrUpdate(String digitalId, MigrationCorrespondentCandidate correspondent) {
+        var pprbGuid = correspondent.getPprbGuid();
+        if (pprbGuid != null) {
+            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(pprbGuid));
+            if (foundAccount.isPresent()) {
+                var account = foundAccount.get();
+                var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, account.getPartnerUuid());
+                if (foundPartner.isPresent()) {
+                    var partner = foundPartner.get();
+                    migrationPartnerMapper.updatePartnerEntity(digitalId, correspondent, partner);
+                    partnerRepository.save(partner);
+                    migrationPartnerMapper.updateAccountEntity(digitalId, account.getPartnerUuid(), correspondent, account);
+                    return accountRepository.save(account);
+                }
+            }
+        }
+        var search = Stream.of(correspondent.getInn(), correspondent.getKpp(), correspondent.getName())
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(StringUtils.EMPTY));
+        AccountEntity savedAccount;
+        var searchPartner = partnerRepository.findByDigitalIdAndSearch(digitalId, search);
+        if (searchPartner == null) {
+            var partnerEntity = migrationPartnerMapper.toPartnerEntity(digitalId, correspondent);
+            var save = partnerRepository.save(partnerEntity);
+            var accountEntity = migrationPartnerMapper.toAccountEntity(digitalId, save.getUuid(), correspondent);
+            savedAccount = accountRepository.save(accountEntity);
+        } else {
+            var bic = correspondent.getBic();
+            var account = correspondent.getAccount();
+            var bankAccount = correspondent.getBankAccount();
+            var searchAccount = Stream.of(searchPartner.getUuid().toString(), account, bic, bankAccount)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(StringUtils.EMPTY));
+            var foundAccount =
+                accountRepository.findByDigitalIdAndSearch(digitalId, searchAccount);
+            if (foundAccount == null) {
+                var accountEntity =
+                    migrationPartnerMapper.toAccountEntity(digitalId, searchPartner.getUuid(), correspondent);
+                savedAccount = accountRepository.save(accountEntity);
+            } else {
+                migrationPartnerMapper.updateAccountEntity(digitalId, searchPartner.getUuid(), correspondent, foundAccount);
+                savedAccount = accountRepository.save(foundAccount);
+            }
+            migrationPartnerMapper.updatePartnerEntity(digitalId, correspondent, searchPartner);
+            partnerRepository.save(searchPartner);
+        }
+        return savedAccount;
     }
 }

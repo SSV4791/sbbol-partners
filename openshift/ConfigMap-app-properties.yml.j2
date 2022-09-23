@@ -12,6 +12,7 @@ data:
     spring.jpa.properties.hibernate.cache.use_second_level_cache=true
     spring.jpa.properties.hibernate.cache.use_query_cache=true
     spring.jpa.properties.hibernate.cache.region.factory_class=jcache
+    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
     spring.main.banner-mode=off
     spring.application.name={{ os_project.name }}
@@ -44,9 +45,9 @@ data:
 
     # Audit
     audit.enabled={{ os_project.audit.enabled | default('false')}}
-    audit.url={% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.host }}{% else %}{{ int_entry.pprb.audit | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.istio_mesh_port }}{% else %}{{ int_entry.pprb.audit | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
     audit.time_out={{ os_project.audit.time_out | default('5000')}}
     audit.x-node-id={{ openshift.env }}
+    audit.url={% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.host }}{% else %}{{ int_entry.pprb.audit | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.istio_mesh_port }}{% else %}{{ int_entry.pprb.audit | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
 
     # Sbbol connect
     sbbol.url={% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.host }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='host') | first }}{% endif %}:{% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.istio_mesh_port | default('80') }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}/ss-rest/api
@@ -54,6 +55,14 @@ data:
 
     # Application Journal
     appjournal.moduleId=pprb4-digital-partners
+
+    #StandIn plugin
+    standin.plugin.configuration.journalHashKeyResolver={{ standin.plugin.configuration.journalHashKeyResolver | default('INTERFACE')}}
+    standin.plugin.configuration.replicationStrategy={{ standin.plugin.configuration.replicationStrategy | default('STANDIN_LOCKS')}}
+    standin.plugin.configuration.serializerType={{ standin.plugin.configuration.serializerType | default('BINARY_KRYO')}}
+    standin.plugin.configuration.partitionLockMode={{ standin.plugin.configuration.partitionLockMode | default('NONE')}}
+    standin.plugin.configuration.orderingControlStrategy={{ standin.plugin.configuration.orderingControlStrategy | default('OPTIMISTIC_LOCK_VERSION_CONTROL')}}
+    standin.plugin.configuration.partitionMultiplyingMode={{ standin.plugin.configuration.partitionMultiplyingMode | default('FORBIDDEN')}}
 
     standin.cloud.client.heartBeatPeriod=1000
     standin.cloud.client.subscriptionKafkaConcurrency=10

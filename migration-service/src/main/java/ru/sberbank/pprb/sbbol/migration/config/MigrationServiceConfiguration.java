@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.migration.gku.repository.MigrationGkuRepository;
 import ru.sberbank.pprb.sbbol.migration.gku.service.GkuMigrationService;
 import ru.sberbank.pprb.sbbol.migration.gku.service.GkuMigrationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 @Configuration
@@ -31,12 +32,14 @@ public class MigrationServiceConfiguration {
     @Bean
     CorrespondentMigrationService correspondentMigrationService(
         PartnerRepository partnerRepository,
-        AccountRepository accountRepository
+        AccountRepository accountRepository,
+        AccountSignRepository accountSignRepository
     ) {
         return new CorrespondentMigrationServiceImpl(
             migrationPartnerMapper(),
             partnerRepository,
-            accountRepository
+            accountRepository,
+            accountSignRepository
         );
     }
 

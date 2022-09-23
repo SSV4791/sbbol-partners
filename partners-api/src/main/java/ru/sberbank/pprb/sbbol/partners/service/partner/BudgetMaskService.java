@@ -1,23 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
-
-import java.util.List;
 
 /**
  * Сервис по работе с масками по определению бюджетности
  */
 public interface BudgetMaskService {
-
-    /**
-     * Создание новой бюджетной маски
-     *
-     * @param budgetMask данные маски
-     * @return Маска
-     */
-    BudgetMask saveBudgetMask(BudgetMask budgetMask);
 
     /**
      * Получение списка бюджетным масок по фильтру
@@ -26,13 +15,6 @@ public interface BudgetMaskService {
      * @return список бюджетных масок
      */
     BudgetMasksResponse getBudgetMasks(BudgetMaskFilter budgetMaskFilter);
-
-    /**
-     * Удаление маски из справочника
-     *
-     * @param ids идентификаторы записей в справочнике
-     */
-    void deleteBudgetMasks(List<String> ids);
 
     /**
      * Проверка является ли счет бюджетным

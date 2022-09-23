@@ -243,12 +243,14 @@ public class PartnerServiceConfiguration {
     @Bean
     AccountService accountService(
         AccountRepository accountRepository,
+        AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter
     ) {
         return new AccountServiceImpl(
             accountRepository,
+            accountSignRepository,
             replicationService,
             budgetMaskService,
             auditAdapter,
@@ -371,8 +373,6 @@ public class PartnerServiceConfiguration {
         DocumentRepository documentRepository,
         ContactRepository contactRepository,
         AddressRepository addressRepository,
-        PhoneRepository phoneRepository,
-        EmailRepository emailRepository,
         PartnerRepository partnerRepository,
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
         BudgetMaskService budgetMaskService,
@@ -383,8 +383,6 @@ public class PartnerServiceConfiguration {
             documentRepository,
             contactRepository,
             addressRepository,
-            phoneRepository,
-            emailRepository,
             partnerRepository,
             gkuInnDictionaryRepository,
             budgetMaskService,

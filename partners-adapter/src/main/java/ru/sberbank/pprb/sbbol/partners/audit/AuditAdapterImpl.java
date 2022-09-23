@@ -51,16 +51,10 @@ public class AuditAdapterImpl implements AuditAdapter {
             return;
         }
         try {
-            var auditMetamodel = new ObjectMapper().readValue(metaModel.getInputStream(), AuditMetamodel.class);
+            var auditMetamodel =
+                new ObjectMapper().readValue(metaModel.getInputStream(), AuditMetamodel.class);
             moduleName = auditMetamodel.getModule();
             metamodelVersion = auditMetamodel.getMetamodelVersion();
-            var response = auditApi.uploadMetamodelWithHttpInfo(auditMetamodel);
-            var statusCode = response.getStatusCode();
-            if (statusCode.isError()) {
-                throw new AuditSendException(statusCode, response);
-            }
-        } catch (RestClientException e) {
-            LOGGER.error("Ошибка при инициализации metaModel в сервисе Audit", e);
         } catch (FileNotFoundException e) {
             LOGGER.error("Ошибка получения файла auditMetamodel, не найден в classpath", e);
         } catch (IOException e) {

@@ -25,6 +25,8 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
 
     protected static final String baseRoutePath = "/partner";
     protected static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
+    protected static final String BUDGET_ACCOUNT_VALID = "03010643100000000001";
+    protected static final String BUDGET_CORR_ACCOUNT_VALID = "40102810300000000001";
 
     /**
      * Алгоритм расчета контрольного ключа:
@@ -88,6 +90,15 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         );
     }
 
+    public static Error createInvalidAccount(AccountCreate account) {
+        return post(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            account,
+            Error.class
+        );
+    }
+
     public static AccountChange updateAccount(Account account) {
         return new AccountChange()
             .comment(randomAlphabetic(20))
@@ -103,9 +114,40 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
                     .bankAccount("30101810145250000411")));
     }
 
-    private static AccountCreate getValidBudgetAccount(String partnerUuid, String digitalId) {
+    public static AccountChange updateAccountEntityWithEmptyAccountAndBankAccount(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account("")
+            .bank(new Bank()
+                .bic("044525411")
+                .name(account.getBank().getName())
+                .bankAccount(new BankAccount()
+                    .bankAccount("")));
+    }
+
+    public static AccountChange updateAccountEntityWithNullAccountAndBankAccount(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account(null)
+            .bank(new Bank()
+                .bic("044525411")
+                .name(account.getBank().getName())
+                .bankAccount(new BankAccount()
+                    .bankAccount(null)));
+    }
+
+    protected static AccountCreate getValidBudgetAccount(String partnerUuid, String digitalId) {
         var account = getValidAccount(partnerUuid, digitalId);
-        account.setAccount("40601810300490014209");
+        account.setAccount(BUDGET_ACCOUNT_VALID);
+        account.getBank().getBankAccount().setBankAccount(BUDGET_CORR_ACCOUNT_VALID);
         return account;
     }
 
@@ -126,6 +168,22 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         account.getBank().setBic("44444");
         account.getBank().getBankAccount().setBankAccount("2131243255234324123123123");
         return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+    }
+
+    public static Account createAccountEntityWithEmptyAccountAndBankAccount(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        account.setAccount("");
+        account.getBank().setBic("044525411");
+        account.getBank().getBankAccount().setBankAccount("");
+        return post(baseRoutePath + "/account", HttpStatus.CREATED, account, Account.class);
+    }
+
+    public static Account createAccountEntityWithNullAccountAndBankAccount(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        account.setAccount(null);
+        account.getBank().setBic("044525411");
+        account.getBank().getBankAccount().setBankAccount(null);
+        return post(baseRoutePath + "/account", HttpStatus.CREATED, account, Account.class);
     }
 
     private static AccountPriority getValidPriorityAccount(String accountId, String digitalId) {

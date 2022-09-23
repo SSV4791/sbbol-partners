@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Счёт партнера",
-  "x-extra-class-annotation": "@AccountAttributeAccountChangeDtoValidation @BankAccountAttributeAccountChangeDtoValidation",
+  "x-extra-class-annotation": "@AccountKeyValidation @AccountBalanceValidation @AccountRubCodeCurrencyValidation @BalanceTreasureAccountValidation @TreasureAccountCodeCurrencyValidation",
   "properties": {
     "id": {
       "type": "string",
@@ -33,7 +33,8 @@
     "account": {
       "type": "string",
       "title": "Счёт",
-      "maxLength": 20
+      "pattern": "^(\\d{20})*$",
+      "x-pattern-message": "{validation.account.account.pattern}"
     },
     "bank": {
       "title": "Банк",
@@ -42,7 +43,10 @@
     "comment": {
       "type": "string",
       "title": "Комментарий счета",
-      "maxLength": 50
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
     }
   },
   "required": [
