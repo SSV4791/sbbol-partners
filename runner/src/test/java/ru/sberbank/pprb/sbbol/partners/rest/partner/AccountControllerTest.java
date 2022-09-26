@@ -37,7 +37,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
 
     private static final String INN_WITHOUT_ACCOUNT = "3522329000";
     private static final String KPP_WITHOUT_ACCOUNT = "618243879";
-    private static final String PART_ACCOUNT_FOR_TEST_PARTNER = "40802810500";
 
     @Test
     void testViewFilter_whenGkuAttributeIsDefinedAndIsTrue() {
@@ -373,11 +372,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
         for (int i = 0; i < 5; i++) {
             accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
         }
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        accounts.add(account.getId());
         var accountsFilter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
             .accountIds(accounts)
-            .partnerSearch(ACCOUNT_FOR_TEST_PARTNER)
+            .partnerSearch(account.getAccount())
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -390,9 +391,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getAccounts())
-            .hasSize(4);
+            .hasSize(1);
         assertThat(response.getPagination().getHasNextPage())
-            .isTrue();
+            .isFalse();
     }
 
     @Test
@@ -402,11 +403,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
         for (int i = 0; i < 5; i++) {
             accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
         }
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        accounts.add(account.getId());
         var accountsFilter = new AccountsFilter()
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
             .accountIds(accounts)
-            .partnerSearch(PART_ACCOUNT_FOR_TEST_PARTNER)
+            .partnerSearch(account.getAccount().substring(6))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -419,9 +422,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getAccounts())
-            .hasSize(4);
+            .hasSize(1);
         assertThat(response.getPagination().getHasNextPage())
-            .isTrue();
+            .isFalse();
     }
 
     @Test
@@ -661,7 +664,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testViewSearchAccount() {
+    void testViewSearchOneAccount() {
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         createValidAccount(partner.getId(), partner.getDigitalId());
@@ -672,6 +675,33 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
             .search(new SearchAccounts().search(account.getAccount().substring(6)))
+            .pagination(new Pagination()
+                .count(1)
+                .offset(0));
+        var response = post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter,
+            AccountsResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getAccounts())
+            .hasSize(1);
+    }
+
+    @Test
+    void testViewSearchAllAccounts() {
+        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+        createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var filter = new AccountsFilter()
+            .digitalId(partner.getDigitalId())
+            .partnerIds(List.of(partner.getId()))
+            .search(new SearchAccounts().search("40702810"))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -711,7 +741,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         assertThat(response)
             .isNotNull();
         assertThat(response.getAccounts())
-            .hasSize(4);
+            .hasSize(1);
     }
 
     @Test
