@@ -3,11 +3,14 @@ docker:
     java: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-alpine:15.0.2-10-sber-certs
     postgres: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/postgres:13-alpine
     liquibase: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/liquibase/liquibase:3.10.3
+    docs: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-alpine:15.0.2-10-sber-certs
+
 credentials:
   sonar: SA-SDVO0000346-sonar-token
   nexus: SA-SDVO0000346-nexus
   checkmarx: SA-SDVO0000346-checkmarx
   openshift: SA-SDVO0000346-openshift
+  jenkins: SA-SDVO0000346-jenkins
 
 project_name: sbbol-partners
 
@@ -90,13 +93,28 @@ pr_check:
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
-  version_init: 01.000.00_0000
+  version_init: 02.000.00_0000
   artifact_id: partners
   group_id: Nexus_PROD.CI02792425_sbbol-partners
   docker_registry: registry.sigma.sbrf.ru
   docker_prom: 'pprb/ci00908578/ci02792425_sbbol-partners'
   docker_dev: 'pprb-dev/ci00908578/ci02792425_sbbol-partners_dev'
   doc_path: 'docs/build/docs/'
+  skip_istio: false
+  jira_project: DCBBRAIN
+  default_values:
+    parallel_build: true
+    params_branch: master
+    params_folder: develop
+    istio_tag: '2.1'
+    commit_or_tag: '01.002.00_0053'
+    release_key: DCBBRAIN-1847
+    checkmarx: false
+    reverse_and_publish: false
+    type: develop
+  jobs:
+    test_release:
+      wait: false
   build_gradle:
     cpu: 2
     mem: '4g'
@@ -105,26 +123,32 @@ release:
       -PnexusLogin=${env.NEXUS_USR}
       -PnexusPassword=${env.NEXUS_PWD}
       -Pversion=${env.VERSION}
-      -Dtest-layer=unit,configuration,cdcConsumer,cdcProvider
-      -Dpactbroker.url=${env.PACT_BROKER_URL}
-      -Dpactbroker.auth.username=${env.PACT_USER}
-      -Dpactbroker.auth.password='${env.PACT_PASSWORD}'
-      -Dpact.pacticipant.version=${env.VERSION}
-      -Dpact.pacticipant.tag=${params.branch}
-      -Dpactbroker.consumerversionselectors.tags=${settings.project_name}:${params.branch}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=release
-      -Dallure.jobrunId=${launch.jobRunId}
-      -Dsonar.login=${env.SONAR_TOKEN}
-      -Dsonar.branch.name=${params.branch}
-      build -x test qaReporterUpload sonarCoverage --parallel --info
-  skip_istio: false
-  default_values:
-    params_branch: master
-    istio_tag: '2.1'
-    commit_or_tag: '01.002.00_0053'
-    release_key: DCBBRAIN-1847
-    checkmarx: false
-    reverse_and_publish: false
-    type: develop
-    params_folder: develop
+      build -x test --parallel --info
+  run_backend_tests: true
+  run_frontend_tests: false
+  test:
+    allure_dir: build/allure-results
+    email_list: DCB_BRAIN_NEW@sberbank.ru
+    backend:
+      command: >-
+        ./gradlew
+        -PnexusLogin=${env.NEXUS_USR}
+        -PnexusPassword='${env.NEXUS_PWD}'
+        -PsonarToken=${env.SONAR_TOKEN}
+        -Pversion=${env.VERSION}
+        build qaReporterUpload sonarCoverage
+        -Dtest-layer=unit,api,configuration,cdcConsumer,cdcProvider
+        -Dsonar.branch.name=${params.branch}
+        -Dpactbroker.url=${env.PACT_BROKER_URL}
+        -Dpactbroker.auth.username=${env.PACT_USER}
+        -Dpactbroker.auth.password='${env.PACT_PASSWORD}'
+        -Dpact.pacticipant.version=${env.VERSION}
+        -Dpact.pacticipant.tag=${params.branch}
+        -Dpact.consumer.tag=${params.branch}
+        -Dpactbroker.consumerversionselectors.tags=${settings.project_name}:${params.branch}
+        -Dversion=${env.VERSION}
+        -Dbuild.link=${env.BUILD_URL}
+        -Dbuild.type=release
+        -Dallure.jobrunId=${launch.jobRunId}
