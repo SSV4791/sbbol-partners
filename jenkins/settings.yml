@@ -106,7 +106,7 @@ release:
     parallel_build: true
     params_branch: master
     params_folder: develop
-    istio_tag: '2.1'
+    istio_tag: '2.3'
     commit_or_tag: '01.002.00_0053'
     release_key: DCBBRAIN-1847
     checkmarx: false
