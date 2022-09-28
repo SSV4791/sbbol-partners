@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 @SuppressWarnings("java:S2187")
 public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
@@ -32,6 +33,20 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         assertThat(createAccountSign)
             .isNotNull();
         return createAccountSign;
+    }
+
+    public static Error createAccountSignWithBadRequest(String digitalId, String accountId) {
+        var response = post(baseRoutePath, HttpStatus.BAD_REQUEST, getValidAccountsSign(digitalId, accountId), Error.class);
+        assertThat(response)
+            .isNotNull();
+        return response;
+    }
+
+    public static Error createAccountSignWithNotFound(String digitalId, String accountId) {
+        var response = post(baseRoutePath, HttpStatus.NOT_FOUND, getValidAccountsSign(digitalId, accountId), Error.class);
+        assertThat(response)
+            .isNotNull();
+        return response;
     }
 
     public static ResponseBody deleteAccountSign(String digitalId, String accountId) {

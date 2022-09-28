@@ -129,12 +129,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
             new Descriptions()
                 .field("pagination.count")
                 .message(
-                    List.of("Поле не может быть равно null")
+                    List.of("Поле обязательно для заполнения")
                 ),
             new Descriptions()
                 .field("pagination.offset")
                 .message(
-                    List.of("Поле не может быть равно null")
+                    List.of("Поле обязательно для заполнения")
                 )
         );
         var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
@@ -156,7 +156,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        for (var text : errorTexts) {
+        for (var text : response.getDescriptions()) {
             assertThat(errorTexts.contains(text)).isTrue();
         }
     }
