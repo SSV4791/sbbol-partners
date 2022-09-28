@@ -1,16 +1,18 @@
 docker:
   images:
-    java: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-alpine:15.0.2-10-sber-certs
+    java: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
     postgres: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/postgres:13-alpine
     liquibase: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/liquibase/liquibase:3.10.3
-    docs: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-alpine:15.0.2-10-sber-certs
+    docs: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
 
 credentials:
   sonar: SA-SDVO0000346-sonar-token
   nexus: SA-SDVO0000346-nexus
+  nexus_token: CAB-SA-DVO0000028-nexus
   checkmarx: SA-SDVO0000346-checkmarx
   openshift: SA-SDVO0000346-openshift
   jenkins: SA-SDVO0000346-jenkins
+  registry_delta: CAB-SA-DVO0000028-registry
 
 project_name: sbbol-partners
 
@@ -18,6 +20,7 @@ pr_check:
   liquibase:
     match:
       files:
+        - 'buildSrc/'
         - 'runner/src/main/resources/db/changelog'
     changelog:
       path: runner/src/main/resources/db/changelog/changelog.yaml
@@ -28,6 +31,7 @@ pr_check:
     workdir: openshift
     match:
       files:
+        - 'buildSrc/'
         - 'openshift/'
         - 'jenkins/resources/openshift/'
     server: dev-terra000006-idm.ocp
@@ -35,6 +39,7 @@ pr_check:
   build_gradle:
     match:
       files:
+        - 'buildSrc/'
         - 'migration-service/'
         - 'partners-adapter/'
         - 'partners-api/'
@@ -51,13 +56,16 @@ pr_check:
     memory: '2g'
     command: >-
       ./gradlew
-      -PnexusLogin=${env.NEXUS_USR}
-      -PnexusPassword=${env.NEXUS_PWD}
+      -PtokenName=${env.TOKEN_NAME}
+      -PtokenPassword=${env.TOKEN_PASSWORD}
+      -Dgradle.wrapperUser=${env.TOKEN_NAME}
+      -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
       clean build -x test
   test:
     postgres: true
     match:
       files:
+        - 'buildSrc/'
         - 'partners-adapter/'
         - 'partners-openapi/'
         - 'partners-service/'
@@ -72,8 +80,10 @@ pr_check:
     memory: '4g'
     command: >-
       ./gradlew
-      -PnexusLogin=${env.NEXUS_USR}
-      -PnexusPassword='${env.NEXUS_PWD}'
+      -PtokenName=${env.TOKEN_NAME}
+      -PtokenPassword=${env.TOKEN_PASSWORD}
+      -Dgradle.wrapperUser=${env.TOKEN_NAME}
+      -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
       -Dsonar.login=${env.SONAR_TOKEN}
       -Dsonar.projectVersion=${pullRequest.fromRef.displayId}
       -Dsonar.pullrequest.key=${params.pullRequestId}
@@ -93,49 +103,56 @@ pr_check:
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
-  version_init: 02.000.00_0000
-  artifact_id: partners
-  group_id: Nexus_PROD.CI02792425_sbbol-partners
-  docker_registry: registry.sigma.sbrf.ru
-  docker_prom: 'pprb/ci00908578/ci02792425_sbbol-partners'
-  docker_dev: 'pprb-dev/ci00908578/ci02792425_sbbol-partners_dev'
+  version_init: 02.001.00_0000
+  repository: maven-distr-dev
+  artifact_id: CI02792425
+  group_id: CI00908578
+  docker_dev: docker-dev.registry-ci.delta.sbrf.ru
+  docker_prom: docker-release.registry-ci.delta.sbrf.ru
+  image_name: 'CI00908578/CI02792425/partners'
   doc_path: 'docs/build/docs/'
   skip_istio: false
   jira_project: DCBBRAIN
+  params_folder: partners
+  qgm:
+    repository: maven-distr
   default_values:
     parallel_build: true
     params_branch: master
     params_folder: develop
     istio_tag: '2.3'
-    commit_or_tag: '01.002.00_0053'
-    release_key: DCBBRAIN-1847
-    checkmarx: false
+    commit_or_tag: '02.000.00_0082_i-2.1'
+    release_key: DCBBRAIN-3152
     reverse_and_publish: false
-    type: develop
+    type: release
   jobs:
     test_release:
-      wait: false
+      wait: true
   build_gradle:
     cpu: 2
     mem: '4g'
     command: >-
       ./gradlew
-      -PnexusLogin=${env.NEXUS_USR}
-      -PnexusPassword=${env.NEXUS_PWD}
+      -PtokenName=${env.TOKEN_NAME}
+      -PtokenPassword=${env.TOKEN_PASSWORD}
+      -Dgradle.wrapperUser=${env.TOKEN_NAME}
+      -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
       -Pversion=${env.VERSION}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=release
       build -x test --parallel --info
-  run_backend_tests: true
-  run_frontend_tests: false
+  run_backend_tests: 'true'
+  run_frontend_tests: 'false'
   test:
     allure_dir: build/allure-results
     email_list: DCB_BRAIN_NEW@sberbank.ru
     backend:
       command: >-
         ./gradlew
-        -PnexusLogin=${env.NEXUS_USR}
-        -PnexusPassword='${env.NEXUS_PWD}'
+        -PtokenName=${env.TOKEN_NAME}
+        -PtokenPassword=${env.TOKEN_PASSWORD}
+        -Dgradle.wrapperUser=${env.TOKEN_NAME}
+        -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
         -PsonarToken=${env.SONAR_TOKEN}
         -Pversion=${env.VERSION}
         build qaReporterUpload sonarCoverage
@@ -151,4 +168,10 @@ release:
         -Dversion=${env.VERSION}
         -Dbuild.link=${env.BUILD_URL}
         -Dbuild.type=release
+        -Pspring.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_MAIN}/${env.POSTGRES_DB_NAME}
+        -Pspring.datasource.username=${env.POSTGRES_DB_USER}
+        -Pspring.datasource.password=${env.POSTGRES_DB_PASSWORD}
+        -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
+        -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
+        -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
         -Dallure.jobrunId=${launch.jobRunId}

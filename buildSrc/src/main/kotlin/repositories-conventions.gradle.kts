@@ -1,28 +1,19 @@
-plugins {
-    id("nu.studer.credentials")
-}
-
 repositories {
-    val credentials: nu.studer.gradle.credentials.domain.CredentialsContainer by project.extra
-    val nexusLogin = project.findProperty("nexusLogin") as String?
-        ?: credentials.getProperty("nexusLogin") as String?
-    val nexusPassword = project.findProperty("nexusPassword") as String?
-        ?: credentials.getProperty("nexusPassword") as String?
+    val tokenName = project.properties["tokenName"] as String?
+    val tokenPassword = project.properties["tokenPassword"] as String?
 
-    maven {
-        val publicRepositoryUrl: String by project
-        url = uri(publicRepositoryUrl)
-    }
-
+    val publicRepositoryUrl: String by project
     listOf(
-        "https://nexus.sigma.sbrf.ru/nexus/content/groups/internal"
+        publicRepositoryUrl,
+        "https://nexus-ci.delta.sbrf.ru/repository/maven-proxy-lib-internal/"
     ).forEach {
         maven {
             url = uri(it)
             credentials {
-                username = nexusLogin
-                password = nexusPassword
+                username = tokenName
+                password = tokenPassword
             }
+            isAllowInsecureProtocol = true
         }
     }
 }
