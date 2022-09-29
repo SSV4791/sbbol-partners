@@ -1,73 +1,97 @@
 Фабрика Партнеры
 ======
+
 ## Детальная информация
+
 https://confluence.sberbank.ru/pages/viewpage.action?pageId=4121926530
 
 ## Quick Start Guide
+
 ### Необходимое ПО
-- **JDK** (Сборка и локальный запуск проекта поддерживаются на Liberica OpenJDK 15 с последними исправлениями безопасности)
+
+- **JDK** (Сборка и локальный запуск проекта поддерживаются на Liberica OpenJDK 15 с последними исправлениями
+  безопасности)
 - **IDEA** (Рекомендуется версия IntelliJ IDEA не ниже 2021.2)
 - **Git**
 
 ### Настройки git
+
 Указать автора по умолчанию. Важно, чтобы name и email совпадали с учетной записью Active Directory
+
 ```
 git config --global user.name "Пупкин Василий Васильевич"
 git config --global user.email sbt.vasya@sberbank.ru
 ```
 
 ### Клонирование репозитория
+
 ```
-git clone https://sbtatlas.sigma.sbrf.ru/stashdbo/scm/cibpprb/sbbol-partners.git
+git clone https://stash.sigma.sbrf.ru/scm/cibpprb/sbbol-partners.git
 git checkout develop
+```
+
+### Установка сертификатов
+
+Для сборки проекта необходимо установить корневой сертификат и сертификат удостоверяющего центра. Скачать их можно
+тут: https://cert.sberbank.ru/pfx/
+
+Для установки надо перейти в папку ~/.gradle (~ это домашняя дирректория) и выполнить команды
+
+```
+keytool -import -trustcacerts -alias sber-root -file путь_до/root.crt -keystore cacerts -storepass changeit
+keytool -import -trustcacerts -alias sber-ca2 -file путь_до/ca2.crt -keystore cacerts -storepass changeit
+```
+
+В файле `~/.gradle/gradle.properties` (если файла нет необходимо его создать) добавить две строки
+
+```
+systemProp.javax.net.ssl.trustStore=/Users/<ваша пользовательская директория, например, a16689666>/.gradle/cacerts
+systemProp.javax.net.ssl.trustStorePassword=changeit
 ```
 
 ### Аутентификация в NEXUS
 
-Для обеспечения доступа в nexus необходимо указать credentials доменной УЗ.
-ВАЖНО: не использовать онлайн-сервисы для encode/decode ваших УЗ и паролей.
-
-1. Для доступа в nexus нужно создать задачу в Jira на админов, инструкция и шаблон здесь:
-https://confluence.sberbank.ru/pages/viewpage.action?pageId=849021130
-
-2. Создание новых или обновление существующих credentials осуществляется через таску `addCredentials`
-Необходимо выполнить нижеуказанные команды, заменив значения login и password.
-
-P.S. Если в пароле содержится спецсимвол, необходимо его экранировать, указав перед спецсимволов \
-(Например `super'Puper'Password` должен указываться как `super\'Puper\'Password`)
-```
-./gradlew -p buildSrc addCredentials --key nexusLogin --value login --no-scan
-./gradlew -p buildSrc addCredentials --key nexusPassword --value password --no-scan
-```
-
-Credentials хранятся в `GRADLE_HOME/gradle.encrypted.properties`
-
-Удалить credentials можно таской `removeCredentials` с указанием ключа.
+Необходимо добавить креды для gradle. Необходимо залогиниться в https://nexus-ci.sigma.sbrf.ru/ и в управлении
+аккаунтом (manage account) получить User Token для своей учетной записи. После этого указать в ~
+/.gradle/gradle.properties:
 
 ```
-./gradlew -p buildSrc removeCredentials --key nexusLogin --no-scan
-./gradlew -p buildSrc removeCredentials --key nexusPassword --no-scan
+systemProp.gradle.wrapperUser=<Your user token name code>
+systemProp.gradle.wrapperPassword=<Your user token pass code>
+tokenName=<Your user token name code>
+tokenPassword=<Your user token pass code>
 ```
 
 ### Сборка проекта
+
 `./gradlew build`.
 
 ### Запуск приложения локально
+
 `./gradlew bootRun`, `make run`
 
 ### Запуск приложения локально под профилем dev
+
 `./gradlew bootRun --args='--spring.profiles.active=dev'`, `make runDev`
 
 ### Проверить что приложение работает
+
 `curl localhost:8080/actuator/health`, `make ping`
 
 ### Обновление зависимостей
+
 `./gradlew resolveAndLockAll --write-locks`, `make resolveConflict`
 
-###Создание отчёта SONAR при локальном запуске
+### Создание отчёта SONAR при локальном запуске
+
 `./gradlew sonar`
 
+### Публикация API в META
+
+`./gradlew clean build reverseAndPublish -x test`
+
 ### Генерация sql патча
+
 `./gradlew newpatch -Ppatchname=newpatch`
 
 Для изменения директории создания патча использовать с флагом

@@ -2,7 +2,7 @@
 
 # Ожидание готовности контейнера истио
 echo Waiting for Istio
-while ! nc -z 127.0.0.1 15021 ;
+while ! curl http://127.0.0.1:15021/healthz/ready ;
 do
     echo -n .
     sleep 1

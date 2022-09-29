@@ -1,4 +1,3 @@
-import nu.studer.gradle.credentials.domain.CredentialsContainer
 import org.gradle.api.publish.maven.MavenPublication
 
 plugins {
@@ -6,36 +5,27 @@ plugins {
     id("create-release-conventions")
 }
 
-tasks.register("release") {
-    group = "publishing"
-    description = "Publish release distributions to nexus CDP release repository"
-    dependsOn("publishReleaseBuildPublicationToReleaseBuildRepository")
-}
-
 publishing {
     repositories {
-        val credentials: CredentialsContainer by project.extra
-        val nexusLogin = (project.properties["nexusLogin"] ?: credentials.getProperty("nexusLogin")) as String?
-        val nexusPassword = (project.properties["nexusPassword"] ?: credentials.getProperty("nexusPassword")) as String?
+        val tokenName = project.properties["tokenName"] as String?
+        val tokenPassword = project.properties["tokenPassword"] as String?
 
         maven {
-            val releaseRepositoryUrl: String by project
-            url = uri(releaseRepositoryUrl)
-
-            name = "ReleaseBuild"
+            name = "publish"
+            url = uri(project.properties["releaseRepositoryUrl"]!!)
+            isAllowInsecureProtocol = true
             credentials {
-                username = nexusLogin
-                password = nexusPassword
+                username = tokenName
+                password = tokenPassword
             }
         }
     }
     publications {
-        register<MavenPublication>("ReleaseBuild") {
-            groupId = "Nexus_PROD.CI02792425_sbbol-partners"
-
-            artifactId = "partners"
+        register<MavenPublication>("publish") {
+            groupId = "${project.properties["groupId"]}"
+            artifactId = "${project.properties["artifactId"]}"
             artifact(tasks["fullDistrib"]) {
-                classifier = "distrib.configs"
+                classifier = "distrib"
             }
         }
     }

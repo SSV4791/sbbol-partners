@@ -1,5 +1,6 @@
 dependencyLocking {
     lockAllConfigurations()
+    ignoredDependencies.add("org.jacoco:*")
     lockFile.set(file("${rootDir}/gradle/dependency-locks/gradle-${project.name}.lockfile"))
 }
 

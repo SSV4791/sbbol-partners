@@ -4,9 +4,7 @@ plugins {
     id("jacoco-conventions")
     id("java-conventions")
     id("org.sonarqube") version "3.2.0"
-    id("publish-develop-conventions")
     id("publish-release-conventions")
-    id("publish-snapshot-conventions")
     id("ru.sbrf.build.gradle.qa.reporter") version "3.3.4"
     id("ru.sbt.meta.meta-gradle-plugin")
 }
@@ -70,9 +68,7 @@ project
     .dependsOn("qaReporterUpload")
 
 sonarqube {
-    val credentials: nu.studer.gradle.credentials.domain.CredentialsContainer by project.extra
-    val sonarToken = (project.properties["sonarToken"] ?: credentials.getProperty("sonarToken")) as String?
-
+    val sonarToken = project.properties["sonarToken"] as String?
     properties {
         property("sonar.projectKey", "ru.sberbank.pprb.sbbol.partners:partners")
         property("sonar.host.url", "https://sbt-sonarqube.sigma.sbrf.ru")
@@ -94,15 +90,12 @@ sonarqube {
     }
 }
 
-
+val nexusLogin = project.properties["nexusLogin"] as String?
+val nexusPassword = project.properties["nexusPassword"] as String?
 meta {
-    val credentials: nu.studer.gradle.credentials.domain.CredentialsContainer by project.extra
-    val nexusLoginValue = (project.properties["nexusLogin"] ?: credentials.getProperty("nexusLogin")) as String?
-    val nexusPasswordValue =
-        (project.properties["nexusPassword"] ?: credentials.getProperty("nexusPassword")) as String?
-    nexusUrl = "https://nexus.sigma.sbrf.ru/nexus/content/repositories/internal"
-    nexusUser = nexusLoginValue
-    nexusPassword = nexusPasswordValue
+    nexusUrl = null
+    nexusUser = nexusLogin
+    nexusPassword = nexusPassword
     version = "latest.release"
     componentId = "9655c0f1-74bf-11eb-6742-005056b72594"
     ext {

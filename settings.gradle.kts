@@ -1,11 +1,23 @@
 pluginManagement {
     repositories {
+        val tokenName: String by settings
+        val tokenPassword: String by settings
         maven {
             val publicRepositoryUrl: String by settings
             url = uri(publicRepositoryUrl)
+            credentials {
+                username = tokenName
+                password = tokenPassword
+            }
+            isAllowInsecureProtocol = true
         }
         maven {
-            url = uri("https://nexus.sigma.sbrf.ru/nexus/content/repositories/thirdparty")
+            url = uri("https://nexus-ci.delta.sbrf.ru/repository/maven-proxy-lib-internal/")
+            credentials {
+                username = tokenName
+                password = tokenPassword
+            }
+            isAllowInsecureProtocol = true
         }
     }
     dependencyResolutionManagement {
