@@ -1,8 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.util.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
@@ -17,6 +17,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.OffsetDateTime;
@@ -39,7 +40,6 @@ public class PartnerEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-    @CreationTimestamp
     @Column(name = "create_date", nullable = false)
     private OffsetDateTime createDate;
 
@@ -272,5 +272,12 @@ public class PartnerEntity extends BaseEntity {
     @Override
     public String getHashKey() {
         return getDigitalId();
+    }
+
+    @PrePersist
+    private void initCreateDate() {
+        if (ObjectUtils.isEmpty(createDate)) {
+            this.createDate = OffsetDateTime.now();
+        }
     }
 }
