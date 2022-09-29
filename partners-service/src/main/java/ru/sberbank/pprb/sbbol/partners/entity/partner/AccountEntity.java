@@ -186,7 +186,7 @@ public class AccountEntity extends BaseEntity {
     }
 
     @PrePersist
-    private void setTimeStamp() {
+    private void initCreateDate() {
         if (ObjectUtils.isEmpty(createDate)) {
             this.createDate = OffsetDateTime.now();
         }
