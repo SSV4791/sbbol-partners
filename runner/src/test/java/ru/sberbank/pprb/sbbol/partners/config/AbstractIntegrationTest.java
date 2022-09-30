@@ -63,6 +63,8 @@ public abstract class AbstractIntegrationTest {
 
     protected static ResponseSpecification internalServerErrorResponseSpec;
 
+    protected static ResponseSpecification methodNotAllowedResponseSpec;
+
     @BeforeAll
     final void setup() {
         initTest();
@@ -99,6 +101,10 @@ public abstract class AbstractIntegrationTest {
 
         internalServerErrorResponseSpec = new ResponseSpecBuilder()
             .expectStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .build();
+
+        methodNotAllowedResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
             .build();
     }
 
@@ -163,6 +169,17 @@ public abstract class AbstractIntegrationTest {
             .extract();
     }
 
+    protected static <BODY> void postWithMethodNotAllowedExpected(String url, BODY body) {
+        given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(methodNotAllowedResponseSpec)
+            .extract();
+    }
+
     protected static <T, BODY> T put(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
         return given()
             .spec(requestSpec)
@@ -206,6 +223,7 @@ public abstract class AbstractIntegrationTest {
             case NO_CONTENT -> notContentResponseSpec;
             case NOT_FOUND -> notFoundResponseSpec;
             case INTERNAL_SERVER_ERROR -> internalServerErrorResponseSpec;
+            case METHOD_NOT_ALLOWED -> methodNotAllowedResponseSpec;
             default -> throw new IllegalStateException("Unexpected value: " + httpStatus);
         };
     }
