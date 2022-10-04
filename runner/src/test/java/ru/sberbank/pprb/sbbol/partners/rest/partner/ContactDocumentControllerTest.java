@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
@@ -166,6 +167,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             HttpStatus.OK,
             Document.class,
             documentUpdate.getDigitalId(), documentUpdate.getId());
+
         assertThat(checkDocument)
             .isNotNull();
         assertThat(checkDocument.getVersion())
@@ -222,8 +224,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .dateIssue(LocalDate.now())
             .divisionCode("1111")
             .number("23")
-            .documentTypeId("3422aec8-7f44-4089-9a43-f8e3c5b00722")
-            ;
+            .documentTypeId("3422aec8-7f44-4089-9a43-f8e3c5b00722");
     }
 
     private static Document createValidContactDocument(String contactUuid, String digitalId) {
@@ -244,8 +245,8 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         );
     }
 
-    public static Document updateDocument(Document document) {
-        return new Document()
+    public static DocumentChange updateDocument(Document document) {
+        return new DocumentChange()
             .number(randomAlphanumeric(5))
             .id(document.getId())
             .version(document.getVersion())
@@ -255,6 +256,6 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .certifierType(document.getCertifierType())
             .dateIssue(document.getDateIssue())
             .divisionCode(document.getDivisionCode())
-            .documentType(document.getDocumentType());
+            .documentTypeId(document.getDocumentType().getId());
     }
 }

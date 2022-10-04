@@ -323,6 +323,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
         updateDocument.setVersion(document.getVersion());
+        updateDocument.documentTypeId("3422aec8-7f44-4089-9a43-f8e3c5b00722");
         Document newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, Document.class);
 
         assertThat(newUpdateDocument)
@@ -464,8 +465,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2");
     }
 
-    public static Document updateDocument(Document document) {
-        return new Document()
+    public static DocumentChange updateDocument(Document document) {
+        return new DocumentChange()
             .number(randomAlphanumeric(5))
             .id(document.getId())
             .version(document.getVersion())
@@ -475,6 +476,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .certifierType(document.getCertifierType())
             .dateIssue(document.getDateIssue())
             .divisionCode(document.getDivisionCode())
-            .documentType(document.getDocumentType());
+            .documentTypeId(document.getDocumentType().getId());
     }
 }

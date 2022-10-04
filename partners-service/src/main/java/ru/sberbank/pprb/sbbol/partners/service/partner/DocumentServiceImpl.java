@@ -90,7 +90,7 @@ abstract class DocumentServiceImpl implements DocumentService {
         if (StringUtils.isNotEmpty(document.getDocumentTypeId())) {
             var foundDocumentType =
                 documentDictionaryRepository.getByUuid(UUID.fromString(document.getDocumentTypeId()));
-            if (foundDocumentType.isPresent()) {
+            if (foundDocumentType.isEmpty()) {
                 throw new EntryNotFoundException("documentType", document.getDigitalId(), document.getId());
             }
         }
