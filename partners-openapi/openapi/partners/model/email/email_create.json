@@ -22,5 +22,8 @@
       "format": "email",
       "title": "Электронный адрес"
     }
-  }
+  },
+  "required": [
+    "digitalId"
+  ]
 }

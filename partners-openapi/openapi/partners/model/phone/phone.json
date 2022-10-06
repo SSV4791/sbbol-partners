@@ -39,6 +39,7 @@
     }
   },
   "required": [
+    "digitalId",
     "phone"
   ]
 }

@@ -25,5 +25,8 @@
       "pattern": "\\d{13}",
       "x-pattern-message": "{validation.partner.illegal_symbols}"
     }
-  }
+  },
+  "required": [
+    "digitalId"
+  ]
 }
