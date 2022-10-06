@@ -123,4 +123,15 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
         assertThat(migrationPartnerEntity.getPhones().get(0).getPartner()).isNotNull();
         assertThat(migrationPartnerEntity.getEmails().get(0).getPartner()).isNotNull();
     }
+
+    @Test
+    void testSearcher_whenComplexPartnerName() {
+        var migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
+        migrationCorrespondentCandidate.setName("Составное имя организации");
+        var migrationPartnerEntity = mapper.toPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
+        assertThat(migrationPartnerEntity)
+            .isNotNull();
+        assertThat(migrationPartnerEntity.getSearch())
+            .contains("Составноеимяорганизации");
+    }
 }
