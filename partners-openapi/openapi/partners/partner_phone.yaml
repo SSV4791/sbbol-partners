@@ -83,7 +83,7 @@ paths:
     post:
       tags:
         - Partner Phone
-      description: Обновление номера телефона партнера
+      description: Создание номера телефона партнера
       operationId: create
       requestBody:
         description: Номера телефонов

@@ -1,51 +1,273 @@
-### Получение Партнера
-GET http://127.0.0.1:8080/partners/11111/1633bdab-fb11-40c2-8363-9075ca8b139e
-Content-Type: application/json
+### PartnerApplication ###
 
-### Обновление счета
-PUT http://127.0.0.1:8080/partner/account
-Content-Type: application/json
-
-{
-    "id": "e066be99-dc1d-48f4-b66e-be5c03100045",
-    "partnerId": "4865ce07-4e81-4c4b-8c0c-708535f8fe84",
-    "digitalId": "12345",
-    "name": "Ололошечdка",
-    "account": "40702810138170109674",
-    "bank": {
-      "name": "ого какой вбанк123",
-      "bic": "044525225",
-      "bankAccount": {
-        "account": "30101810400000000212"
-      }
-    }
-}
-
-### Создание Партнера
-POST http://127.0.0.1:8080/partner
+### 1 Создание партнера (внести после создания id в поле partnerId в файл http-client.private.env)
+POST http://{{host}}/partner
 Content-Type: application/json
 
 {
-    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
-    "digitalId": "12345",
+    "digitalId": "{{digitalId}}",
     "version": 0,
     "partnerType": "PARTNER",
     "legalForm": "ENTREPRENEUR",
-    "orgName": "Ололоа",
-    "firstName": "Малохито",
-    "inn": "8753645468"
+    "orgName": "ИП Ромашка1",
+    "inn": "521031961500"
 }
 
-### Создание Счета
-POST http://127.0.0.1:8080/partner/account
+### 2 Изменение партнера
+PUT http://{{host}}/partner
 Content-Type: application/json
 
 {
-    "partnerId": "b7654d86-3701-412a-8582-efe5e020dc1d",
-    "digitalId": "12345",
+    "id": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "orgName": "ИП Николаев Сергей Михайлович",
+    "inn": "521031961500",
+    "account": "40702810138170100000",
+    "legalForm": "ENTREPRENEUR",
+    "bank": {
+        "name": "Теперь не Сбер",
+        "bic": "044525225",
+        "bankAccount": {
+            "account": "30101810400000000212"
+        }
+    },
+    "version": "0"
+}
+
+### 3 Получение Партнера по его идентификатору
+GET http://{{host}}/partners/{{digitalId}}/{{partnerId}}
+
+### 4 Получение Партнеров
+POST http://{{host}}/partners/view
+Content-Type: application/json
+
+{
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 5 Создание партнера Full Model (внести id в поле partnerId_Для_удаления_партнера)
+POST http://{{host}}/partner/full-model
+Content-Type: application/json
+
+{
+    "digitalId": "{{digitalId}}",
+    "version": 0,
+    "partnerType": "PARTNER",
+    "legalForm": "ENTREPRENEUR",
+    "orgName": "ИП Сергеев НИ",
+    "inn": "521031961500",
+    "phones": ["0079001112233"],
+    "emails": ["email_1@sber.ru"]
+}
+
+### 6 Удаление Партнера
+DELETE http://{{host}}/partners/{{digitalId}}/?ids={{partnerId_Для_удаления_партнера}}
+
+### 7 Создание адресов партнера (После создания id внести в переменную id_uuid_адреса)
+POST http://{{host}}/partner/address
+Content-Type: application/json
+
+{
+    "unifiedId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "type": "PHYSICAL_ADDRESS",
+    "zipCode": "111222",
+    "region": "Область",
+    "regionCode": "0332",
+    "city": "Омск",
+    "street": "Ленина",
+    "building": "99",
+    "buildingBlock": "Б",
+    "flat": "123"
+}
+
+### 8 Получения адресов партнеров
+POST http://{{host}}/partner/addresses/view
+Content-Type: application/json
+
+{
+    "unifiedIds": [
+        "{{partnerId}}"
+    ],
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 9 Получение адреса по его идентификатору
+GET http://{{host}}/partner/addresses/{{digitalId}}/{{id_uuid_адреса}}
+
+### 10 Обновление адресов партнера
+PUT http://{{host}}/partner/address
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_адреса}}",
+    "digitalId": "{{digitalId}}",
+    "unifiedId": "{{partnerId}}",
+    "version": "0",
+    "type": "PHYSICAL_ADDRESS",
+    "zipCode": "333444",
+    "region": "Область",
+    "regionCode": "0332",
+    "city": "Саратов",
+    "street": "Солнечная",
+    "building": "55",
+    "buildingBlock": "А",
+    "flat": "7"
+}
+
+### 11 Удаление адреса партнера
+DELETE http://{{host}}/partner/addresses/{{digitalId}}/?ids={{id_uuid_адреса}}
+
+### 12 Создание документов (созданый id внести в поле id_uuid_документа)
+POST http://{{host}}/partner/document
+Content-Type: application/json
+
+{
+    "unifiedId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "documentTypeId": "3422aec8-7f44-4089-9a43-f8e3c5b00722",
+    "series": "1111",
+    "number": "000000"
+}
+
+### 13 Получение документа по id
+GET http://{{host}}/partner/documents/{{digitalId}}/{{id_uuid_документа}}
+
+### 14 Обновление документов
+PUT http://{{host}}/partner/document
+Content-Type: application/json
+
+{
+    "unifiedId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "id": "{{id_uuid_документа}}",
+    "documentTypeId": "3422aec8-7f44-4089-9a43-f8e3c5b00722",
+    "series": "2222",
+    "number": "111111",
+    "version": "0"
+}
+
+### 15 Получение документов
+POST http://{{host}}/partner/documents/view
+Content-Type: application/json
+
+{
+    "unifiedIds": [
+        "{{partnerId}}"
+    ],
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 16 Удаление документа
+DELETE http://{{host}}/partner/documents/{{digitalId}}/?ids={{id_uuid_документа}}
+
+### 17 Создание email адреса контакта (id внести в переменную id_uuid_email)
+POST http://{{host}}/partner/email
+Content-Type: application/json
+
+{
+    "unifiedId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "email": "example@mail.ru"
+}
+
+### 18 Обновление email адреса контакта
+PUT http://{{host}}/partner/email
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_email}}",
+    "unifiedId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "version": "0",
+    "email": "new_email@mail.ru"
+}
+
+### 19 Получения Email адресов контакта
+POST http://{{host}}/partner/emails/view
+Content-Type: application/json
+
+{
+    "unifiedIds": [
+        "{{partnerId}}"
+    ],
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 20 Удаление email контакта
+DELETE http://{{host}}/partner/emails/{{digitalId}}/?ids={{id_uuid_email}}
+
+### 21 Создание номера телефона партнера (внести id в поле id_uuid_phone)
+POST http://{{host}}/partner/phone
+Content-Type: application/json
+
+{
+    "unifiedId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "phone": "0079001112233"
+}
+
+### 22 Обновление номера телефона партнера
+PUT http://{{host}}/partner/phone
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_phone}}",
+    "unifiedId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "version": "0",
+    "phone": "0079005557777"
+}
+
+### 23 Получения номеров телефона контакта
+POST http://{{host}}/partner/phones/view
+Content-Type: application/json
+
+{
+    "unifiedIds": [
+        "{{partnerId}}"
+    ],
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 24 Удаление phone контакта
+DELETE http://{{host}}/partner/phones/{{digitalId}}/?ids={{id_uuid_phone}}
+
+### 25 Создание счётов партнера (внести id в поле id_uuid_account)
+POST http://{{host}}/partner/account
+Content-Type: application/json
+
+{
+    "partnerId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
     "account": "40702810138170109674",
     "bank": {
-        "name": "Ого какой банк",
+        "name": "Какой-то банк",
         "bic": "044525225",
         "bankAccount": {
             "account": "30101810400000000225"
@@ -53,83 +275,347 @@ Content-Type: application/json
     }
 }
 
-
-### Обновление Партнера
-PUT http://127.0.0.1:8080/partner
+### 26 Изменение признака приоритетности аккаунта
+PUT http://{{host}}/partner/account/priority
 Content-Type: application/json
 
 {
-    "id": "41f3213d-5cce-4465-882f-a1a9cc68d764",
-    "digitalId": "12345",
-    "legalForm": "LEGAL_ENTITY",
-    "orgName": "Малоха",
-    "inn": "4139314257",
+    "id": "{{id_uuid_account}}",
+    "digitalId": "{{digitalId}}",
+    "priorityAccount": true
+}
+
+### 27 Обновление счётов Партнера
+PUT http://{{host}}/partner/account
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_account}}",
+    "partnerId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "account": "40702810040000110562",
+    "bank": {
+        "name": "Сбербанк",
+        "bic": "044525225",
+        "bankAccount": {
+            "account": "30101810400000000225"
+        }
+    },
     "version": "1"
 }
 
+### 28 Получение счётов по его идентификатору
+GET http://{{host}}/partner/accounts/{{digitalId}}/{{id_uuid_account}}
 
-### Удаление Партнера
-DELETE http://127.0.0.1:8080/partner/12345/f0cd55bb-88fd-47c5-b9f0-1ba2dfe07a12
-Content-Type: application/json
-
-
-### Удаление Счета
-DELETE http://127.0.0.1:8080/partner/account/12345/130638c6-a02a-439b-80b4-2813a3eb5a16
-Content-Type: application/json
-//При удалении счета подписанного не возвращается полное описание
-
-### Создание Контакта
-POST http://127.0.0.1:8080/partner/contact
+### 29 Получение счётов Партнера
+POST http://{{host}}/partner/accounts/view
 Content-Type: application/json
 
 {
-    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
-    "digitalId": "11111",
-    "partnerUuid": "6dd8eddc-69ed-405f-8cd9-c6660540ef75",
-    "version": 0,
-    "legalForm": "LEGAL_ENTITY"
-}
-
-### Создание документа Контакта
-POST http://127.0.0.1:8080/partner/contact/document
-Content-Type: application/json
-
-{
-    "uuid": "2fd15304-01c8-49f3-9eef-c3b32b96091f",
-    "digitalId": "11111",
-    "unifiedUuid": "1fe6fa21-14c4-4b30-baac-b1c218e09d62",
-    "version": 0
-}
-
-### Создание списка документа Контакта
-POST http://127.0.0.1:8080/partner/contact/documents/view
-Content-Type: application/json
-
-{
-    "unifiedUuid": [
-        "1fe6fa21-14c4-4b30-baac-b1c218e09d62"
+    "unifiedIds": [
+        "{{partnerId}}"
     ],
-    "digitalId": "11111",
+    "digitalId": "{{digitalId}}",
     "pagination": {
         "offset": 0,
-        "count": 1
+        "count": 30,
+        "hasNextPage": false
     }
 }
 
-###
-POST http://ci02281165-sbbol-partners.apps.dev-gen2.sigma.sbrf.ru/partner/contact/address
+### 30 Подпись
+POST http://{{host}}/partner/accounts/sign
 Content-Type: application/json
 
 {
-    "type": "LEGAL_ADDRESS",
-    "digitalId": "6933363154490000000",
-    "zipCode": "112344",
-    "region": "Регион",
+    "digitalId": "{{digitalId}}",
+    "digitalUserId": "{{partnerId}}",
+    "accountsSignDetail": [
+        {
+            "entityId": "b48fae3a-02e2-4ce4-b9e4-eee6a79082ba",
+            "accountId": "{{id_uuid_account}}",
+            "digest": "KoxmXyAxRh",
+            "sign": "LqFhxAjNPX"
+        }
+    ]
+}
+
+### 31 Проверка подписи аккаунта
+GET http://{{host}}/partner/accounts/sign/{{digitalId}}/{{id_uuid_account}}
+
+### 32 Удаление подписи счёта по идентификатору аккаунта
+DELETE http://{{host}}/partner/accounts/sign/{{digitalId}}/?accountIds={{id_uuid_account}}
+
+### 33 Удаление счёта Партнера
+DELETE http://{{host}}/partner/accounts/{{digitalId}}/?ids={{id_uuid_account}}
+
+### 34 Создание контактов (Внести id в переменную id_uuid_contact)
+POST http://{{host}}/partner/contact
+Content-Type: application/json
+
+{
+    "partnerId": "{{partnerId}}",
+    "digitalId": "{{digitalId}}",
+    "legalForm": "PHYSICAL_PERSON",
+    "orgName": "Какая-то организация",
+    "position": "Директор",
+    "firstName": "Иван",
+    "middleName": "Иванович",
+    "secondName": "Иванов"
+}
+
+### 35 Получение Контактов по его идентификатору
+GET http://{{host}}/partner/contacts/{{digitalId}}/{{id_uuid_contact}}
+
+### 36 Обновление Контактов
+PUT http://{{host}}/partner/contact
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_contact}}",
+    "digitalId": "{{digitalId}}",
+    "partnerId": "{{partnerId}}",
+    "version": "0",
+    "firstName": "Петр",
+    "middleName": "Петрович",
+    "secondName": "Петров"
+}
+
+### 37 Получение контактов
+POST http://{{host}}/partner/contacts/view
+Content-Type: application/json
+
+{
+    "partnerId": "{{partnerId}}",
+    "ids": [
+       "{{id_uuid_contact}}"
+    ],
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 38 Создание адресов контакта (id записываем в id_uuid_contact_address)
+POST http://{{host}}/partner/contact/address
+Content-Type: application/json
+
+{
+    "unifiedId": "{{id_uuid_contact}}",
+    "digitalId": "{{digitalId}}",
+    "type": "PHYSICAL_ADDRESS",
+    "zipCode": "111222",
+    "region": "Область",
     "regionCode": "0332",
-    "city": "МоскоуСити",
-    "location": "РусиаЛокатион",
-    "street": "КутузСтрит",
-    "building": "32Билдин",
-    "buildingBlock": "1Строение",
-    "flat": "ФлатХз что"
+    "city": "Омск",
+    "street": "Ленина",
+    "building": "99",
+    "buildingBlock": "Б",
+    "flat": "123"
+}
+
+### 39 Получение адреса по его идентификатору
+GET http://{{host}}/partner/contact/addresses/{{digitalId}}/{{id_uuid_contact_address}}
+
+### 40 Обновление адресов контакта
+PUT http://{{host}}/partner/contact/address
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_contact_address}}",
+    "digitalId": "{{digitalId}}",
+    "unifiedId": "{{id_uuid_contact}}",
+    "version": "0",
+    "type": "PHYSICAL_ADDRESS",
+    "zipCode": "333444",
+    "region": "Область",
+    "regionCode": "0332",
+    "city": "Саратов",
+    "street": "Солнечная",
+    "building": "55",
+    "buildingBlock": "А",
+    "flat": "7"
+}
+
+### 41 Получения адресов контакта
+POST http://{{host}}/partner/contact/addresses/view
+Content-Type: application/json
+
+{
+    "digitalId": "{{digitalId}}",
+    "unifiedIds": [
+        "{{id_uuid_contact}}"
+    ],
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 42 Удаление адреса контакта
+DELETE http://{{host}}/partner/contact/addresses/{{digitalId}}/?ids={{id_uuid_contact_address}}
+
+### 43 Создание документов контакта (записать id в поле id_uuid_contact_document)
+POST http://{{host}}/partner/contact/document
+Content-Type: application/json
+
+{
+    "unifiedId": "{{id_uuid_contact}}",
+    "digitalId": "{{digitalId}}",
+    "documentTypeId": "3422aec8-7f44-4089-9a43-f8e3c5b00722",
+    "series": "1234",
+    "number": "123456"
+}
+
+### 44 Получение документа по Идентефикатору
+GET http://{{host}}/partner/contact/documents/{{digitalId}}/{{id_uuid_contact_document}}
+
+### 45 Обновление документов
+PUT http://{{host}}/partner/contact/document
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_contact_document}}",
+    "digitalId": "{{digitalId}}",
+    "unifiedId": "{{id_uuid_contact}}",
+    "documentTypeId": "3422aec8-7f44-4089-9a43-f8e3c5b00722",
+    "series": "2222",
+    "number": "111111",
+    "version": "0"
+}
+
+### 46 Получение документов
+POST http://{{host}}/partner/contact/documents/view
+Content-Type: application/json
+
+{
+    "digitalId": "{{digitalId}}",
+    "unifiedIds": [
+        "{{id_uuid_contact}}"
+    ],
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 47 Удаление документа
+DELETE http://{{host}}/partner/contact/documents/{{digitalId}}/?ids={{id_uuid_contact_document}}
+
+### 48 Создание электронных адресов контакта (внести id  в поле id_uuid_contact_email)
+POST http://{{host}}/partner/contact/email
+Content-Type: application/json
+
+{
+    "unifiedId": "{{id_uuid_contact}}",
+    "digitalId": "{{digitalId}}",
+    "email": "example@mail.ru"
+}
+
+### 49 Обновление электронных адресов контакта
+PUT http://{{host}}/partner/contact/email
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_contact_email}}",
+    "unifiedId": "{{id_uuid_contact}}",
+    "digitalId": "{{digitalId}}",
+    "version": "0",
+    "email": "new_email@mail.ru"
+}
+
+### 50 Получения Email адресов контакта
+POST http://{{host}}/partner/contact/emails/view
+Content-Type: application/json
+
+{
+    "unifiedIds": [
+        "{{id_uuid_contact}}"
+    ],
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 51 Удаление email контакта
+DELETE http://{{host}}/partner/contact/emails/{{digitalId}}/?ids={{id_uuid_contact_email}}
+
+### 52 Создание телефонов контакта (внести id в поле id_uuid_contact_phone)
+POST http://{{host}}/partner/contact/phone
+Content-Type: application/json
+
+{
+    "unifiedId": "{{id_uuid_contact}}",
+    "digitalId": "{{digitalId}}",
+    "phone": "0079001112233"
+}
+
+### 53 Получения номеров телефона контакта
+POST http://{{host}}/partner/contact/phones/view
+Content-Type: application/json
+
+{
+    "unifiedIds": [
+        "{{id_uuid_contact}}"
+    ],
+    "digitalId": "{{digitalId}}",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 54 Обновление номера телефонов контакта
+PUT http://{{host}}/partner/contact/phone
+Content-Type: application/json
+
+{
+    "id": "{{id_uuid_contact_phone}}",
+    "unifiedId": "{{id_uuid_contact}}",
+    "digitalId": "{{digitalId}}",
+    "version": "0",
+    "phone": "0079005557777"
+}
+
+### 55 Удаление номера телефона контакта
+DELETE http://{{host}}/partner/contact/phones/{{digitalId}}/?ids={{id_uuid_contact_phone}}
+
+### 56 Удаление контакта
+DELETE http://{{host}}/partner/contacts/{{digitalId}}/?ids={{id_uuid_contact}}
+
+### 57 Получение списка масок бюджетности
+POST http://{{host}}/dictionary/budget-mask/view
+Content-Type: application/json
+
+{
+    "maskType": "GIS_GMP_ACCOUNT",
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
+}
+
+### 58 Получение справочника видов документа
+POST http://{{host}}/dictionary/documents/view
+Content-Type: application/json
+
+{
+    "deleted": false,
+    "legalForms": [
+        "PHYSICAL_PERSON"
+    ],
+    "pagination": {
+        "offset": 0,
+        "count": 30,
+        "hasNextPage": false
+    }
 }
