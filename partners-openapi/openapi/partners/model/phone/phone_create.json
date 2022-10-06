@@ -27,6 +27,7 @@
     }
   },
   "required": [
+    "unifiedId",
     "digitalId"
   ]
 }
