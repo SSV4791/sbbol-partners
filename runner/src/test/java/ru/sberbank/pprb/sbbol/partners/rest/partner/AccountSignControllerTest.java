@@ -4,9 +4,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_ALREADY_SIGNED_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
@@ -69,13 +72,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
 
     @Test
     void testCreateSignAccountWithoutAccountId() {
-        List<Descriptions> errorTexts = List.of(
-            new Descriptions()
-                .field("accountsSignDetail[0].accountId")
-                .message(
-                    List.of("размер должен находиться в диапазоне от 36 до 36")
-                )
-        );
+        var errorText = List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36");
         var partner = createValidPartner();
         var account = createValidAccount(partner.getId(), partner.getDigitalId());
         var response = createAccountSignWithBadRequest(account.getDigitalId(), "");
@@ -83,8 +80,8 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        for (var text : response.getDescriptions()) {
-            assertThat(errorTexts.contains(text)).isTrue();
+        for (var description : response.getDescriptions()) {
+            assertTrue(description.getMessage().containsAll(errorText));
         }
     }
 
@@ -125,20 +122,14 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
 
     @Test
     void testCreateSignAccountWithoutIds() {
-        List<Descriptions> errorTexts = List.of(
-            new Descriptions()
-                .field("accountsSignDetail[0].accountId")
-                .message(
-                    List.of("размер должен находиться в диапазоне от 36 до 36")
-                )
-        );
+        var errorText = List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36");
         var response = createAccountSignWithBadRequest("", "");
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        for (var text : response.getDescriptions()) {
-            assertThat(errorTexts.contains(text)).isTrue();
+        for (var description : response.getDescriptions()) {
+            assertTrue(description.getMessage().containsAll(errorText));
         }
     }
 

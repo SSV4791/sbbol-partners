@@ -138,7 +138,7 @@
     }
   },
   "required": [
-    "id",
+    "digitalId",
     "legalForm"
   ]
 }

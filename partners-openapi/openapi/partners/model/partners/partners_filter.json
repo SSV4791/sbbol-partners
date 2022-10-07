@@ -27,6 +27,7 @@
     }
   },
   "required": [
+    "digitalId",
     "pagination"
   ]
 }

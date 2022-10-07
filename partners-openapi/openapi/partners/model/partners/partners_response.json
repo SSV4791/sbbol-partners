@@ -14,6 +14,10 @@
       "$ref": "../../../common/model/pagination.json",
       "title": "Параметры ответа Партнеров"
     }
-  }
+  },
+  "required": [
+    "partners",
+    "pagination"
+  ]
 }
 

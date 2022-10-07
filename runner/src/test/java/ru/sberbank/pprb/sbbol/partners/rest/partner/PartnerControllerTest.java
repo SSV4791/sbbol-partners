@@ -1253,8 +1253,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
         assertThat(createdPartner.getEmails())
             .isNotNull();
-        createdPartner.getPhones().add(new Phone().phone("0071234567890"));
-        createdPartner.getEmails().add(new Email().email("007@mail.ru"));
+        createdPartner.getPhones().add(new Phone().phone("0071234567890").digitalId(createdPartner.getDigitalId()));
+        createdPartner.getEmails().add(new Email().email("007@mail.ru").digitalId(createdPartner.getDigitalId()));
         put(
             baseRoutePath,
             HttpStatus.OK,
