@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.InheritConfiguration;
@@ -28,11 +27,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Loggable
 @Mapper(
@@ -146,29 +143,23 @@ public interface AccountMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var searchSubString = Stream.of(
-                account.getPartnerUuid().toString(),
-                account.getAccount()
-            )
-            .filter(Objects::nonNull)
-            .collect(Collectors.joining(StringUtils.EMPTY));
+        var searchSubString = prepareSearchString(
+            account.getPartnerUuid().toString(),
+            account.getAccount()
+        );
         var bank = account.getBank();
         if (bank != null) {
             bank.setAccount(account);
-            searchSubString = Stream.of(
-                    searchSubString,
-                    bank.getBic()
-                )
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining(StringUtils.EMPTY));
+            searchSubString = prepareSearchString(
+                searchSubString,
+                bank.getBic()
+            );
             var bankAccount = bank.getBankAccount();
             if (bankAccount != null) {
-                searchSubString = Stream.of(
-                        searchSubString,
-                        bankAccount.getAccount()
-                    )
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining(StringUtils.EMPTY));
+                searchSubString = prepareSearchString(
+                    searchSubString,
+                    bankAccount.getAccount()
+                );
             }
         }
         account.setSearch(searchSubString);

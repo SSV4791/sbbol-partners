@@ -174,17 +174,13 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
         var searchSubString =
-            Stream.of(
-                    partner.getInn(),
-                    partner.getKpp(),
-                    partner.getOrgName(),
-                    partner.getSecondName(),
-                    partner.getFirstName(),
-                    partner.getMiddleName()
-                )
-                .filter(Objects::nonNull)
-                .map(it -> it.replace(StringUtils.SPACE, StringUtils.EMPTY))
-                .collect(Collectors.joining(StringUtils.EMPTY));
+            prepareSearchString(partner.getInn(),
+                partner.getKpp(),
+                partner.getOrgName(),
+                partner.getSecondName(),
+                partner.getFirstName(),
+                partner.getMiddleName()
+            );
         partner.setSearch(searchSubString);
         var phones = partner.getPhones();
         if (phones != null) {
@@ -206,29 +202,23 @@ public interface MigrationPartnerMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var searchSubString = Stream.of(
-                account.getPartnerUuid().toString(),
-                account.getAccount()
-            )
-            .filter(Objects::nonNull)
-            .collect(Collectors.joining(StringUtils.EMPTY));
+        var searchSubString = prepareSearchString(
+            account.getPartnerUuid().toString(),
+            account.getAccount()
+        );
         var bank = account.getBank();
         if (bank != null) {
             bank.setAccount(account);
-            searchSubString = Stream.of(
-                    searchSubString,
-                    bank.getBic()
-                )
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining(StringUtils.EMPTY));
+            searchSubString = prepareSearchString(
+                searchSubString,
+                bank.getBic()
+            );
             var bankAccount = bank.getBankAccount();
             if (bankAccount != null) {
-                searchSubString = Stream.of(
-                        searchSubString,
-                        bankAccount.getAccount()
-                    )
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining(StringUtils.EMPTY));
+                searchSubString = prepareSearchString(
+                    searchSubString,
+                    bankAccount.getAccount()
+                );
             }
         }
         account.setSearch(searchSubString);

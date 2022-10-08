@@ -153,7 +153,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         for (int i = 0; i < count; i++) {
             String randomReplicationGuid = RandomStringUtils.randomAlphanumeric(8);
             MigrationCorrespondentCandidate correspondent = new MigrationCorrespondentCandidate();
-            correspondent.setName(RandomStringUtils.randomAlphanumeric(8));
+            correspondent.setName(RandomStringUtils.randomAlphanumeric(8) + " " + RandomStringUtils.randomAlphanumeric(8));
             correspondent.setInn(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setKpp(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setAccount(RandomStringUtils.randomAlphanumeric(8));
