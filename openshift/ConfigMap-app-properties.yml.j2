@@ -30,7 +30,7 @@ data:
 
     management.endpoints.enabled-by-default=true
     management.endpoints.web.exposure.include=health,prometheus
-    management.endpoints.web.base-path={{ os_project.healthcheck | default('/sbbol-partners/actuator') }}
+    management.endpoints.web.base-path={{ context_prefix }}actuator
     management.endpoints.jmx.exposure.include=*
     management.endpoint.metrics.enabled=true
     management.endpoint.prometheus.enabled=true
