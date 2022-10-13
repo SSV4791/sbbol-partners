@@ -14,6 +14,8 @@ import static java.lang.String.format;
 @Aspect
 public class LegacyAsynchReplicationAspect {
 
+    private static final int DIGITAL_ID_INDEX = 0;
+    private static final int COUNTERPARTY_INDEX = 1;
     private final AsynchReplicationService asynchReplicationService;
 
     public LegacyAsynchReplicationAspect(AsynchReplicationService asynchReplicationService) {
@@ -48,8 +50,8 @@ public class LegacyAsynchReplicationAspect {
     @Around(value = "callCreatingCounterparty()")
     Counterparty createCounterparty(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         var args = proceedingJoinPoint.getArgs();
-        var digitalId = (String) args[0];
-        var counterparty = (Counterparty) args[1];
+        var digitalId = (String) args[DIGITAL_ID_INDEX];
+        var counterparty = (Counterparty) args[COUNTERPARTY_INDEX];
         try {
             return (Counterparty) proceedingJoinPoint.proceed(args);
         } catch (Throwable e) {
@@ -70,8 +72,8 @@ public class LegacyAsynchReplicationAspect {
     @Around(value = "callUpdatingCounterparty()")
     Counterparty updateCounterparty(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         var args = proceedingJoinPoint.getArgs();
-        var digitalId = (String) args[0];
-        var counterparty = (Counterparty) args[1];
+        var digitalId = (String) args[DIGITAL_ID_INDEX];
+        var counterparty = (Counterparty) args[COUNTERPARTY_INDEX];
         try {
             return (Counterparty) proceedingJoinPoint.proceed(args);
         } catch (Throwable e) {
@@ -92,8 +94,8 @@ public class LegacyAsynchReplicationAspect {
     @Around(value = "callDeletingCounterparty()")
     void deleteCounterparty(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         var args = proceedingJoinPoint.getArgs();
-        var digitalId = (String) args[0];
-        var counterpartyId = (String) args[1];
+        var digitalId = (String) args[DIGITAL_ID_INDEX];
+        var counterpartyId = (String) args[COUNTERPARTY_INDEX];
         try {
             proceedingJoinPoint.proceed(args);
         } catch (Throwable e) {
@@ -113,8 +115,8 @@ public class LegacyAsynchReplicationAspect {
     @Around(value = "callCreatingSign()")
     void createSign(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         var args = proceedingJoinPoint.getArgs();
-        var digitalId = (String) args[0];
-        var counterpartySignData = (CounterpartySignData) args[1];
+        var digitalId = (String) args[DIGITAL_ID_INDEX];
+        var counterpartySignData = (CounterpartySignData) args[COUNTERPARTY_INDEX];
         try {
             proceedingJoinPoint.proceed(args);
         } catch (Throwable e) {
@@ -134,8 +136,8 @@ public class LegacyAsynchReplicationAspect {
     @Around(value = "callDeletingSign()")
     void deleteSign(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         var args = proceedingJoinPoint.getArgs();
-        var digitalId = (String) args[0];
-        var counterpartyId = (String) args[1];
+        var digitalId = (String) args[DIGITAL_ID_INDEX];
+        var counterpartyId = (String) args[COUNTERPARTY_INDEX];
         try {
             proceedingJoinPoint.proceed(args);
         } catch (Throwable e) {

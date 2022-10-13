@@ -9,8 +9,8 @@ public class BadRequestException extends RuntimeException {
 
     private final String code;
 
-    public BadRequestException(String message) {
-        super(message);
+    public BadRequestException(Throwable ex) {
+        super(ex.getLocalizedMessage(), ex);
         this.code = EXCEPTION;
     }
 

@@ -116,7 +116,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
                 maskFormatter.valueToString(param);
                 return true;
             } catch (ParseException e) {
-                throw new BadRequestException(e.getLocalizedMessage());
+                throw new BadRequestException(e);
             }
         }
         return false;

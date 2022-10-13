@@ -82,8 +82,12 @@ public class ReplicationKafkaSecurityProperties {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ReplicationKafkaSecurityProperties)) return false;
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         ReplicationKafkaSecurityProperties that = (ReplicationKafkaSecurityProperties) o;
         return enable == that.enable &&
             Objects.equals(protocol, that.protocol) &&
@@ -97,6 +101,15 @@ public class ReplicationKafkaSecurityProperties {
 
     @Override
     public int hashCode() {
-        return Objects.hash(enable, protocol, sslProtocol, sslEnabledProtocols, sslKeystoreLocation, sslTruststoreLocation, sslKeystoreType, sslTruststoreType);
+        return Objects.hash(
+            enable,
+            protocol,
+            sslProtocol,
+            sslEnabledProtocols,
+            sslKeystoreLocation,
+            sslTruststoreLocation,
+            sslKeystoreType,
+            sslTruststoreType
+        );
     }
 }

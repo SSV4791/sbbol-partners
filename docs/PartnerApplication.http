@@ -28,7 +28,7 @@ Content-Type: application/json
         "name": "Теперь не Сбер",
         "bic": "044525225",
         "bankAccount": {
-            "account": "30101810400000000212"
+            "bankAccount": "30101810400000000212"
         }
     },
     "version": "0"
@@ -270,7 +270,7 @@ Content-Type: application/json
         "name": "Какой-то банк",
         "bic": "044525225",
         "bankAccount": {
-            "account": "30101810400000000225"
+            "bankAccount": "30101810400000000225"
         }
     }
 }
@@ -298,7 +298,7 @@ Content-Type: application/json
         "name": "Сбербанк",
         "bic": "044525225",
         "bankAccount": {
-            "account": "30101810400000000225"
+            "bankAccount": "30101810400000000225"
         }
     },
     "version": "1"
