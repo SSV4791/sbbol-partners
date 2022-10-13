@@ -38,8 +38,12 @@ public class ValidationInterceptorProperties {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ValidationInterceptorProperties)) return false;
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         ValidationInterceptorProperties that = (ValidationInterceptorProperties) o;
         return enable == that.enable &&
             Objects.equals(classes, that.classes) &&

@@ -72,8 +72,12 @@ public class ReplicationKafkaProducerProperties {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ReplicationKafkaProducerProperties)) return false;
+        if (o == this) {
+            return true;
+        }
+        if (o == null || o.getClass() != this.getClass()) {
+            return false;
+        }
         ReplicationKafkaProducerProperties that = (ReplicationKafkaProducerProperties) o;
         return enable == that.enable &&
             Objects.equals(server, that.server) &&

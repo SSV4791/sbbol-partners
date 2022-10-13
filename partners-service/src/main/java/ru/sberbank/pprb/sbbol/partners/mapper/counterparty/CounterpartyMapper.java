@@ -109,12 +109,6 @@ public interface CounterpartyMapper extends BaseMapper {
 
     @Named("toSign")
     static Boolean toSign(AccountStateType sign) {
-        if (sign == null) {
-            return false;
-        }
-        return switch (sign) {
-            case SIGNED -> true;
-            case NOT_SIGNED -> false;
-        };
+        return sign == AccountStateType.SIGNED;
     }
 }

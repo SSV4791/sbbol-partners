@@ -23,13 +23,13 @@ public class AccountBudgetViewRepositoryImpl implements AccountBudgetViewReposit
     public List<AccountEntity> findBudgetAccounts(String digitalId, List<String> masksConditions) {
         var builder = entityManager.getCriteriaBuilder();
         var criteria = builder.createQuery(AccountEntity.class);
-        List<Predicate> predicates = new ArrayList<>();
         var root = criteria.from(AccountEntity.class);
-        predicates.add(builder.equal(root.get("digitalId"), digitalId));
-        List<Predicate> maskPredicates = new ArrayList<>();
+        List<Predicate> maskPredicates = new ArrayList<>(masksConditions.size());
         for (String mask : masksConditions) {
             maskPredicates.add(builder.or(builder.like(builder.upper(root.get("account")), mask.toUpperCase(Locale.getDefault()))));
         }
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(builder.equal(root.get("digitalId"), digitalId));
         predicates.add(builder.or(maskPredicates.toArray(Predicate[]::new)));
         criteria.orderBy(defaultOrder(builder, root));
         criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));

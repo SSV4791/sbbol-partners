@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
+import org.apache.commons.lang3.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.TreasureAccountCodeCurrencyValidation;
 import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountValidator;
@@ -23,7 +24,7 @@ public class AccountAttributeTreasureCodeCurrencyAccountChangeDtoValidator exten
             return true;
         }
         var bank = value.getBank();
-        if (bank == null) {
+        if (ObjectUtils.isEmpty(bank)) {
             return true;
         }
         var bankAccount = bank.getBankAccount();
