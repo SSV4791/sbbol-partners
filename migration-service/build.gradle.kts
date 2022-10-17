@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     annotationProcessor(liveLibs.mapstruct.processor)
+    annotationProcessor(liveLibs.hibernate.jpamodelgen)
 
     implementation(project(":partners-api"))
     implementation(project(":partners-service"))
@@ -21,6 +22,8 @@ dependencies {
     implementation(liveLibs.jsonrpc4j.client)
     implementation(liveLibs.mapstruct.core)
     implementation(liveLibs.sbp.hibernate.standin)
+
+    compileOnly(liveLibs.hibernate.jpamodelgen)
 }
 
 description = "Сервис для миграции данных из Legacy СББОЛ"

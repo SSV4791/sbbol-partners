@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     annotationProcessor(liveLibs.mapstruct.processor)
+    annotationProcessor(liveLibs.hibernate.jpamodelgen)
 
     implementation(project(":partners-adapter"))
     implementation(project(":partners-api"))
@@ -25,6 +26,7 @@ dependencies {
     implementation(liveLibs.sbp.jpa.model.support)
     implementation(liveLibs.sbt.kafka.validator.interceptor)
 
+    compileOnly(liveLibs.hibernate.jpamodelgen)
     runtimeOnly(liveLibs.ehcache.org.core)
 }
 

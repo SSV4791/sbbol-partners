@@ -9,6 +9,7 @@ aspectjrt = { module = "org.aspectj:aspectjrt", version = "1.9.7" }
 ehcache-net-core = { module = "net.sf.ehcache:ehcache", version = "2.10.4" }
 ehcache-org-core = { module = "org.ehcache:ehcache", version = "3.9.2" }
 hibernate-jcache = { module = "org.hibernate:hibernate-jcache", version = "5.4.29.Final" }
+hibernate-jpamodelgen = { module = "org.hibernate:hibernate-jpamodelgen", version = "5.4.32.Final" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.13.0" }
 jackson-databind-nullable = { module = "org.openapitools:jackson-databind-nullable", version = "0.2.2" }
 javax-annotation-api = { module = "javax.annotation:javax.annotation-api", version = "1.3.2" }
