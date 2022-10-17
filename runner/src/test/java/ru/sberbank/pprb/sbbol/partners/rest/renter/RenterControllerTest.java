@@ -106,6 +106,37 @@ class RenterControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testUpdateValidRenter_withoutBankAccount() {
+        Renter renter = getValidRenter();
+        renter.bankAccount(null);
+        Renter createdRenter = given()
+            .spec(requestSpec)
+            .body(renter)
+            .when()
+            .post(baseRoutePath + "/create")
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(Renter.class);
+        String newKpp = "999999999";
+        createdRenter.setKpp(newKpp);
+        createdRenter.setBankAccount("30101810400000000225");
+        Renter updated = given()
+            .spec(requestSpec)
+            .body(createdRenter)
+            .when()
+            .post(baseRoutePath + "/update")
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(Renter.class);
+
+        assertThat(updated).isNotNull();
+        assertThat(updated.getCheckResults()).isNull();
+        assertThat(updated.getKpp()).isEqualTo(newKpp);
+    }
+
+    @Test
     void testUpdateInvalidRenter() {
         Renter renter = getValidRenter();
         Renter createdRenter = given()

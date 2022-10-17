@@ -121,8 +121,8 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: '2.3'
-    commit_or_tag: '02.000.00_0082_i-2.1'
-    release_key: DCBBRAIN-3152
+    commit_or_tag: 'D-02.001.00_0023_i-2.3'
+    release_key: DCBBRAIN-3307
     reverse_and_publish: false
     type: release
   jobs:
