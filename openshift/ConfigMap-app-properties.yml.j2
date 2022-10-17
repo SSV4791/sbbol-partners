@@ -43,6 +43,10 @@ data:
     management.endpoint.health.group.liveness.show-details=always
     management.health.db.enabled=false
 
+    # Service Cache
+    service.legacy.default.cache.time={{ service.legacy.default.cache.time | default('300')}}
+    service.legacy.max.entries.local.heap={{ service.legacy.max.entries.local.heap | default('1000')}}
+
     # AutoProc params
     migrate.gku.batch_size={{ migrate.gku.batch_size | default('10000')}}
 

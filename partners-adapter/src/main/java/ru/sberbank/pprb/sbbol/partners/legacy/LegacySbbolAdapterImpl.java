@@ -216,7 +216,6 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
-    @Cacheable("housingInns")
     public Set<String> getHousingInn(String digitalId, Set<String> counterpartyInns) {
         try {
             ResponseEntity<Set<String>> response = restTemplate.exchange(

@@ -66,6 +66,10 @@ tokenPassword=<Your user token pass code>
 
 `./gradlew build`.
 
+### Сборка проекта с отключенным кешом и без запуска тестов
+
+./gradlew clean build --no-build-cache -x test
+
 ### Запуск приложения локально
 
 `./gradlew bootRun`, `make run`
