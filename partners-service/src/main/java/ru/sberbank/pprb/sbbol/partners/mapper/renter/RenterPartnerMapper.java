@@ -418,4 +418,11 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "bic", source = "bankBic")
     @Mapping(target = "name", source = "bankName")
     void updateBank(Renter renter, @MappingTarget BankEntity bank);
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "bank", ignore = true)
+    @Mapping(target = "account", source = "bankAccount")
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    void updateBankAccount(Renter renter, @MappingTarget BankAccountEntity bankAccount);
 }

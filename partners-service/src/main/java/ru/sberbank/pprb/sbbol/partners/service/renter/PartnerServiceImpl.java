@@ -218,23 +218,24 @@ public class PartnerServiceImpl implements RenterService {
                         mapBankAccount.put(bankAccount.getUuid(), bankAccount);
                     }
                 }
+                BankEntity bankEntity;
                 if (mapBank.containsKey(flatRenter.getBankUuid())) {
-                    var bankEntity = mapBank.get(flatRenter.getBankUuid());
+                    bankEntity = mapBank.get(flatRenter.getBankUuid());
                     renterPartnerMapper.updateBank(renter, bankEntity);
                 } else {
-                    var bank = new BankEntity();
-                    renterPartnerMapper.updateBank(renter, bank);
-                    account.setBank(bank);
+                    bankEntity = new BankEntity();
+                    renterPartnerMapper.updateBank(renter, bankEntity);
+                    account.setBank(bankEntity);
                 }
                 if (renter.getBankAccount() != null) {
                     if (mapBankAccount.containsKey(flatRenter.getBankAccountUuid())) {
                         var bankAccount = mapBankAccount.get(flatRenter.getBankAccountUuid());
-                        bankAccount.setAccount(renter.getBankAccount());
+                        renterPartnerMapper.updateBankAccount(renter, bankAccount);
                     } else {
                         var bankAccount = new BankAccountEntity();
-                        bankAccount.setAccount(renter.getBankAccount());
-                        var bankEntity = mapBank.get(flatRenter.getBankUuid());
+                        renterPartnerMapper.updateBankAccount(renter, bankAccount);
                         bankEntity.setBankAccount(bankAccount);
+                        bankAccount.setBank(bankEntity);
                     }
                 }
                 savedAccount = accountRepository.save(account);
