@@ -43,6 +43,9 @@ data:
     management.endpoint.health.group.liveness.show-details=always
     management.health.db.enabled=false
 
+    # AutoProc params
+    migrate.gku.batch_size={{ migrate.gku.batch_size | default('10000')}}
+
     # Audit
     audit.enabled={{ os_project.audit.enabled | default('false')}}
     audit.time_out={{ os_project.audit.time_out | default('10000')}}

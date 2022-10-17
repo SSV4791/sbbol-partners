@@ -15,6 +15,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collection;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -72,5 +73,20 @@ class GkuMigrationServiceTest extends AbstractIntegrationTest {
 
         var foundInnAfterDelete = gkuInnDictionaryRepository.getByInn(savedEntity.getInn());
         assertNull(foundInnAfterDelete);
+    }
+
+    @Test
+    void deleteGKU_batch() {
+        for (int i = 0; i < 50; i++) {
+            var entity = podamFactory.manufacturePojo(GkuInnEntity.class);
+             gkuInnDictionaryRepository.save(entity);
+        }
+        JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestDelete, new TypeRef<>() {});
+        assertNotNull(response);
+        assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
+        assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
+
+        Iterable<GkuInnEntity> allInn = gkuInnDictionaryRepository.findAll();
+        assertThat(allInn).isEmpty();
     }
 }

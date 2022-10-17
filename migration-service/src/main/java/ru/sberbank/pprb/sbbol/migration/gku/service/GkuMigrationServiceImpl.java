@@ -4,9 +4,15 @@ package ru.sberbank.pprb.sbbol.migration.gku.service;
 import com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import ru.sberbank.pprb.sbbol.migration.gku.entity.MigrationGkuInnEntity;
+import ru.sberbank.pprb.sbbol.migration.gku.entity.MigrationGkuInnEntity_;
 import ru.sberbank.pprb.sbbol.migration.gku.mapper.MigrationGkuMapper;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
 import ru.sberbank.pprb.sbbol.migration.gku.repository.MigrationGkuRepository;
@@ -21,6 +27,9 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
 
     private final MigrationGkuMapper migrationGkuMapper;
     private final MigrationGkuRepository migrationGkuRepository;
+
+    @Value("${migrate.gku.batch_size}")
+    private int batchSize;
 
     public GkuMigrationServiceImpl(
         MigrationGkuMapper migrationGkuMapper,
@@ -48,10 +57,18 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
     }
 
     @Override
-    @Transactional
     public void delete() {
         LOGGER.info("Начало процедуры удаления записей ЖКУ");
-        migrationGkuRepository.deleteAll();
+        Page<MigrationGkuInnEntity> inns;
+        do {
+            inns = migrationGkuRepository.findAll(PageRequest.of(0, batchSize, Sort.by(MigrationGkuInnEntity_.INN)));
+            delete(inns.getContent());
+        } while (inns.hasNext());
         LOGGER.info("Окончание процедуры удаления записей ЖКУ");
+    }
+
+    @Transactional
+    public void delete(List<MigrationGkuInnEntity> content) {
+        migrationGkuRepository.deleteAll(content);
     }
 }
