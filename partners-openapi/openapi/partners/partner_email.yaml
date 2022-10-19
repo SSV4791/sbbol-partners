@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
-  title: Request for Partner email
-  version: 1.0.0
+  title: Request for partners email
+  version: 1.0.2
   description: OpenAPI Specification for Partner email
 
 servers:

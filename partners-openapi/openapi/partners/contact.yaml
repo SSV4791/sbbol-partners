@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
-  title: Request for partners
-  version: 1.0.0
+  title: Request for partners contact
+  version: 1.0.2
   description: OpenAPI Specification for contact
 
 servers:
