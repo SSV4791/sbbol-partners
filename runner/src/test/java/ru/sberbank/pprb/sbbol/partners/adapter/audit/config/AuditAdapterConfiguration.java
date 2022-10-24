@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.sberbank.pprb.sbbol.audit.api.DefaultApi;
 import ru.sberbank.pprb.sbbol.audit.invoker.ApiClient;
 import ru.sberbank.pprb.sbbol.audit.model.BaseResponse;
@@ -32,7 +33,7 @@ public class AuditAdapterConfiguration {
 
     @PostConstruct
     void initMock() {
-
+        when(auditRestTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(auditRestTemplate.exchange(ArgumentMatchers.<RequestEntity<Object>>any(), ArgumentMatchers.<ParameterizedTypeReference<BaseResponse>>any()))
             .thenReturn(new ResponseEntity<>(new BaseResponse(), HttpStatus.CREATED));
     }
