@@ -31,7 +31,7 @@ pluginManagement {
         }
     }
     plugins {
-        id("org.openapi.generator") version "5.3.1"
+        id("org.openapi.generator") version "5.2.1"
         id("org.springframework.boot") version "2.5.5"
     }
 }
