@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 class RenterControllerTest extends AbstractIntegrationTest {
 
@@ -254,44 +255,5 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .as(RenterListResponse.class);
         assertThat(response).isNotNull();
         assertThat(response.getItems().size()).isEqualTo(2);
-    }
-
-    private Renter getValidRenter() {
-        RenterAddress address = new RenterAddress().zipCode("655511")
-            .regionCode("42")
-            .region("Кемеровская область")
-            .city("Кемерово")
-            .locality("Кемерово")
-            .street("Ленина")
-            .building("162")
-            .buildingBlock("1")
-            .flat("55");
-
-        return new Renter()
-            .digitalId(randomAlphabetic(10))
-            .type(Renter.TypeEnum.LEGAL_ENTITY)
-            .legalName("ОАО Рога и копыта")
-            .inn("132456789132")
-            .kpp("0")
-            .ogrn("123456789012345")
-            .okpo("1234567890")
-            .lastName("Фамилия")
-            .firstName("Имя")
-            .middleName("Отчество")
-            .dulType(Renter.DulTypeEnum.PASSPORTOFRUSSIA)
-            .dulName(DulType.PASSPORTOFRUSSIA.getDesc())
-            .dulSerie("Серия")
-            .dulNumber("Номер")
-            .dulDivisionIssue("Место")
-            .dulDateIssue(LocalDate.now())
-            .dulDivisionCode("Код")
-            .account("40702810538261023926")
-            .bankBic("044525225")
-            .bankName("ПАО СБЕРБАНК")
-            .bankAccount("30101810400000000225")
-            .phoneNumbers("+79991112233")
-            .emails("roga@mail.ru")
-            .legalAddress(address)
-            .physicalAddress(address);
     }
 }

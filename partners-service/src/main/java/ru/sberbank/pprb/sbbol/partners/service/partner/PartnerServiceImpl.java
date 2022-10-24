@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -84,6 +85,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional(readOnly = true)
     public Partner getPartner(String digitalId, String id) {
         PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = partnerMapper.toPartner(partner);
         response.setGku(getGku(response.getInn()));
@@ -167,6 +169,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     public Partner updatePartner(Partner partner) {
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
+            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
         if (!Objects.equals(partner.getVersion(), foundPartner.getVersion())) {
             throw new OptimisticLockException(foundPartner.getVersion(), partner.getVersion());
@@ -185,6 +188,7 @@ public class PartnerServiceImpl implements PartnerService {
         for (String partnerId : ids) {
             var partnerUuid = partnerMapper.mapUuid(partnerId);
             PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
+                .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerUuid));
             partnerRepository.delete(foundPartner);
             addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
