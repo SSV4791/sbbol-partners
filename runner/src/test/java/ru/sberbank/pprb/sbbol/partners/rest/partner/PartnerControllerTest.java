@@ -31,6 +31,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -52,6 +53,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
+import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class PartnerControllerTest extends AbstractIntegrationTest {
@@ -907,6 +909,46 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isEqualTo(2);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
+    }
+
+    @Test
+    void testGetPartnersWithoutRenters() {
+        var digitalId = randomAlphabetic(10);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(digitalId),
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+
+        var createdRenter = createValidRenter(digitalId);
+        assertThat(createdRenter)
+            .isNotNull();
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(2)
+        );
+
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isEqualTo(1);
+        assertThat(response.getPartners().get(0).getDigitalId())
+            .isEqualTo(digitalId);
+        assertThat(response.getPartners().get(0).getId())
+            .isEqualTo(createdPartner.getId());
     }
 
     @Test
@@ -1920,5 +1962,18 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .firstName(randomAlphabetic(10))
             .version(partner.getVersion())
             .inn(partner.getInn());
+    }
+
+    private Renter createValidRenter(String digitalId) {
+        Renter renter = getValidRenter(digitalId);
+        return given()
+            .spec(requestSpec)
+            .body(renter)
+            .when()
+            .post("/sbbol-partners/renter/create")
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(Renter.class);
     }
 }

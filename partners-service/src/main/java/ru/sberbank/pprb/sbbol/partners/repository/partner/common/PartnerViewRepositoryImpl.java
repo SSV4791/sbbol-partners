@@ -7,6 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
@@ -54,6 +55,7 @@ public class PartnerViewRepositoryImpl
         PartnersFilter filter
     ) {
         predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
+        predicates.add(builder.equal(root.get("type"), PartnerType.PARTNER));
         var filterSearch = filter.getSearch();
         if (filterSearch != null && StringUtils.hasText(filterSearch.getSearch())) {
             var searchPattern = filterSearch.getSearch()
