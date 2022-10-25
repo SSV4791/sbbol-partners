@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.config;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import uk.co.jemos.podam.api.AttributeMetadata;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -26,6 +27,10 @@ public class PodamConfiguration {
     private static final int[] WEIGHT_FACTOR = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
     private static final String STATIC_ACCOUNT_PART = "40702810";
     private static final String ACCOUNT_KEY = "0";
+    private static final String STATIC_INN_PART = "7707";
+    private static final int[] WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN = new int[]{2, 4, 10, 3, 5, 9, 4, 6, 8};
+    private static final int[] WEIGHT_FACTOR_FOR_ELEVEN_KEY = new int[]{7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
+    private static final int[] WEIGHT_FACTOR_FOR_TWELVE_KEY = new int[]{3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
 
     @Bean
     PodamFactory podamFactory() {
@@ -62,6 +67,7 @@ public class PodamConfiguration {
                     "bankId",
                     "documentTypeId" -> UUID.randomUUID().toString();
                 case "phone" -> randomNumeric(PHONE_LENGTH);
+                case "inn" -> getValidInnNumber(LegalForm.LEGAL_ENTITY);
                 case "kpp" -> "123456789";
                 case "bic" -> bic;
                 case "account" -> getValidAccountNumber(bic);
@@ -99,11 +105,62 @@ public class PodamConfiguration {
             result[i] = numberForCalculate[i] * WEIGHT_FACTOR[i];
         }
         int resulSumma = 0;
-        for (int i = 0; i < result.length; i++) {
-            resulSumma += result[i] % 10;
+        for (int j : result) {
+            resulSumma += j % 10;
         }
 
         return STATIC_ACCOUNT_PART + resulSumma * 3 % 10 + randomAccountPart;
+    }
+
+    /**
+     * Для расчета десятого контрольного разряда в 10-ти значном ИНН
+     * каждая цифра ИНН (кроме десятой) умножается на соответствующий множитель в соответствии с таблицей,
+     * затем все значения суммируются, сумма берется по модулю 11 (остаток деления на 11),
+     * затем полученное число берется по модулю 10 это и есть десятый разряд.
+     *
+     * Для расчета 11-ого контрольного разряда (1-ой контрольной цифры) в 12-ти значном ИНН
+     * каждая цифра ИНН (кроме 11-ой и 12-ой) умножается на соответствующий множитель в соответствии с таблицей,
+     * затем все значения суммируются, сумма берется по модулю 11,
+     * затем полученное число берется по модулю 10 это и есть 11-ый разряд.
+     *
+     * Для расчета 12-ого контрольного разряда (2-ой контрольной цифры) в 12-ти значном ИНН
+     * каждая цифра ИНН (кроме12-ой), 11-ая вычисляется в соотв. с пред. пунктом,
+     * умножается на соответствующий множитель в соответствии с таблицей,
+     * затем все значения суммируются, сумма берется по модулю 11,
+     * затем полученное число берется по модулю 10 это и есть 12-ый разряд.
+     */
+    public static String getValidInnNumber(LegalForm legalForm) {
+
+        if (legalForm.getValue() == "LEGAL_ENTITY") {
+            String randomInnPart = RandomStringUtils.randomNumeric(5);
+            String innForCalculate = STATIC_INN_PART + randomInnPart;
+            int calculateValidKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN);
+
+            return STATIC_INN_PART + randomInnPart + calculateValidKeyForInn;
+        } else {
+            String randomInnPart = RandomStringUtils.randomNumeric(6);
+            String innForCalculate = STATIC_INN_PART + randomInnPart;
+            int calculateElevenKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_ELEVEN_KEY);
+
+            String innForCalculateTwelveKey = innForCalculate + calculateElevenKeyForInn;
+            int calculateTwelveKeyForInn = calculateValidKeyForInn(innForCalculateTwelveKey, WEIGHT_FACTOR_FOR_TWELVE_KEY);
+
+            return STATIC_INN_PART + randomInnPart + calculateElevenKeyForInn + calculateTwelveKeyForInn;
+        }
+    }
+
+    private static int calculateValidKeyForInn(String innForCalculate, int[] weightFactorForCalculate) {
+        int[] numberForCalculate = Arrays.stream(innForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
+        int[] result = new int[numberForCalculate.length];
+        for (int i = 0; i < weightFactorForCalculate.length; i++) {
+            result[i] = numberForCalculate[i] * weightFactorForCalculate[i];
+        }
+        int resulSumma = 0;
+        for (int numberForCalculatingElevenKey : result) {
+            resulSumma += numberForCalculatingElevenKey;
+        }
+
+        return (resulSumma % 11) % 10;
     }
 
     public static String getBic() {

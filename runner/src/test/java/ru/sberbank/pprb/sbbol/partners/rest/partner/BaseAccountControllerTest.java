@@ -18,18 +18,22 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.getBic;
 
 @SuppressWarnings("java:S2187")
 public class BaseAccountControllerTest extends AbstractIntegrationTest {
 
     protected static final String baseRoutePath = "/partner";
-    protected static final String ACCOUNT_FOR_TEST_PARTNER = "40802810500490014206";
     protected static final String BUDGET_ACCOUNT_VALID = "03010643100000000001";
     protected static final String BUDGET_CORR_ACCOUNT_VALID = "40102810300000000001";
-    protected static final int[] WEIGHT_FACTOR = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
-    protected static final String STATIC_ACCOUNT_PART = "40702810";
-    protected static final String ACCOUNT_KEY = "0";
+    private static final int[] WEIGHT_FACTOR = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
+    private static final String STATIC_ACCOUNT_PART = "40702810";
+    private static final String ACCOUNT_KEY = "0";
+    private static final String STATIC_INN_PART = "7707";
+    private static final int[] WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN = new int[]{2, 4, 10, 3, 5, 9, 4, 6, 8};
+    private static final int[] WEIGHT_FACTOR_FOR_ELEVEN_KEY = new int[]{7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
+    private static final int[] WEIGHT_FACTOR_FOR_TWELVE_KEY = new int[]{3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
 
     /**
      * Алгоритм расчета контрольного ключа:
@@ -55,6 +59,57 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         }
 
         return STATIC_ACCOUNT_PART + resulSumma * 3 % 10 + randomAccountPart;
+    }
+
+    /**
+     * Для расчета десятого контрольного разряда в 10-ти значном ИНН
+     * каждая цифра ИНН (кроме десятой) умножается на соответствующий множитель в соответствии с таблицей,
+     * затем все значения суммируются, сумма берется по модулю 11 (остаток деления на 11),
+     * затем полученное число берется по модулю 10 это и есть десятый разряд.
+     *
+     * Для расчета 11-ого контрольного разряда (1-ой контрольной цифры) в 12-ти значном ИНН
+     * каждая цифра ИНН (кроме 11-ой и 12-ой) умножается на соответствующий множитель в соответствии с таблицей,
+     * затем все значения суммируются, сумма берется по модулю 11,
+     * затем полученное число берется по модулю 10 это и есть 11-ый разряд.
+     *
+     * Для расчета 12-ого контрольного разряда (2-ой контрольной цифры) в 12-ти значном ИНН
+     * каждая цифра ИНН (кроме12-ой), 11-ая вычисляется в соотв. с пред. пунктом,
+     * умножается на соответствующий множитель в соответствии с таблицей,
+     * затем все значения суммируются, сумма берется по модулю 11,
+     * затем полученное число берется по модулю 10 это и есть 12-ый разряд.
+     */
+    public static String getValidInnNumber(LegalForm legalForm) {
+
+        if (legalForm == LegalForm.LEGAL_ENTITY) {
+            String randomInnPart = RandomStringUtils.randomNumeric(5);
+            String innForCalculate = STATIC_INN_PART + randomInnPart;
+            int calculateValidKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN);
+
+            return STATIC_INN_PART + randomInnPart + calculateValidKeyForInn;
+        } else {
+            String randomInnPart = RandomStringUtils.randomNumeric(6);
+            String innForCalculate = STATIC_INN_PART + randomInnPart;
+            int calculateElevenKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_ELEVEN_KEY);
+
+            String innForCalculateTwelveKey = innForCalculate + calculateElevenKeyForInn;
+            int calculateTwelveKeyForInn = calculateValidKeyForInn(innForCalculateTwelveKey, WEIGHT_FACTOR_FOR_TWELVE_KEY);
+
+            return STATIC_INN_PART + randomInnPart + calculateElevenKeyForInn + calculateTwelveKeyForInn;
+        }
+    }
+
+    private static int calculateValidKeyForInn(String innForCalculate, int[] weightFactorForCalculate) {
+        int[] numberForCalculate = Arrays.stream(innForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
+        int[] result = new int[numberForCalculate.length];
+        for (int i = 0; i < weightFactorForCalculate.length; i++) {
+            result[i] = numberForCalculate[i] * weightFactorForCalculate[i];
+        }
+        int resulSumma = 0;
+        for (int numberForCalculatingElevenKey : result) {
+            resulSumma += numberForCalculatingElevenKey;
+        }
+
+        return (resulSumma % 11) % 10;
     }
 
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
@@ -106,7 +161,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account(ACCOUNT_FOR_TEST_PARTNER)
+            .account(getValidAccountNumber())
             .bank(new Bank()
                 .bic("044525411")
                 .name(account.getBank().getName())

@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,6 +30,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidInnNumber;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import java.time.LocalDate;
@@ -44,24 +44,149 @@ import java.util.stream.Collectors;
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.ACCOUNT_FOR_TEST_PARTNER;
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidAccountNumber;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class PartnerControllerTest extends AbstractIntegrationTest {
 
-    private static final String VALID_PHYSICAL_INN = "521031961500";
     private static final String VALID_PHYSICAL_OKPO = "1234567890";
 
     public static final String baseRoutePath = "/partner";
+    public static final String baseRoutePathForGet = "/partners/{digitalId}/{id}";
+
+    @Test
+    void testCreatePartnerWithoutDigitalId() {
+        var partner = getValidLegalEntityPartner("");
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        List<Descriptions> descriptions = error.getDescriptions();
+        assertThat(descriptions).isNotNull();
+        assertThat(descriptions).size().isEqualTo(1);
+        Descriptions description = descriptions.stream()
+            .filter(value -> value.getField().equals("digitalId"))
+            .findFirst().orElse(null);
+        assertThat(description).isNotNull();
+        assertThat(description.getMessage()).contains("Поле обязательно для заполнения");
+        assertThat(description.getMessage()).contains("размер должен находиться в диапазоне от 1 до 40");
+        assertThat(description.getMessage()).size().isEqualTo(2);
+    }
+
+    @Test
+    void testCreateEmptyLegalEntityPartner() {
+        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
+            .firstName(null)
+            .secondName(null)
+            .middleName(null)
+            .kpp(null)
+            .ogrn(null)
+            .okpo(null)
+            .phones(null)
+            .emails(null)
+            .comment(null);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        var actualPartner = get(
+            baseRoutePathForGet,
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(actualPartner)
+            .isNotNull()
+            .isEqualTo(createdPartner);
+    }
+
+    @Test
+    void testCreateEmptyEntrepreneurPartner() {
+        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
+            .legalForm(LegalForm.ENTREPRENEUR)
+            .firstName(null)
+            .secondName(null)
+            .middleName(null)
+            .inn(getValidInnNumber(LegalForm.ENTREPRENEUR))
+            .kpp(null)
+            .ogrn(null)
+            .okpo(null)
+            .phones(null)
+            .emails(null)
+            .comment(null);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        var actualPartner = get(
+            baseRoutePathForGet,
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(actualPartner)
+            .isNotNull()
+            .isEqualTo(createdPartner);
+    }
+
+    @Test
+    void testCreateEmptyPhysicalPersonPartner() {
+        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
+            .legalForm(LegalForm.PHYSICAL_PERSON)
+            .orgName(null)
+            .secondName(null)
+            .middleName(null)
+            .inn(null)
+            .kpp(null)
+            .ogrn(null)
+            .okpo(null)
+            .phones(null)
+            .emails(null)
+            .comment(null);
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            partner,
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        var actualPartner = get(
+            baseRoutePathForGet,
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(actualPartner)
+            .isNotNull()
+            .isEqualTo(createdPartner);
+    }
 
     @Test
     void testGetPartner() {
@@ -76,7 +201,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var actualPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -150,10 +275,12 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void testGetSearchInnPartners() {
         var digitalId = randomAlphabetic(10);
+        var innForPartner = getValidInnNumber(LegalForm.LEGAL_ENTITY);
         var createdPartner1 = post(
             baseRoutePath,
             HttpStatus.CREATED,
-            getValidLegalEntityPartner(digitalId),
+            getValidLegalEntityPartner(digitalId)
+                .inn(innForPartner),
             Partner.class
         );
         assertThat(createdPartner1)
@@ -162,7 +289,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var createdPartner2 = post(
             baseRoutePath,
             HttpStatus.CREATED,
-            getValidLegalEntityPartner(digitalId),
+            getValidLegalEntityPartner(digitalId)
+                .inn(innForPartner),
             Partner.class
         );
         assertThat(createdPartner2)
@@ -404,7 +532,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        Assertions.assertThat(response.getPartners())
+        assertThat(response.getPartners())
             .hasSize(2);
     }
 
@@ -1115,7 +1243,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(partnerError.getCode())
             .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
-        Assertions.assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+        assertThat(partnerError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .contains("Версия записи в базе данных " + (partner.getVersion() - 1) +
                 " не равна версии записи в запросе version=" + version);
     }
@@ -1130,7 +1258,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Partner.class
         );
         var checkPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.OK,
             Partner.class,
             updatePartner.getDigitalId(),
@@ -1153,7 +1281,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1171,7 +1299,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         ).getBody();
 
         var searchPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.NOT_FOUND,
             Error.class,
             createdPartner.getDigitalId(),
@@ -1230,9 +1358,9 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(createdPartner)
             .isNotNull();
-        assertThat(createdPartner.getPhones().size() > 0 )
+        assertThat(createdPartner.getPhones().size() > 0)
             .isTrue();
-        assertThat(createdPartner.getEmails().size() > 0 )
+        assertThat(createdPartner.getEmails().size() > 0)
             .isTrue();
         var updatePhone = createdPartner.getPhones().stream().findFirst().orElse(null);
         assertThat(updatePhone)
@@ -1249,7 +1377,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Partner.class
         );
         var updatedPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1307,7 +1435,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Partner.class
         );
         var updatedPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1369,7 +1497,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Partner.class
         );
         var updatedPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1429,7 +1557,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Partner.class
         );
         var updatedPartner = get(
-            "/partners/{digitalId}" + "/{id}",
+            baseRoutePathForGet,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1439,8 +1567,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
         assertThat(updatedPartner.getPhones())
             .usingRecursiveComparison()
-                .ignoringCollectionOrder()
-                    .isEqualTo(Collections.emptySet());
+            .ignoringCollectionOrder()
+            .isEqualTo(Collections.emptySet());
 
         assertThat(updatedPartner.getEmails())
             .usingRecursiveComparison()
@@ -1507,7 +1635,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath+"/full-model")
+            .post(baseRoutePath + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1523,7 +1651,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner1)
             .when()
-            .post(baseRoutePath+"/full-model")
+            .post(baseRoutePath + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1531,7 +1659,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols")+" [§±]");
+            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols") + " [§±]");
 
         var str = "0123456789";
         var partner2 = getValidFullModelLegalEntityPartner();
@@ -1540,7 +1668,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner2)
             .when()
-            .post(baseRoutePath+"/full-model")
+            .post(baseRoutePath + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1613,7 +1741,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath+"/full-model")
+            .post(baseRoutePath + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1629,7 +1757,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath+"/full-model")
+            .post(baseRoutePath + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1689,7 +1817,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Partner.class
         );
         assertThat(response)
-                .isNotNull();
+            .isNotNull();
         assertThat(response.getKpp())
             .isNull();
 
@@ -1729,7 +1857,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     void testSavePartner_whenLegalFormIsNull() {
         var partner = getValidLegalEntityPartner();
         partner.setLegalForm(null);
-        partner.setInn(VALID_PHYSICAL_INN);
+        partner.setInn(getValidInnNumber(LegalForm.PHYSICAL_PERSON));
         partner.setOkpo(VALID_PHYSICAL_OKPO);
         var error = given()
             .spec(requestSpec)
@@ -1751,7 +1879,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     void testSaveFullModelPartner_whenLegalFormIsNull() {
         var partner = getValidFullModelLegalEntityPartner();
         partner.setLegalForm(null);
-        partner.setInn(VALID_PHYSICAL_INN);
+        partner.setInn(getValidInnNumber(LegalForm.PHYSICAL_PERSON));
         partner.setOkpo(VALID_PHYSICAL_OKPO);
         var error = given()
             .spec(requestSpec)
@@ -1850,7 +1978,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .firstName(randomAlphabetic(10))
             .secondName(randomAlphabetic(10))
             .middleName(randomAlphabetic(10))
-            .inn("4139314257")
+            .inn(getValidInnNumber(LegalForm.LEGAL_ENTITY))
             .kpp("123456789")
             .ogrn("1035006110083")
             .okpo("12345678")
@@ -1873,7 +2001,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .firstName(randomAlphabetic(10))
             .secondName(randomAlphabetic(10))
             .middleName(randomAlphabetic(10))
-            .inn("4139314257")
+            .inn(getValidInnNumber(LegalForm.LEGAL_ENTITY))
             .kpp("123456789")
             .ogrn("1035006110083")
             .okpo("12345678")
@@ -1887,7 +2015,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 ))
             .comment("555555")
             .accounts(Set.of(new AccountCreateFullModel()
-                .account(ACCOUNT_FOR_TEST_PARTNER)
+                .account(getValidAccountNumber())
                 .comment("Это тестовый комментарий")
                 .bank(new BankCreate()
                     .bic("044525411")
@@ -1948,7 +2076,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {
         var partner = getValidLegalEntityPartner(digitalId);
         partner.setLegalForm(LegalForm.PHYSICAL_PERSON);
-        partner.setInn(VALID_PHYSICAL_INN);
+        partner.setInn(getValidInnNumber(LegalForm.PHYSICAL_PERSON));
         return partner;
     }
 
@@ -1956,7 +2084,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidLegalEntityPartner(digitalId);
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
         partner.setOkpo(VALID_PHYSICAL_OKPO);
-        partner.setInn(VALID_PHYSICAL_INN);
+        partner.setInn(getValidInnNumber(LegalForm.ENTREPRENEUR));
         partner.setOgrn("314505309900027");
         return partner;
     }
