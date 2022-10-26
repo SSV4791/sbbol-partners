@@ -14,7 +14,7 @@ public class BaseOkpoLengthValidator extends BaseValidator {
     private static final String MESSAGE_ENTREPRENEUR = "{validation.partner.entrepreneur.okpo.length}";
 
     public boolean isValid(ConstraintValidatorContext context, String okpo, LegalForm legalForm) {
-        if (!StringUtils.hasText(okpo)) {
+        if (!StringUtils.hasText(okpo) || legalForm == null) {
             return true;
         }
         if (legalForm == LegalForm.PHYSICAL_PERSON) {

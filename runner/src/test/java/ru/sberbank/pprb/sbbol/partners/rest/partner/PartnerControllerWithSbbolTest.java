@@ -60,7 +60,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
 
     @Test
     void testCreatePartner() {
-        var response = post(baseRoutePath, HttpStatus.NOT_FOUND, PartnerControllerTest.getValidPartner(), Error.class);
+        var response = post(baseRoutePath, HttpStatus.NOT_FOUND, PartnerControllerTest.getValidLegalEntityPartner(), Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())

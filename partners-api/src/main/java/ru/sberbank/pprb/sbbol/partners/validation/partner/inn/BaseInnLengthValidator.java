@@ -15,7 +15,7 @@ public class BaseInnLengthValidator extends BaseValidator {
     private static final String MESSAGE_PHYSICAL_PERSON_OR_ENTREPRENEUR = "{validation.partner.physical_person_or_entrepreneur.inn.length}";
 
     public boolean isValid(ConstraintValidatorContext context, String inn, LegalForm legalForm) {
-        if (!StringUtils.hasText(inn)) {
+        if (!StringUtils.hasText(inn) || legalForm == null) {
             return true;
         }
         var innLength = inn.length();
