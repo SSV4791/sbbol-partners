@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
@@ -35,7 +36,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class AccountControllerTest extends BaseAccountControllerTest {
 
-    private static final String INN_WITHOUT_ACCOUNT = "3522329000";
     private static final String KPP_WITHOUT_ACCOUNT = "618243879";
 
     @Test
@@ -260,7 +260,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .digitalId(partner.getDigitalId())
             .partnerIds(List.of(partner.getId()))
             .accountIds(account)
-            .partnerSearch(INN_WITHOUT_ACCOUNT)
+            .partnerSearch(getValidInnNumber(LegalForm.LEGAL_ENTITY))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
