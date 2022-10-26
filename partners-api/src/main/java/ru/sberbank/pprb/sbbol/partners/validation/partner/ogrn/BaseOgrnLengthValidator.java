@@ -14,7 +14,7 @@ public class BaseOgrnLengthValidator extends BaseValidator {
     private static final String MESSAGE_ENTREPRENEUR = "{validation.partner.physical_person_or_entrepreneur.ogrn.length}";
 
     public boolean isValid(ConstraintValidatorContext context, String ogrn, LegalForm legalForm) {
-        if (!StringUtils.hasText(ogrn)) {
+        if (!StringUtils.hasText(ogrn) || legalForm == null) {
             return true;
         }
         if (legalForm == LegalForm.PHYSICAL_PERSON) {

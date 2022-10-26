@@ -10,6 +10,9 @@ public class BaseInnExistValidator extends BaseValidator {
     private static final String MESSAGE_INN_EXIST = "{javax.validation.constraints.NotEmpty.message}";
 
     public boolean isValid(ConstraintValidatorContext context, String inn, LegalForm legalForm) {
+        if (legalForm == null) {
+            return true;
+        }
         if (StringUtils.isEmpty(inn) && legalForm != LegalForm.PHYSICAL_PERSON) {
             buildMessage(context, "inn", MESSAGE_INN_EXIST);
             return false;
