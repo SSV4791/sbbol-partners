@@ -34,7 +34,7 @@
       "type": "string",
       "title": "Счёт",
       "pattern": "^(\\d{20})*$",
-      "x-pattern-message": "{validation.account.account.pattern}"
+      "x-pattern-message": "{validation.account.simple_pattern}"
     },
     "bank": {
       "title": "Банк",

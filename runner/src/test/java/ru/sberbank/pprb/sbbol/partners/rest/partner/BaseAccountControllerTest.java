@@ -184,6 +184,21 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
                     .bankAccount("")));
     }
 
+    public static AccountChange updateAccountEntityWithInvalidAccountAndBankAccount(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account("123AS")
+            .bank(new Bank()
+                .bic("044525411")
+                .name(account.getBank().getName())
+                .bankAccount(new BankAccount()
+                    .bankAccount("123AS")));
+    }
+
     public static AccountChange updateAccountEntityWithNullAccountAndBankAccount(Account account) {
         return new AccountChange()
             .comment(randomAlphabetic(20))
@@ -219,9 +234,9 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
 
     public static Error createNotValidAccount(String partnerUuid, String digitalId) {
         var account = getValidAccount(partnerUuid, digitalId);
-        account.setAccount("222222");
+        account.setAccount("222222AS");
         account.getBank().setBic("44444");
-        account.getBank().getBankAccount().setBankAccount("2131243255234324123123123");
+        account.getBank().getBankAccount().setBankAccount("2131243255234324123123123AS");
         return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
     }
 
