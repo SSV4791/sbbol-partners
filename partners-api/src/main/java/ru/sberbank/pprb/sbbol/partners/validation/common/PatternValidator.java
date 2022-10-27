@@ -26,7 +26,7 @@ public class PatternValidator extends BaseValidator
             return true;
         }
         if (!pattern.matcher(value).matches()) {
-            if ("{javax.validation.constraints.Pattern.message}".equals(message)) {
+            if ("{javax.validation.constraints.Pattern.message}".equals(message) || message.contains(".simple_pattern")) {
                 buildMessage(context, message);
                 return false;
             }

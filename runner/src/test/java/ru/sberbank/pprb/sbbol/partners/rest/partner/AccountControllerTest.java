@@ -812,6 +812,24 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(error.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        var actualAccountDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "account".equals(descriptions.getField()))
+            .findAny().orElse(null);
+        assertThat(actualAccountDescriptions)
+            .isNotNull();
+        assertThat(actualAccountDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.account.control_number"))
+            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+        var actualBankAccountDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
+            .findAny().orElse(null);
+        assertThat(actualBankAccountDescriptions)
+            .isNotNull();
+        assertThat(actualBankAccountDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("account.account.bank_account.control_number"))
+            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
     }
 
     @Test
@@ -933,6 +951,36 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isEmpty();
         assertThat(updateAccount.getBank().getBankAccount().getBankAccount())
             .isEmpty();
+    }
+
+    @Test
+    void testUpdateAccountEntityInvalidAccountAndBankAccount() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccountEntityWithInvalidAccountAndBankAccount(account),
+            Error.class
+        );
+        var actualAccountDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "account".equals(descriptions.getField()))
+            .findAny().orElse(null);
+        assertThat(actualAccountDescriptions)
+            .isNotNull();
+        assertThat(actualAccountDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.account.control_number"))
+            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+        var actualBankAccountDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
+            .findAny().orElse(null);
+        assertThat(actualBankAccountDescriptions)
+            .isNotNull();
+        assertThat(actualBankAccountDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("account.account.bank_account.control_number"))
+            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
     }
 
     @Test
