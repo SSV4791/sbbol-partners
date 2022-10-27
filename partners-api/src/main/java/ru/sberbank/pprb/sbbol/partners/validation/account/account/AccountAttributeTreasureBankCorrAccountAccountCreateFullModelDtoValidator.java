@@ -3,9 +3,9 @@ package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.BalanceTreasureAccountValidation;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountValidator;
 
@@ -14,16 +14,16 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Iterator;
 import java.util.Set;
 
-public class AccountAttributeBalanceTreasureAccountCreateFullModelDtoValidator extends BaseTreasuryAccountValidator
-    implements ConstraintValidator<BalanceTreasureAccountValidation, PartnerCreateFullModel> {
+public class AccountAttributeTreasureBankCorrAccountAccountCreateFullModelDtoValidator extends BaseTreasuryAccountValidator
+    implements ConstraintValidator<TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation, PartnerCreateFullModel> {
     private String message;
 
-    public AccountAttributeBalanceTreasureAccountCreateFullModelDtoValidator(PartnerService partnerService) {
+    public AccountAttributeTreasureBankCorrAccountAccountCreateFullModelDtoValidator(PartnerService partnerService) {
         super(partnerService);
     }
 
     @Override
-    public void initialize(BalanceTreasureAccountValidation constraintAnnotation) {
+    public void initialize(TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation constraintAnnotation) {
         message = constraintAnnotation.message();
     }
 
@@ -47,11 +47,11 @@ public class AccountAttributeBalanceTreasureAccountCreateFullModelDtoValidator e
                 return true;
             }
             var bankAccount = bank.getBankAccount();
-            if (ObjectUtils.isEmpty(bankAccount)) {
+            if (bankAccount == null) {
                 return true;
             }
-            buildMessage(context, String.format("accounts[%s].account", i), message);
-            return validateBalance(next.getAccount(), bankAccount.getBankAccount());
+            buildMessage(context, String.format("accounts[%s].bank.bankAccount.bankAccount", i), message);
+            return validateCorrAccount(next.getAccount(), bankAccount.getBankAccount());
         }
         return false;
     }

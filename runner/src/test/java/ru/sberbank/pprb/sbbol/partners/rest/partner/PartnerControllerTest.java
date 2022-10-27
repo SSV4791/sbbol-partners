@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
@@ -30,10 +31,11 @@ import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidInnNumber;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -44,16 +46,17 @@ import java.util.stream.Collectors;
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
-import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
-import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidAccountNumber;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidInnNumber;
+import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class PartnerControllerTest extends AbstractIntegrationTest {
@@ -187,6 +190,9 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull()
             .isEqualTo(createdPartner);
     }
+
+    @Autowired
+    private PodamFactory podamFactory;
 
     @Test
     void testGetPartner() {
@@ -1590,18 +1596,65 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void savePartnerFullModel_notValidateCodeCurrencyAndBalance() {
+        var request = getValidFullModelLegalEntityPartner();
+        AccountCreateFullModel accountCreateFullModel = podamFactory.manufacturePojo(AccountCreateFullModel.class);
+        accountCreateFullModel.setAccount("00101643145250000411");
+        request.setAccounts(Set.of(
+            accountCreateFullModel
+        ));
+        var error = post(
+            baseRoutePath + "/full-model",
+            HttpStatus.BAD_REQUEST,
+            request,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        List<String> errorsMessage = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(errorsMessage)
+            .asList()
+            .contains("Единый казначейский счёт должен должен начинаться с 40102");
+    }
+
+    @Test
+    void savePartnerFullModel_physicalPersonNotSetBudgetCorrAccount() {
+        var request = getValidFullModelLegalEntityPartner()
+            .legalForm(LegalForm.PHYSICAL_PERSON);
+        AccountCreateFullModel accountCreateFullModel = podamFactory.manufacturePojo(AccountCreateFullModel.class);
+        accountCreateFullModel.getBank().getBankAccount().setBankAccount("40102643145250000411");
+        request.setAccounts(Set.of(
+            accountCreateFullModel
+        ));
+        var error = post(
+            baseRoutePath + "/full-model",
+            HttpStatus.BAD_REQUEST,
+            request,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        List<String> errorsMessage = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(errorsMessage)
+            .contains("Единый казначейский счёт не должен использоваться для физического лица или ИП");
+    }
+
+    @Test
     void savePartnerFullModelEmptyOrgName() {
         var partner = getValidFullModelLegalEntityPartner();
         partner.setOrgName("");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(baseRoutePath)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
@@ -1612,16 +1665,12 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     void savePartnerFullModelInvalidOrgName() {
         var partner = getValidFullModelLegalEntityPartner();
         partner.setOrgName("[Наименование] §±`~><");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(baseRoutePath)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
@@ -1683,15 +1732,12 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     void savePhysicalPartnerInvalidName() {
         var partner = getValidPhysicalPersonPartner();
         partner.setFirstName("[Имя] §±`~><");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(baseRoutePath)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
@@ -1702,15 +1748,12 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     void savePhysicalPartnerInvalidComment() {
         var partner = getValidPhysicalPersonPartner();
         partner.setComment("[Коммент Ёё §±]");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(baseRoutePath)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
@@ -1885,7 +1928,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath+"/full-model")
+            .post(baseRoutePath + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1982,8 +2025,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .kpp("123456789")
             .ogrn("1035006110083")
             .okpo("12345678")
-            .phones( new HashSet<>(List.of("0079241111111")))
-            .emails( new HashSet<>(List.of("a.a.a@sberbank.ru")))
+            .phones(new HashSet<>(List.of("0079241111111")))
+            .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
             .comment("555555");
         partner.setDigitalId(digitalId);
         return partner;
