@@ -35,6 +35,10 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     private static final int[] WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN = new int[]{2, 4, 10, 3, 5, 9, 4, 6, 8};
     private static final int[] WEIGHT_FACTOR_FOR_ELEVEN_KEY = new int[]{7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
     private static final int[] WEIGHT_FACTOR_FOR_TWELVE_KEY = new int[]{3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
+    private static final String STATIC_OGRN_PART = "10077";
+    private static final int NUMBER_FOR_CHECK = 9;
+    private static final int DIVIDER_FOR_LEGAL_ENTITY = 11;
+    private static final int DIVIDER_FOR_PHYSICAL_PERSON = 13;
 
     /**
      * Алгоритм расчета контрольного ключа:
@@ -55,8 +59,8 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             result[i] = numberForCalculate[i] * WEIGHT_FACTOR[i];
         }
         int resulSumma = 0;
-        for (int i = 0; i < result.length; i++) {
-            resulSumma += result[i] % 10;
+        for (int j : result) {
+            resulSumma += j % 10;
         }
 
         return STATIC_ACCOUNT_PART + resulSumma * 3 % 10 + randomAccountPart;
@@ -99,6 +103,29 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         }
     }
 
+    /**
+     * Алгоритм проверки ОГРН/ОГРНИП
+     * Выбрать 12-значное число ОГРН (с 1-й по 12-ю цифру) / 14-значное число ОГРНИП (с 1-й по 14-ю цифру).
+     * Вычислить остаток от деления выбранного числа на 11 (ОГРН) / на 13 (ОГРНИП).
+     * Если остаток больше 9, то контрольная цифра = последней цифре остатка
+     * Сравнить младший разряд полученного остатка от деления с 13-й цифрой ОГРН / 15-й цифрой ОГРНИП. Если они равны, то ОГРН/ОГРНИП верный.
+     */
+    public static String getValidOgrnNumber(LegalForm legalForm) {
+        if (legalForm == LegalForm.LEGAL_ENTITY) {
+            String randomOgrnPart = RandomStringUtils.randomNumeric(7);
+            String ogrnForCalculate = STATIC_OGRN_PART + randomOgrnPart;
+            long validKeyForOgrn = calculateValidKeyForOgrn(ogrnForCalculate, legalForm);
+
+            return ogrnForCalculate + validKeyForOgrn;
+        } else {
+            String randomOgrnPart = RandomStringUtils.randomNumeric(9);
+            String ogrnForCalculate = STATIC_OGRN_PART + randomOgrnPart;
+            long validKeyForOgrn = calculateValidKeyForOgrn(ogrnForCalculate, legalForm);
+
+            return ogrnForCalculate + validKeyForOgrn;
+        }
+    }
+
     private static int calculateValidKeyForInn(String innForCalculate, int[] weightFactorForCalculate) {
         int[] numberForCalculate = Arrays.stream(innForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
         int[] result = new int[numberForCalculate.length];
@@ -111,6 +138,23 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         }
 
         return (resulSumma % 11) % 10;
+    }
+
+    private static long calculateValidKeyForOgrn(String ogrnForCalculate, LegalForm legalForm) {
+        long ogrnNumber = Long.parseLong(ogrnForCalculate);
+        if (legalForm == LegalForm.LEGAL_ENTITY) {
+            long key = ogrnNumber % DIVIDER_FOR_LEGAL_ENTITY;
+            if (key > NUMBER_FOR_CHECK) {
+                key = key % 10;
+            }
+            return key;
+        } else {
+            long key = ogrnNumber % DIVIDER_FOR_PHYSICAL_PERSON;
+            if (key > NUMBER_FOR_CHECK) {
+                key = key % 10;
+            }
+            return key;
+        }
     }
 
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {

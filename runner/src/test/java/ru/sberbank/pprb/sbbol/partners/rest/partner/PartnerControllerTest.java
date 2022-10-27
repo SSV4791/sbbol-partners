@@ -37,6 +37,8 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidInnNumber;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidOgrnNumber;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import uk.co.jemos.podam.api.PodamFactory;
 
@@ -214,6 +216,31 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(actualPartner)
             .isNotNull()
             .isEqualTo(createdPartner);
+    }
+
+        @Test
+    void testCreatePartnerWithoutLegalForm() {
+        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
+            .legalForm(null);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        List<Descriptions> descriptions = error.getDescriptions();
+        assertThat(descriptions).isNotNull();
+        assertThat(descriptions).size().isEqualTo(1);
+        Descriptions description = descriptions.stream()
+            .filter(value -> value.getField().equals("legalForm"))
+            .findFirst().orElse(null);
+        assertThat(description).isNotNull();
+        assertThat(description.getMessage()).contains("Поле обязательно для заполнения");
+        assertThat(description.getMessage()).size().isEqualTo(1);
     }
 
     @Test
@@ -2094,7 +2121,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .middleName(randomAlphabetic(10))
             .inn(getValidInnNumber(LegalForm.LEGAL_ENTITY))
             .kpp("123456789")
-            .ogrn("1035006110083")
+            .ogrn(getValidOgrnNumber(LegalForm.LEGAL_ENTITY))
             .okpo("12345678")
             .phones(new HashSet<>(List.of("0079241111111")))
             .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
@@ -2117,7 +2144,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .middleName(randomAlphabetic(10))
             .inn(getValidInnNumber(LegalForm.LEGAL_ENTITY))
             .kpp("123456789")
-            .ogrn("1035006110083")
+            .ogrn(getValidOgrnNumber(LegalForm.LEGAL_ENTITY))
             .okpo("12345678")
             .phones(
                 Set.of(
@@ -2199,7 +2226,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
         partner.setOkpo(VALID_PHYSICAL_OKPO);
         partner.setInn(getValidInnNumber(LegalForm.ENTREPRENEUR));
-        partner.setOgrn("314505309900027");
+        partner.setOgrn(getValidOgrnNumber(LegalForm.ENTREPRENEUR));
         return partner;
     }
 
