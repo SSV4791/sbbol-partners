@@ -26,7 +26,7 @@ public class AccountAttributeKeyAccountCreateDtoValidator extends BaseAccountKey
             return true;
         }
         var bank = value.getBank();
-        if (StringUtils.isEmpty(bank.getBic())) {
+        if (bank == null || StringUtils.isEmpty(bank.getBic())) {
             return true;
         }
         var account = value.getAccount();

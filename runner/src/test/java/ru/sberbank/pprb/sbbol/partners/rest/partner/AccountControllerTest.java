@@ -849,6 +849,101 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    void testCreateAccount_whenBankIsNull_thenBadRequest() {
+        var partner = createValidPartner();
+        var  error = createAccountEntityWhenBankIsNull(partner.getId(), partner.getDigitalId());
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testCreateAccount_whenBankNameIsNull_thenBadRequest() {
+        var partner = createValidPartner();
+        var  error = createAccountEntityWhenBankNameIsNull(partner.getId(), partner.getDigitalId());
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testCreateAccount_whenBankNameIsEmpty_thenBadRequest() {
+        var partner = createValidPartner();
+        var  error = createAccountEntityWhenBankNameIsEmpty(partner.getId(), partner.getDigitalId());
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testCreateAccount_whenBankBicIsNull_thenBadRequest() {
+        var partner = createValidPartner();
+        var  error = createAccountEntityWhenBankBicIsNull(partner.getId(), partner.getDigitalId());
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testCreateAccount_whenBankBicIsEmpty_thenBadRequest() {
+        var partner = createValidPartner();
+        var  error = createAccountEntityWhenBankBicIsEmpty(partner.getId(), partner.getDigitalId());
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
+    }
+
+    @Test
     void testCreateUsdAccount() {
         var partner = createValidPartner();
         var expected = getValidAccount(partner.getId(), partner.getDigitalId());
@@ -933,6 +1028,136 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotEqualTo(account.getComment());
         assertThat(updateAccount.getComment())
             .isNotNull();
+    }
+
+    @Test
+    void testUpdateAccount_whenBankIsNull_thenBadRequest() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccountEntityWhenBankIsNull(account),
+            Error.class
+        );
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testUpdateAccount_whenBankNameIsNull_thenBadRequest() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccountEntityWhenBankNameIsNull(account),
+            Error.class
+        );
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testUpdateAccount_whenBankNameIsEmpty_thenBadRequest() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccountEntityWhenBankNameIsEmpty(account),
+            Error.class
+        );
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testUpdateAccount_whenBankBicIsNull_thenBadRequest() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccountEntityWhenBankBicIsNull(account),
+            Error.class
+        );
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+    }
+
+    @Test
+    void testUpdateAccount_whenBankBicIsEmpty_thenBadRequest() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            updateAccountEntityWhenBankBicIsEmpty(account),
+            Error.class
+        );
+
+        assertThat(error)
+            .isNotNull();
+
+        var actualBankDescriptions = error.getDescriptions().stream()
+            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+            .findAny().orElse(null);
+
+        assertThat(actualBankDescriptions)
+            .isNotNull();
+        assertThat(actualBankDescriptions.getMessage())
+            .asList()
+            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
     }
 
     @Test
