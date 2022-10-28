@@ -169,6 +169,77 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
                     .bankAccount("30101810145250000411")));
     }
 
+    public static AccountChange updateAccountEntityWhenBankIsNull(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account(getValidAccountNumber())
+            .bank(null);
+    }
+
+    public static AccountChange updateAccountEntityWhenBankNameIsNull(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account(getValidAccountNumber())
+            .bank(new Bank()
+                .bic("044525411")
+                .name(null)
+                .bankAccount(new BankAccount()
+                    .bankAccount("30101810145250000411")));
+    }
+
+    public static AccountChange updateAccountEntityWhenBankNameIsEmpty(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account(getValidAccountNumber())
+            .bank(new Bank()
+                .bic("044525411")
+                .name("")
+                .bankAccount(new BankAccount()
+                    .bankAccount("30101810145250000411")));
+    }
+
+    public static AccountChange updateAccountEntityWhenBankBicIsNull(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account(getValidAccountNumber())
+            .bank(new Bank()
+                .bic(null)
+                .name(account.getBank().getName())
+                .bankAccount(new BankAccount()
+                    .bankAccount("30101810145250000411")));
+    }
+
+    public static AccountChange updateAccountEntityWhenBankBicIsEmpty(Account account) {
+        return new AccountChange()
+            .comment(randomAlphabetic(20))
+            .version(account.getVersion())
+            .digitalId(account.getDigitalId())
+            .id(account.getId())
+            .partnerId(account.getPartnerId())
+            .account(getValidAccountNumber())
+            .bank(new Bank()
+                .bic("")
+                .name(account.getBank().getName())
+                .bankAccount(new BankAccount()
+                    .bankAccount("30101810145250000411")));
+    }
+
     public static AccountChange updateAccountEntityWithEmptyAccountAndBankAccount(Account account) {
         return new AccountChange()
             .comment(randomAlphabetic(20))
@@ -254,6 +325,40 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         account.getBank().setBic("044525411");
         account.getBank().getBankAccount().setBankAccount(null);
         return post(baseRoutePath + "/account", HttpStatus.CREATED, account, Account.class);
+    }
+
+    public static Error createAccountEntityWhenBankIsNull(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        account.setBank(null);
+        return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+    }
+
+    public static Error createAccountEntityWhenBankNameIsNull(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        var bank = account.getBank();
+        bank.setName(null);
+        return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+    }
+
+    public static Error createAccountEntityWhenBankNameIsEmpty(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        var bank = account.getBank();
+        bank.setName("");
+        return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+    }
+
+    public static Error createAccountEntityWhenBankBicIsNull(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        var bank = account.getBank();
+        bank.setBic(null);
+        return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+    }
+
+    public static Error createAccountEntityWhenBankBicIsEmpty(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        var bank = account.getBank();
+        bank.setBic("");
+        return post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
     }
 
     private static AccountPriority getValidPriorityAccount(String accountId, String digitalId) {
