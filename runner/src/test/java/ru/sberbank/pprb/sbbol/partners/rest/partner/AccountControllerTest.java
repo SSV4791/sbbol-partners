@@ -7,12 +7,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
@@ -32,6 +35,7 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMIS
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PRIORITY_ACCOUNT_MORE_ONE;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidPhysicalPersonPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class AccountControllerTest extends BaseAccountControllerTest {
@@ -835,7 +839,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testCreateWithEmptyAccountAndBankAccount() {
         var partner = createValidPartner();
-        var  account = createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId());
+        var account = createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId());
         assertThat(account)
             .isNotNull();
     }
@@ -843,7 +847,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testCreateWithNullAccountAndBankAccount() {
         var partner = createValidPartner();
-        var  account = createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId());
+        var account = createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId());
         assertThat(account)
             .isNotNull();
     }
@@ -1310,7 +1314,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         AssertionsForClassTypes.assertThat(updateAccount4.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols")+" ABC")
+            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols") + " ABC")
             .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
     }
 
@@ -1610,5 +1614,66 @@ class AccountControllerTest extends BaseAccountControllerTest {
         String bic = "525411";
         var key = randomNumeric(3);
         return key + bic;
+    }
+
+    @Test
+    void testSaveAccountNotValidateCodeCurrencyAndBalance() {
+        var partner = createValidPartner();
+        var account = getValidAccount(partner.getId(), partner.getDigitalId());
+        account.setAccount("00101643145250000411");
+        var error = post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        List<String> errorsMessage = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(errorsMessage)
+            .asList()
+            .contains("Единый казначейский счёт должен должен начинаться с 40102");
+    }
+
+    @Test
+    void testUpdateAccountNotValidateCodeCurrencyAndBalance() {
+        var partner = createValidPartner();
+        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        AccountChange accountChange = updateAccount(account);
+        accountChange.setAccount("00101643145250000411");
+        var error = put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            accountChange,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        List<String> errorsMessage = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(errorsMessage)
+            .asList()
+            .contains("Единый казначейский счёт должен должен начинаться с 40102");
+    }
+
+    @Test
+    void testSaveAccountPhysicalPersonNotSetBudgetCorrAccount() {
+        var partner = post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(), Partner.class);
+        assertThat(partner).isNotNull();
+        var account = getValidAccount(partner.getId(), partner.getDigitalId());
+        account.getBank().getBankAccount().setBankAccount("40102643145250000411");
+        var error = post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+        assertThat(error)
+            .isNotNull();
+        List<String> errorsMessage = error.getDescriptions().stream()
+            .map(Descriptions::getMessage)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        assertThat(errorsMessage)
+            .contains("Единый казначейский счёт не должен использоваться для физического лица или ИП");
     }
 }

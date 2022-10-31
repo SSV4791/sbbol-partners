@@ -1,29 +1,30 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
 import org.apache.commons.lang3.ObjectUtils;
-import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
-import ru.sberbank.pprb.sbbol.partners.model.TreasureAccountCodeCurrencyValidation;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class AccountAttributeTreasureCodeCurrencyAccountChangeDtoValidator extends BaseTreasuryAccountValidator
-    implements ConstraintValidator<TreasureAccountCodeCurrencyValidation, AccountChange> {
+public class AccountAttributeTreasureBankCorrAccountAccountCreateDtoValidator extends BaseTreasuryAccountValidator
+    implements ConstraintValidator<TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation, AccountCreate> {
+
     private String message;
 
-    public AccountAttributeTreasureCodeCurrencyAccountChangeDtoValidator(PartnerService partnerService) {
+    public AccountAttributeTreasureBankCorrAccountAccountCreateDtoValidator(PartnerService partnerService) {
         super(partnerService);
     }
 
     @Override
-    public void initialize(TreasureAccountCodeCurrencyValidation constraintAnnotation) {
+    public void initialize(TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation constraintAnnotation) {
         message = constraintAnnotation.message();
     }
 
     @Override
-    public boolean isValid(AccountChange value, ConstraintValidatorContext context) {
+    public boolean isValid(AccountCreate value, ConstraintValidatorContext context) {
         buildMessage(context, "account", message);
         if (value == null) {
             return true;
@@ -36,6 +37,6 @@ public class AccountAttributeTreasureCodeCurrencyAccountChangeDtoValidator exten
         if (bankAccount == null) {
             return true;
         }
-        return validateCodeCurrency(value.getDigitalId(), value.getPartnerId(), value.getAccount(), bankAccount.getBankAccount());
+        return validateCorrAccount(value.getDigitalId(), value.getPartnerId(), value.getAccount(), bankAccount.getBankAccount());
     }
 }

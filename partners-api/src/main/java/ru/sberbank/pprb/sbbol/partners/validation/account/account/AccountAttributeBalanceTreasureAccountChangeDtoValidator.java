@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 import org.apache.commons.lang3.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.BalanceTreasureAccountValidation;
+import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountValidator;
 
 import javax.validation.ConstraintValidator;
@@ -11,6 +12,10 @@ import javax.validation.ConstraintValidatorContext;
 public class AccountAttributeBalanceTreasureAccountChangeDtoValidator extends BaseTreasuryAccountValidator
     implements ConstraintValidator<BalanceTreasureAccountValidation, AccountChange> {
     private String message;
+
+    public AccountAttributeBalanceTreasureAccountChangeDtoValidator(PartnerService partnerService) {
+        super(partnerService);
+    }
 
     @Override
     public void initialize(BalanceTreasureAccountValidation constraintAnnotation) {
@@ -28,9 +33,9 @@ public class AccountAttributeBalanceTreasureAccountChangeDtoValidator extends Ba
             return true;
         }
         var bankAccount = bank.getBankAccount();
-        if (bankAccount == null) {
+        if (ObjectUtils.isEmpty(bankAccount)) {
             return true;
         }
-        return validateBalance(value.getAccount(), bankAccount.getBankAccount());
+        return validateBalance(value.getDigitalId(), value.getPartnerId(), value.getAccount(), bankAccount.getBankAccount());
     }
 }
