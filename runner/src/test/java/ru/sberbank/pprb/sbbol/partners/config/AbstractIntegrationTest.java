@@ -5,6 +5,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
+import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
@@ -76,6 +77,7 @@ public abstract class AbstractIntegrationTest {
             .setContentType(ContentType.JSON)
             .addFilter(new RestAssuredCoverageReporter())
             .addFilter(new AllureRestAssured())
+            .addFilter(new ResponseLoggingFilter())
             .log(LogDetail.ALL)
             .build();
 
@@ -156,6 +158,18 @@ public abstract class AbstractIntegrationTest {
             .spec(responseSpec)
             .extract()
             .as(response);
+    }
+
+    protected static <BODY> Response post(String url, HttpStatus responseHttpStatus, BODY body) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(specResponseHandler(responseHttpStatus))
+            .extract()
+            .response();
     }
 
     protected static <BODY> void postWithInternalServerErrorExpected(String url, BODY body) {

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
@@ -128,12 +129,12 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     }
 
     public static Account createValidAccount(String partnerUuid, String digitalId) {
-        return post(
+        return Allure.step("Создание счета " + getValidAccount(partnerUuid, digitalId).getAccount(), () -> post(
             baseRoutePath + "/account",
             HttpStatus.CREATED,
             getValidAccount(partnerUuid, digitalId),
             Account.class
-        );
+        ));
     }
 
     public static Account createValidAccount(AccountCreate account) {

@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,6 +26,7 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
@@ -213,6 +216,30 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
 
         assertThat(searchDocument.getCode())
             .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+    }
+
+    @Test
+    @DisplayName("DELETE /partner/contact/documents/{digitalId} удаление не найденного документа")
+    void negativeTestDeleteContactDocument() {
+        var document = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createValidContactDocument(contact.getId(), contact.getDigitalId());
+        });
+        Allure.step("Выполнение delete-запроса /partner/contact/documents/{digitalId}(удаление документа), код ответа 204", () -> delete(
+                baseRoutePath + "/documents" + "/{digitalId}",
+                HttpStatus.NO_CONTENT,
+                Map.of("ids", document.getId()),
+                document.getDigitalId()
+            ));
+        Allure.step("Выполнение delete-запроса /partner/contact/documents/{digitalId}(повторное удаление документа), код ответа 404", () -> delete(
+            baseRoutePath + "/documents" + "/{digitalId}",
+            HttpStatus.NOT_FOUND,
+            Map.of("ids", document.getId()),
+            document.getDigitalId()
+        ).then()
+            .body("message", equalTo("Искомая сущность document с id: " + document.getId() + ", digitalId: " + document.getDigitalId() + " не найдена")));
+
     }
 
     public static DocumentCreate getValidContactDocument(String partnerUuid, String digitalId) {
