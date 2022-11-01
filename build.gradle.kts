@@ -1,37 +1,13 @@
 plugins {
+    id("coverage-conventions")
     id("create-liquibase-path-conventions")
     id("dependency-locking-conventions")
+    id("repositories-conventions")
     id("jacoco-conventions")
     id("java-conventions")
-    id("org.sonarqube") version "3.2.0"
     id("publish-release-conventions")
-    id("ru.sbrf.build.gradle.qa.reporter") version "3.3.4"
     id("ru.sbt.meta.meta-gradle-plugin")
 }
-
-val coverageExclusions = listOf(
-    // Классы с конфигурациями
-    "ru/sbrf/ufs/sbbol/Application*",
-    //POJO
-    "**/model/**",
-    "**/enums/**",
-    "**/entity/**",
-    //Классы с контроллерами и вызовами сервисов без логики, в которых происходит только вызов соответствующего сервиса
-    "**/*Controller*",
-    "**/*Adapter*",
-    "**/*Api*",
-    "**/*Client*",
-    //Классы с заглушками для локальной разработки
-    "**/*Stub*",
-    //Сериализаторы/десериализаторы
-    "**/handler/*Handler*",
-    //Классы с exception
-    "**/exception/**",
-    //Инфраструктура
-    "**/swagger/**",
-    "**/*Aspect*",
-    "**/*Config*"
-)
 
 tasks {
 
@@ -59,39 +35,14 @@ tasks {
         dependsOn(subprojects.flatMap { it.tasks.withType<Test>() })
     }
 
-    qaReporterUpload {
-        jacocoExcludes.addAll(coverageExclusions)
-    }
 }
 project
     .tasks["sonarqube"]
     .dependsOn("qaReporterUpload")
 
-sonarqube {
-    val sonarToken = project.properties["sonarToken"] as String?
-    properties {
-        property("sonar.projectKey", "ru.sberbank.pprb.sbbol.partners:partners")
-        property("sonar.host.url", "https://sbt-sonarqube.sigma.sbrf.ru")
-        property("sonar.login", "$sonarToken")
-        property("sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/coverage/jacoco/jacocoTestReport.xml")
-        property("sonar.coverage.exclusions", coverageExclusions)
-        property(
-            "sonar.sources", """
-            "openapi",
-            "src/main/java",
-            "src/main/resources"
-        """.trimIndent()
-        )
-        property(
-            "sonar.cpd.exclusions", """
-                    partners-service/src/main/java/ru/sberbank/pprb/sbbol/partners/entity/**,
-                """.trimIndent()
-        )
-    }
-}
-
 val nexusLogin = project.properties["nexusLogin"] as String?
 val nexusPassword = project.properties["nexusPassword"] as String?
+
 meta {
     nexusUrl = null
     nexusUser = nexusLogin

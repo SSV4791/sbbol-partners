@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2151,11 +2152,11 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Partner createValidPartner(String digitalId) {
-        return post(
+        return Allure.step("Создание валидного контрагента", () -> post(
             baseRoutePath,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
-            Partner.class);
+            Partner.class));
     }
 
     private static Error createNotValidPartner() {

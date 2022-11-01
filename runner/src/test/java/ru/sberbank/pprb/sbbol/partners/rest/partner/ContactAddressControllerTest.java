@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
@@ -148,6 +149,13 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void negativeTestCreateAddressWithAllEmptyField() {
+        post(baseRoutePath + "/addresses", HttpStatus.NOT_FOUND, new AddressCreate())
+            .then()
+            .body("error", equalTo("Not Found"));
+    }
+
+    @Test
     void positiveTestUpdateAddressVersion() {
         var partner = createValidPartner(randomAlphabetic(10));
         var contact = createValidContact(partner.getId(), partner.getDigitalId());
@@ -208,6 +216,26 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
 
         assertThat(searchAddress.getCode())
             .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+    }
+
+    @Test
+    void testNegativeDeleteContactAddress() {
+        var partner = createValidPartner(randomAlphabetic(10));
+        var contact = createValidContact(partner.getId(), partner.getDigitalId());
+        var address = createValidAddress(contact.getId(), contact.getDigitalId());
+        delete(
+            baseRoutePath + "/addresses" + "/{digitalId}",
+            HttpStatus.NO_CONTENT,
+            Map.of("ids", address.getId()),
+            address.getDigitalId()
+        ).getBody();
+        delete(
+            baseRoutePath + "/addresses" + "/{digitalId}",
+            HttpStatus.NOT_FOUND,
+            Map.of("ids", address.getId()),
+            address.getDigitalId()
+        ).then()
+            .body("message", equalTo("Искомая сущность contact_address с id: " + address.getId() + ", digitalId: " + address.getDigitalId() + " не найдена"));
     }
 
     private static Address createValidAddress(String partnerUuid, String digitalId) {

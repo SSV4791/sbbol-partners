@@ -61,14 +61,12 @@ dependencies {
     testImplementation(liveLibs.aspectjrt)
     testImplementation(liveLibs.mapstruct.core)
     testImplementation(testLibs.bundles.pact)
-    testImplementation(testLibs.dcb.allure.annotations)
     // заглушка для тестирования репликации между БД
     testImplementation(testLibs.orm.tests.common) {
         exclude("com.vaadin.external.google", "android-json")
     }
-    testImplementation(testLibs.rest.assured)
-    testImplementation(testLibs.rest.assured.common)
-    testImplementation(testLibs.swagger.coverage.reporter)
+    testImplementation(testLibs.bundles.rest.assured)
+
 }
 
 description = "ППРБ.Digital.Партнеры"
