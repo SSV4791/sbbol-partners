@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 
 import javax.persistence.EntityManager;
@@ -33,18 +34,19 @@ public class EmailViewRepositoryImpl extends BaseRepository<EmailEntity, EmailsF
         Root<EmailEntity> root,
         EmailsFilter filter
     ) {
-        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
+        predicates.add(builder.equal(root.get(EmailEntity_.DIGITAL_ID), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
-            predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
+            predicates.add(root.get(EmailEntity_.UNIFIED_UUID)
+                .in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
     }
 
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get("digitalId")),
-            builder.desc(root.get("unifiedUuid")),
-            builder.desc(root.get("uuid"))
+            builder.desc(root.get(EmailEntity_.DIGITAL_ID)),
+            builder.desc(root.get(EmailEntity_.UNIFIED_UUID)),
+            builder.desc(root.get(EmailEntity_.UUID))
         );
     }
 

@@ -2,7 +2,9 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeLegalFormEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeLegalFormEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 
@@ -34,15 +36,17 @@ public class DocumentDictionaryViewRepositoryImpl
         DocumentTypeFilter filter
     ) {
         if (!CollectionUtils.isEmpty(filter.getLegalForms())) {
-            Join<DocumentTypeEntity, DocumentTypeLegalFormEntity> legalForm = root.join("legalForms");
-            predicates.add(legalForm.get("legalForm").in(filter.getLegalForms().stream().map(LegalForm::getValue).collect(toList())));
+            Join<DocumentTypeEntity, DocumentTypeLegalFormEntity> legalForm = root.join(DocumentTypeEntity_.LEGAL_FORMS);
+            predicates.add(
+                legalForm.get(DocumentTypeLegalFormEntity_.LEGAL_FORM)
+                    .in(filter.getLegalForms().stream().map(LegalForm::getValue).collect(toList())));
         }
-        predicates.add(builder.equal(root.get("deleted"), filter.getDeleted()));
+        predicates.add(builder.equal(root.get(DocumentTypeEntity_.DELETED), filter.getDeleted()));
     }
 
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
-        return List.of(builder.desc(root.get("systemName")));
+        return List.of(builder.desc(root.get(DocumentTypeEntity_.SYSTEM_NAME)));
     }
 
     @Override

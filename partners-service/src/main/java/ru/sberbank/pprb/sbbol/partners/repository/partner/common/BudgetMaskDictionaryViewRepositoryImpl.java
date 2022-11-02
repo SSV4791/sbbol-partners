@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 
@@ -21,7 +22,7 @@ public class BudgetMaskDictionaryViewRepositoryImpl implements BudgetMaskDiction
         var criteria = builder.createQuery(BudgetMaskEntity.class);
         List<Predicate> predicates = new ArrayList<>();
         var root = criteria.from(BudgetMaskEntity.class);
-        predicates.add(builder.equal(root.get("type"), BudgetMaskType.valueOf(filter.getMaskType().name())));
+        predicates.add(builder.equal(root.get(BudgetMaskEntity_.TYPE), BudgetMaskType.valueOf(filter.getMaskType().name())));
         criteria.select(root).where(builder.and(predicates.toArray(Predicate[]::new)));
         var query = entityManager.createQuery(criteria);
         if (filter.getPagination() != null) {

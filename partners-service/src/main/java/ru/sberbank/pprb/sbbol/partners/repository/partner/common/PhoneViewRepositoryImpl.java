@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 
 import javax.persistence.EntityManager;
@@ -33,18 +34,20 @@ public class PhoneViewRepositoryImpl extends BaseRepository<PhoneEntity, PhonesF
         Root<PhoneEntity> root,
         PhonesFilter filter
     ) {
-        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
+        predicates.add(builder.equal(root.get(PhoneEntity_.DIGITAL_ID), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
-            predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
+            predicates.add(
+                root.get(PhoneEntity_.UNIFIED_UUID)
+                    .in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
     }
 
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get("digitalId")),
-            builder.desc(root.get("unifiedUuid")),
-            builder.desc(root.get("uuid"))
+            builder.desc(root.get(PhoneEntity_.DIGITAL_ID)),
+            builder.desc(root.get(PhoneEntity_.UNIFIED_UUID)),
+            builder.desc(root.get(PhoneEntity_.UUID))
         );
     }
 

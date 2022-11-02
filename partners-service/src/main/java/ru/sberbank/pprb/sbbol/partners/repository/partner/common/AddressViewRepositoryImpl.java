@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 
@@ -34,20 +35,21 @@ public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, Add
         Root<AddressEntity> root,
         AddressesFilter filter
     ) {
-        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
+        predicates.add(builder.equal(root.get(AddressEntity_.DIGITAL_ID), filter.getDigitalId()));
         if (filter.getUnifiedIds() != null) {
-            predicates.add(root.get("unifiedUuid").in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
+            predicates.add(root.get(AddressEntity_.UNIFIED_UUID)
+                .in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
         if (filter.getType() != null) {
-            predicates.add(builder.equal(root.get("type"), AddressType.valueOf(filter.getType().getValue())));
+            predicates.add(builder.equal(root.get(AddressEntity_.TYPE), AddressType.valueOf(filter.getType().getValue())));
         }
     }
 
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get("digitalId")),
-            builder.desc(root.get("uuid"))
+            builder.desc(root.get(AddressEntity_.DIGITAL_ID)),
+            builder.desc(root.get(AddressEntity_.UUID))
         );
     }
 
