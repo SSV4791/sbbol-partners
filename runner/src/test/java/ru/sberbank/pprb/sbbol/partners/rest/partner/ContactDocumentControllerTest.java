@@ -28,6 +28,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.ContactControllerTest.createValidContact;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
@@ -38,33 +39,40 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner/contact";
 
     @Test
+    @DisplayName("GET /partner/contact/documents/{digitalId}/{id} получение документа по идентификатору")
     void testGetContactDocument() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
-        var actualDocument =
+        var document = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createValidContactDocument(contact.getId(), contact.getDigitalId());
+        });
+        var actualDocument = Allure.step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 200", () ->
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Document.class,
                 document.getDigitalId(), document.getId()
-            );
-        assertThat(actualDocument)
+            ));
+        Allure.step("Проверка корректности ответа", () -> assertThat(actualDocument)
             .isNotNull()
-            .isEqualTo(document);
+            .isEqualTo(document));
     }
 
     @Test
+    @DisplayName("POST /partner/contact/documents/view получение списка документов")
     void testViewContactDocument() {
-        Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        Contact contact = createValidContact(partner.getId(), partner.getDigitalId());
-        createValidContactDocument(contact.getId(), contact.getDigitalId());
-        createValidContactDocument(contact.getId(), contact.getDigitalId());
-        createValidContactDocument(contact.getId(), contact.getDigitalId());
-        createValidContactDocument(contact.getId(), contact.getDigitalId());
-        createValidContactDocument(contact.getId(), contact.getDigitalId());
+        Contact contact = Allure.step("Подготовка тестовых данных", () -> {
+            Partner partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            Contact partnerContact = createValidContact(partner.getId(), partner.getDigitalId());
+            createValidContactDocument(partnerContact.getId(), partnerContact.getDigitalId());
+            createValidContactDocument(partnerContact.getId(), partnerContact.getDigitalId());
+            createValidContactDocument(partnerContact.getId(), partnerContact.getDigitalId());
+            createValidContactDocument(partnerContact.getId(), partnerContact.getDigitalId());
+            createValidContactDocument(partnerContact.getId(), partnerContact.getDigitalId());
+            return partnerContact;
+        });
 
-        DocumentsFilter filter1 = new DocumentsFilter()
+        DocumentsFilter filter1 = Allure.step("Формирование списка документов", () -> new DocumentsFilter()
             .digitalId(contact.getDigitalId())
             .unifiedIds(
                 List.of(
@@ -73,149 +81,395 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             )
             .pagination(new Pagination()
                 .count(4)
-                .offset(0));
-        var response1 = post(
+                .offset(0)));
+        var response1 = Allure.step("Выполнение post-запроса /partner/contact/documents/view, код ответа 200", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.OK,
             filter1,
             DocumentsResponse.class
-        );
-        assertThat(response1)
-            .isNotNull();
-        assertThat(response1.getDocuments().size())
-            .isEqualTo(4);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response1)
+                .isNotNull();
+            assertThat(response1.getDocuments().size())
+                .isEqualTo(4);
+        });
 
-        DocumentsFilter filter2 = new DocumentsFilter()
+        DocumentsFilter filter2 = Allure.step("Формирование списка документов (тип документа = паспорт РФ)", () -> new DocumentsFilter()
             .digitalId(contact.getDigitalId())
             .unifiedIds(List.of(contact.getId()))
             .documentType("PASSPORT_OF_RUSSIA")
             .pagination(new Pagination()
                 .count(4)
-                .offset(0));
-        var response2 = post(
+                .offset(0)));
+        var response2 = Allure.step("Выполнение post-запроса /partner/contact/documents/view, код ответа 200", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.OK,
             filter2,
             DocumentsResponse.class
-        );
-        assertThat(response2)
-            .isNotNull();
-        assertThat(response2.getDocuments().size())
-            .isEqualTo(4);
-        assertThat(response2.getPagination().getHasNextPage())
-            .isEqualTo(Boolean.TRUE);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response2)
+                .isNotNull();
+            assertThat(response2.getDocuments().size())
+                .isEqualTo(4);
+            assertThat(response2.getPagination().getHasNextPage())
+                .isEqualTo(Boolean.TRUE);
+        });
     }
 
+    @Test
+    @DisplayName("POST /partner/contact/documents/view с пустым телом запроса")
+    void testViewContactDocumentWithEmptyBodyResponse() {
+        DocumentsFilter filter = Allure.step("Подготовка тестовых данных", () -> new DocumentsFilter());
+        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view, код ответа 400", () -> post (
+            baseRoutePath + "/documents/view",
+            HttpStatus.BAD_REQUEST,
+            filter,
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            List<Descriptions> errorTexts = List.of(
+                new Descriptions()
+                    .field("pagination")
+                    .message(
+                        List.of("Поле обязательно для заполнения")
+                    ),
+                new Descriptions()
+                    .field("digitalId")
+                    .message(
+                        List.of("Поле обязательно для заполнения", "Поле обязательно для заполнения")
+                    )
+            );
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            for (var text : response.getDescriptions()) {
+                assertThat(errorTexts.contains(text)).isTrue();
+            }
+        });
+    }
 
     @Test
+    @DisplayName("POST /partner/contact/documents/view негативные проверки digitalId")
+    void negativeTestViewContactDocumentWithDigitalId() {
+        DocumentsFilter filter = Allure.step("Формирование списка документов (digitalId равен null)", () -> new DocumentsFilter()
+            .digitalId(null)
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0)));
+        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view (digitalId равен null), код ответа 400", () -> post (
+            baseRoutePath + "/documents/view",
+            HttpStatus.BAD_REQUEST,
+            filter,
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(response.getDescriptions()
+                .get(0).getField())
+                .isEqualTo("digitalId");
+            assertThat(response.getDescriptions()
+                .get(0).getMessage())
+                .asList()
+                .contains("Поле обязательно для заполнения");
+        });
+
+        DocumentsFilter filter2 = Allure.step("Формирование списка документов (digitalId пуст)", () -> new DocumentsFilter()
+            .digitalId("")
+            .unifiedIds(List.of(""))
+            .pagination(new Pagination()
+                .count(4)
+                .offset(0)));
+        var response2 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (digitalId пуст), код ответа 400", () -> post (
+            baseRoutePath + "/documents/view",
+            HttpStatus.BAD_REQUEST,
+            filter2,
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response2)
+                .isNotNull();
+            assertThat(response2.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(response2.getDescriptions()
+                .get(0).getField())
+                .isEqualTo("digitalId");
+            assertThat(response2.getDescriptions()
+                .get(0).getMessage())
+                .asList()
+                .contains("Поле обязательно для заполнения");
+        });
+    }
+
+    @Test
+    @DisplayName("POST /partner/contact/documents/view негативные проверки pagination")
+    void testTest() {
+        Partner partner = Allure.step("Подготовка тестовых данных", () -> {
+            Partner partnerContact = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return partnerContact;
+        });
+
+        DocumentsFilter filter = Allure.step("Подготовка фильтра (pagination равен null)", () -> new DocumentsFilter()
+            .digitalId(partner.getDigitalId())
+            .pagination(null));
+        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view (pagination равен null), код ответа 400", () -> post (
+            baseRoutePath + "/documents/view",
+            HttpStatus.BAD_REQUEST,
+            filter,
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(response.getDescriptions()
+                .get(0).getField())
+                .isEqualTo("pagination");
+            assertThat(response.getDescriptions()
+                .get(0).getMessage())
+                .asList()
+                .contains("Поле обязательно для заполнения");
+        });
+
+        DocumentsFilter filter2 = Allure.step("Подготовка фильтра (count отсутсвует в теле запроса)", () -> new DocumentsFilter()
+            .digitalId(partner.getDigitalId())
+            .pagination(new Pagination()
+                .offset(0)));
+        var response2 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (count отсутсвует в теле запроса), код ответа 400", () -> post (
+            baseRoutePath + "/documents/view",
+            HttpStatus.BAD_REQUEST,
+            filter2,
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response2)
+                .isNotNull();
+            assertThat(response2.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(response2.getDescriptions()
+                .get(0).getField())
+                .isEqualTo("pagination.count");
+            assertThat(response2.getDescriptions()
+                .get(0).getMessage())
+                .asList()
+                .contains("Поле обязательно для заполнения");
+        });
+
+        DocumentsFilter filter3 = Allure.step("Подготовка фильтра (offset отсутсвует в теле запроса)", () -> new DocumentsFilter()
+            .digitalId(partner.getDigitalId())
+            .pagination(new Pagination()
+                .count(4)));
+        var response3 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (offset отсутсвует в теле запроса), код ответа 400", () -> post (
+            baseRoutePath + "/documents/view",
+            HttpStatus.BAD_REQUEST,
+            filter3,
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response3)
+                .isNotNull();
+            assertThat(response3.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(response3.getDescriptions()
+                .get(0).getField())
+                .isEqualTo("pagination.offset");
+            assertThat(response3.getDescriptions()
+                .get(0).getMessage())
+                .asList()
+                .contains("Поле обязательно для заполнения");
+        });
+    }
+
+    @Test
+    @DisplayName("POST /partner/contact/document создание документа")
     void testCreateContactDocument() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var expected = getValidContactDocument(contact.getId(), contact.getDigitalId());
-        var document = createValidContactDocument(expected);
-        assertThat(document)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "id",
-                "version",
-                "documentType")
-            .isEqualTo(expected);
+        var expected = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return getValidContactDocument(contact.getId(), contact.getDigitalId());
+        });
+        var document = Allure.step("Выполнение post-запроса /partner/contact/document, код ответа 201", () ->
+            createValidContactDocument(expected));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(document)
+                .usingRecursiveComparison()
+                .ignoringFields(
+                    "id",
+                    "version",
+                    "documentType")
+                .isEqualTo(expected);
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/contact/document создание документа без реквизитова")
+    void testCreateDocumentWithoutContact() {
+        Partner partner = Allure.step("Подготовка тестовых данных", () -> createValidPartner(RandomStringUtils.randomAlphabetic(10)));
+        var response1 = Allure.step("Выполнение post-запроса /partner/contact/document, код ответа 404", () -> post(
+            baseRoutePath + "/document",
+            HttpStatus.NOT_FOUND,
+            getValidContactDocument(partner.getId(), partner.getDigitalId()),
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response1)
+                .isNotNull();
+            assertThat(response1.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
+    }
+
+    @Test
+    @DisplayName("PUT /partner/contact/document редактирование документа")
     void testUpdateContactDocument() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
-        var newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument(document), Document.class);
-        assertThat(newUpdateDocument)
-            .isNotNull();
-        assertThat(newUpdateDocument.getNumber())
-            .isEqualTo(newUpdateDocument.getNumber());
+        var document = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createValidContactDocument(contact.getId(), contact.getDigitalId());
+        });
+        var newUpdateDocument = Allure.step("Выполнение put-запроса /partner/contact/document, код ответа 200", () ->
+            put(baseRoutePath + "/document", HttpStatus.OK, updateDocument(document), Document.class));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateDocument)
+                .isNotNull();
+            assertThat(newUpdateDocument.getNumber())
+                .isEqualTo(newUpdateDocument.getNumber());
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/contact/document редактирование удаленного документа")
+    void testUpdateNotFoundContactDocument() {
+        var document = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createValidContactDocument(contact.getId(), contact.getDigitalId());
+        });
+        Allure.step("Выполнение delete-запроса /partner/contact/documents/{digitalId}, код ответа 204", () -> delete(
+            baseRoutePath + "/documents" + "/{digitalId}",
+            HttpStatus.NO_CONTENT,
+            Map.of("ids", document.getId()),
+            document.getDigitalId()
+        ));
+        var updateDocument = Allure.step("Выполнение put-запроса /partner/contact/document, код ответа 404", () -> put(
+            baseRoutePath + "/document",
+            HttpStatus.NOT_FOUND,
+            updateDocument(document),
+            Error.class));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(updateDocument)
+                .isNotNull();
+            assertThat(updateDocument.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(updateDocument.getMessage())
+                .isEqualTo("Искомая сущность document с id: "+ document.getId() + ", digitalId: " + document.getDigitalId() + " не найдена");
+        });
+    }
+
+    @Test
+    @DisplayName("PUT /partner/contact/document редактирование документа с невалидной версией")
     void negativeTestUpdateDocumentVersion() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
-        Long version = document.getVersion() + 1;
-        document.setVersion(version);
-        var documentError = put(
+        var documentWithNewVersion = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
+            Long version = document.getVersion() + 1;
+            document.setVersion(version);
+            return document;
+        });
+        var documentError = Allure.step("Выполнение put-запроса /partner/contact/document, код ответа 400", () -> put(
             baseRoutePath + "/document",
             HttpStatus.BAD_REQUEST,
-            updateDocument(document),
+            updateDocument(documentWithNewVersion),
             Error.class
-        );
-        assertThat(documentError.getCode())
-            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
-        assertThat(documentError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .contains("Версия записи в базе данных " + (document.getVersion() - 1) +
-                " не равна версии записи в запросе version=" + version);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(documentError.getCode())
+                .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
+            assertThat(documentError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+                .contains("Версия записи в базе данных " + (documentWithNewVersion.getVersion() - 1) +
+                    " не равна версии записи в запросе version=" + documentWithNewVersion.getVersion());
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/contact/document редактирование документа с валидной версией")
     void positiveTestUpdateDocumentVersion() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
-        var documentUpdate = put(
+        var document = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createValidContactDocument(contact.getId(), contact.getDigitalId());
+        });
+        var documentUpdate = Allure.step("Выполнение put-запроса /partner/contact/document, код ответа 200", () -> put(
             baseRoutePath + "/document",
             HttpStatus.OK,
             updateDocument(document),
             Document.class
-        );
-        var checkDocument = get(
+        ));
+        var checkDocument = Allure.step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Document.class,
-            documentUpdate.getDigitalId(), documentUpdate.getId());
-
-        assertThat(checkDocument)
-            .isNotNull();
-        assertThat(checkDocument.getVersion())
-            .isEqualTo(document.getVersion() + 1);
+            documentUpdate.getDigitalId(), documentUpdate.getId()));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(checkDocument)
+                .isNotNull();
+            assertThat(checkDocument.getVersion())
+                .isEqualTo(document.getVersion() + 1);
+        });
     }
 
     @Test
+    @DisplayName("DELETE /partner/contact/documents/{digitalId} удаление документа")
     void testDeleteContactDocument() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var document = createValidContactDocument(contact.getId(), contact.getDigitalId());
-        var actualDocument =
+        var document = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createValidContactDocument(contact.getId(), contact.getDigitalId());
+        });
+        var actualDocument = Allure.step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 200", () ->
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Document.class,
                 document.getDigitalId(), document.getId()
-            );
-        assertThat(actualDocument)
+            ));
+        Allure.step("Проверка корректности ответа", () -> assertThat(actualDocument)
             .isNotNull()
-            .isEqualTo(document);
+            .isEqualTo(document));
 
-        var deleteDocument =
-            delete(
-                baseRoutePath + "/documents" + "/{digitalId}",
-                HttpStatus.NO_CONTENT,
-                Map.of("ids", actualDocument.getId()),
-                actualDocument.getDigitalId()
-            ).getBody();
-        assertThat(deleteDocument)
-            .isNotNull();
+        Allure.step("Выполнение delete-запроса /partner/contact/documents/{digitalId}, код ответа 204", () -> {
+            var deleteDocument =
+                delete(
+                    baseRoutePath + "/documents" + "/{digitalId}",
+                    HttpStatus.NO_CONTENT,
+                    Map.of("ids", actualDocument.getId()),
+                    actualDocument.getDigitalId()
+                ).getBody();
+            assertThat(deleteDocument)
+                .isNotNull();
+        });
 
-        var searchDocument =
+        var searchDocument = Allure.step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id} (повторный поиск), код ответа 404", () ->
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
                 document.getDigitalId(), document.getId()
-            );
+            ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(searchDocument)
+                .isNotNull();
 
-        assertThat(searchDocument)
-            .isNotNull();
-
-        assertThat(searchDocument.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(searchDocument.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
     }
 
     @Test
@@ -232,6 +486,20 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 Map.of("ids", document.getId()),
                 document.getDigitalId()
             ));
+        var searchDocument = Allure.step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 404", () ->
+            get(
+                baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
+                HttpStatus.NOT_FOUND,
+                Error.class,
+                document.getDigitalId(), document.getId()
+            ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(searchDocument)
+                .isNotNull();
+
+            assertThat(searchDocument.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
         Allure.step("Выполнение delete-запроса /partner/contact/documents/{digitalId}(повторное удаление документа), код ответа 404", () -> delete(
             baseRoutePath + "/documents" + "/{digitalId}",
             HttpStatus.NOT_FOUND,
@@ -255,25 +523,25 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     private static Document createValidContactDocument(String contactUuid, String digitalId) {
-        return post(
+        return Allure.step("Создание валидного документа", () -> post(
             baseRoutePath + "/document",
             HttpStatus.CREATED,
             getValidContactDocument(contactUuid, digitalId),
             Document.class
-        );
+        ));
     }
 
     private static Document createValidContactDocument(DocumentCreate document) {
-        return post(
+        return Allure.step("Создание валидного документа", () -> post(
             baseRoutePath + "/document",
             HttpStatus.CREATED,
             document,
             Document.class
-        );
+        ));
     }
 
     public static DocumentChange updateDocument(Document document) {
-        return new DocumentChange()
+        return Allure.step("Редактирование документа", () -> new DocumentChange()
             .number(randomAlphanumeric(5))
             .id(document.getId())
             .version(document.getVersion())
@@ -283,6 +551,6 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .certifierType(document.getCertifierType())
             .dateIssue(document.getDateIssue())
             .divisionCode(document.getDivisionCode())
-            .documentTypeId(document.getDocumentType().getId());
+            .documentTypeId(document.getDocumentType().getId()));
     }
 }

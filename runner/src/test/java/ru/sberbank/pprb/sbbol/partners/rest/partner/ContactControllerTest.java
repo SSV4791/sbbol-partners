@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.Allure;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -547,12 +548,12 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Contact createValidContact(String partnerUuid, String digitalId) {
-        return post(
+        return Allure.step("Создание валидных реквизитов", () -> post(
             baseRoutePath + "/contact",
             HttpStatus.CREATED,
             getValidContact(partnerUuid, digitalId),
             Contact.class
-        );
+        ));
     }
 
     protected static Contact createValidContact(ContactCreate contact) {
