@@ -2,12 +2,16 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
@@ -31,6 +35,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -70,6 +75,22 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     @Autowired
     private PodamFactory podamFactory;
 
+    @Autowired
+    private GkuInnDictionaryRepository innDictionaryRepository;
+
+    private GkuInnEntity gkuInnEntity1;
+    private GkuInnEntity gkuInnEntity2;
+
+
+    @AfterEach
+    void after() {
+        if (gkuInnEntity1 != null) {
+            innDictionaryRepository.delete(gkuInnEntity1);
+        }
+        if (gkuInnEntity2 != null) {
+            innDictionaryRepository.delete(gkuInnEntity2);
+        }
+    }
     @Test
     void testCreatePartnerWithoutDigitalId() {
         var partner = getValidLegalEntityPartner("");
@@ -352,6 +373,55 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var filter = new PartnersFilter();
         filter.setDigitalId(digitalId);
         filter.setPartnersFilter(PartnerFilterType.BUDGET);
+        filter.setPagination(
+            new Pagination()
+                .offset(0)
+                .count(1)
+        );
+
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        assertThat(response.getPartners().size())
+            .isOne();
+    }
+
+    @Test
+    void testGetSearchGKUPartners() {
+        var digitalId = randomAlphabetic(10);
+        var createdPartner1 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidLegalEntityPartner(digitalId),
+            Partner.class
+        );
+        assertThat(createdPartner1)
+            .isNotNull();
+        createValidBudgetAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
+        gkuInnEntity1 = new GkuInnEntity();
+        gkuInnEntity1.setInn(createdPartner1.getInn());
+        innDictionaryRepository.save(gkuInnEntity1);
+        var createdPartner2 = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidLegalEntityPartner(digitalId),
+            Partner.class
+        );
+        assertThat(createdPartner2)
+            .isNotNull();
+
+        gkuInnEntity2 = new GkuInnEntity();
+        gkuInnEntity2.setInn(createdPartner2.getInn());
+        innDictionaryRepository.save(gkuInnEntity2);
+
+        var filter = new PartnersFilter();
+        filter.setDigitalId(digitalId);
+        filter.setPartnersFilter(PartnerFilterType.GKU);
         filter.setPagination(
             new Pagination()
                 .offset(0)
