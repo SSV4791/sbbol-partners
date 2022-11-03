@@ -14,42 +14,19 @@ import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.config.props.ReplicationKafkaProducerProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.AsynchReplicationCounterpartyMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.AsynchReplicationCounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactEmailMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactEmailMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactPhoneMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactPhoneMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.LegalFormMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.LegalFormMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
@@ -120,109 +97,21 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
-    AsynchReplicationCounterpartyMapper asynchReplicationCounterpartyMapper() {
-        return new AsynchReplicationCounterpartyMapperImpl();
-    }
-
-    @Bean
-    AccountMapper accountMapper() {
-        return new AccountMapperImpl();
-    }
-
-    @Bean
-    AccountSingMapper accountSingMapper() {
-        return new AccountSingMapperImpl();
-    }
-
-    @Bean
-    AddressMapper addressMapper() {
-        return new AddressMapperImpl();
-    }
-
-    @Bean
-    ContactEmailMapper contactEmailMapper() {
-        return new ContactEmailMapperImpl();
-    }
-
-    @Bean
-    ContactPhoneMapper contactPhoneMapper() {
-        return new ContactPhoneMapperImpl();
-    }
-
-    @Bean
-    ContactMapper contactMapper() {
-        return new ContactMapperImpl(contactEmailMapper(), contactPhoneMapper());
-    }
-
-    @Bean
-    DocumentMapper documentMapper() {
-        return new DocumentMapperImpl(documentTypeMapper());
-    }
-
-    @Bean
-    DocumentTypeMapper documentTypeMapper() {
-        return new DocumentTypeMapperImpl(legalFormMapper());
-    }
-
-    @Bean
-    LegalFormMapper legalFormMapper() {
-        return new LegalFormMapperImpl();
-    }
-
-    @Bean
-    PartnerEmailMapper partnerEmailMapper() {
-        return new PartnerEmailMapperImpl();
-    }
-
-    @Bean
-    PartnerPhoneMapper partnerPhoneMapper() {
-        return new PartnerPhoneMapperImpl();
-    }
-
-    @Bean
-    PartnerMapper partnerMapper() {
-        return new PartnerMapperImpl(partnerEmailMapper(), partnerPhoneMapper());
-    }
-
-    @Bean
-    @SuppressWarnings("java:S5738")
-    RenterPartnerMapper renterPartnerMapper() {
-        return new RenterPartnerMapperImpl();
-    }
-
-    @Bean
-    BudgetMaskMapper budgetMaskMapper() {
-        return new BudgetMaskMapperImpl();
-    }
-
-    @Bean
-    CounterpartyMapper counterpartyMapper() {
-        return new CounterpartyMapperImpl();
-    }
-
-    @Bean
-    EmailMapper emailMapper() {
-        return new EmailMapperImpl();
-    }
-
-    @Bean
-    PhoneMapper phoneMapper() {
-        return new PhoneMapperImpl();
-    }
-
-    @Bean
     ReplicationService replicationHistoryService(
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
-        LegacySbbolAdapter legacySbbolAdapter
+        LegacySbbolAdapter legacySbbolAdapter,
+        AccountMapper accountMapper,
+        AccountSingMapper accountSingMapper,
+        CounterpartyMapper counterpartyMapper
     ) {
         return new ReplicationServiceImpl(
             partnerRepository,
             accountRepository,
             legacySbbolAdapter,
-            accountMapper(),
-            accountSingMapper(),
-            counterpartyMapper()
+            accountMapper,
+            accountSingMapper,
+            counterpartyMapper
         );
     }
 
@@ -246,7 +135,8 @@ public class PartnerServiceConfiguration {
         AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
-        AuditAdapter auditAdapter
+        AuditAdapter auditAdapter,
+        AccountMapper accountMapper
     ) {
         return new AccountServiceImpl(
             accountRepository,
@@ -254,7 +144,7 @@ public class PartnerServiceConfiguration {
             replicationService,
             budgetMaskService,
             auditAdapter,
-            accountMapper());
+            accountMapper);
     }
 
     @Bean
@@ -262,42 +152,49 @@ public class PartnerServiceConfiguration {
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
-        AuditAdapter auditAdapter
+        AuditAdapter auditAdapter,
+        AccountMapper accountMapper,
+        AccountSingMapper accountSingMapper
     ) {
         return new AccountSignServiceImpl(
             accountRepository,
             accountSignRepository,
             replicationService,
             auditAdapter,
-            accountMapper(),
-            accountSingMapper()
+            accountMapper,
+            accountSingMapper
         );
     }
 
     @Bean
-    BudgetMaskService budgetMaskService(BudgetMaskDictionaryRepository budgetMaskDictionaryRepository) {
-        return new BudgetMaskServiceImpl(budgetMaskDictionaryRepository, budgetMaskMapper());
+    BudgetMaskService budgetMaskService(
+        BudgetMaskDictionaryRepository budgetMaskDictionaryRepository,
+        BudgetMaskMapper budgetMaskMapper
+    ) {
+        return new BudgetMaskServiceImpl(budgetMaskDictionaryRepository, budgetMaskMapper);
     }
 
     @Bean
     AddressService contactAddressService(
         ContactRepository contactRepository,
-        AddressRepository addressRepository
+        AddressRepository addressRepository,
+        AddressMapper addressMapper
     ) {
-        return new ContactAddressServiceImpl(contactRepository, addressRepository, addressMapper());
+        return new ContactAddressServiceImpl(contactRepository, addressRepository, addressMapper);
     }
 
     @Bean
     DocumentService contactDocumentService(
         ContactRepository contactRepository,
         DocumentRepository documentRepository,
-        DocumentDictionaryRepository documentDictionaryRepository
+        DocumentDictionaryRepository documentDictionaryRepository,
+        DocumentMapper documentMapper
     ) {
         return new ContactDocumentServiceImpl(
             contactRepository,
             documentRepository,
             documentDictionaryRepository,
-            documentMapper()
+            documentMapper
         );
     }
 
@@ -307,7 +204,8 @@ public class PartnerServiceConfiguration {
         EmailRepository emailRepository,
         PhoneRepository phoneRepository,
         AddressRepository addressRepository,
-        DocumentRepository documentRepository
+        DocumentRepository documentRepository,
+        ContactMapper contactMapper
     ) {
         return new ContactServiceImpl(
             contactRepository,
@@ -315,55 +213,75 @@ public class PartnerServiceConfiguration {
             phoneRepository,
             addressRepository,
             documentRepository,
-            contactMapper())
+            contactMapper)
             ;
     }
 
     @Bean
-    DocumentTypeService documentTypeService(DocumentDictionaryRepository dictionaryRepository) {
-        return new DocumentTypeServiceImpl(dictionaryRepository, documentTypeMapper());
+    DocumentTypeService documentTypeService(
+        DocumentDictionaryRepository dictionaryRepository,
+        DocumentTypeMapper documentTypeMapper
+    ) {
+        return new DocumentTypeServiceImpl(dictionaryRepository, documentTypeMapper);
     }
 
     @Bean
     AddressService partnerAddressService(
         PartnerRepository partnerRepository,
-        AddressRepository addressRepository
+        AddressRepository addressRepository,
+        AddressMapper addressMapper
     ) {
-        return new PartnerAddressServiceImpl(partnerRepository, addressRepository, addressMapper());
+        return new PartnerAddressServiceImpl(partnerRepository, addressRepository, addressMapper);
     }
 
     @Bean
     DocumentService partnerDocumentService(
         PartnerRepository partnerRepository,
         DocumentRepository documentRepository,
-        DocumentDictionaryRepository documentDictionaryRepository
+        DocumentDictionaryRepository documentDictionaryRepository,
+        DocumentMapper documentMapper
     ) {
         return new PartnerDocumentServiceImpl(
             partnerRepository,
             documentRepository,
             documentDictionaryRepository,
-            documentMapper()
+            documentMapper
         );
     }
 
     @Bean
-    PhoneService partnerPhoneService(PartnerRepository partnerRepository, PhoneRepository phoneRepository) {
-        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper());
+    PhoneService partnerPhoneService(
+        PartnerRepository partnerRepository,
+        PhoneRepository phoneRepository,
+        PhoneMapper phoneMapper
+    ) {
+        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper);
     }
 
     @Bean
-    PhoneService contactPhoneService(ContactRepository contactRepository, PhoneRepository phoneRepository) {
-        return new ContactPhoneServiceImpl(contactRepository, phoneRepository, phoneMapper());
+    PhoneService contactPhoneService(
+        ContactRepository contactRepository,
+        PhoneRepository phoneRepository,
+        PhoneMapper phoneMapper
+    ) {
+        return new ContactPhoneServiceImpl(contactRepository, phoneRepository, phoneMapper);
     }
 
     @Bean
-    EmailService partnerEmailService(PartnerRepository partnerRepository, EmailRepository emailRepository) {
-        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper());
+    EmailService partnerEmailService(
+        PartnerRepository partnerRepository,
+        EmailRepository emailRepository,
+        EmailMapper emailMapper
+    ) {
+        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper);
     }
 
     @Bean
-    EmailService contactEmailService(ContactRepository contactRepository, EmailRepository emailRepository) {
-        return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper());
+    EmailService contactEmailService(
+        ContactRepository contactRepository,
+        EmailRepository emailRepository,
+        EmailMapper emailMapper) {
+        return new ContactEmailServiceImpl(contactRepository, emailRepository, emailMapper);
     }
 
     @SuppressWarnings("java:S107")
@@ -376,7 +294,12 @@ public class PartnerServiceConfiguration {
         PartnerRepository partnerRepository,
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
         BudgetMaskService budgetMaskService,
-        ReplicationService replicationService
+        ReplicationService replicationService,
+        AccountMapper accountMapper,
+        DocumentMapper documentMapper,
+        AddressMapper addressMapper,
+        ContactMapper contactMapper,
+        PartnerMapper partnerMapper
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
             accountRepository,
@@ -387,11 +310,11 @@ public class PartnerServiceConfiguration {
             gkuInnDictionaryRepository,
             budgetMaskService,
             replicationService,
-            accountMapper(),
-            documentMapper(),
-            addressMapper(),
-            contactMapper(),
-            partnerMapper()
+            accountMapper,
+            documentMapper,
+            addressMapper,
+            contactMapper,
+            partnerMapper
         );
     }
 
@@ -413,7 +336,8 @@ public class PartnerServiceConfiguration {
         DocumentRepository documentRepository,
         DocumentDictionaryRepository dictionaryRepository,
         FlatRenterRepository flatRenterRepository,
-        ValidationService validationService
+        ValidationService validationService,
+        RenterPartnerMapper renterPartnerMapper
     ) {
         return new PartnerServiceImpl(
             partnerRepository,
@@ -423,7 +347,7 @@ public class PartnerServiceConfiguration {
             dictionaryRepository,
             flatRenterRepository,
             validationService,
-            renterPartnerMapper()
+            renterPartnerMapper
         );
     }
 }
