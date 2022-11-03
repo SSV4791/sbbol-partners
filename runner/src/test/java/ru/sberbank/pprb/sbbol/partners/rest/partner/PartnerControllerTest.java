@@ -67,6 +67,9 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
     public static final String baseRoutePathForGet = "/partners/{digitalId}/{id}";
 
+    @Autowired
+    private PodamFactory podamFactory;
+
     @Test
     void testCreatePartnerWithoutDigitalId() {
         var partner = getValidLegalEntityPartner("");
@@ -191,9 +194,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull()
             .isEqualTo(createdPartner);
     }
-
-    @Autowired
-    private PodamFactory podamFactory;
 
     @Test
     void testGetPartner() {

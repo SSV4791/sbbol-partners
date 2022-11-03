@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 
 import javax.persistence.EntityManager;
@@ -33,18 +34,18 @@ public class ContactViewRepositoryImpl extends BaseRepository<ContactEntity, Con
         Root<ContactEntity> root,
         ContactsFilter filter
     ) {
-        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        predicates.add(builder.equal(root.get("partnerUuid"), UUID.fromString(filter.getPartnerId())));
+        predicates.add(builder.equal(root.get(ContactEntity_.DIGITAL_ID), filter.getDigitalId()));
+        predicates.add(builder.equal(root.get(ContactEntity_.PARTNER_UUID), UUID.fromString(filter.getPartnerId())));
         if (filter.getIds() != null) {
-            predicates.add(root.get("uuid").in(filter.getIds().stream().map(UUID::fromString).collect(Collectors.toList())));
+            predicates.add(root.get(ContactEntity_.UUID).in(filter.getIds().stream().map(UUID::fromString).collect(Collectors.toList())));
         }
     }
 
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get("digitalId")),
-            builder.desc(root.get("uuid"))
+            builder.desc(root.get(ContactEntity_.DIGITAL_ID)),
+            builder.desc(root.get(ContactEntity_.UUID))
         );
     }
 

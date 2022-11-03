@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 
@@ -32,15 +33,15 @@ public class RenterViewRepositoryImpl extends BaseRepository<PartnerEntity, Rent
         Root<PartnerEntity> root,
         RenterFilter filter
     ) {
-        predicates.add(builder.equal(root.get("digitalId"), filter.getDigitalId()));
-        predicates.add(builder.equal(root.get("type"), PartnerType.RENTER));
+        predicates.add(builder.equal(root.get(PartnerEntity_.DIGITAL_ID), filter.getDigitalId()));
+        predicates.add(builder.equal(root.get(PartnerEntity_.TYPE), PartnerType.RENTER));
     }
 
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get("digitalId")),
-            builder.desc(root.get("uuid"))
+            builder.desc(root.get(PartnerEntity_.DIGITAL_ID)),
+            builder.desc(root.get(PartnerEntity_.UUID))
         );
     }
 
