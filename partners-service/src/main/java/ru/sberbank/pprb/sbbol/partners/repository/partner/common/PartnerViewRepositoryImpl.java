@@ -83,7 +83,7 @@ public class PartnerViewRepositoryImpl
         if (filter.getPartnersFilter() != null) {
             switch (filter.getPartnersFilter()) {
                 case GKU -> {
-                    Join<PartnerEntity, GkuInnEntity> join = root.join(GkuInnEntity_.INN, JoinType.LEFT);
+                    Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.LEFT);
                     predicates.add(builder.equal(root.get(PartnerEntity_.INN), join.get(GkuInnEntity_.INN)));
                 }
                 case BUDGET -> {
