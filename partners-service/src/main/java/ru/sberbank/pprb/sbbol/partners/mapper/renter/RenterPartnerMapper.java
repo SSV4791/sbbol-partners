@@ -37,7 +37,6 @@ import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.SERVICEPASSP
 
 /**
  * @deprecated {@link ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper}
- *
  */
 @Deprecated(forRemoval = true)
 @Mapper(
@@ -408,6 +407,16 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "dateIssue", source = "dulDateIssue")
     @Mapping(target = "divisionCode", source = "dulDivisionCode")
     void updateDocument(Renter renter, @MappingTarget DocumentEntity entity);
+
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "partnerUuid", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "priorityAccount", ignore = true)
+    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "search", ignore = true)
+    @Mapping(target = "partner", ignore = true)
+    void updateAccount(Renter renter, @MappingTarget AccountEntity account);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "account", ignore = true)

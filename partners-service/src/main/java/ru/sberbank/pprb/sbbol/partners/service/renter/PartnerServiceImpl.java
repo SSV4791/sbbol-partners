@@ -209,6 +209,7 @@ public class PartnerServiceImpl implements RenterService {
             if (flatRenter.getAccountUuid() != null) {
                 var account = accountRepository.getByDigitalIdAndUuid(targetRenter.getDigitalId(), flatRenter.getAccountUuid())
                     .orElseThrow(() -> new RuntimeException(ERROR_MESSAGE));
+                renterPartnerMapper.updateAccount(renter, account);
                 var mapBank = new HashMap<UUID, BankEntity>();
                 var mapBankAccount = new HashMap<UUID, BankAccountEntity>();
                 if (account.getBank() != null) {
