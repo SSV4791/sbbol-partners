@@ -90,7 +90,11 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(Renter.class);
         String newKpp = "999999999";
+        String newBic = "045004641";
+        String newAccount = "40817810788460000076";
         createdRenter.setKpp(newKpp);
+        createdRenter.setBankBic(newBic);
+        createdRenter.setAccount(newAccount);
         Renter updated = given()
             .spec(requestSpec)
             .body(createdRenter)
@@ -104,6 +108,8 @@ class RenterControllerTest extends AbstractIntegrationTest {
         assertThat(updated).isNotNull();
         assertThat(updated.getCheckResults()).isNull();
         assertThat(updated.getKpp()).isEqualTo(newKpp);
+        assertThat(updated.getBankBic()).isEqualTo(newBic);
+        assertThat(updated.getAccount()).isEqualTo(newAccount);
     }
 
     @Test
