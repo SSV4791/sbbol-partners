@@ -108,7 +108,6 @@ public class AccountSignServiceImpl implements AccountSignService {
                 SignEntity signEntity = sign.get();
                 try {
                     accountSignRepository.delete(signEntity);
-                    replicationService.deleteSign(digitalId, accountUuid);
                     auditAdapter.send(new Event()
                         .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                         .eventParams(accountSingMapper.toEventParams(signEntity))
@@ -126,6 +125,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             try {
                 account.setState(AccountStateType.NOT_SIGNED);
                 var saveAccount = accountRepository.save(account);
+                replicationService.deleteSign(digitalId, accountUuid);
                 auditAdapter.send(new Event()
                     .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
                     .eventParams(accountMapper.toEventParams(saveAccount))
