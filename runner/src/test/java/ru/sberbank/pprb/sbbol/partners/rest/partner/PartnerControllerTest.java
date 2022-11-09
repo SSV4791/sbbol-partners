@@ -3,15 +3,17 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
@@ -37,8 +39,6 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidInnNumber;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidOgrnNumber;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import uk.co.jemos.podam.api.PodamFactory;
 
@@ -62,8 +62,6 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMIS
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidAccountNumber;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -2156,7 +2154,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 ))
             .comment("555555")
             .accounts(Set.of(new AccountCreateFullModel()
-                .account(getValidAccountNumber())
+                .account(getValidAccountNumber(getBic()))
                 .comment("Это тестовый комментарий")
                 .bank(new BankCreate()
                     .bic("044525411")
