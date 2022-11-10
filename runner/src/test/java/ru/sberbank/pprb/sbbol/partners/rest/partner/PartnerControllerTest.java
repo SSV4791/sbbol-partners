@@ -3,15 +3,17 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
@@ -60,8 +62,6 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMIS
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidAccountNumber;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -214,6 +214,31 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(actualPartner)
             .isNotNull()
             .isEqualTo(createdPartner);
+    }
+
+        @Test
+    void testCreatePartnerWithoutLegalForm() {
+        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
+            .legalForm(null);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        List<Descriptions> descriptions = error.getDescriptions();
+        assertThat(descriptions).isNotNull();
+        assertThat(descriptions).size().isEqualTo(1);
+        Descriptions description = descriptions.stream()
+            .filter(value -> value.getField().equals("legalForm"))
+            .findFirst().orElse(null);
+        assertThat(description).isNotNull();
+        assertThat(description.getMessage()).contains("Поле обязательно для заполнения");
+        assertThat(description.getMessage()).size().isEqualTo(1);
     }
 
     @Test
@@ -2094,7 +2119,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .middleName(randomAlphabetic(10))
             .inn(getValidInnNumber(LegalForm.LEGAL_ENTITY))
             .kpp("123456789")
-            .ogrn("1035006110083")
+            .ogrn(getValidOgrnNumber(LegalForm.LEGAL_ENTITY))
             .okpo("12345678")
             .phones(new HashSet<>(List.of("0079241111111")))
             .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
@@ -2117,7 +2142,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .middleName(randomAlphabetic(10))
             .inn(getValidInnNumber(LegalForm.LEGAL_ENTITY))
             .kpp("123456789")
-            .ogrn("1035006110083")
+            .ogrn(getValidOgrnNumber(LegalForm.LEGAL_ENTITY))
             .okpo("12345678")
             .phones(
                 Set.of(
@@ -2129,7 +2154,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                 ))
             .comment("555555")
             .accounts(Set.of(new AccountCreateFullModel()
-                .account(getValidAccountNumber())
+                .account(getValidAccountNumber(getBic()))
                 .comment("Это тестовый комментарий")
                 .bank(new BankCreate()
                     .bic("044525411")
@@ -2199,7 +2224,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         partner.setLegalForm(LegalForm.ENTREPRENEUR);
         partner.setOkpo(VALID_PHYSICAL_OKPO);
         partner.setInn(getValidInnNumber(LegalForm.ENTREPRENEUR));
-        partner.setOgrn("314505309900027");
+        partner.setOgrn(getValidOgrnNumber(LegalForm.ENTREPRENEUR));
         return partner;
     }
 
