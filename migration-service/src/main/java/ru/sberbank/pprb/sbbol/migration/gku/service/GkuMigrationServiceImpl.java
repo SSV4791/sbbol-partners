@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.migration.gku.service;
 
-
 import com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,9 @@ import ru.sberbank.pprb.sbbol.migration.gku.mapper.MigrationGkuMapper;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
 import ru.sberbank.pprb.sbbol.migration.gku.repository.MigrationGkuRepository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AutoJsonRpcServiceImpl
@@ -46,7 +47,11 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
         if (CollectionUtils.isEmpty(gkuInns)) {
             return;
         }
-        var entities = migrationGkuMapper.toDictionary(gkuInns);
+        List<MigrationGkuInnEntity> entities = gkuInns.stream()
+            .map(value ->
+                migrationGkuRepository.getByInn(value.getInn())
+                    .orElse(migrationGkuMapper.toDictionary(value)))
+            .collect(Collectors.toList());
         try {
             migrationGkuRepository.saveAll(entities);
         } catch (Exception ex) {
@@ -57,11 +62,14 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
     }
 
     @Override
-    public void delete() {
+    public void delete(LocalDate migrateDate) {
         LOGGER.info("Начало процедуры удаления записей ЖКУ");
         Page<MigrationGkuInnEntity> inns;
         do {
-            inns = migrationGkuRepository.findAll(PageRequest.of(0, batchSize, Sort.by(MigrationGkuInnEntity_.INN)));
+            inns = migrationGkuRepository.findAllByModifiedDateBefore(
+                migrateDate,
+                PageRequest.of(0, batchSize, Sort.by(MigrationGkuInnEntity_.INN))
+            );
             delete(inns.getContent());
         } while (inns.hasNext());
         LOGGER.info("Окончание процедуры удаления записей ЖКУ");
