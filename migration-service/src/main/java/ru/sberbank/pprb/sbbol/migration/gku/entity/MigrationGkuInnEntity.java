@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -28,12 +29,23 @@ public class MigrationGkuInnEntity extends BaseEntity {
     @Column(name = "inn", nullable = false, length = 12)
     private String inn;
 
+    @Column(name = "SYS_LASTCHANGEDATE", nullable = false, insertable = false, updatable = false)
+    private LocalDate modifiedDate;
+
     public String getInn() {
         return inn;
     }
 
     public void setInn(String inn) {
         this.inn = inn;
+    }
+
+    public LocalDate getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(LocalDate modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 
     @Override
