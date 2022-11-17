@@ -32,5 +32,5 @@ public interface GkuMigrationService {
         @JsonRpcError(exception = InvalidFormatException.class, code = -32600),
         @JsonRpcError(exception = InvalidTypeIdException.class, code = -32600),
     })
-    void delete(LocalDate migrateDate);
+    void delete(@JsonRpcParam(value = "migrateDate") LocalDate migrateDate);
 }

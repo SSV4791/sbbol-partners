@@ -174,7 +174,7 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
         var searchSubString =
-            prepareSearchString(partner.getInn(),
+            saveSearchString(partner.getInn(),
                 partner.getKpp(),
                 partner.getOrgName(),
                 partner.getSecondName(),
