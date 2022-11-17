@@ -34,4 +34,13 @@ public interface BaseMapper {
             .map(it -> it.replace(SPACE, EMPTY))
             .collect(Collectors.joining(EMPTY));
     }
+
+    @NotNull
+    default String saveSearchString(String... search) {
+        return Stream.of(
+                search
+            )
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(SPACE));
+    }
 }

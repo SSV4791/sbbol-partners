@@ -119,7 +119,8 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                 }
             }
         }
-        var search = migrationPartnerMapper.prepareSearchString(correspondent.getInn(), correspondent.getKpp(), correspondent.getName());
+        var search =
+            migrationPartnerMapper.saveSearchString(correspondent.getInn(), correspondent.getKpp(), correspondent.getName());
         AccountEntity savedAccount;
         var searchPartner = partnerRepository.findByDigitalIdAndSearch(digitalId, search);
         if (searchPartner == null) {

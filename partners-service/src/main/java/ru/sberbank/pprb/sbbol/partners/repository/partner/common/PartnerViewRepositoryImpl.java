@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
+
 public class PartnerViewRepositoryImpl
     extends BaseRepository<PartnerEntity, PartnersFilter> implements PartnerViewRepository {
 
@@ -68,7 +71,12 @@ public class PartnerViewRepositoryImpl
                 .toLowerCase(Locale.getDefault());
             predicates.add(
                 builder.like(
-                    builder.lower(root.get(PartnerEntity_.SEARCH)),
+                    builder.function("replace",
+                        String.class,
+                        builder.lower(root.get(PartnerEntity_.SEARCH)),
+                        builder.literal(SPACE),
+                        builder.literal(EMPTY)
+                    ),
                     "%" + searchPattern + "%"
                 )
             );

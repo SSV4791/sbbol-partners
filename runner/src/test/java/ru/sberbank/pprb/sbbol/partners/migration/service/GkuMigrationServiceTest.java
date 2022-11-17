@@ -9,10 +9,13 @@ import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
-import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuRequest;
+import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuDeleteRequest;
+import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuMigrateRequest;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,26 +37,27 @@ class GkuMigrationServiceTest extends AbstractIntegrationTest {
     private static final String REMOTE_DELETE_METHOD_NAME = "delete";
     private static final String URI_REMOTE_SERVICE = "/gku/migrate";
 
-    private final JsonRpcRequest<MigrateGkuRequest> requestMigrate = new JsonRpcRequest<>(
+    private final JsonRpcRequest<MigrateGkuMigrateRequest> requestMigrate = new JsonRpcRequest<>(
         JSON_RPC_REQUEST_ID,
         JSON_RPC_VERSION,
         REMOTE_MIGRATE_METHOD_NAME,
         null
     );
 
-    private final JsonRpcRequest<MigrateGkuRequest> requestDelete = new JsonRpcRequest<>(
+    private final JsonRpcRequest<MigrateGkuDeleteRequest> requestDelete = new JsonRpcRequest<>(
         JSON_RPC_REQUEST_ID,
         JSON_RPC_VERSION,
         REMOTE_DELETE_METHOD_NAME,
-        null
+        new MigrateGkuDeleteRequest(LocalDate.now())
     );
 
     @Test
     void migrationGKU() {
         @SuppressWarnings("unchecked")
         Collection<MigrationGkuCandidate> collection = podamFactory.manufacturePojo(Collection.class, MigrationGkuCandidate.class);
-        requestMigrate.setParams(new MigrateGkuRequest(collection));
-        JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestMigrate, new TypeRef<>() {});
+        requestMigrate.setParams(new MigrateGkuMigrateRequest(collection));
+        JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestMigrate, new TypeRef<>() {
+        });
         assertNotNull(response);
         assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
         assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
@@ -65,21 +69,20 @@ class GkuMigrationServiceTest extends AbstractIntegrationTest {
         var savedEntity = gkuInnDictionaryRepository.save(entity);
         var foundInnBeforeDelete = gkuInnDictionaryRepository.getByInn(savedEntity.getInn());
         assertNotNull(foundInnBeforeDelete);
-
         JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestDelete, new TypeRef<>() {});
         assertNotNull(response);
         assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
         assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
 
         var foundInnAfterDelete = gkuInnDictionaryRepository.getByInn(savedEntity.getInn());
-        assertNull(foundInnAfterDelete);
+        assertNotNull(foundInnAfterDelete);
     }
 
     @Test
     void deleteGKU_batch() {
         for (int i = 0; i < 50; i++) {
             var entity = podamFactory.manufacturePojo(GkuInnEntity.class);
-             gkuInnDictionaryRepository.save(entity);
+            gkuInnDictionaryRepository.save(entity);
         }
         JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestDelete, new TypeRef<>() {});
         assertNotNull(response);
@@ -87,6 +90,6 @@ class GkuMigrationServiceTest extends AbstractIntegrationTest {
         assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
 
         Iterable<GkuInnEntity> allInn = gkuInnDictionaryRepository.findAll();
-        assertThat(allInn).isEmpty();
+        assertThat(allInn).isNotEmpty();
     }
 }
