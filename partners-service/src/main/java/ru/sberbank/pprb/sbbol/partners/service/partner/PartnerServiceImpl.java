@@ -144,7 +144,7 @@ public class PartnerServiceImpl implements PartnerService {
             .map(contactRepository::save)
             .map(contactMapper::toContact)
             .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(accounts)) {
+        if (!CollectionUtils.isEmpty(accounts)) {
             replicationService.saveCounterparty(accounts);
         }
         return partnerMapper.toPartnerMullResponse(savedPartner)
