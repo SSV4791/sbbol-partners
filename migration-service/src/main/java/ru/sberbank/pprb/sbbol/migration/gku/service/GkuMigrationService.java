@@ -8,7 +8,6 @@ import com.googlecode.jsonrpc4j.JsonRpcParam;
 import com.googlecode.jsonrpc4j.JsonRpcService;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @JsonRpcService("/gku/migrate")
@@ -32,5 +31,5 @@ public interface GkuMigrationService {
         @JsonRpcError(exception = InvalidFormatException.class, code = -32600),
         @JsonRpcError(exception = InvalidTypeIdException.class, code = -32600),
     })
-    void delete(@JsonRpcParam(value = "migrateDate") LocalDate migrateDate);
+    void delete();
 }

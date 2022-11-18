@@ -9,19 +9,15 @@ import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
-import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuDeleteRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateGkuMigrateRequest;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class GkuMigrationServiceTest extends AbstractIntegrationTest {
 
@@ -44,11 +40,11 @@ class GkuMigrationServiceTest extends AbstractIntegrationTest {
         null
     );
 
-    private final JsonRpcRequest<MigrateGkuDeleteRequest> requestDelete = new JsonRpcRequest<>(
+    private final JsonRpcRequest<Void> requestDelete = new JsonRpcRequest<>(
         JSON_RPC_REQUEST_ID,
         JSON_RPC_VERSION,
         REMOTE_DELETE_METHOD_NAME,
-        new MigrateGkuDeleteRequest(LocalDate.now())
+        null
     );
 
     @Test
