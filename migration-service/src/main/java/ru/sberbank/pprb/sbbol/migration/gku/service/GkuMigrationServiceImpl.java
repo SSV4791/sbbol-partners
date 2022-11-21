@@ -62,12 +62,12 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
     }
 
     @Override
-    public void delete(LocalDate migrateDate) {
+    public void delete() {
         LOGGER.info("Начало процедуры удаления записей ЖКУ");
         Page<MigrationGkuInnEntity> inns;
         do {
             inns = migrationGkuRepository.findAllByModifiedDateBefore(
-                migrateDate,
+                LocalDate.now(),
                 PageRequest.of(0, batchSize, Sort.by(MigrationGkuInnEntity_.INN))
             );
             delete(inns.getContent());
