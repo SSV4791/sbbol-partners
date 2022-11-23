@@ -11,7 +11,7 @@
       "title": "Электронные адреса"
     },
     "pagination": {
-      "$ref": "../../../common/model/pagination.json",
+      "$ref": "../common/pagination.json",
       "title": "Параметры пагинации"
     }
   }

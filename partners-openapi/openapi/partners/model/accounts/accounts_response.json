@@ -11,7 +11,7 @@
       "title": "Счетa Партнера"
     },
     "pagination": {
-      "$ref": "../../../common/model/pagination.json",
+      "$ref": "../common/pagination.json",
       "title": "Параметры ответа Партнеров"
     }
   },

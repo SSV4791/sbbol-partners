@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
@@ -10,6 +11,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 import uk.co.jemos.podam.typeManufacturers.AbstractTypeManufacturer;
 import uk.co.jemos.podam.typeManufacturers.BooleanTypeManufacturerImpl;
+import uk.co.jemos.podam.typeManufacturers.IntTypeManufacturerImpl;
 import uk.co.jemos.podam.typeManufacturers.StringTypeManufacturerImpl;
 
 import java.lang.reflect.Type;
@@ -42,7 +44,8 @@ public class PodamConfiguration {
         factory.getStrategy()
             .addOrReplaceTypeManufacturer(BigDecimal.class, new BigDecimalManufacturerImpl())
             .addOrReplaceTypeManufacturer(String.class, new StringManufacturerImpl())
-            .addOrReplaceTypeManufacturer(Boolean.class, new BooleanManufacturerImpl());
+            .addOrReplaceTypeManufacturer(Boolean.class, new BooleanManufacturerImpl())
+            .addOrReplaceTypeManufacturer(Integer.class, new IntManufacturerImpl());
         return factory;
     }
 
@@ -90,7 +93,22 @@ public class PodamConfiguration {
             };
         }
     }
+
+    private static class IntManufacturerImpl extends IntTypeManufacturerImpl {
+        @Override
+        public Integer getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata, Map<String, Type> genericTypesArgumentsMap) {
+            if (attributeMetadata.getAttributeName() == null) {
+                return super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
+            }
+            return switch (attributeMetadata.getAttributeName()) {
+                case "count" -> RandomUtils.nextInt(0, 200);
+                default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
+            };
+        }
+    }
+
     //TODO DCBBRAIN-2724 Необходимо переписать логику под использование генерации валидного счета через podamFactory
+
     /**
      * Алгоритм расчета контрольного ключа:
      * Значение контрольного ключа приравнивается нулю (К = 0).
@@ -122,12 +140,12 @@ public class PodamConfiguration {
      * каждая цифра ИНН (кроме десятой) умножается на соответствующий множитель в соответствии с таблицей,
      * затем все значения суммируются, сумма берется по модулю 11 (остаток деления на 11),
      * затем полученное число берется по модулю 10 это и есть десятый разряд.
-     *
+     * <p>
      * Для расчета 11-ого контрольного разряда (1-ой контрольной цифры) в 12-ти значном ИНН
      * каждая цифра ИНН (кроме 11-ой и 12-ой) умножается на соответствующий множитель в соответствии с таблицей,
      * затем все значения суммируются, сумма берется по модулю 11,
      * затем полученное число берется по модулю 10 это и есть 11-ый разряд.
-     *
+     * <p>
      * Для расчета 12-ого контрольного разряда (2-ой контрольной цифры) в 12-ти значном ИНН
      * каждая цифра ИНН (кроме12-ой), 11-ая вычисляется в соотв. с пред. пунктом,
      * умножается на соответствующий множитель в соответствии с таблицей,
@@ -136,7 +154,7 @@ public class PodamConfiguration {
      */
     public static String getValidInnNumber(LegalForm legalForm) {
 
-        if (legalForm.getValue() == "LEGAL_ENTITY") {
+        if (legalForm == LegalForm.LEGAL_ENTITY) {
             String randomInnPart = RandomStringUtils.randomNumeric(5);
             String innForCalculate = STATIC_INN_PART + randomInnPart;
             int calculateValidKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN);

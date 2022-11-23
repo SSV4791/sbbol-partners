@@ -25,7 +25,7 @@
       "x-not-empty": true
     },
     "pagination": {
-      "$ref": "../../../common/model/pagination.json",
+      "$ref": "../common/pagination.json",
       "title": "Параметры запроса Документов"
     }
   },
