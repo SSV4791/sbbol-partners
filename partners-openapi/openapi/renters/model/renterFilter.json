@@ -8,7 +8,7 @@
       "title": "Идентификатор договора ДБО"
     },
     "pagination": {
-      "$ref": "../../common/model/pagination.json",
+      "$ref": "pagination.json",
       "title": "Нумерация"
     }
   },

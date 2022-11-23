@@ -129,7 +129,7 @@
       "title": "Ошибки валидации договора",
       "type": "array",
       "items": {
-        "$ref": "../../common/model/checkResult.json"
+        "$ref": "checkResult.json"
       }
     }
   },

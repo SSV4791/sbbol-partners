@@ -12,7 +12,7 @@
     },
     "pagination": {
       "title": "Пагинация контактов",
-      "$ref": "../../../common/model/pagination.json"
+      "$ref": "../common/pagination.json"
     }
   }
 }

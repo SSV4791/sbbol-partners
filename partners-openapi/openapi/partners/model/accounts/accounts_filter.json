@@ -44,7 +44,7 @@
       "$ref": "../search/search_accounts.json"
     },
     "pagination": {
-      "$ref": "../../../common/model/pagination.json",
+      "$ref": "../common/pagination.json",
       "title": "Параметры запроса Счетов"
     },
     "isHousingServicesProvider": {
