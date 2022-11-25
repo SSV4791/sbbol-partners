@@ -17,6 +17,11 @@
         "$ref": "account_sign_detail.json"
       },
       "title": "Изменение статуса подписи счетов"
+    },
+    "fraudMetaData": {
+      "type": "object",
+      "$ref": "../fraud/fraud_meta_data.json",
+      "title": "Данные для отправки во ФМ ЮЛ "
     }
   }
 }

@@ -8,16 +8,20 @@ import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
+import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryDeleteException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudModelArgumentException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
+import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -31,6 +35,7 @@ public class AccountSignServiceImpl implements AccountSignService {
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
     private final ReplicationService replicationService;
+    private final FraudServiceManager fraudServiceManager;
     private final AuditAdapter auditAdapter;
     private final AccountSingMapper accountSingMapper;
     private final AccountMapper accountMapper;
@@ -39,6 +44,7 @@ public class AccountSignServiceImpl implements AccountSignService {
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
+        FraudServiceManager fraudServiceManager,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         AccountSingMapper accountSingMapper
@@ -46,6 +52,7 @@ public class AccountSignServiceImpl implements AccountSignService {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
         this.replicationService = replicationService;
+        this.fraudServiceManager = fraudServiceManager;
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
         this.accountSingMapper = accountSingMapper;
@@ -64,6 +71,17 @@ public class AccountSignServiceImpl implements AccountSignService {
                 throw new AccountAlreadySignedException(account.getAccount());
             }
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
+            try {
+                fraudServiceManager
+                    .getService(FraudEventType.SIGN_ACCOUNT)
+                    .sendEvent(accountsSign.getFraudMetaData(), account);
+            } catch (FraudDeniedException | FraudModelArgumentException e) {
+                auditAdapter.send(new Event()
+                    .eventType(EventType.SIGN_ACCOUNT_CREATE_ERROR)
+                    .eventParams(accountSingMapper.toEventParams(sign))
+                );
+                throw e;
+            }
             try {
                 var savedSign = accountSignRepository.save(sign);
                 replicationService.saveSign(accountsSign.getDigitalId(), accountsSign.getDigitalUserId(), sign);

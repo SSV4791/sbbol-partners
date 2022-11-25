@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Данные криптопрофиля пользователя",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Наименование криптопрофиля",
+      "maxLength": 255,
+      "x-not-empty": true
+    },
+    "type": {
+      "type": "string",
+      "title": "Тип криптопрофиля",
+      "maxLength": 255,
+      "x-not-empty": true
+    },
+    "signChannel": {
+      "type": "string",
+      "title": "Канал подписи",
+      "maxLength": 255,
+      "x-not-empty": true
+    },
+    "titleName": {
+      "type": "string",
+      "title": "Тип подписи",
+      "maxLength": 2000,
+      "x-not-empty": true
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "signChannel",
+    "titleName"
+  ]
+}

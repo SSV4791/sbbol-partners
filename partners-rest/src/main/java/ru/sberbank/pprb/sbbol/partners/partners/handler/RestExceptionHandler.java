@@ -21,8 +21,10 @@ import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
+import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.exception.FraudModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.exception.common.BaseException;
@@ -43,6 +45,8 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ENTRY_SAVE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_DENIED_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
@@ -54,6 +58,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
     private static final String FILL_OBJECT_MESSAGE_EXCEPTION = "Ошибка заполнения объекта";
+    private static final String FRAUD_DENIED_OPERATION = "Операция запрещена со стороны ФРОД-мониторинга";
+    private static final String FRAUD_MODEL_VALIDATION_ERROR = "Ошибка валидации модели данных, отсылаемой в ППРБ Агрегатор данных ФРОД-мониторинга";
 
     @ExceptionHandler({
         DataIntegrityViolationException.class
@@ -129,6 +135,38 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             null,
             ENTRY_SAVE_EXCEPTION.getValue(),
             ex.getLocalizedMessage(),
+            Collections.emptyMap(),
+            httpRequest.getRequestURL()
+        );
+    }
+
+    @ExceptionHandler(FraudDeniedException.class)
+    protected ResponseEntity<Object> handleFraudDeniedException(
+        FraudDeniedException ex,
+        HttpServletRequest httpRequest
+    ) {
+        LOG.error(FRAUD_DENIED_OPERATION, ex);
+        return buildResponsesEntity(
+            HttpStatus.BAD_REQUEST,
+            BUSINESS,
+            FRAUD_DENIED_EXCEPTION.getValue(),
+            ex.getMessage(),
+            Collections.emptyMap(),
+            httpRequest.getRequestURL()
+        );
+    }
+
+    @ExceptionHandler(FraudModelValidationException.class)
+    protected ResponseEntity<Object> handleFraudModelValidationException(
+        FraudDeniedException ex,
+        HttpServletRequest httpRequest
+    ) {
+        LOG.error(FRAUD_MODEL_VALIDATION_ERROR, ex);
+        return buildResponsesEntity(
+            HttpStatus.BAD_REQUEST,
+            BUSINESS,
+            FRAUD_MODEL_VALIDATION_EXCEPTION.getValue(),
+            ex.getMessage(),
             Collections.emptyMap(),
             httpRequest.getRequestURL()
         );

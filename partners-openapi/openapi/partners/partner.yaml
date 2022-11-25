@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners
-  version: 1.0.2
+  version: 1.0.4
   description: OpenAPI Specification for partners
 
 servers:
@@ -53,6 +53,13 @@ paths:
         - Partners
       description: Удаление Партнера
       operationId: delete
+      requestBody:
+        description: Партнеры
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: 'model/partners/partner_delete.json'
       parameters:
         - name: digitalId
           in: path

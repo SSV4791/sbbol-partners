@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Удаление партнера",
+  "properties": {
+    "fraudMetaData": {
+      "type": "object",
+      "$ref": "../fraud/fraud_meta_data.json",
+      "title": "Данные для отправки во ФМ ЮЛ "
+    }
+  }
+}
