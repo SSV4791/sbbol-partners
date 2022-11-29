@@ -957,7 +957,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(actualAccountDescriptions.getMessage())
             .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.control_number"))
             .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
         var actualBankAccountDescriptions = error.getDescriptions().stream()
             .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
@@ -966,7 +965,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(actualBankAccountDescriptions.getMessage())
             .asList()
-            .contains(MessagesTranslator.toLocale("account.account.bank_account.control_number"))
             .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
     }
 
@@ -1371,8 +1369,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(actualAccountDescriptions.getMessage())
             .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.control_number"))
-            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"))
+            .doesNotContainSequence(MessagesTranslator.toLocale("validation.account.rub_code_currency"));
         var actualBankAccountDescriptions = error.getDescriptions().stream()
             .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
             .findAny().orElse(null);
@@ -1380,7 +1378,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .isNotNull();
         assertThat(actualBankAccountDescriptions.getMessage())
             .asList()
-            .contains(MessagesTranslator.toLocale("account.account.bank_account.control_number"))
             .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
     }
 
