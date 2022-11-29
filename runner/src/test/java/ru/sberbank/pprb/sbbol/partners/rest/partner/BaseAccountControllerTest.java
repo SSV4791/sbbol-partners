@@ -177,7 +177,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account("123AS")
+            .account("123AS810")
             .bank(new Bank()
                 .bic("044525411")
                 .name(account.getBank().getName())

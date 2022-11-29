@@ -27,7 +27,7 @@ public class BaseAccountKeyValidator extends BaseValidator {
      */
     protected boolean validateBankAccount(String account, String bic) {
         if (bic.length() != BIC_VALID_LENGTH) {
-            return false;
+            return true;
         }
         var matchCorrAccEks = CORR_ACCOUNT_EKS.matcher(account);
         if (matchCorrAccEks.matches()) {
@@ -59,7 +59,7 @@ public class BaseAccountKeyValidator extends BaseValidator {
      */
     private boolean validateUserAccount(String account, String bic) {
         if (bic.length() != BIC_VALID_LENGTH) {
-            return false;
+            return true;
         }
         return validateAccount(account, StringUtils.right(bic, CONTROL_KEY_BIC));
     }
@@ -73,7 +73,7 @@ public class BaseAccountKeyValidator extends BaseValidator {
      */
     private boolean validateAccount(String account, String keyBic) {
         if (account.length() != ACCOUNT_VALID_LENGTH) {
-            return false;
+            return true;
         }
         var matchAcc = BUDGET_ACCOUNT.matcher(account);
         if (matchAcc.matches()) {
@@ -83,7 +83,11 @@ public class BaseAccountKeyValidator extends BaseValidator {
         int controlSum = 0;
         for (int i = 0; i < checkAccount.length(); i++) {
             var checkSymbol = checkAccount.substring(i, i + 1);
-            controlSum += (Integer.parseInt(checkSymbol) * CONTROL_KEY_ACCOUNT[i]);
+            try {
+                controlSum += (Integer.parseInt(checkSymbol) * CONTROL_KEY_ACCOUNT[i]);
+            } catch (NumberFormatException ignore) {
+                return true;
+            }
         }
         return controlSum % 10 == 0;
     }
