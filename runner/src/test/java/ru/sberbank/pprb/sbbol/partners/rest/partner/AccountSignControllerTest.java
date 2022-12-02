@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,279 +32,422 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 public class AccountSignControllerTest extends BaseAccountSignControllerTest {
 
     @Test
+    @DisplayName("GET /partner/accounts/{digitalId}/{id} Подписание счёта")
     void testCreateSignAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = createValidAccountsSign(account.getDigitalId(), account.getId());
-        var updatedAccount = get(
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var savedSign = Allure.step("Подписание счёта", () -> {
+            return createValidAccountsSign(account.getDigitalId(), account.getId());
+        });
+        var getAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             "/partner" + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
-        );
-        assertThat(savedSign)
-            .isNotNull();
-        assertThat(updatedAccount.getState())
-            .isEqualTo(SignType.SIGNED);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(savedSign)
+                .isNotNull();
+            assertThat(getAccount.getState())
+                .isEqualTo(SignType.SIGNED);
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/sign Повторное подписание счёта")
     void testCreateDuplicateSignAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = createValidAccountsSign(account.getDigitalId(), account.getId());
-        var savedDuplicateSign = createAccountSignWithBadRequest(account.getDigitalId(), account.getId());
-        List<Descriptions> errorTexts = List.of(
-            new Descriptions()
-                .field("account")
-                .message(
-                    List.of("Ошибка обновления счёта: " + account.getAccount() + " запрещено повторно подписывать или изменять подписанные счета")
-                )
-        );
-        assertThat(savedSign)
-            .isNotNull();
-        assertThat(savedDuplicateSign)
-            .isNotNull();
-        assertThat(savedDuplicateSign.getCode())
-            .isEqualTo(ACCOUNT_ALREADY_SIGNED_EXCEPTION.getValue());
-        for (var text : savedDuplicateSign.getDescriptions()) {
-            assertThat(errorTexts.contains(text)).isTrue();
-        }
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var savedSign = Allure.step("Первое подписание счёта", () -> {
+            return createValidAccountsSign(account.getDigitalId(), account.getId());
+        });
+        var savedDuplicateSign = Allure.step("Повторное подписание счёта", () -> {
+            return createAccountSignWithBadRequest(account.getDigitalId(), account.getId());
+        });
+        List<Descriptions> errorText = Allure.step("Подготовка текста ошибки для проверки", () -> {
+            return List.of(
+                new Descriptions()
+                    .field("account")
+                    .message(
+                        List.of("Ошибка обновления счёта: " + account.getAccount() + " запрещено повторно подписывать или изменять подписанные счета")
+                    ));
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(savedSign)
+                .isNotNull();
+            assertThat(savedDuplicateSign)
+                .isNotNull();
+            assertThat(savedDuplicateSign.getCode())
+                .isEqualTo(ACCOUNT_ALREADY_SIGNED_EXCEPTION.getValue());
+            for (var text : savedDuplicateSign.getDescriptions()) {
+                assertThat(errorText.contains(text)).isTrue();
+            }
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/sign Попытка подписания счёта без AccountId")
     void testCreateSignAccountWithoutAccountId() {
-        var errorText = List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36");
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var response = createAccountSignWithBadRequest(account.getDigitalId(), "");
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        for (var description : response.getDescriptions()) {
-            assertTrue(description.getMessage().containsAll(errorText));
-        }
+        var errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36");
+        });
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var response = Allure.step("Попытка подписания счёта без AccountId", () -> {
+            return createAccountSignWithBadRequest(account.getDigitalId(), "");
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            for (var description : response.getDescriptions()) {
+                assertTrue(description.getMessage().containsAll(errorText));
+            }
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/sign Попытка подписания счёта без DigitalId")
     void testCreateSignAccountWithoutDigitalId() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var response = createAccountSignWithNotFound("", account.getId());
-        var errorText = "Искомая сущность account с id: " + account.getId() + ", digitalId:  не найдена";
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
-        assertThat(response.getMessage())
-            .isEqualTo(errorText);
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return "Искомая сущность account с id: " + account.getId() + ", digitalId:  не найдена";
+        });
+        var response = Allure.step("Попытка подписания счёта без DigitalId", () -> {
+            return createAccountSignWithNotFound("", account.getId());
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(response.getMessage())
+                .isEqualTo(errorText);
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/sign Попытка подписания счёта с не корректным AccountId")
     void testCreateSignAccountWithBadAccountId() {
-        List<Descriptions> errorTexts = List.of(
-            new Descriptions()
-                .field("accountsSignDetail[0].accountId")
-                .message(
-                    List.of("размер должен находиться в диапазоне от 36 до 36")
-                )
-        );
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var response = createAccountSignWithBadRequest(account.getDigitalId(), RandomStringUtils.randomAlphabetic(37));
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        for (var text : response.getDescriptions()) {
-            assertThat(errorTexts.contains(text)).isTrue();
-        }
+        List<Descriptions> errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return List.of(
+                new Descriptions()
+                    .field("accountsSignDetail[0].accountId")
+                    .message(
+                        List.of("размер должен находиться в диапазоне от 36 до 36")
+                    )
+            );
+        });
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var response = Allure.step("Попытка подписания счёта с не корректным AccountId", () -> {
+            return createAccountSignWithBadRequest(account.getDigitalId(), RandomStringUtils.randomAlphabetic(37));
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            for (var text : response.getDescriptions()) {
+                assertThat(errorText.contains(text)).isTrue();
+            }
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/sign Попытка подписания счёта без Id")
     void testCreateSignAccountWithoutIds() {
-        var errorText = List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36");
-        var response = createAccountSignWithBadRequest("", "");
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        for (var description : response.getDescriptions()) {
-            assertTrue(description.getMessage().containsAll(errorText));
-        }
+        var errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36");
+        });
+        var response = Allure.step("Попытка подписания счёта с не корректным AccountId", () -> {
+            return createAccountSignWithBadRequest("", "");
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            for (var description : response.getDescriptions()) {
+                assertTrue(description.getMessage().containsAll(errorText));
+            }
+        });
     }
 
     @Test
+    @DisplayName("GET /partner/accounts/sign/{digitalId}/{accountId} Получение подписанного счёта")
     void testGetSignAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        get(
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 404", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
             HttpStatus.NOT_FOUND,
             Error.class,
             account.getDigitalId(), account.getId()
-        );
-        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountsSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
-        assertThat(savedSign)
-            .isNotNull();
-        var signInfo = get(
+        ));
+        var savedSign = Allure.step("Выполнение post-запроса /partner/accounts/sign, код ответа 200", () -> post(
+            baseRoutePath,
+            HttpStatus.OK,
+            getValidAccountsSign(account.getDigitalId(), account.getId()),
+            AccountsSignInfoResponse.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(savedSign)
+                .isNotNull();
+        });
+        var signInfo = Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 200", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
             HttpStatus.OK,
             AccountSignInfo.class,
             account.getDigitalId(), account.getId()
-        );
-        assertThat(signInfo)
-            .isNotNull();
-        assertThat(signInfo.getDigitalId())
-            .isEqualTo(savedSign.getDigitalId());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(signInfo)
+                .isNotNull();
+            assertThat(signInfo.getDigitalId())
+                .isEqualTo(savedSign.getDigitalId());
+        });
     }
 
     @Test
+    @DisplayName("GET /partner/accounts/sign/{digitalId}/{accountId} Попытка получения подписанного счёта которого нет")
     void testGetWhenNotFoundSignAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountsSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
-        var notSignedAccount = createValidAccount(partner.getId(), partner.getDigitalId());
-        assertThat(savedSign)
-            .isNotNull();
-        var signInfo = get(
+        var partner = Allure.step("Создание партнера", () -> {
+            return createValidPartner();
+        });
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var savedSign = Allure.step("Выполнение post-запроса /partner/accounts/sign, код ответа 200", () -> post(
+            baseRoutePath,
+            HttpStatus.OK,
+            getValidAccountsSign(account.getDigitalId(), account.getId()),
+            AccountsSignInfoResponse.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(savedSign)
+                .isNotNull();
+        });
+        var notSignedAccount = Allure.step("Создание не подписанного счёта для партнера", () -> {
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var signInfo = Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 404", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
             HttpStatus.NOT_FOUND,
             Error.class,
             notSignedAccount.getDigitalId(), notSignedAccount.getId()
-        );
-        assertThat(signInfo)
-            .isNotNull();
-        assertThat(signInfo.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
-        var errorText = "Искомая сущность sign с id: " + notSignedAccount.getId() + ", digitalId: " + notSignedAccount.getDigitalId() + " не найдена";
-        assertThat(signInfo.getMessage())
-            .isEqualTo(errorText);
+        ));
+        var errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return "Искомая сущность sign с id: " + notSignedAccount.getId() + ", digitalId: " + notSignedAccount.getDigitalId() + " не найдена";
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(signInfo)
+                .isNotNull();
+            assertThat(signInfo.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(signInfo.getMessage())
+                .isEqualTo(errorText);
+        });
     }
 
     @Test
+    @DisplayName("GET /partner/accounts/sign/{digitalId}/{accountId} Попытка получения подписанного счёта без DigitalId")
     void testGetSignAccountWithoutDigitalId() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountsSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
-        assertThat(savedSign)
-            .isNotNull();
-        var signInfo = get(
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var savedSign = Allure.step("Выполнение post-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 200", () -> post(
+            baseRoutePath,
+            HttpStatus.OK,
+            getValidAccountsSign(account.getDigitalId(), account.getId()),
+            AccountsSignInfoResponse.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(savedSign)
+                .isNotNull();
+        });
+        var signInfo = Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 404", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
             HttpStatus.NOT_FOUND,
             Error.class,
             "", account.getId()
-        );
-        assertThat(signInfo)
-            .isNotNull();
-        assertThat(signInfo.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
-        var errorText = "Искомая сущность account с id: " + account.getId() + ", digitalId: sign не найдена";
-        assertThat(signInfo.getMessage())
-            .isEqualTo(errorText);
+        ));
+        var errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return "Искомая сущность account с id: " + account.getId() + ", digitalId: sign не найдена";
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(signInfo)
+                .isNotNull();
+            assertThat(signInfo.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(signInfo.getMessage())
+                .isEqualTo(errorText);
+        });
     }
 
     @Test
+    @DisplayName("GET /partner/accounts/sign/{digitalId}/{accountId} Попытка получения подписанного счёта без AccountId")
     void testGetSignAccountWithoutAccountId() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountsSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
-        assertThat(savedSign)
-            .isNotNull();
-        var signInfo = get(
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var savedSign = Allure.step("Выполнение post-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 200", () -> post(
+            baseRoutePath,
+            HttpStatus.OK,
+            getValidAccountsSign(account.getDigitalId(), account.getId()),
+            AccountsSignInfoResponse.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(savedSign)
+                .isNotNull();
+        });
+        var signInfo = Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 500", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
             HttpStatus.INTERNAL_SERVER_ERROR,
             Error.class,
             account.getDigitalId(), ""
-        );
-        assertThat(signInfo)
-            .isNotNull();
-        assertThat(signInfo.getCode())
-            .isEqualTo(EXCEPTION.getValue());
-        var errorText = "Invalid UUID string: " + account.getDigitalId();
-        assertThat(signInfo.getMessage())
-            .isEqualTo(errorText);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(signInfo)
+                .isNotNull();
+        });
+        var errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return "Invalid UUID string: " + account.getDigitalId();
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(signInfo.getCode())
+                .isEqualTo(EXCEPTION.getValue());
+            assertThat(signInfo.getMessage())
+                .isEqualTo(errorText);
+        });
     }
 
     @Test
+    @DisplayName("GET /partner/accounts/sign/{digitalId}/{accountId} Попытка получения подписанного счёта без AccountId и без DigitalId")
     void testGetSignAccountWithoutDigitalIdAndAccountId() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = post(baseRoutePath, HttpStatus.OK, getValidAccountsSign(account.getDigitalId(), account.getId()), AccountsSignInfoResponse.class);
-        assertThat(savedSign)
-            .isNotNull();
-        var signInfo = get(
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var savedSign = Allure.step("Выполнение post-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 200", () -> post(
+            baseRoutePath,
+            HttpStatus.OK,
+            getValidAccountsSign(account.getDigitalId(), account.getId()),
+            AccountsSignInfoResponse.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(savedSign)
+                .isNotNull();
+        });
+        var signInfo = Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 405", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
             HttpStatus.METHOD_NOT_ALLOWED,
             Error.class,
             "", ""
-        );
-        assertThat(signInfo)
-            .isNotNull();
-        var errorText = "Request method 'GET' not supported";
-        assertThat(signInfo.getMessage())
-            .isEqualTo(errorText);
+        ));
+        var errorText = Allure.step("Подготовка текста ошибки", () -> {
+            return "Request method 'GET' not supported";
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(signInfo)
+                .isNotNull();
+            assertThat(signInfo.getMessage())
+                .isEqualTo(errorText);
+        });
     }
 
     @Test
+    @DisplayName("DELETE /partner/accounts/sign/{digitalId} Удаление подписи счёта")
     void testDeleteSignAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var savedSign = createValidAccountsSign(account.getDigitalId(), account.getId());
-        var accountSignDetail = savedSign.getAccountsSignDetail().get(0);
-        var actualAccountSign =
-            get(
-                baseRoutePath + "/{digitalId}" + "/{accountId}",
-                HttpStatus.OK,
-                AccountSignInfo.class,
-                savedSign.getDigitalId(), accountSignDetail.getAccountId()
-            );
-        assertThat(actualAccountSign)
-            .isNotNull();
-        assertThat(actualAccountSign.getAccountSignDetail())
-            .isNotNull()
-            .usingRecursiveComparison()
-            .ignoringFields("dateTimeOfSign")
-            .isEqualTo(accountSignDetail);
-
-        var deleteAccountSign =
-            delete(
-                baseRoutePath + "/{digitalId}",
-                HttpStatus.NO_CONTENT,
-                Map.of("accountIds", accountSignDetail.getAccountId()),
-                savedSign.getDigitalId()
-            ).getBody();
-        assertThat(deleteAccountSign)
-            .isNotNull();
-
-        var searchAccountSign =
-            get(
-                baseRoutePath + "/{digitalId}" + "/{accountId}",
-                HttpStatus.NOT_FOUND,
-                Error.class,
-                savedSign.getDigitalId(), accountSignDetail.getAccountId()
-            );
-        assertThat(searchAccountSign)
-            .isNotNull();
-        assertThat(searchAccountSign.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var savedSign = Allure.step("Создание подписанного счёта", () -> {
+            return createValidAccountsSign(account.getDigitalId(), account.getId());
+        });
+        var accountSignDetail = Allure.step("Получение деталей подписи", () -> {
+            return savedSign.getAccountsSignDetail().get(0);
+        });
+        var actualAccountSign = Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 200", () -> get(
+            baseRoutePath + "/{digitalId}" + "/{accountId}",
+            HttpStatus.OK,
+            AccountSignInfo.class,
+            savedSign.getDigitalId(), accountSignDetail.getAccountId()
+        ));
+        Allure.step("Проверка корректности подписи", () -> {
+            assertThat(actualAccountSign)
+                .isNotNull();
+            assertThat(actualAccountSign.getAccountSignDetail())
+                .isNotNull()
+                .usingRecursiveComparison()
+                .ignoringFields("dateTimeOfSign")
+                .isEqualTo(accountSignDetail);
+        });
+        var deleteAccountSign = Allure.step("Выполнение delete-запроса /partner/accounts/sign/{digitalId}, код ответа 204 (удаление подписи)", () -> delete(
+            baseRoutePath + "/{digitalId}",
+            HttpStatus.NO_CONTENT,
+            Map.of("accountIds", accountSignDetail.getAccountId()),
+            savedSign.getDigitalId()
+        ).getBody());
+        Allure.step("Проверка корректности запроса", () -> {
+            assertThat(deleteAccountSign)
+                .isNotNull();
+        });
+        var searchAccountSign = Allure.step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 404", () -> get(
+            baseRoutePath + "/{digitalId}" + "/{accountId}",
+            HttpStatus.NOT_FOUND,
+            Error.class,
+            savedSign.getDigitalId(), accountSignDetail.getAccountId()
+        ));
+        Allure.step("Проверка корректности запроса", () -> {
+            assertThat(searchAccountSign)
+                .isNotNull();
+            assertThat(searchAccountSign.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
     }
 
     @Test
+    @DisplayName("DELETE /partner/accounts/sign/{digitalId} Попытка удаления не сущестущей подписи счёта")
     void testDeleteNotExistedSignAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var accountWithoutSign = createValidAccount(partner.getId(), partner.getDigitalId());
-        createValidAccountsSign(account.getDigitalId(), account.getId());
-        var deleteAccountSign =
-            delete(
-                baseRoutePath + "/{digitalId}",
-                HttpStatus.NO_CONTENT,
-                Map.of("accountIds", accountWithoutSign.getId()),
-                accountWithoutSign.getDigitalId()
-            ).getBody();
-        assertThat(deleteAccountSign)
-            .isNotNull();
+        var partner = Allure.step("Создание партнера", () -> {
+            return createValidPartner();
+        });
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        Allure.step("Подписание счёта партнера", () -> {
+            createValidAccountsSign(account.getDigitalId(), account.getId());
+        });
+        var accountWithoutSign = Allure.step("Создание счёта без подписи", () -> {
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var deleteAccountSign = Allure.step("Выполнение delete-запроса /partner/accounts/sign/{digitalId}, код ответа 204 (удаление подписи)", () -> delete(
+            baseRoutePath + "/{digitalId}",
+            HttpStatus.NO_CONTENT,
+            Map.of("accountIds", accountWithoutSign.getId()),
+            accountWithoutSign.getDigitalId()
+        ).getBody());
+        Allure.step("Проверка корректности запроса", () -> {
+            assertThat(deleteAccountSign)
+                .isNotNull();
+        });
     }
 }
