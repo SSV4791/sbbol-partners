@@ -13,7 +13,8 @@ import javax.validation.ConstraintValidatorContext;
 public class BaseBalanceAccountValidator extends BaseValidator {
 
     private static final String MESSAGE_ENTITY_NOT_FOUND = "{error.message.entity.not_found}";
-    private static final String MESSAGE_INVALID_ACCOUNT = "{validation.account.physical_person.account.invalid_account}";
+    private static final String MESSAGE_INVALID_ACCOUNT_PHYSICAL_PERSON = "{validation.account.physical_person.account.invalid_account}";
+    private static final String MESSAGE_INVALID_ACCOUNT_ENTREPRENEUR = "{validation.account.entrepreneur.account.invalid_account}";
     private final PartnerService partnerService;
 
     public BaseBalanceAccountValidator(PartnerService partnerService) {
@@ -38,9 +39,15 @@ public class BaseBalanceAccountValidator extends BaseValidator {
         if (StringUtils.isEmpty(account)) {
             return true;
         }
-        if (legalForm == LegalForm.PHYSICAL_PERSON && !"408".equals(account.substring(0, 3))) {
-            buildMessage(context, field, MESSAGE_INVALID_ACCOUNT);
-            return false;
+        if (!"408".equals(account.substring(0, 3))) {
+            if (legalForm == LegalForm.PHYSICAL_PERSON) {
+                buildMessage(context, field, MESSAGE_INVALID_ACCOUNT_PHYSICAL_PERSON);
+                return false;
+            }
+            if (legalForm == LegalForm.ENTREPRENEUR) {
+                buildMessage(context, field, MESSAGE_INVALID_ACCOUNT_ENTREPRENEUR);
+                return false;
+            }
         }
         return true;
     }
