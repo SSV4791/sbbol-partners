@@ -56,6 +56,7 @@ public class PartnerViewRepositoryImpl
     }
 
     @Override
+    @SuppressWarnings("java:S1120")
     void createPredicate(
         CriteriaBuilder builder,
         CriteriaQuery<PartnerEntity> criteria,
@@ -91,14 +92,18 @@ public class PartnerViewRepositoryImpl
         if (filter.getPartnersFilter() != null) {
             switch (filter.getPartnersFilter()) {
                 case GKU -> {
-                    Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.LEFT);
+                    Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.INNER);
                     predicates.add(builder.equal(root.get(PartnerEntity_.INN), join.get(GkuInnEntity_.INN)));
                 }
                 case BUDGET -> {
-                    var masks = dictionaryRepository.findAll().stream().map(BudgetMaskEntity::getCondition).collect(Collectors.toList());
+                    var masks = dictionaryRepository.findAll().stream()
+                        .map(BudgetMaskEntity::getCondition)
+                        .collect(Collectors.toList());
                     var budgetAccount = accountRepository.findBudgetAccounts(filter.getDigitalId(), masks);
                     predicates.add(root.get(PartnerEntity_.UUID)
-                        .in(budgetAccount.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
+                        .in(budgetAccount.stream()
+                            .map(AccountEntity::getPartnerUuid)
+                            .collect(Collectors.toList())));
                 }
                 case ENTREPRENEUR -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.ENTREPRENEUR));
                 case PHYSICAL_PERSON -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.PHYSICAL_PERSON));
