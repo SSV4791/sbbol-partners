@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import io.qameta.allure.Allure;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
@@ -15,20 +17,25 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/dictionary/budget-mask";
 
     @Test
+    @DisplayName("POST /dictionary/budget-mask/view Фильтрация по бюджеткой маске")
     void testViewBudgetMasks() {
-        var filter1 = new BudgetMaskFilter()
-            .maskType(BudgetMaskForm.BUDGET_ACCOUNT)
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0)
-            );
-        var response = post(
+        var filter = Allure.step("Подготовка фильтра с маской бюджетного счёта", () -> {
+            return new BudgetMaskFilter()
+                .maskType(BudgetMaskForm.BUDGET_ACCOUNT)
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0)
+                );
+        });
+        var response = Allure.step("Выполнение post-запроса /dictionary/budget-mask/view, код ответа 200", () -> post(
             baseRoutePath + "/view",
             HttpStatus.OK,
-            filter1,
+            filter,
             BudgetMasksResponse.class
-        );
-        assertThat(response)
-            .isNotNull();
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+        });
     }
 }
