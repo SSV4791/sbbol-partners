@@ -118,7 +118,8 @@ class PartnerMapperTest extends BaseUnitConfiguration {
                 "search",
                 "createDate",
                 "phones",
-                "emails"
+                "emails",
+                "accounts"
             )
             .isEqualTo(actual);
         assertThat(PartnerMapper.toLegalType(expected.getLegalType()))

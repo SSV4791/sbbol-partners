@@ -2,12 +2,18 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity_;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
@@ -24,6 +30,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -95,21 +102,105 @@ public class PartnerViewRepositoryImpl
                     Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.INNER);
                     predicates.add(builder.equal(root.get(PartnerEntity_.INN), join.get(GkuInnEntity_.INN)));
                 }
-                case BUDGET -> {
-                    var masks = dictionaryRepository.findAll().stream()
-                        .map(BudgetMaskEntity::getCondition)
-                        .collect(Collectors.toList());
-                    var budgetAccount = accountRepository.findBudgetAccounts(filter.getDigitalId(), masks);
-                    predicates.add(root.get(PartnerEntity_.UUID)
-                        .in(budgetAccount.stream()
-                            .map(AccountEntity::getPartnerUuid)
-                            .collect(Collectors.toList())));
-                }
+                case BUDGET -> addBudgetPredicate(predicates, builder, root);
                 case ENTREPRENEUR -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.ENTREPRENEUR));
                 case PHYSICAL_PERSON -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.PHYSICAL_PERSON));
                 case LEGAL_ENTITY -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.LEGAL_ENTITY));
             }
         }
+    }
+
+    private void addBudgetPredicate(List<Predicate> predicates, CriteriaBuilder builder, Root<PartnerEntity> root) {
+        Join<PartnerEntity, AccountEntity> accountJoin = root.join(PartnerEntity_.ACCOUNTS, JoinType.INNER);
+        Join<AccountEntity, BankEntity> bankJoin = accountJoin.join(AccountEntity_.BANK, JoinType.INNER);
+        Join<BankEntity, BankAccountEntity> bankAccountJoin = bankJoin.join(BankEntity_.BANK_ACCOUNT, JoinType.INNER);
+        Predicate gisGmpPredicate = gisGmpPredicate(accountJoin, bankJoin, builder);
+        Predicate taxAccountPredicate = taxAccountPredicate(accountJoin, builder);
+        Predicate okrPredicate = okrPredicate(accountJoin, bankAccountJoin, builder);
+        predicates.add(
+            builder.and(
+                taxAccountPredicate.not(),
+                builder.or(
+                    gisGmpPredicate,
+                    okrPredicate
+                )
+            )
+        );
+    }
+
+    private Predicate gisGmpPredicate(
+        Join<PartnerEntity, AccountEntity> accountJoin,
+        Join<AccountEntity, BankEntity> bankJoin,
+        CriteriaBuilder builder
+    ) {
+        List<BudgetMaskEntity> bicMasks = dictionaryRepository.findAllByType(BudgetMaskType.BIC);
+        var maskBicPredicates = new ArrayList<>(bicMasks.size());
+        for (var mask : bicMasks) {
+            maskBicPredicates.add(
+                builder.or(
+                    builder.like(
+                        builder.upper(bankJoin.get(BankEntity_.BIC)),
+                        mask.getCondition().toUpperCase(Locale.getDefault()))));
+        }
+        List<BudgetMaskEntity> gisGmlMasks = dictionaryRepository.findAllByType(BudgetMaskType.GIS_GMP_ACCOUNT);
+        var gisGmpAccountPredicates = new ArrayList<>(gisGmlMasks.size());
+        for (var mask : gisGmlMasks) {
+            gisGmpAccountPredicates.add(
+                builder.or(
+                    builder.like(
+                        builder.upper(
+                            accountJoin.get(AccountEntity_.ACCOUNT)),
+                        mask.getCondition().toUpperCase(Locale.getDefault()))));
+        }
+        return builder.and(
+            builder.or(maskBicPredicates.toArray(Predicate[]::new)),
+            builder.or(gisGmpAccountPredicates.toArray(Predicate[]::new))
+        );
+    }
+
+    private Predicate taxAccountPredicate(
+        Join<PartnerEntity, AccountEntity> accountJoin,
+        CriteriaBuilder builder
+    ) {
+        var taxAccountMasks = dictionaryRepository.findAllByType(BudgetMaskType.TAX_ACCOUNT_RECEIVER);
+        var taxAccountPredicates = new ArrayList<>(taxAccountMasks.size());
+        for (var mask : taxAccountMasks) {
+            taxAccountPredicates.add(
+                builder.or(
+                    builder.like(
+                        builder.upper(accountJoin.get(AccountEntity_.ACCOUNT)),
+                        mask.getCondition().toUpperCase(Locale.getDefault()))));
+        }
+        return builder.or(taxAccountPredicates.toArray(Predicate[]::new));
+    }
+
+    private Predicate okrPredicate(
+        Join<PartnerEntity, AccountEntity> accountJoin,
+        Join<BankEntity, BankAccountEntity> bankAccountJoin,
+        CriteriaBuilder builder
+    ) {
+        var accountMasks = dictionaryRepository.findAllByType(BudgetMaskType.BUDGET_ACCOUNT);
+        var budgetAccountPredicates = new ArrayList<>(accountMasks.size());
+        for (var mask : accountMasks) {
+            budgetAccountPredicates.add(
+                builder.or(
+                    builder.like(
+                        builder.upper(accountJoin.get(AccountEntity_.ACCOUNT)),
+                        mask.getCondition().toUpperCase(Locale.getDefault()))));
+        }
+        var budgetCorrAccountMasks = dictionaryRepository.findAllByType(BudgetMaskType.BUDGET_CORR_ACCOUNT);
+        var budgetCorAccountPredicates = new ArrayList<>(budgetCorrAccountMasks.size());
+        for (var mask : budgetCorrAccountMasks) {
+            budgetCorAccountPredicates.add(
+                builder.or(
+                    builder.like(
+                        builder.upper(bankAccountJoin.get(BankAccountEntity_.ACCOUNT)),
+                        mask.getCondition().toUpperCase(Locale.getDefault()))));
+        }
+        return builder.and(
+            builder.or(budgetAccountPredicates.toArray(Predicate[]::new)),
+            builder.or(budgetCorAccountPredicates.toArray(Predicate[]::new))
+        );
     }
 
     @Override
