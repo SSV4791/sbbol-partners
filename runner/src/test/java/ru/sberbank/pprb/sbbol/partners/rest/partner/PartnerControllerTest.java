@@ -187,7 +187,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidLegalEntityPartner(randomAlphabetic(10))
             .legalForm(LegalForm.PHYSICAL_PERSON)
             .orgName(null)
-            .secondName(null)
             .middleName(null)
             .inn(null)
             .kpp(null)

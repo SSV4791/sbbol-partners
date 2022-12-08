@@ -13,7 +13,7 @@ public class NameAttributePartnerFullModelDtoValidator extends BaseNameAttribute
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
         if (!ObjectUtils.isEmpty(value)) {
-            return isValid(context, value.getLegalForm(), value.getOrgName(), value.getFirstName());
+            return isValid(context, value.getLegalForm(), value.getOrgName(), value.getFirstName(), value.getSecondName());
         }
         return true;
     }
