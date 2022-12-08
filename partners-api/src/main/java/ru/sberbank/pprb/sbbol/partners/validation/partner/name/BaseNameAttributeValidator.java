@@ -11,13 +11,27 @@ public class BaseNameAttributeValidator extends BaseValidator {
 
     private static final String MESSAGE = "{javax.validation.constraints.NotEmpty.message}";
 
-    protected boolean isValid(ConstraintValidatorContext context, LegalForm legalForm, String orgName, String firstName) {
+    protected boolean isValid(
+        ConstraintValidatorContext context,
+        LegalForm legalForm,
+        String orgName,
+        String firstName,
+        String secondName
+    ) {
         if (legalForm != LegalForm.PHYSICAL_PERSON) {
             buildMessage(context, "orgName", MESSAGE);
             return !isEmpty(orgName);
         } else {
-            buildMessage(context, "firstName", MESSAGE);
-            return !isEmpty(firstName);
+            boolean valid = true;
+            if (isEmpty(firstName)) {
+                buildMessage(context, "firstName", MESSAGE);
+                valid = false;
+            }
+            if (isEmpty(secondName)) {
+                buildMessage(context, "secondName", MESSAGE);
+                valid = false;
+            }
+            return valid;
         }
     }
 }
