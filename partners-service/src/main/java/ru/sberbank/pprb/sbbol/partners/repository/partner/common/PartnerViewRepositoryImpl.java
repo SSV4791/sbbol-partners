@@ -30,6 +30,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -102,7 +103,7 @@ public class PartnerViewRepositoryImpl
                     Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.INNER);
                     predicates.add(builder.equal(root.get(PartnerEntity_.INN), join.get(GkuInnEntity_.INN)));
                 }
-                case BUDGET -> addBudgetPredicate(predicates, builder, root);
+                case BUDGET -> addBudgetPredicate(builder, criteria, predicates, root);
                 case ENTREPRENEUR -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.ENTREPRENEUR));
                 case PHYSICAL_PERSON -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.PHYSICAL_PERSON));
                 case LEGAL_ENTITY -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.LEGAL_ENTITY));
@@ -110,26 +111,36 @@ public class PartnerViewRepositoryImpl
         }
     }
 
-    private void addBudgetPredicate(List<Predicate> predicates, CriteriaBuilder builder, Root<PartnerEntity> root) {
-        Join<PartnerEntity, AccountEntity> accountJoin = root.join(PartnerEntity_.ACCOUNTS, JoinType.INNER);
-        Join<AccountEntity, BankEntity> bankJoin = accountJoin.join(AccountEntity_.BANK, JoinType.INNER);
+    private void addBudgetPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<PartnerEntity> criteria,
+        List<Predicate> predicates,
+        Root<PartnerEntity> root
+    ) {
+        Subquery<Integer> subQuery = criteria.subquery(Integer.class);
+        Root<AccountEntity> accountRoot = subQuery.from(AccountEntity.class);
+        Join<AccountEntity, BankEntity> bankJoin = accountRoot.join(AccountEntity_.BANK, JoinType.INNER);
         Join<BankEntity, BankAccountEntity> bankAccountJoin = bankJoin.join(BankEntity_.BANK_ACCOUNT, JoinType.INNER);
-        Predicate gisGmpPredicate = gisGmpPredicate(accountJoin, bankJoin, builder);
-        Predicate taxAccountPredicate = taxAccountPredicate(accountJoin, builder);
-        Predicate okrPredicate = okrPredicate(accountJoin, bankAccountJoin, builder);
-        predicates.add(
-            builder.and(
-                taxAccountPredicate.not(),
-                builder.or(
-                    gisGmpPredicate,
-                    okrPredicate
+        Predicate gisGmpPredicate = gisGmpPredicate(accountRoot, bankJoin, builder);
+        Predicate taxAccountPredicate = taxAccountPredicate(accountRoot, builder);
+        Predicate okrPredicate = okrPredicate(accountRoot, bankAccountJoin, builder);
+        subQuery
+            .select(builder.literal(1))
+            .where(
+                builder.and(
+                    taxAccountPredicate.not(),
+                    builder.or(
+                        gisGmpPredicate,
+                        okrPredicate
+                    ),
+                    builder.equal(accountRoot.get(AccountEntity_.PARTNER_UUID), root.get(PartnerEntity_.UUID))
                 )
-            )
-        );
+            );
+        predicates.add(builder.exists(subQuery));
     }
 
     private Predicate gisGmpPredicate(
-        Join<PartnerEntity, AccountEntity> accountJoin,
+        Root<AccountEntity> accountRoot,
         Join<AccountEntity, BankEntity> bankJoin,
         CriteriaBuilder builder
     ) {
@@ -149,7 +160,7 @@ public class PartnerViewRepositoryImpl
                 builder.or(
                     builder.like(
                         builder.upper(
-                            accountJoin.get(AccountEntity_.ACCOUNT)),
+                            accountRoot.get(AccountEntity_.ACCOUNT)),
                         mask.getCondition().toUpperCase(Locale.getDefault()))));
         }
         return builder.and(
@@ -159,7 +170,7 @@ public class PartnerViewRepositoryImpl
     }
 
     private Predicate taxAccountPredicate(
-        Join<PartnerEntity, AccountEntity> accountJoin,
+        Root<AccountEntity> accountRoot,
         CriteriaBuilder builder
     ) {
         var taxAccountMasks = dictionaryRepository.findAllByType(BudgetMaskType.TAX_ACCOUNT_RECEIVER);
@@ -168,14 +179,14 @@ public class PartnerViewRepositoryImpl
             taxAccountPredicates.add(
                 builder.or(
                     builder.like(
-                        builder.upper(accountJoin.get(AccountEntity_.ACCOUNT)),
+                        builder.upper(accountRoot.get(AccountEntity_.ACCOUNT)),
                         mask.getCondition().toUpperCase(Locale.getDefault()))));
         }
         return builder.or(taxAccountPredicates.toArray(Predicate[]::new));
     }
 
     private Predicate okrPredicate(
-        Join<PartnerEntity, AccountEntity> accountJoin,
+        Root<AccountEntity> accountRoot,
         Join<BankEntity, BankAccountEntity> bankAccountJoin,
         CriteriaBuilder builder
     ) {
@@ -185,7 +196,7 @@ public class PartnerViewRepositoryImpl
             budgetAccountPredicates.add(
                 builder.or(
                     builder.like(
-                        builder.upper(accountJoin.get(AccountEntity_.ACCOUNT)),
+                        builder.upper(accountRoot.get(AccountEntity_.ACCOUNT)),
                         mask.getCondition().toUpperCase(Locale.getDefault()))));
         }
         var budgetCorrAccountMasks = dictionaryRepository.findAllByType(BudgetMaskType.BUDGET_CORR_ACCOUNT);
