@@ -98,9 +98,6 @@ public class PartnerEntity extends BaseEntity {
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnerEmailEntity> emails;
 
-    @OneToMany(mappedBy = "partner", fetch = FetchType.LAZY)
-    private List<AccountEntity> accounts;
-
     public OffsetDateTime getCreateDate() {
         return createDate;
     }
@@ -249,14 +246,6 @@ public class PartnerEntity extends BaseEntity {
 
     public void setGkuInnEntity(GkuInnEntity gkuInnEntity) {
         this.gkuInnEntity = gkuInnEntity;
-    }
-
-    public List<AccountEntity> getAccounts() {
-        return accounts;
-    }
-
-    public void setAccounts(List<AccountEntity> accounts) {
-        this.accounts = accounts;
     }
 
     @Override

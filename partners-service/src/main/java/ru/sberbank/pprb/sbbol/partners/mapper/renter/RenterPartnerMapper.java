@@ -62,7 +62,6 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
-    @Mapping(target = "accounts", ignore = true)
     PartnerEntity toPartner(Renter renter);
 
     @Named("toPhones")
@@ -370,7 +369,6 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
-    @Mapping(target = "accounts", ignore = true)
     void updatePartner(Renter renter, @MappingTarget PartnerEntity partnerEntity);
 
     @Named("toLegalType")
