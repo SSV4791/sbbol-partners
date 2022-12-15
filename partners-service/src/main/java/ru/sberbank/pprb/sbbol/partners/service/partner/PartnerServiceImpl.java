@@ -17,20 +17,25 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerDelete;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
+import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -45,6 +50,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final GkuInnDictionaryRepository gkuInnDictionaryRepository;
     private final BudgetMaskService budgetMaskService;
     private final ReplicationService replicationService;
+    private final FraudServiceManager fraudServiceManager;
     private final AccountMapper accountMapper;
     private final DocumentMapper documentMapper;
     private final AddressMapper addressMapper;
@@ -60,6 +66,7 @@ public class PartnerServiceImpl implements PartnerService {
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
         BudgetMaskService budgetMaskService,
         ReplicationService replicationService,
+        FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
         DocumentMapper documentMapper,
         AddressMapper addressMapper,
@@ -74,6 +81,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.gkuInnDictionaryRepository = gkuInnDictionaryRepository;
         this.budgetMaskService = budgetMaskService;
         this.replicationService = replicationService;
+        this.fraudServiceManager = fraudServiceManager;
         this.accountMapper = accountMapper;
         this.documentMapper = documentMapper;
         this.addressMapper = addressMapper;
@@ -184,12 +192,17 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public void deletePartners(String digitalId, List<String> ids) {
+    public void deletePartners(String digitalId, List<String> ids, PartnerDelete partnerDelete) {
         for (String partnerId : ids) {
             var partnerUuid = partnerMapper.mapUuid(partnerId);
             PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
                 .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerUuid));
+            if (nonNull(partnerDelete)) {
+                fraudServiceManager
+                    .getService(FraudEventType.DELETE_PARTNER)
+                    .sendEvent(partnerDelete.getFraudMetaData(), foundPartner);
+            }
             partnerRepository.delete(foundPartner);
             addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
             contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid));

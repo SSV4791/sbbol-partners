@@ -48,10 +48,13 @@ dependencies {
     annotationProcessor(liveLibs.mapstruct.processor)
 
     implementation(platform(liveLibs.spring.boot.dependencies))
+    implementation(liveLibs.antifraud.api)
+    implementation(liveLibs.antifraud.rpc.api)
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(liveLibs.ehcache.net.core)
     implementation(liveLibs.jackson.databind)
     implementation(liveLibs.jackson.databind.nullable)
+    implementation(liveLibs.jsonrpc4j.client)
     implementation(liveLibs.jsr305)
     implementation(liveLibs.mapstruct.core)
     implementation(liveLibs.spring.context.support)

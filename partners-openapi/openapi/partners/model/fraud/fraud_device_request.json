@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Данные устройства",
+  "properties": {
+    "devicePrint": {
+      "type": "string",
+      "title": "Слепок устройства",
+      "maxLength": 4000,
+      "x-not-empty": true
+    },
+    "httpAccept": {
+      "type": "string",
+      "title": "Значение заголовка Accept HTTP-запроса",
+      "maxLength": 3000
+    },
+    "httpReferrer": {
+      "type": "string",
+      "title": "Значение заголовка Referer HTTP-запроса",
+      "maxLength": 3000
+    },
+    "httpAcceptChars": {
+      "type": "string",
+      "title": "Значение заголовка Accept-Charset HTTP-запроса",
+      "maxLength": 256
+    },
+    "httpAcceptEncoding": {
+      "type": "string",
+      "title": "Значение заголовка Accept-Encoding HTTP-запроса",
+      "maxLength": 256
+    },
+    "httpAcceptLanguage": {
+      "type": "string",
+      "title": "Значение заголовка Accept-Language HTTP-запроса"
+    },
+    "ipAddress": {
+      "type": "string",
+      "title": "IP-адрес пользовательского устройства Значение заголовка ip-address HTTP-запросаа",
+      "maxLength": 15,
+      "x-not-empty": true
+    },
+    "userAgent": {
+      "type": "string",
+      "title": "Значение заголовка User-Agent из заголовка HTTP-запроса",
+      "maxLength": 1024,
+      "x-not-empty": true
+    },
+    "mobileSdkData": {
+      "type": "string",
+      "title": "Информация о мобильном устройстве",
+      "maxLength": 1024
+    }
+  },
+  "required": [
+    "devicePrint",
+    "ipAddress",
+    "userAgent"
+  ]
+}

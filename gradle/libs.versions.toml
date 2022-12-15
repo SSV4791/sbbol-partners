@@ -2,9 +2,12 @@
 mapstruct = "1.4.2.Final"
 micrometer = "1.7.5"
 spring-boot = "2.5.5"
+antifraud = "D-02.003.00_0003"
 
 [libraries]
 apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.9" }
+antifraud-api = { module = "ru.sberbank.pprb.antifraud:antifraud-api", version.ref = "antifraud"}
+antifraud-rpc-api = { module = "ru.sberbank.pprb.antifraud:antifraud-rpc-api", version.ref = "antifraud"}
 aspectjrt = { module = "org.aspectj:aspectjrt", version = "1.9.7" }
 ehcache-net-core = { module = "net.sf.ehcache:ehcache", version = "2.10.4" }
 ehcache-org-core = { module = "org.ehcache:ehcache", version = "3.9.2" }

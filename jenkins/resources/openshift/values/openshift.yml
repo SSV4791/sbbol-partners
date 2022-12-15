@@ -55,6 +55,11 @@ os_project:
     enabled: false
     time_out: 5000
 
+  fraud:
+    enabled: false
+    time_out: 5000
+    endpoint: /antifraud/v2/counterparty
+
   replication:
     kafka:
       producer:

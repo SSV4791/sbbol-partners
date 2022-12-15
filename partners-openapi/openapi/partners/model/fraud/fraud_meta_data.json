@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Данные для отправки во ФМ ЮЛ",
+  "properties": {
+    "clientData": {
+      "type": "object",
+      "$ref": "fraud_client_data.json",
+      "title": "Данные пользователя"
+    },
+    "deviceRequest": {
+      "type": "object",
+      "$ref": "fraud_device_request.json",
+      "title": "Данные устройства"
+    },
+    "channelIndicator": {
+      "$ref": "fraud_channel_indicator.json",
+      "title": "Тип канала связи, через который осуществляется связь клиента с банком"
+    },
+    "eventData": {
+      "type": "object",
+      "$ref": "fraud_event_data.json",
+      "title": "Данные о событии"
+    },
+    "cryptoProfileData": {
+      "type": "object",
+      "$ref": "fraud_crypto_profile_data.json",
+      "title": "Данные криптопрофиля"
+    }
+  },
+  "required": [
+    "userData",
+    "deviceRequest",
+    "channelIndicator",
+    "eventData",
+    "cryptoProfileData"
+  ]
+}

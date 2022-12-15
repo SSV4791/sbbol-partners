@@ -58,6 +58,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude("com.vaadin.external.google", "android-json")
     }
+    testImplementation(liveLibs.antifraud.api)
     testImplementation(liveLibs.aspectjrt)
     testImplementation(liveLibs.mapstruct.core)
     testImplementation(testLibs.bundles.pact)
@@ -66,7 +67,6 @@ dependencies {
         exclude("com.vaadin.external.google", "android-json")
     }
     testImplementation(testLibs.bundles.rest.assured)
-
 }
 
 description = "ППРБ.Digital.Партнеры"

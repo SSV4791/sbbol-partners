@@ -60,6 +60,12 @@ data:
     sbbol.url={% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.host }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='host') | first }}{% endif %}:{% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.istio_mesh_port | default('80') }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}/ss-rest/api
     sbbol.time_out={{ os_project.sbbol.time_out | default('10000') }}
 
+    # Fraud
+    fraud.enabled={{ os_project.fraud.enabled | default('false') }}
+    fraud.time_out={{ os_project.fraud.time_out | default('10000') }}
+    fraud.endpoint={{ os_project.fraud.endpoint | default('/antifraud/v2/counterparty') }}
+    fraud.url={% if int_entry.pprb.fraud is mapping %}{{ int_entry.pprb.fraud.host }}{% else %}{{ int_entry.pprb.fraud | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.fraud is mapping %}{{ int_entry.pprb.fraud.istio_mesh_port }}{% else %}{{ int_entry.pprb.fraud | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
+
     # Application Journal
     appjournal.moduleId=pprb4-digital-partners
 

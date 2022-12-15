@@ -165,6 +165,17 @@ int:
         protocol: TLS
         url: https://ingress-ci02745214-digitalapi-ott.apps.dev-gen2.sigma.sbrf.ru
 
+    CI03045533_antifraud_aggregator:
+      v1_0:
+        name: antifraud-aggregator
+        host: ingress-ci02281165-antifraud-ott.apps.dev-terra000006-idm.ocp.delta.sbrf.ru
+        port: 443
+        istio_mesh_port: 80
+        ott: true
+        mtls: true
+        rotocol: HTTPS
+        url: https://ingress-ci02281165-antifraud-ott.apps.dev-terra000006-idm.ocp.delta.sbrf.ru
+
   ott:
     v2_0:
       - name: ott-1

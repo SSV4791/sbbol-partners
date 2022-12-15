@@ -12,9 +12,13 @@ import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.config.props.ReplicationKafkaProducerProperties;
+import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapter;
+import ru.sberbank.pprb.sbbol.partners.fraud.config.FraudProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.AsynchReplicationCounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.fraud.DeletedPartnerFraudMetaDataMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.fraud.SignedAccountFraudMetaDataMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
@@ -40,6 +44,11 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
+import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
+import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
+import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.DeletedPartnerFraudServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.FraudServiceManagerImpl;
+import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.SignedAccountFraudServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
@@ -73,6 +82,7 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -130,6 +140,34 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
+    FraudService deletedPartnerFraudService(
+        FraudProperties fraudProperties,
+        FraudAdapter fraudAdapter,
+        DeletedPartnerFraudMetaDataMapper fraudMapper
+    ) {
+        return new DeletedPartnerFraudServiceImpl(fraudProperties, fraudAdapter, fraudMapper);
+    }
+
+    @Bean
+    FraudService signedAccountFraudService(
+        FraudProperties fraudProperties,
+        FraudAdapter fraudAdapter,
+        SignedAccountFraudMetaDataMapper fraudMapper,
+        PartnerRepository partnerRepository
+    ) {
+        return new SignedAccountFraudServiceImpl(
+            fraudProperties,
+            fraudAdapter,
+            fraudMapper,
+            partnerRepository);
+    }
+
+    @Bean
+    FraudServiceManager fraudServiceManager(List<FraudService> services) {
+        return new FraudServiceManagerImpl(services);
+    }
+
+    @Bean
     AccountService accountService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
@@ -152,6 +190,7 @@ public class PartnerServiceConfiguration {
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
+        FraudServiceManager fraudServiceManager,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         AccountSingMapper accountSingMapper
@@ -160,6 +199,7 @@ public class PartnerServiceConfiguration {
             accountRepository,
             accountSignRepository,
             replicationService,
+            fraudServiceManager,
             auditAdapter,
             accountMapper,
             accountSingMapper
@@ -295,6 +335,7 @@ public class PartnerServiceConfiguration {
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
         BudgetMaskService budgetMaskService,
         ReplicationService replicationService,
+        FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
         DocumentMapper documentMapper,
         AddressMapper addressMapper,
@@ -310,6 +351,7 @@ public class PartnerServiceConfiguration {
             gkuInnDictionaryRepository,
             budgetMaskService,
             replicationService,
+            fraudServiceManager,
             accountMapper,
             documentMapper,
             addressMapper,
