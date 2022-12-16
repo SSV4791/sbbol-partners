@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: 1671180627481_add_parameter_in_budget_mask_dictionary.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1671181226711_delete_parameter_in_budget_mask_dictionary.sql
+      relativeToChangelogFile: true
