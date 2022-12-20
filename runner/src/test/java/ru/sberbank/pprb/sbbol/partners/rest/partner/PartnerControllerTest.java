@@ -31,6 +31,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerDelete;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
@@ -1395,6 +1396,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         delete(
             "/partners/{digitalId}",
             HttpStatus.NO_CONTENT,
+            podamFactory.manufacturePojo(PartnerDelete.class),
             Map.of("ids", actualPartner.getId()),
             actualPartner.getDigitalId()
         ).getBody();
