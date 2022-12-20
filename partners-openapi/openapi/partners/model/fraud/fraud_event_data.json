@@ -6,8 +6,7 @@
     "timeOfOccurrence": {
       "type": "string",
       "format": "date-time",
-      "title": "Дата и время наступления события",
-      "x-not-empty": true
+      "title": "Дата и время наступления события"
     }
   },
   "required": [
