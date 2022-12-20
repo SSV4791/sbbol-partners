@@ -7,7 +7,6 @@
       "type": "string",
       "format": "date-time",
       "title": "Дата и время наступления события",
-      "maxLength": 30,
       "x-not-empty": true
     }
   },
