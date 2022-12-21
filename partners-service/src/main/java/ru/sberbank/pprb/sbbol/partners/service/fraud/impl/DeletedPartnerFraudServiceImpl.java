@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.fraud.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapter;
@@ -16,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
 
 import static java.util.Objects.isNull;
 
+@Loggable
 public class DeletedPartnerFraudServiceImpl implements FraudService<PartnerEntity> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeletedPartnerFraudServiceImpl.class);
@@ -48,7 +50,9 @@ public class DeletedPartnerFraudServiceImpl implements FraudService<PartnerEntit
         }
         var fraudRequest = fraudMapper.mapToCounterPartySendToAnalyzeRq(metaData, partnerEntity);
         try {
+            LOG.debug("Отправляем запрос В АС Агрегатор данных ФРОД-мониторинг: {}", fraudRequest);
             adapter.send(fraudRequest);
+            LOG.debug("Получили ответ от АС Агрегатора данных ФРОД-мониторинг: {}", fraudRequest);
         } catch (FraudModelArgumentException e) {
             throw new FraudModelValidationException(e.getMessage(), e);
         } catch (FraudAdapterException | FraudApplicationException e) {

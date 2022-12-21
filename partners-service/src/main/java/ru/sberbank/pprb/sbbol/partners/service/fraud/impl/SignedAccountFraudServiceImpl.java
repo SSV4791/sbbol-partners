@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.fraud.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -19,6 +20,7 @@ import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
 
 import static java.util.Objects.isNull;
 
+@Loggable
 public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SignedAccountFraudServiceImpl.class);
@@ -59,7 +61,9 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
             .orElseThrow(() -> new EntryNotFoundException("partner", accountEntity.getDigitalId(), accountEntity.getPartnerUuid()));
         var request = fraudMapper.mapToCounterPartySendToAnalyzeRq(metaData, partnerEntity, accountEntity);
         try {
+            LOG.debug("Отправляем запрос В АС Агрегатор данных ФРОД-мониторинг: {}", request);
             var response = adapter.send(request);
+            LOG.debug("Получили ответ от АС Агрегатора данных ФРОД-мониторинг: {}", response);
             if (!ANALYZE_RESPONSE_ACTION_CODE_ALLOW.equalsIgnoreCase(response.getActionCode())) {
                 throw new FraudDeniedException(response.getComment());
             }
