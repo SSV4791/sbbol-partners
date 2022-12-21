@@ -44,4 +44,14 @@ public class FraudProperties {
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }
+
+    @Override
+    public String toString() {
+        return "FraudProperties{" +
+            "enabled=" + enabled +
+            ", url='" + url + '\'' +
+            ", endpoint='" + endpoint + '\'' +
+            ", timeOut=" + timeOut +
+            '}';
+    }
 }
