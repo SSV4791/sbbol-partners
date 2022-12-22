@@ -229,19 +229,6 @@ public abstract class AbstractIntegrationTest {
             .response();
     }
 
-    protected static Response delete(String url, HttpStatus responseHttpStatus, Object body, Map<String, ?> queryParams, Object... params) {
-        return given()
-            .spec(requestSpec)
-            .when()
-            .queryParams(queryParams)
-            .body(body)
-            .delete(url, params)
-            .then()
-            .spec(specResponseHandler(responseHttpStatus))
-            .extract()
-            .response();
-    }
-
     private static ResponseSpecification specResponseHandler(HttpStatus httpStatus) {
         return switch (httpStatus) {
             case OK -> responseSpec;

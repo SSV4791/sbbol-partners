@@ -22,7 +22,7 @@ import static java.util.Objects.isNull;
 
 public interface BaseFraudMetaDataMapper extends BaseMapper {
 
-    String EVENT_TYPE_SIGN_COUNTERPARTY_ACCOUNT = "SIGN_COUNTERPARTY_ACCOUNT";
+    String EVENT_TYPE_SIGN_COUNTERPARTY_ACCOUNT = "EDIT_PAYEE";
 
     String EVENT_TYPE_EDIT_PAYEE = "EDIT_PAYEE";
 

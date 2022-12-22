@@ -62,7 +62,14 @@ public interface PartnerService {
      *
      * @param digitalId Идентификатор личного кабинета клиента
      * @param id        Идентификаторы Партнеров
-     * @param partnerDelete Данные Партнера
      */
-    void deletePartners(String digitalId, List<String> id, PartnerDelete partnerDelete);
+    @Deprecated
+    void deletePartners(String digitalId, List<String> id);
+
+    /**
+     * Удаление Партнера
+     *
+     * @param partnerDelete Данные по удалению Партнеров
+     */
+    void deletePartners(PartnerDelete partnerDelete);
 }

@@ -52,14 +52,8 @@ paths:
       tags:
         - Partners
       description: Удаление Партнера
+      deprecated: true
       operationId: delete
-      requestBody:
-        description: Партнеры
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: 'model/partners/partner_delete.json'
       parameters:
         - name: digitalId
           in: path
@@ -76,6 +70,35 @@ paths:
               type: string
               maxItems: 200
           description: Идентефикатор партнера
+      responses:
+        204:
+          description: Успешный ответ
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: 'model/common/error.json'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partners/delete:
+    post:
+      tags:
+        - Partners
+      description: Удаление Партнера
+      operationId: deletePartners
+      requestBody:
+        description: Партнеры
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/partners/partner_delete.json'
       responses:
         204:
           description: Успешный ответ

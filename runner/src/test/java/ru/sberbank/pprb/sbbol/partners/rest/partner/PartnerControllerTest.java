@@ -1373,7 +1373,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testDeletePartner() {
+    void testDeprecatedDeletePartner() {
         var createdPartner = post(
             baseRoutePath,
             HttpStatus.CREATED,
@@ -1396,10 +1396,54 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         delete(
             "/partners/{digitalId}",
             HttpStatus.NO_CONTENT,
-            podamFactory.manufacturePojo(PartnerDelete.class),
             Map.of("ids", actualPartner.getId()),
             actualPartner.getDigitalId()
         ).getBody();
+
+        var searchPartner = get(
+            baseRoutePathForGet,
+            HttpStatus.NOT_FOUND,
+            Error.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(searchPartner)
+            .isNotNull();
+
+        assertThat(searchPartner.getCode())
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+    }
+
+    @Test
+    void testDeletePartner() {
+        var createdPartner = post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidLegalEntityPartner(),
+            Partner.class
+        );
+        assertThat(createdPartner)
+            .isNotNull();
+        var actualPartner = get(
+            baseRoutePathForGet,
+            HttpStatus.OK,
+            Partner.class,
+            createdPartner.getDigitalId(),
+            createdPartner.getId()
+        );
+        assertThat(actualPartner)
+            .isNotNull()
+            .isEqualTo(createdPartner);
+
+        var partnerDelete = podamFactory.manufacturePojo(PartnerDelete.class);
+        partnerDelete.setDigitalId(actualPartner.getDigitalId());
+        partnerDelete.setPartnerIds(Set.of(actualPartner.getId()));
+
+        post(
+            "/partners/delete",
+            HttpStatus.NO_CONTENT,
+            partnerDelete
+        );
 
         var searchPartner = get(
             baseRoutePathForGet,

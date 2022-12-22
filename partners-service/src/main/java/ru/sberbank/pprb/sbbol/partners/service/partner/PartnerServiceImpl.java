@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
@@ -32,6 +33,7 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -190,18 +192,29 @@ public class PartnerServiceImpl implements PartnerService {
         return response;
     }
 
+    @Deprecated
     @Override
     @Transactional
-    public void deletePartners(String digitalId, List<String> ids, PartnerDelete partnerDelete) {
+    public void deletePartners(String digitalId, List<String> ids) {
+        deletePartners(digitalId, Set.copyOf(ids), null);
+    }
+
+    @Override
+    @Transactional
+    public void deletePartners(PartnerDelete partnerDelete) {
+        deletePartners(partnerDelete.getDigitalId(), partnerDelete.getPartnerIds(), partnerDelete.getFraudMetaData());
+    }
+
+    private void deletePartners(String digitalId, Set<String> ids, FraudMetaData fraudMetaData) {
         for (String partnerId : ids) {
             var partnerUuid = partnerMapper.mapUuid(partnerId);
             PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
                 .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerUuid));
-            if (nonNull(partnerDelete)) {
+            if (nonNull(fraudMetaData)) {
                 fraudServiceManager
                     .getService(FraudEventType.DELETE_PARTNER)
-                    .sendEvent(partnerDelete.getFraudMetaData(), foundPartner);
+                    .sendEvent(fraudMetaData, foundPartner);
             }
             partnerRepository.delete(foundPartner);
             addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
