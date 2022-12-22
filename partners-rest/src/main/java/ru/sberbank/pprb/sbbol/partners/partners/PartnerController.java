@@ -40,8 +40,14 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids, PartnerDelete partnerDelete) {
-        partnerService.deletePartners(digitalId, ids, partnerDelete);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+        partnerService.deletePartners(digitalId, ids);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deletePartners(PartnerDelete partnerDelete) {
+        partnerService.deletePartners(partnerDelete);
         return ResponseEntity.noContent().build();
     }
 

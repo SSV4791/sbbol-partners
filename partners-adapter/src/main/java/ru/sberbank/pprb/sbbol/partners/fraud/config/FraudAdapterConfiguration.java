@@ -1,9 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.fraud.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import com.googlecode.jsonrpc4j.ProxyUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,12 +17,12 @@ import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapterImpl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 
 @Configuration
 @EnableConfigurationProperties(FraudProperties.class)
 public class FraudAdapterConfiguration {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FraudAdapterConfiguration.class);
 
     private final FraudProperties fraudProperties;
 
@@ -28,25 +30,26 @@ public class FraudAdapterConfiguration {
         this.fraudProperties = fraudProperties;
     }
 
-    @ConditionalOnProperty(prefix = "fraud", name = "enabled")
     @Bean
-    JsonRpcHttpClient fraudJsonRpcHttpClient() throws MalformedURLException {
-        try {
-            URL fraudURL = new URL("http://" + fraudProperties.getUrl() + fraudProperties.getEndpoint());
-            return new JsonRpcHttpClient(fraudURL);
-        } catch (MalformedURLException e) {
-            LOG.error("Невозможно создать бин fraudJsonRpcHttpClient. Невалидный URL АС Агрегатора данных ФРОД-мониторинга: {}", fraudProperties);
-            return null;
-        }
+    ObjectMapper fraudObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.isEnabled(MapperFeature.DEFAULT_VIEW_INCLUSION);
+        return mapper;
     }
 
     @ConditionalOnProperty(prefix = "fraud", name = "enabled")
     @Bean
-    CounterPartyService fraudRpcProxy(@Autowired(required = false) JsonRpcHttpClient fraudRpcClient) {
-        if (fraudRpcClient == null) {
-            LOG.error("Невозможно создать бин fraudRpcProxy. В контексте отсутствует бин fraudJsonRpcHttpClient.");
-            return null;
-        }
+    JsonRpcHttpClient fraudJsonRpcHttpClient() throws MalformedURLException {
+        URL fraudURL = new URL("http://" + fraudProperties.getUrl() + fraudProperties.getEndpoint());
+        return new JsonRpcHttpClient(fraudObjectMapper(), fraudURL,  new HashMap<>());
+    }
+
+    @ConditionalOnProperty(prefix = "fraud", name = "enabled")
+    @Bean
+    CounterPartyService fraudRpcProxy(JsonRpcHttpClient fraudRpcClient) {
         return ProxyUtil.createClientProxy(
             fraudRpcClient.getClass().getClassLoader(),
             CounterPartyService.class,
@@ -55,6 +58,6 @@ public class FraudAdapterConfiguration {
 
     @Bean
     FraudAdapter fraudAdapter(@Autowired(required = false)  CounterPartyService fraudRpcProxy) {
-        return new FraudAdapterImpl(fraudRpcProxy, fraudProperties);
+        return new FraudAdapterImpl(fraudRpcProxy);
     }
 }
