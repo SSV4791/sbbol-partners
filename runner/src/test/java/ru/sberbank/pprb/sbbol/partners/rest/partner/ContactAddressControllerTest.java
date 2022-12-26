@@ -115,7 +115,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /partner/contact//address Создание контактного адреса")
+    @DisplayName("POST /partner/contact/address Создание контактного адреса")
     void testCreateContactAddress() {
         var contact = Allure.step("Подготовка тестового контакта", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
@@ -160,6 +160,36 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("Negative PUT /partner/contact/address редактирование ненайденного адреса")
+    void negativeTestUpdateDeletedAddress() {
+        var address = Allure.step("Подготовка валидного адреса", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            var address1 = createValidAddress(contact.getId(), contact.getDigitalId());
+            delete(
+                baseRoutePath + "/addresses" + "/{digitalId}",
+                HttpStatus.NO_CONTENT,
+                Map.of("ids", address1.getId()),
+                address1.getDigitalId()
+            ).getBody();
+            return address1;
+        });
+        var addressError = Allure.step("Выполнение PUT-запроса /partner/contact/address, код ответа 404", () -> put(
+            baseRoutePath + "/address",
+            HttpStatus.NOT_FOUND,
+            updateAddress(address),
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(addressError.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(addressError.getMessage())
+                .isEqualTo("Искомая сущность contact_address с id: " +
+                    address.getId() + ", digitalId: " + address.getDigitalId() + " не найдена");
+        });
+    }
+
+    @Test
     @DisplayName("Negative PUT /partner/contact/address Обновление версии контактного адреса")
     void negativeTestUpdateAddressVersion() {
         var address = Allure.step("Подготовка валидного адреса", () -> {
@@ -185,6 +215,32 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             assertThat(addressError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
                 .contains("Версия записи в базе данных " + (address.getVersion() - 1) +
                     " не равна версии записи в запросе version=" + version);
+        });
+    }
+
+    @Test
+    @DisplayName("Negative POST /partner/contact/addresses контрагент не найден")
+    void createAddressWithNotFoundPartner() {
+        var partner = Allure.step("Подготовка тестовых данных", () -> {
+            var createPartner = createValidPartner(randomAlphabetic(10));
+            delete(
+                "/partners/{digitalId}",
+                HttpStatus.NO_CONTENT,
+                Map.of("ids", createPartner.getId()),
+                createPartner.getDigitalId()
+            ).getBody();
+            return createPartner;
+        });
+        var response = Allure.step("Выполнение POST-запроса /partner/contact/address, код ответа 404", () -> post(
+            baseRoutePath + "/address",
+            HttpStatus.NOT_FOUND,
+            getValidPartnerAddress(partner.getId(), partner.getDigitalId()),
+            Error.class));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response).isNotNull();
+            assertThat(response.getCode()).isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(response.getMessage()).isEqualTo("Искомая сущность contact c digitalId: " +
+                partner.getDigitalId() + " не найдена");
         });
     }
 
