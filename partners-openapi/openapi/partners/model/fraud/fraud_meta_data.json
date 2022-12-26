@@ -32,7 +32,6 @@
     "userData",
     "deviceRequest",
     "channelIndicator",
-    "eventData",
-    "cryptoProfileData"
+    "eventData"
   ]
 }
