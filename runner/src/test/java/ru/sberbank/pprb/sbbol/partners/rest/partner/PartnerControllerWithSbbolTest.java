@@ -2,15 +2,18 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithSbbolConfiguration;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Map;
 import java.util.UUID;
@@ -22,6 +25,9 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_N
 class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner";
+
+    @Autowired
+    private PodamFactory podamFactory;
 
     @Test
     void testGetPartner() {
@@ -96,6 +102,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
             "/partners/{digitalId}",
             HttpStatus.NOT_FOUND,
             Map.of("ids", RandomStringUtils.randomAlphabetic(10)),
+            Map.of("Fraud-Meta-Data", podamFactory.manufacturePojo(FraudMetaData.class)),
             RandomStringUtils.randomAlphabetic(10)
         ).as(Error.class);
         assertThat(response)

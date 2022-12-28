@@ -25,6 +25,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -50,16 +51,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
@@ -1373,6 +1377,56 @@ class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testDeletePartner_whenInvalidFraudMetaDataHeader_thenBadRequest() {
+        var fraudMetaData = podamFactory.manufacturePojo(String.class);
+        var uuid = podamFactory.manufacturePojo(UUID.class);
+        var digitalId = podamFactory.manufacturePojo(String.class);
+        var error = delete(
+            "/partners/{digitalId}",
+            HttpStatus.BAD_REQUEST,
+            Map.of("ids", uuid.toString()),
+            Map.of("Fraud-Meta-Data", fraudMetaData),
+            digitalId
+        ).getBody().as(Error.class);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(FRAUD_MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getType())
+            .isEqualTo(BUSINESS);
+        assertThat(error.getMessage())
+            .isEqualTo(MessagesTranslator.toLocale("fraud.conversion_error_from_http_header"));
+    }
+
+    @Test
+    void testDeletePartner_whenInvalidFraudMetaData_thenBadRequest() {
+        var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+        fraudMetaData.getClientData().setDigitalId(null);
+        var uuid = podamFactory.manufacturePojo(UUID.class);
+        var digitalId = podamFactory.manufacturePojo(String.class);
+        var error = delete(
+            "/partners/{digitalId}",
+            HttpStatus.BAD_REQUEST,
+            Map.of("ids", uuid.toString()),
+            Map.of("Fraud-Meta-Data", fraudMetaData),
+            digitalId
+        ).getBody().as(Error.class);
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        assertThat(error.getType())
+            .isEqualTo(BUSINESS);
+        assertThat(error.getDescriptions())
+            .hasSize(1);
+        assertThat(error.getDescriptions().get(0).getField())
+            .isEqualTo("fraudMetaData.clientData.digitalId");
+        assertThat(error.getDescriptions().get(0).getMessage())
+            .contains("Поле обязательно для заполнения");
+
+    }
+
+    @Test
     void testDeprecatedDeletePartner() {
         var createdPartner = post(
             baseRoutePath,
@@ -1397,6 +1451,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             "/partners/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", actualPartner.getId()),
+            Map.of("Fraud-Meta-Data", podamFactory.manufacturePojo(FraudMetaData.class)),
             actualPartner.getDigitalId()
         ).getBody();
 

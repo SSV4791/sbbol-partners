@@ -52,7 +52,6 @@ paths:
       tags:
         - Partners
       description: Удаление Партнера
-      deprecated: true
       operationId: delete
       parameters:
         - name: digitalId
@@ -70,6 +69,12 @@ paths:
               type: string
               maxItems: 200
           description: Идентефикатор партнера
+        - name: Fraud-Meta-Data
+          in: header
+          required: true
+          schema:
+            $ref: 'model/fraud/fraud_meta_data.json'
+          description: Метаданные для ФРОД-мониторинга
       responses:
         204:
           description: Успешный ответ

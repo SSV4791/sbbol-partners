@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnersApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValid;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
@@ -39,9 +41,10 @@ public class PartnerController implements PartnersApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.savePartner(partner));
     }
 
+    @FraudValid
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
-        partnerService.deletePartners(digitalId, ids);
+    public ResponseEntity<Void> delete(String digitalId, List<String> ids, FraudMetaData fraudMetaData) {
+        partnerService.deletePartners(digitalId, ids, fraudMetaData);
         return ResponseEntity.noContent().build();
     }
 
