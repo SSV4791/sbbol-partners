@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
@@ -30,6 +31,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.exception.common.BaseException;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
@@ -158,7 +160,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FraudModelValidationException.class)
     protected ResponseEntity<Object> handleFraudModelValidationException(
-        FraudDeniedException ex,
+        FraudModelValidationException ex,
         HttpServletRequest httpRequest
     ) {
         LOG.error(FRAUD_MODEL_VALIDATION_ERROR, ex);
@@ -170,6 +172,34 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             Collections.emptyMap(),
             httpRequest.getRequestURL()
         );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<Object> handleConversionFailedException(
+        MethodArgumentTypeMismatchException ex,
+        HttpServletRequest httpRequest
+    ) {
+        if (ex.getRequiredType() == FraudMetaData.class) {
+            LOG.error(ex.getCause().getMessage(), ex);
+            return buildResponsesEntity(
+                HttpStatus.BAD_REQUEST,
+                BUSINESS,
+                FRAUD_MODEL_VALIDATION_EXCEPTION.getValue(),
+                MessagesTranslator.toLocale("fraud.conversion_error_from_http_header"),
+                Collections.emptyMap(),
+                httpRequest.getRequestURL()
+            );
+        } else {
+            LOG.error("При выполнении операции произошла ошибка", ex);
+            return buildResponsesEntity(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                null,
+                EXCEPTION.getValue(),
+                ex.getLocalizedMessage(),
+                Collections.emptyMap(),
+                httpRequest.getRequestURL()
+            );
+        }
     }
 
     @ExceptionHandler(Exception.class)

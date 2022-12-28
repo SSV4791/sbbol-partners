@@ -10,6 +10,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyAsynchReplicationAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
+import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValidatorAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.config.props.ReplicationKafkaProducerProperties;
 import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapter;
@@ -82,11 +83,17 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Validator;
 import java.util.List;
 
 @Configuration
 @EnableAspectJAutoProxy
 public class PartnerServiceConfiguration {
+
+    @Bean
+    FraudValidatorAspect fraudValidatorAspect (Validator validator) {
+        return new FraudValidatorAspect(validator);
+    }
 
     @Bean
     LoggerAspect loggedAspect() {

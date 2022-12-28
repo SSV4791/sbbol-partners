@@ -192,13 +192,13 @@ public class PartnerServiceImpl implements PartnerService {
         return response;
     }
 
-    @Deprecated
     @Override
     @Transactional
-    public void deletePartners(String digitalId, List<String> ids) {
-        deletePartners(digitalId, Set.copyOf(ids), null);
+    public void deletePartners(String digitalId, List<String> ids, FraudMetaData fraudMetaData) {
+        deletePartners(digitalId, Set.copyOf(ids), fraudMetaData);
     }
 
+    @Deprecated
     @Override
     @Transactional
     public void deletePartners(PartnerDelete partnerDelete) {
