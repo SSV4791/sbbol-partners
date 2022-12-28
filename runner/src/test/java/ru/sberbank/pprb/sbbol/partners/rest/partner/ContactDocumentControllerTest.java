@@ -23,6 +23,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -170,13 +171,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isNotNull();
             assertThat(response.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            assertThat(response.getDescriptions()
-                .get(0).getField())
-                .isEqualTo("digitalId");
-            assertThat(response.getDescriptions()
-                .get(0).getMessage())
-                .asList()
-                .contains("Поле обязательно для заполнения");
+            Optional<Descriptions> description = response.getDescriptions().stream()
+                .filter(value -> value.getField().equals("digitalId")).findFirst();
+            assertThat(description.isPresent()).isTrue();
+            assertThat(description.get().getMessage()).contains("Поле обязательно для заполнения");
         });
 
         DocumentsFilter filter2 = Allure.step("Формирование списка документов (digitalId пуст)", () -> new DocumentsFilter()
@@ -196,13 +194,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isNotNull();
             assertThat(response2.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            assertThat(response2.getDescriptions()
-                .get(0).getField())
-                .isEqualTo("digitalId");
-            assertThat(response2.getDescriptions()
-                .get(0).getMessage())
-                .asList()
-                .contains("Поле обязательно для заполнения");
+            Optional<Descriptions> description2 = response2.getDescriptions().stream()
+                .filter(value -> value.getField().equals("digitalId")).findFirst();
+            assertThat(description2.isPresent()).isTrue();
+            assertThat(description2.get().getMessage()).contains("Поле обязательно для заполнения");
         });
     }
 
@@ -228,13 +223,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isNotNull();
             assertThat(response.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            assertThat(response.getDescriptions()
-                .get(0).getField())
-                .isEqualTo("pagination");
-            assertThat(response.getDescriptions()
-                .get(0).getMessage())
-                .asList()
-                .contains("Поле обязательно для заполнения");
+            Optional<Descriptions> description = response.getDescriptions().stream()
+                .filter(value -> value.getField().equals("pagination")).findFirst();
+            assertThat(description.isPresent()).isTrue();
+            assertThat(description.get().getMessage()).contains("Поле обязательно для заполнения");
         });
 
         DocumentsFilter filter2 = Allure.step("Подготовка фильтра (count отсутсвует в теле запроса)", () -> new DocumentsFilter()
@@ -252,13 +244,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isNotNull();
             assertThat(response2.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            assertThat(response2.getDescriptions()
-                .get(0).getField())
-                .isEqualTo("pagination.count");
-            assertThat(response2.getDescriptions()
-                .get(0).getMessage())
-                .asList()
-                .contains("Поле обязательно для заполнения");
+            Optional<Descriptions> description2 = response2.getDescriptions().stream()
+                .filter(value -> value.getField().equals("pagination.count")).findFirst();
+            assertThat(description2.isPresent()).isTrue();
+            assertThat(description2.get().getMessage()).contains("Поле обязательно для заполнения");
         });
 
         DocumentsFilter filter3 = Allure.step("Подготовка фильтра (offset отсутсвует в теле запроса)", () -> new DocumentsFilter()
@@ -276,13 +265,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isNotNull();
             assertThat(response3.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            assertThat(response3.getDescriptions()
-                .get(0).getField())
-                .isEqualTo("pagination.offset");
-            assertThat(response3.getDescriptions()
-                .get(0).getMessage())
-                .asList()
-                .contains("Поле обязательно для заполнения");
+            Optional<Descriptions> description3 = response3.getDescriptions().stream()
+                .filter(value -> value.getField().equals("pagination.offset")).findFirst();
+            assertThat(description3.isPresent()).isTrue();
+            assertThat(description3.get().getMessage()).contains("Поле обязательно для заполнения");
         });
     }
 

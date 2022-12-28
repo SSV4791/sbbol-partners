@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.Allure;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,209 +37,277 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
+    @DisplayName("GET /partner/contacts/{digitalId}/{id} Получение адреса")
     void testGetContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var actualContact =
-            get(
-                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
-                HttpStatus.OK,
-                Contact.class,
-                contact.getDigitalId(), contact.getId()
-            );
-        assertThat(actualContact)
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var actualContact = Allure.step("Выполнение get-запроса /partner/contacts/{digitalId}/{id}, код ответа 200", () -> get(
+            baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Contact.class,
+            contact.getDigitalId(), contact.getId()
+        ));
+        Allure.step("Проверка корректности ответа", () -> assertThat(actualContact)
             .isNotNull()
-            .isEqualTo(contact);
+            .isEqualTo(contact));
     }
 
     @Test
-    void testNegativeViewContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact4 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact5 = createValidContact(partner.getId(), partner.getDigitalId());
-
-        var filter1 = new ContactsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerId(partner.getId());
-        var response1 = post(
+    @DisplayName("NEG POST /partner/contacts/view без параметра pagination")
+    void testNegativeViewContactWithoutPagination() {
+        var filter = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return new ContactsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerId(partner.getId());
+        });
+        var response = Allure.step("Выполнение post-запроса /partner/contacts/view, код ответа 400", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.BAD_REQUEST,
-            filter1,
+            filter,
             Error.class
-        );
-        assertThat(response1)
-            .isNotNull();
-        assertThat(response1.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
+    }
 
-        var filter2 = new ContactsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerId(partner.getId())
-            .ids(List.of(contact4.getId()))
-            .pagination(new Pagination()
-                .offset(0));
-        var response2 = post(
+    @Test
+    @DisplayName("NEG POST /partner/contacts/view без параметра pagination.count")
+    void testNegativeViewContactWithoutPaginationCount() {
+        var filter = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return new ContactsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerId(partner.getId())
+                .ids(List.of(contact.getId()))
+                .pagination(new Pagination()
+                    .offset(0));
+        });
+        var response = Allure.step("Выполнение post-запроса /partner/contacts/view, код ответа 400", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.BAD_REQUEST,
-            filter2,
+            filter,
             Error.class
-        );
-        assertThat(response2)
-            .isNotNull();
-        assertThat(response1.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
+    }
 
-        var filter3 = new ContactsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerId(partner.getId())
-            .ids(
-                List.of(
-                    contact1.getId(),
-                    contact2.getId(),
-                    contact3.getId(),
-                    contact4.getId(),
-                    contact5.getId()
+    @Test
+    @DisplayName("NEG POST /partner/contacts/view без параметра pagination.offset")
+    void testNegativeViewContactWithoutPaginationOffset() {
+        var filter = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact4 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact5 = createValidContact(partner.getId(), partner.getDigitalId());
+
+            return new ContactsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerId(partner.getId())
+                .ids(
+                    List.of(
+                        contact1.getId(),
+                        contact2.getId(),
+                        contact3.getId(),
+                        contact4.getId(),
+                        contact5.getId()
+                    )
                 )
-            )
-            .pagination(new Pagination()
-                .count(4));
-        var response3 = post(
+                .pagination(new Pagination()
+                    .count(4));
+        });
+        var response = Allure.step("Выполнение post-запроса /partner/contacts/view, код ответа 400", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.BAD_REQUEST,
-            filter3,
+            filter,
             Error.class
-        );
-        assertThat(response3)
-            .isNotNull();
-        assertThat(response1.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
     }
 
     @Test
-    void testViewContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact4 = createValidContact(partner.getId(), partner.getDigitalId());
-        var contact5 = createValidContact(partner.getId(), partner.getDigitalId());
-
-        var filter1 = new ContactsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerId(partner.getId())
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0));
-        var response1 = post(
+    @DisplayName("POST /partner/contacts/view c пустым списком")
+    void testViewContactWithEmptyList() {
+        var filter = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return new ContactsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerId(partner.getId())
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0));
+        });
+        var response = Allure.step("Выполнение post-запроса /partner/contacts/view, код ответа 200", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.OK,
-            filter1,
+            filter,
             ContactsResponse.class
-        );
-        assertThat(response1)
-            .isNotNull();
-        assertThat(response1.getContacts().size())
-            .isEqualTo(4);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getPagination().getCount())
+                .isEqualTo(4);
+            assertThat(response.getPagination().getHasNextPage())
+                .isEqualTo(Boolean.FALSE);
+        });
+    }
 
-        var filter2 = new ContactsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerId(partner.getId())
-            .ids(List.of(contact4.getId()))
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0));
-        var response2 = post(
+    @Test
+    @DisplayName("POST /partner/contacts/view с единственным контактом")
+    void testViewContactWithOnlyContact() {
+        var filter = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return new ContactsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerId(partner.getId())
+                .ids(List.of(contact.getId()))
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0));
+        });
+        var response = Allure.step("Выполнение post-запроса /partner/contacts/view, код ответа 200", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.OK,
-            filter2,
+            filter,
             ContactsResponse.class
-        );
-        assertThat(response2)
-            .isNotNull();
-        assertThat(response2.getContacts().size())
-            .isEqualTo(1);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getContacts().size())
+                .isEqualTo(1);
+        });
+    }
 
-        var filter3 = new ContactsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerId(partner.getId())
-            .ids(
-                List.of(
-                    contact1.getId(),
-                    contact2.getId(),
-                    contact3.getId(),
-                    contact4.getId(),
-                    contact5.getId()
+    @Test
+    @DisplayName("POST /partner/contacts/view несколько контактов")
+    void testViewContactWithSeveralContacts() {
+        var filter = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact2 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact3 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact4 = createValidContact(partner.getId(), partner.getDigitalId());
+            var contact5 = createValidContact(partner.getId(), partner.getDigitalId());
+            return new ContactsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerId(partner.getId())
+                .ids(
+                    List.of(
+                        contact1.getId(),
+                        contact2.getId(),
+                        contact3.getId(),
+                        contact4.getId(),
+                        contact5.getId()
+                    )
                 )
-            )
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0));
-        var response3 = post(
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0));
+        });
+        var response = Allure.step("Выполнение post-запроса /partner/contacts/view, код ответа 200", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.OK,
-            filter3,
+            filter,
             ContactsResponse.class
-        );
-        assertThat(response3)
-            .isNotNull();
-        assertThat(response3.getContacts().size())
-            .isEqualTo(4);
-        assertThat(response3.getPagination().getHasNextPage())
-            .isEqualTo(Boolean.TRUE);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getContacts().size())
+                .isEqualTo(4);
+            assertThat(response.getPagination().getHasNextPage())
+                .isEqualTo(Boolean.TRUE);
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/contact создание контакта")
     void testCreateContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var expected = getValidContact(partner.getId(), partner.getDigitalId());
-        var contact = createValidContact(expected);
-        assertThat(contact)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "id",
-                "version",
-                "phones",
-                "emails"
-            )
-            .isEqualTo(expected);
+        var expected = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return getValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var contact = Allure.step("Выполнение post-запроса /partner/contact, код ответа 200",
+            () -> createValidContact(expected));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(contact)
+                .usingRecursiveComparison()
+                .ignoringFields(
+                    "id",
+                    "version",
+                    "phones",
+                    "emails"
+                )
+                .isEqualTo(expected);
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/contact создание контакта с пустыми email и phone")
     void testCreateContact2() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var expected = getValidContact(partner.getId(), partner.getDigitalId());
-        expected.setEmails(null);
-        expected.setPhones(null);
-        var contact = createValidContact(expected);
-        assertThat(contact)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "id",
-                "version",
-                "phones",
-                "emails"
-            )
-            .isEqualTo(expected);
+        var expected = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var expected1 = getValidContact(partner.getId(), partner.getDigitalId());
+            expected1.setEmails(null);
+            expected1.setPhones(null);
+            return expected1;
+        });
+        var contact = Allure.step("Выполнение post-запроса /partner/contact, код ответа 200",
+            () -> createValidContact(expected));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(contact)
+                .usingRecursiveComparison()
+                .ignoringFields(
+                    "id",
+                    "version",
+                    "phones",
+                    "emails"
+                )
+                .isEqualTo(expected);
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/contact редактирование контакта с невалидным phone")
     void testCreateInvalidContactButValidLength() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var expected = getValidContact(partner.getId(), partner.getDigitalId());
-        var contact = createValidContact(expected);
-        contact.getPhones()
-            .forEach(value -> value.setPhone("ABC" + randomAlphabetic(10)));
-        var createContact = put(
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var expected = getValidContact(partner.getId(), partner.getDigitalId());
+            var contact1 = createValidContact(expected);
+            contact1.getPhones()
+                .forEach(value -> value.setPhone("ABC" + randomAlphabetic(10)));
+            return contact1;
+        });
+        var createContact = Allure.step("Выполнение put-запроса /partner/contact, код ответа 400", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
             contact,
             Error.class
-        );
-        assertThat(createContact)
-            .isNotNull();
+        ));
+        Allure.step("Проверка корректности ответа", () -> assertThat(createContact)
+            .isNotNull());
     }
 
     @Test
@@ -521,9 +590,60 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             );
         assertThat(searchContact)
             .isNotNull();
-
         assertThat(searchContact.getCode())
             .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+    }
+
+    @Test
+    @DisplayName("NEG DELETE /partner/contacts/{digitalId} ненайденный документ")
+    void testNegativeDeleteContact() {
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
+            delete(
+                baseRoutePath + "/contacts" + "/{digitalId}",
+                HttpStatus.NO_CONTENT,
+                Map.of("ids", contact1.getId()),
+                contact1.getDigitalId()
+            );
+            return contact1;
+        });
+        var deleteContact = Allure.step("Выполнение delete-запроса /partner/contacts/{digitalId}, код ответа 404", () ->
+            delete(
+                baseRoutePath + "/contacts" + "/{digitalId}",
+                HttpStatus.NOT_FOUND,
+                Map.of("ids", contact.getId()),
+                contact.getDigitalId()
+            ));
+        Allure.step("Проверка корректности ответа", () -> assertThat(deleteContact).isNotNull());
+    }
+
+    @Test
+    @DisplayName("NEG PUT /partner/contact ненайденный документ")
+    void testUpdateDeletedContact() {
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact1 = createValidContact(partner.getId(), partner.getDigitalId());
+            delete(
+                baseRoutePath + "/contacts" + "/{digitalId}",
+                HttpStatus.NO_CONTENT,
+                Map.of("ids", contact1.getId()),
+                contact1.getDigitalId()
+            ).getBody();
+            return contact1;
+        });
+        var updateContact = Allure.step("Выполнение put-запроса /partner/contact, код ответа 404", () -> put(
+            baseRoutePath + "/contact",
+            HttpStatus.NOT_FOUND,
+            updateContact(contact),
+            Error.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(updateContact).isNotNull();
+            assertThat(updateContact.getCode()).isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(updateContact.getMessage()).isEqualTo("Искомая сущность contact с id: " +
+                contact.getId() + ", digitalId: " + contact.getDigitalId() + " не найдена");
+        });
     }
 
     public static ContactCreate getValidContact(String partnerUuid, String digitalId) {
