@@ -26,9 +26,7 @@ repositories {
 }
 
 dependencies {
-    implementation("ru.sbt.meta:meta-gradle-plugin:1.5.0") {
-        exclude("org.glassfish.ha", "ha-api")
-    }
+    implementation("ru.sbt.meta:meta-gradle-plugin:2.0.0")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.2.0")
     implementation("ru.sbrf.build.gradle.dcb-test-plugin:gradle-plugin:4.1.3")
 }
