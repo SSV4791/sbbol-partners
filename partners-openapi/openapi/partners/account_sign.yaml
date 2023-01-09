@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners account sign
-  version: 1.0.4
+  version: 1.0.5
   description: OpenAPI Specification for partner account sign
 
 servers:

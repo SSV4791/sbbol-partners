@@ -47,12 +47,12 @@ meta {
     nexusUrl = null
     nexusUser = nexusLogin
     nexusPassword = nexusPassword
-    version = "latest.release"
+    version = "latest.integration"
     componentId = "9655c0f1-74bf-11eb-6742-005056b72594"
     ext {
         set("url", "https://meta.sigma.sbrf.ru")
         set(
-            "openApiSpecs", mutableListOf(
+            "openApiSpecs", listOf(
                 "partners-openapi/openapi/renters/renter.yaml",
                 "partners-openapi/openapi/partners/account.yaml",
                 "partners-openapi/openapi/partners/account_sign.yaml",
@@ -71,7 +71,5 @@ meta {
                 "partners-openapi/openapi/counterparties/counterparty.yaml",
             )
         )
-        set("analyzeJava", false)
-        set("failBuildOnError", true)
     }
 }

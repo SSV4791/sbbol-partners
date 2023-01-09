@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for contact documents
-  version: 1.0.2
+  version: 1.0.5
   description: OpenAPI Specification for contact document
 
 servers:
