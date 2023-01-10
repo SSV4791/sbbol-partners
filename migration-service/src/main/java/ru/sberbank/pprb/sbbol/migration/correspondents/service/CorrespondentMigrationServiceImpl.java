@@ -10,6 +10,8 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMa
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
@@ -50,7 +52,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         AccountEntity savedAccount;
         for (MigrationCorrespondentCandidate correspondent : correspondents) {
             try {
-                savedAccount = saveOrUpdate(digitalId, correspondent);
+                savedAccount = saveOrUpdate(digitalId, correspondent, true);
             } catch (Exception ex) {
                 LOGGER.error(
                     "В процессе миграции контрагента с sbbolReplicationGuid: {}, произошла ошибка. Причина: {}",
@@ -78,7 +80,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     @Override
     @Transactional
     public MigrationCorrespondentCandidate save(String digitalId, MigrationCorrespondentCandidate correspondent) {
-        var accountEntity = saveOrUpdate(digitalId, correspondent);
+        var accountEntity = saveOrUpdate(digitalId, correspondent, false);
         var partnerEntity = partnerRepository.getByDigitalIdAndUuid(digitalId, accountEntity.getPartnerUuid());
         if (partnerEntity.isEmpty()) {
             throw new EntryNotFoundException("partner", digitalId, accountEntity.getPartnerUuid());
@@ -103,12 +105,13 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
 
     }
 
-    private AccountEntity saveOrUpdate(String digitalId, MigrationCorrespondentCandidate correspondent) {
+    private AccountEntity saveOrUpdate(String digitalId, MigrationCorrespondentCandidate correspondent, boolean migration) {
         var pprbGuid = correspondent.getPprbGuid();
         if (pprbGuid != null) {
             var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(pprbGuid));
             if (foundAccount.isPresent()) {
                 var account = foundAccount.get();
+                checkAccountForSign(account, migration);
                 var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, account.getPartnerUuid());
                 if (foundPartner.isPresent()) {
                     var partner = foundPartner.get();
@@ -140,6 +143,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                     migrationPartnerMapper.toAccountEntity(digitalId, searchPartner.getUuid(), correspondent);
                 savedAccount = accountRepository.save(accountEntity);
             } else {
+                checkAccountForSign(foundAccount, migration);
                 migrationPartnerMapper.updateAccountEntity(digitalId, searchPartner.getUuid(), correspondent, foundAccount);
                 savedAccount = accountRepository.save(foundAccount);
             }
@@ -147,5 +151,14 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             partnerRepository.save(searchPartner);
         }
         return savedAccount;
+    }
+
+    private void checkAccountForSign(AccountEntity foundAccount, boolean migration) {
+        if (migration) {
+            return;
+        }
+        if (AccountStateType.SIGNED == foundAccount.getState()) {
+            throw new AccountAlreadySignedException(foundAccount.getAccount());
+        }
     }
 }
