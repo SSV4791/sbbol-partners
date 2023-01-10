@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
-import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
@@ -28,8 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.qameta.allure.Allure.step;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
@@ -47,7 +48,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут ЖКУ = true")
     void testViewFilter_whenGkuAttributeIsDefinedAndIsTrue() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -62,13 +63,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -79,7 +80,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут ЖКУ = false")
     void testViewFilter_whenGkuAttributeIsDefinedAndIsFalse() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -94,13 +95,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -113,7 +114,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут pagination = null")
     void testNegativeViewFilter_whenPaginationIsNull() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
@@ -123,12 +124,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isHousingServicesProvider(false)
                 .pagination(null);
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 400", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 400", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.BAD_REQUEST,
             accountsFilter,
             Error.class));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             Descriptions descriptions = new Descriptions()
                 .field("pagination")
                 .message(
@@ -146,7 +147,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view у pagination аттрибуты count и offset равны null")
     void testNegativeViewFilter_whenPaginationCountAndOffsetIsNull() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
@@ -158,12 +159,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(null)
                     .offset(null));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 400", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 400", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.BAD_REQUEST,
             accountsFilter,
             Error.class));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             List<Descriptions> errorTexts = List.of(
                 new Descriptions()
                     .field("pagination.count")
@@ -189,7 +190,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с корректным значением Наименование партнера")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedPartnerName() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -204,13 +205,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -223,7 +224,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с некорректным значением Наименование партнера")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsDontMatchedPartnerName() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             var partnerWithoutAccount = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
@@ -239,13 +240,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -258,7 +259,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с корректным значением ИНН")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedInn() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -273,13 +274,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -292,28 +293,28 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с некорректным значением ИНН")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedInn() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        List<String> account = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
-        }
-        return new AccountsFilter()
-            .digitalId(partner.getDigitalId())
-            .partnerIds(List.of(partner.getId()))
-            .accountIds(account)
-            .partnerSearch(getValidInnNumber(LegalForm.LEGAL_ENTITY))
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0));
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            List<String> account = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+            }
+            return new AccountsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerIds(List.of(partner.getId()))
+                .accountIds(account)
+                .partnerSearch(getValidInnNumber(LegalForm.LEGAL_ENTITY))
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -326,7 +327,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с корректным значением КПП")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedKpp() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -341,13 +342,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -360,7 +361,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с некорректным значением КПП")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedKpp() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -375,13 +376,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -394,7 +395,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch = No matched pattern")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsNotMatchedPattern() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -409,13 +410,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -428,7 +429,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch содержит корректные данные")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedAccount() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -445,13 +446,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -464,7 +465,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch содержит часть счета")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsPartAccount() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -481,13 +482,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -500,7 +501,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с некорректным счетом")
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsIncorrectAccountNumber() {
-        var accountsFilter = Allure.step("Подготовка тестовых данных", () -> {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -515,13 +516,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -534,7 +535,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view с 5 подписанными счетами")
     void testViewFilterSignFiveAccount() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -552,13 +553,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -574,7 +575,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view с неподписанными счетами")
     void testViewFilterNotSignAccount() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
@@ -591,13 +592,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(5)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -613,7 +614,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view с 4 подписанными счетами")
     void testViewFilterSignFourAccount() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             List<String> account = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
@@ -630,13 +631,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(5)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -652,17 +653,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("GET /partner/{digitalId}/{id} получение счета")
     void testGetAccount() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var actualAccount = Allure.step("Выполнение get-запроса /partner/{digitalId}/{id}, код ответа 200", () -> get(
+        var actualAccount = step("Выполнение get-запроса /partner/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(actualAccount.getComment())
                 .isEqualTo("Это тестовый комментарий");
             assertThat(actualAccount)
@@ -674,7 +675,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view просмотр счета")
     void testViewAccount() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             for (int i = 0; i < 5; i++) {
                 createValidAccount(partner.getId(), partner.getDigitalId());
@@ -686,13 +687,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -705,7 +706,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view просмотр списка счетов с 2-мя accountId")
     void testViewAccountWithTwoAccountId() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             var acc1 = createValidAccount(partner.getId(), partner.getDigitalId());
             var acc2 = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -720,13 +721,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -740,7 +741,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view список счетов со всеми accountId")
     void testViewAccountWithAllAccountsId() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             var account1 = createValidAccount(partner.getId(), partner.getDigitalId());
             var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -755,13 +756,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -774,7 +775,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view список найденного счета")
     void testViewSearchOneAccount() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             var account = createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
@@ -789,13 +790,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(1)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -806,7 +807,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view список всех найденных счетов")
     void testViewSearchAllAccounts() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
@@ -821,13 +822,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -838,7 +839,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view поиск по полному значению счета")
     void testViewSearchAccountWithFullNumber() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             var account = createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
@@ -853,13 +854,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
@@ -870,7 +871,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts/view бюджетный счет")
     void testViewBudgetAccount() {
-        var filter = Allure.step("Подготовка тестовых данных", () -> {
+        var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
@@ -885,13 +886,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
-        var response1 = Allure.step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+        var response1 = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
             AccountsResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response1)
                 .isNotNull();
             assertThat(response1.getAccounts())
@@ -902,12 +903,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts создание счета")
     void testCreateAccount() {
-        var expected = Allure.step("Подготовка тестовых данных", () -> {
+        var expected = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return getValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var account = Allure.step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createValidAccount(expected));
-        Allure.step("Проверка корректности ответа", () -> assertThat(account)
+        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createValidAccount(expected));
+        step("Проверка корректности ответа", () -> assertThat(account)
             .usingRecursiveComparison()
             .ignoringFields(
                 "uuid",
@@ -921,19 +922,19 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account создание счета, проверка на уникальность")
     void testCreateAccount_unique() {
-        var expected_account = Allure.step("Подготовка тестовых данных", () -> {
+        var expected_account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             var expected = getValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(expected);
             return expected;
         });
-        var error = Allure.step("Выполнение post-запроса /partner/account, код ответа 400", () -> post(
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () -> post(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             expected_account,
             Error.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
@@ -971,9 +972,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts с пустыми счетом и корр. счетом")
     void testCreateWithEmptyAccountAndBankAccount() {
-        var partner = Allure.step("Подготовка тестовых данных", () -> createValidPartner());
-        var account = Allure.step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
-        Allure.step("Проверка корректности ответа", () ->
+        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
+        step("Проверка корректности ответа", () ->
             assertThat(account)
                 .isNotNull());
     }
@@ -981,9 +982,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts с счетом и корр. счетомБ равные null")
     void testCreateWithNullAccountAndBankAccount() {
-        var partner = Allure.step("Подготовка тестовых данных", () -> createValidPartner());
-        var account = Allure.step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
-        Allure.step("Проверка корректности ответа", () ->
+        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
+        step("Проверка корректности ответа", () ->
             assertThat(account)
                 .isNotNull());
     }
@@ -991,7 +992,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testCreateAccount_whenBankIsNull_thenBadRequest() {
         var partner = createValidPartner();
-        var  error = createAccountEntityWhenBankIsNull(partner.getId(), partner.getDigitalId());
+        var error = createAccountEntityWhenBankIsNull(partner.getId(), partner.getDigitalId());
 
         assertThat(error)
             .isNotNull();
@@ -1010,7 +1011,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testCreateAccount_whenBankNameIsNull_thenBadRequest() {
         var partner = createValidPartner();
-        var  error = createAccountEntityWhenBankNameIsNull(partner.getId(), partner.getDigitalId());
+        var error = createAccountEntityWhenBankNameIsNull(partner.getId(), partner.getDigitalId());
 
         assertThat(error)
             .isNotNull();
@@ -1029,7 +1030,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testCreateAccount_whenBankNameIsEmpty_thenBadRequest() {
         var partner = createValidPartner();
-        var  error = createAccountEntityWhenBankNameIsEmpty(partner.getId(), partner.getDigitalId());
+        var error = createAccountEntityWhenBankNameIsEmpty(partner.getId(), partner.getDigitalId());
 
         assertThat(error)
             .isNotNull();
@@ -1048,7 +1049,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testCreateAccount_whenBankBicIsNull_thenBadRequest() {
         var partner = createValidPartner();
-        var  error = createAccountEntityWhenBankBicIsNull(partner.getId(), partner.getDigitalId());
+        var error = createAccountEntityWhenBankBicIsNull(partner.getId(), partner.getDigitalId());
 
         assertThat(error)
             .isNotNull();
@@ -1067,7 +1068,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     void testCreateAccount_whenBankBicIsEmpty_thenBadRequest() {
         var partner = createValidPartner();
-        var  error = createAccountEntityWhenBankBicIsEmpty(partner.getId(), partner.getDigitalId());
+        var error = createAccountEntityWhenBankBicIsEmpty(partner.getId(), partner.getDigitalId());
 
         assertThat(error)
             .isNotNull();
@@ -1086,14 +1087,14 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts счет с валютой USD")
     void testCreateUsdAccount() {
-        var expected_account = Allure.step("Подготовка тестовых данных", () -> {
+        var expected_account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             var expected = getValidAccount(partner.getId(), partner.getDigitalId());
             expected.setAccount("40817840100000000001");
             return expected;
         });
-        var error = Allure.step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected_account));
-        Allure.step("Проверка корректности ответа", () -> {
+        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected_account));
+        step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
@@ -1112,14 +1113,14 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts счет с невалидной валютой")
     void testCreateBudgetAccount_whenInvalidCodeCurrency() {
-        var expected = Allure.step("Подготовка тестовых данных", () -> {
+        var expected = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
             expectedAccount.setAccount("00817810100000000001");
             return expectedAccount;
         });
-        var error = Allure.step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected));
-        Allure.step("Проверка корректности ответа", () -> {
+        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected));
+        step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
@@ -1138,14 +1139,14 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts невалидный бюджетный счет")
     void testCreateBudgetAccount_whenInvalidBalance() {
-        var expected = Allure.step("Подготовка тестовых данных", () -> {
+        var expected = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             var expectedAccount = getValidBudgetAccount(partner.getId(), partner.getDigitalId());
             expectedAccount.setAccount("10817643100000000001");
             return expectedAccount;
         });
-        var error = Allure.step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected));
-        Allure.step("Проверка корректности ответа", () -> {
+        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected));
+        step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
@@ -1164,12 +1165,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts валидный бюджетный счет")
     void testCreateValidBudgetAccount() {
-        var expected = Allure.step("Подготовка тестовых данных", () -> {
+        var expected = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
-            var expectedAccount = Allure.step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> getValidBudgetAccount(partner.getId(), partner.getDigitalId()));
-            return expectedAccount;
+            return step("Выполнение post-запроса /partner/accounts, код ответа 201", () ->
+                getValidBudgetAccount(partner.getId(), partner.getDigitalId()));
         });
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             var actualAccount = createValidAccount(expected);
             assertThat(actualAccount)
                 .isNotNull();
@@ -1179,17 +1180,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts редактирование счета")
     void testUpdateAccount() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var updateAccount = Allure.step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
+        var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount(account),
             Account.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
             assertThat(updateAccount.getComment())
@@ -1332,17 +1333,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts пустые счет и корр. счет")
     void testUpdateAccountEntityWithEmptyAccountAndBankAccount() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var updateAccount = Allure.step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
+        var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccountEntityWithEmptyAccountAndBankAccount(account),
             Account.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
             assertThat(updateAccount.getAccount())
@@ -1384,17 +1385,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts счет и корр. счет равны null")
     void testUpdateAccountEntityWithNullAccountAndBankAccount() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var updateAccount = Allure.step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
+        var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccountEntityWithNullAccountAndBankAccount(account),
             Account.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
             assertThat(updateAccount.getAccount())
@@ -1407,7 +1408,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts проверка на уникальность")
     void testUpdateAccount_unique() {
-        var expected = Allure.step("Подготовка тестовых данных", () -> {
+        var expected = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             var account1 = createValidAccount(partner.getId(), partner.getDigitalId());
             var account2 = createValidAccount(partner.getId(), partner.getDigitalId());
@@ -1420,13 +1421,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .bankAccount(account1.getBank().getBankAccount().getBankAccount());
             return updateAccount;
         });
-        var error = Allure.step("Выполнение put-запроса /partner/accounts, код ответа 400", () -> put(
+        var error = step("Выполнение put-запроса /partner/accounts, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             expected,
             Error.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
@@ -1437,12 +1438,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts негативные сценарии")
     void testNegativeUpdateAccount() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
 
-        var updateAccount = Allure.step("Выполнение put-запроса /partner/accounts(БИК банка и корр. счет пустые), код ответа 400", () -> {
+        var updateAccount = step("Выполнение put-запроса /partner/accounts(БИК банка и корр. счет пустые), код ответа 400", () -> {
             var acc = updateAccount(account)
                 .bank(account.getBank()
                     .bic("")
@@ -1455,7 +1456,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 Error.class
             );
         });
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
             assertThat(updateAccount.getCode())
@@ -1465,7 +1466,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
         });
 
-        var updateAccount2 = Allure.step("Выполнение put-запроса /partner/accounts(некорректный счет), код ответа 400", () -> {
+        var updateAccount2 = step("Выполнение put-запроса /partner/accounts(некорректный счет), код ответа 400", () -> {
             var acc2 = updateAccount(account)
                 .account("12345678901234567890");
             return put(
@@ -1475,13 +1476,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 Error.class
             );
         });
-        Allure.step("Проверка корректности ответа", () -> assertThat(updateAccount2.getCode())
+        step("Проверка корректности ответа", () -> assertThat(updateAccount2.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue()));
 
-        var updateAccount3 = Allure.step("Выполнение put-запроса /partner/accounts(не найден БИК), код ответа 400", () -> {
+        var updateAccount3 = step("Выполнение put-запроса /partner/accounts(не найден БИК), код ответа 400", () -> {
             var acc3 = updateAccount(account)
-            .bank(account.getBank()
-                .bic("044525002"));
+                .bank(account.getBank()
+                    .bic("044525002"));
             return put(
                 baseRoutePath + "/account",
                 HttpStatus.BAD_REQUEST,
@@ -1489,10 +1490,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 Error.class
             );
         });
-        Allure.step("Проверка корректности ответа", () -> assertThat(updateAccount3.getCode())
+        step("Проверка корректности ответа", () -> assertThat(updateAccount3.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue()));
 
-        var updateAccount4 = Allure.step("Выполнение put-запроса /partner/accounts(некорректный БИК), код ответа 400", () -> {
+        var updateAccount4 = step("Выполнение put-запроса /partner/accounts(некорректный БИК), код ответа 400", () -> {
             var acc4 = updateAccount(account)
                 .bank(account.getBank()
                     .bic("ABC123456789"));
@@ -1503,7 +1504,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 Error.class
             );
         });
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(updateAccount4.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             AssertionsForClassTypes.assertThat(updateAccount4.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
@@ -1516,11 +1517,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts позитивные сценарии")
     void testPositiveUpdateAccount() {
-        var partner = Allure.step("Создание партнера", () -> createValidPartner());
-        var account = Allure.step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        var account2 = Allure.step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        var partner = step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account = step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        var account2 = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
 
-        var updateAcc = Allure.step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> {
+        var updateAcc = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> {
             var acc = updateAccount(account);
             var updateAccount = put(
                 baseRoutePath + "/account",
@@ -1533,7 +1534,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             return acc;
         });
 
-        var updateAcc1 = Allure.step("Выполнение put-запроса /partner/accounts(изменение счета партнера на корр. счет), код ответа 200", () -> {
+        var updateAcc1 = step("Выполнение put-запроса /partner/accounts(изменение счета партнера на корр. счет), код ответа 200", () -> {
             var acc1 = updateAcc
                 .version(updateAcc.getVersion() + 1)
                 .account("30101810145250000416")
@@ -1552,7 +1553,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             return acc1;
         });
 
-        var updateAcc2 = Allure.step("Выполнение put-запроса /partner/accounts(изменение корр. счета у партнера), код ответа 200", () -> {
+        var updateAcc2 = step("Выполнение put-запроса /partner/accounts(изменение корр. счета у партнера), код ответа 200", () -> {
             var acc2 = updateAcc1
                 .version(updateAcc1.getVersion() + 1)
                 .account("30101810145250000429");
@@ -1567,7 +1568,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             return acc2;
         });
 
-        Allure.step("Выполнение put-запроса /partner/accounts(счет партнера пуст,корр. счет банка null), код ответа 200", () -> {
+        step("Выполнение put-запроса /partner/accounts(счет партнера пуст,корр. счет банка null), код ответа 200", () -> {
             var acc3 = updateAcc2
                 .version(updateAcc2.getVersion() + 1)
                 .account("")
@@ -1585,7 +1586,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
         });
 
-        var updateAcc4 = Allure.step("Выполнение put-запроса /partner/accounts(второй счет пуст), код ответа 200", () -> {
+        var updateAcc4 = step("Выполнение put-запроса /partner/accounts(второй счет пуст), код ответа 200", () -> {
             var acc4 = updateAccount(account2)
                 .account("");
             var updateAccount4 = put(
@@ -1599,7 +1600,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             return acc4;
         });
 
-        var updateAcc5 = Allure.step("Выполнение put-запроса /partner/accounts(второй счет пуст), код ответа 200", () -> {
+        var updateAcc5 = step("Выполнение put-запроса /partner/accounts(второй счет пуст), код ответа 200", () -> {
             var acc5 = updateAcc4
                 .version(updateAcc4.getVersion() + 1)
                 .bank(updateAcc4.getBank()
@@ -1615,7 +1616,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             return acc5;
         });
 
-        Allure.step("Выполнение put-запроса /partner/accounts(корректный счет), код ответа 200", () -> {
+        step("Выполнение put-запроса /partner/accounts(корректный счет), код ответа 200", () -> {
             var acc6 = updateAcc5
                 .version(updateAcc5.getVersion() + 1)
                 .account("40101810045250010041");
@@ -1633,20 +1634,20 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts негативный сценарий обновления версии")
     void negativeTestUpdateAccountVersion() {
-        var expected = Allure.step("Подготовка тестовых данных", () -> {
+        var expected = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             var account = createValidAccount(partner.getId(), partner.getDigitalId());
             Long version = account.getVersion() + 1;
             account.setVersion(version);
             return account;
         });
-        var accountError = Allure.step("Выполнение put-запроса /partner/accounts, код ответа 400", () -> put(
+        var accountError = step("Выполнение put-запроса /partner/accounts, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccount(expected),
             Error.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(accountError.getCode())
                 .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
             assertThat(accountError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
@@ -1658,22 +1659,22 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/account обновление версии")
     void positiveTestUpdateAccountVersion() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var accountVersion = Allure.step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
+        var accountVersion = step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount(account),
             Account.class
         ));
-        var checkAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
+        var checkAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion.getDigitalId(), accountVersion.getId()));
-        Allure.step("Проверка корректности ответа get-запроса", () -> {
+        step("Проверка корректности ответа get-запроса", () -> {
             assertThat(checkAccount)
                 .isNotNull();
             assertThat(checkAccount.getVersion())
@@ -1684,7 +1685,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/account обновление счета")
     void TestUpdateEKSAccount() {
-        var updateAccount = Allure.step("Подготовка тестовых данных(казначейский счет)", () -> {
+        var updateAccount = step("Подготовка тестовых данных(казначейский счет)", () -> {
             var partner = createValidPartner();
             var account = createValidAccount(partner.getId(), partner.getDigitalId());
             updateAccount(account);
@@ -1692,45 +1693,45 @@ class AccountControllerTest extends BaseAccountControllerTest {
             account.getBank().getBankAccount().setBankAccount("40102810545370000003");
             return account;
         });
-        var accountVersion = Allure.step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
+        var accountVersion = step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount,
             Account.class
         ));
-        var checkAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
+        var checkAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion.getDigitalId(), accountVersion.getId()));
-        Allure.step("Проверка корректности ответа get-запроса", () -> {
+        step("Проверка корректности ответа get-запроса", () -> {
             assertThat(checkAccount)
                 .isNotNull();
             assertThat(checkAccount.getVersion())
                 .isEqualTo(updateAccount.getVersion() + 1);
         });
 
-        var updateAccount1 = Allure.step("Подготовка тестовых данных(расчетный счет)", () -> {
+        var updateAccount1 = step("Подготовка тестовых данных(расчетный счет)", () -> {
             updateAccount(updateAccount);
             updateAccount.setVersion(accountVersion.getVersion() + 1);
             updateAccount.setAccount("40702810600000109222");
             updateAccount.getBank().getBankAccount().setBankAccount("40102810545370000003");
             return updateAccount;
         });
-        var accountVersion1 = Allure.step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
+        var accountVersion1 = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccount1,
             Error.class
         ));
-        Allure.step("Проверка корректности ответа put-запроса", () -> {
+        step("Проверка корректности ответа put-запроса", () -> {
             assertThat(accountVersion1)
                 .isNotNull();
             assertThat(accountVersion1.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         });
 
-        var updateAccount2 = Allure.step("Подготовка тестовых данных(изменение банка расчетного счета)", () -> {
+        var updateAccount2 = step("Подготовка тестовых данных(изменение банка расчетного счета)", () -> {
             updateAccount(updateAccount1);
             updateAccount1.setAccount("40702810600000009222");
             updateAccount1.setVersion(accountVersion.getVersion() + 1);
@@ -1738,20 +1739,20 @@ class AccountControllerTest extends BaseAccountControllerTest {
             updateAccount1.getBank().getBankAccount().setBankAccount("40102810945370000073");
             return updateAccount1;
         });
-        var accountVersion2 = Allure.step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
+        var accountVersion2 = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccount2,
             Error.class
         ));
-        Allure.step("Проверка корректности ответа put-запроса", () -> {
+        step("Проверка корректности ответа put-запроса", () -> {
             assertThat(accountVersion2)
                 .isNotNull();
             assertThat(accountVersion2.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         });
 
-        var updateAccount3 = Allure.step("Подготовка тестовых данных(изменение банка казначейского счета)", () -> {
+        var updateAccount3 = step("Подготовка тестовых данных(изменение банка казначейского счета)", () -> {
             updateAccount(updateAccount2);
             updateAccount2.setVersion(accountVersion.getVersion());
             updateAccount2.setAccount("00101643600000010006");
@@ -1759,18 +1760,18 @@ class AccountControllerTest extends BaseAccountControllerTest {
             updateAccount2.getBank().getBankAccount().setBankAccount("40102810945370000073");
             return updateAccount2;
         });
-        var accountVersion3 = Allure.step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
+        var accountVersion3 = step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount3,
             Account.class
         ));
-        var checkAccount3 = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
+        var checkAccount3 = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion3.getDigitalId(), accountVersion.getId()));
-        Allure.step("Проверка корректности ответа get-запроса", () -> {
+        step("Проверка корректности ответа get-запроса", () -> {
             assertThat(checkAccount3)
                 .isNotNull();
             assertThat(checkAccount3.getVersion())
@@ -1781,38 +1782,38 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("DELETE /partner/accounts/{digitalId} удаление счетов")
     void testDeleteAccount() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var actualAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
+        var actualAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
         ));
-        Allure.step("Проверка корректности ответа get-запроса", () -> {
+        step("Проверка корректности ответа get-запроса", () -> {
             assertThat(actualAccount)
                 .isNotNull()
                 .isEqualTo(account);
         });
 
-        var deleteAccount = Allure.step("Выполнение delete-запроса /partner/accounts/{digitalId}, код ответа 204 (удаление счетов)", () -> delete(
+        var deleteAccount = step("Выполнение delete-запроса /partner/accounts/{digitalId}, код ответа 204 (удаление счетов)", () -> delete(
             baseRoutePath + "/accounts" + "/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", actualAccount.getId()),
             actualAccount.getDigitalId()
         ).getBody());
-        Allure.step("Проверка корректности ответа delete-запроса", () -> assertThat(deleteAccount)
+        step("Проверка корректности ответа delete-запроса", () -> assertThat(deleteAccount)
             .isNotNull());
 
-        var searchAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 404", () -> get(
+        var searchAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 404", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
             account.getDigitalId(), account.getId()
         ));
-        Allure.step("Проверка корректности ответа get-запроса", () -> {
+        step("Проверка корректности ответа get-запроса", () -> {
             assertThat(searchAccount)
                 .isNotNull();
             assertThat(searchAccount.getCode())
@@ -1823,17 +1824,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("GET /partner/accounts/{digitalId}/{id} без приоритета и с приоритетом true")
     void testPriorityAccount() {
-        var account = Allure.step("Подготовка тестовых данных", () -> {
+        var account = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
-        var foundAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
+        var foundAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(foundAccount)
                 .isNotNull()
                 .isEqualTo(account);
@@ -1841,15 +1842,15 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isFalse();
         });
 
-        Allure.step("Изменение приоритета на true", () -> createValidPriorityAccount(account.getId(), account.getDigitalId()));
+        step("Изменение приоритета на true", () -> createValidPriorityAccount(account.getId(), account.getDigitalId()));
 
-        var actualAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
+        var actualAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             account.getDigitalId(), account.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(actualAccount)
                 .isNotNull();
             assertThat(actualAccount.getPriorityAccount())
@@ -1860,12 +1861,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/account/priority присвоение priority для 2-х счетов")
     void testPriorityAccountException() {
-        var partner = Allure.step("Создание партнера", () -> createValidPartner());
-        var account1 = Allure.step("Создание первого счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        var account2 = Allure.step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        Allure.step("Выполнение put-запроса /partner/account/priority, код ответа 200 (для 1 счета)", () -> createValidPriorityAccount(account1.getId(), account1.getDigitalId()));
-        var error = Allure.step("Выполнение put-запроса /partner/account/priority, код ответа 400 (для 2 счета)", () -> notCreatePriorityAccount(account2.getId(), account2.getDigitalId()));
-        Allure.step("Проверка корректности ответа для 2 счета", () -> {
+        var partner = step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account1 = step("Создание первого счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        var account2 = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        step("Выполнение put-запроса /partner/account/priority, код ответа 200 (для 1 счета)", () -> createValidPriorityAccount(account1.getId(), account1.getDigitalId()));
+        var error = step("Выполнение put-запроса /partner/account/priority, код ответа 400 (для 2 счета)", () -> notCreatePriorityAccount(account2.getId(), account2.getDigitalId()));
+        step("Проверка корректности ответа для 2 счета", () -> {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
@@ -1895,7 +1896,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .collect(Collectors.toList());
         assertThat(errorsMessage)
             .asList()
-            .contains("Единый казначейский счёт должен должен начинаться с 40102");
+            .contains("Единый казначейский счёт должен начинаться с 40102");
     }
 
     @Test
@@ -1920,7 +1921,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             .collect(Collectors.toList());
         assertThat(errorsMessage)
             .asList()
-            .contains("Единый казначейский счёт должен должен начинаться с 40102");
+            .contains("Единый казначейский счёт должен начинаться с 40102");
     }
 
     @Test
