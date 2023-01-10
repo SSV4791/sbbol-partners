@@ -1758,7 +1758,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .collect(Collectors.toList());
         assertThat(errorsMessage)
             .asList()
-            .contains("Единый казначейский счёт должен должен начинаться с 40102");
+            .contains("Единый казначейский счёт должен начинаться с 40102");
     }
 
     @Test
