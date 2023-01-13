@@ -18,7 +18,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerDelete;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
@@ -196,13 +195,6 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     public void deletePartners(String digitalId, List<String> ids, FraudMetaData fraudMetaData) {
         deletePartners(digitalId, Set.copyOf(ids), fraudMetaData);
-    }
-
-    @Deprecated
-    @Override
-    @Transactional
-    public void deletePartners(PartnerDelete partnerDelete) {
-        deletePartners(partnerDelete.getDigitalId(), partnerDelete.getPartnerIds(), partnerDelete.getFraudMetaData());
     }
 
     private void deletePartners(String digitalId, Set<String> ids, FraudMetaData fraudMetaData) {

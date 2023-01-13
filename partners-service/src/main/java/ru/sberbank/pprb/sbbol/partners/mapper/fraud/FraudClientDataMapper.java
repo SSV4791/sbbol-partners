@@ -16,7 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.model.FraudClientData;
 public interface FraudClientDataMapper {
 
     @Mapping(target = "clientTransactionId", ignore = true)
-    @Mapping(target = "orgName", source = "terBankCode")
+    @Mapping(target = "orgName", source = "terBankNumber")
     @Mapping(target = "userName", source = "epkId")
     @Mapping(target = "userLoginName", source = "login")
     @Mapping(target = "dboOperation", expression = "java(getDboOperation())")

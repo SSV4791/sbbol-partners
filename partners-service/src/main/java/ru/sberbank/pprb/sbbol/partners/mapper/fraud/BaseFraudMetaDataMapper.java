@@ -47,8 +47,8 @@ public interface BaseFraudMetaDataMapper extends BaseMapper {
     @Mapping(target = "receiverInn", expression = "java(partner.getInn())")
     @Mapping(target = "payerInn", source = "clientData.inn")
     @Mapping(target = "payerName", source = "clientData.orgName")
-    @Mapping(target = "osbNumber", source = "clientData.terBankGosb")
-    @Mapping(target = "vspNumber", source = "clientData.terBankVsp")
+    @Mapping(target = "osbNumber", source = "clientData.gosbNumber")
+    @Mapping(target = "vspNumber", source = "clientData.vspNumber")
     @Mapping(target = "dboOperationName", expression = "java(getDboOperationName())")
     @Mapping(target = "privateIpAddress", source = "deviceRequest.ipAddress")
     CounterPartyClientDefinedAttributes toCounterPartyClientDefinedAttributes(FraudMetaData metaData, @Context PartnerEntity partner);

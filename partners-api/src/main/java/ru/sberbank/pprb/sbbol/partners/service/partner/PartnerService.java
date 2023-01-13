@@ -5,7 +5,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerDelete;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 
@@ -64,12 +63,4 @@ public interface PartnerService {
      * @param id        Идентификаторы Партнеров
      */
     void deletePartners(String digitalId, List<String> id, FraudMetaData fraudMetaData);
-
-    /**
-     * Удаление Партнера
-     *
-     * @param partnerDelete Данные по удалению Партнеров
-     */
-    @Deprecated
-    void deletePartners(PartnerDelete partnerDelete);
 }

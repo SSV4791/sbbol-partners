@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 import java.util.List;
 
@@ -15,9 +16,10 @@ public interface AccountSignService {
      * Создание информации о подписи счетов Партнера
      *
      * @param accountsSign новые данные о подписях счетов Партнера
+     * @param fraudMetaData метаданные для Фрод-мониторинга
      * @return Информация о подписях счетов партнера
      */
-    AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign);
+    AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign, FraudMetaData fraudMetaData);
 
     /**
      * Удаление информации о подписи счёта Партнера

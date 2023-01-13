@@ -10,7 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerDelete;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
@@ -45,12 +44,6 @@ public class PartnerController implements PartnersApi {
     @Override
     public ResponseEntity<Void> delete(String digitalId, List<String> ids, FraudMetaData fraudMetaData) {
         partnerService.deletePartners(digitalId, ids, fraudMetaData);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> deletePartners(PartnerDelete partnerDelete) {
-        partnerService.deletePartners(partnerDelete);
         return ResponseEntity.noContent().build();
     }
 

@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
@@ -39,7 +40,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
         var savedSign = Allure.step("Подписание счёта", () -> {
-            return createValidAccountsSign(account.getDigitalId(), account.getId());
+            return createValidAccountsSign(account.getDigitalId(), account.getId(), podamFactory.manufacturePojo(FraudMetaData.class));
         });
         var getAccount = Allure.step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             "/partner" + "/accounts" + "/{digitalId}" + "/{id}",
@@ -56,17 +57,44 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/sign Ошибка валидации FraudMetaData")
+    void testCreateSignAccount_whenInvalidFraudMetaData() {
+        var account = Allure.step("Создание счёта для партнера", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+        var errorSign = Allure.step("Первое подписание счёта", () -> {
+            var invalidFraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+            invalidFraudMetaData.getClientData().setTerBankNumber(null);
+            return createInvalidAccountsSignWithInvalidFraudMetaData(account.getDigitalId(), account.getId(), invalidFraudMetaData);
+        });
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(errorSign)
+                .isNotNull();
+            assertThat(errorSign.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(errorSign.getDescriptions())
+                .hasSize(1);
+            assertThat(errorSign.getDescriptions().get(0).getField())
+                .isEqualTo("fraudMetaData.clientData.terBankNumber");
+            assertThat(errorSign.getDescriptions().get(0).getMessage())
+                .contains("Поле обязательно для заполнения");
+        });
+    }
+
+    @Test
     @DisplayName("POST /partner/accounts/sign Повторное подписание счёта")
     void testCreateDuplicateSignAccount() {
         var account = Allure.step("Создание счёта для партнера", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+        var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
         var savedSign = Allure.step("Первое подписание счёта", () -> {
-            return createValidAccountsSign(account.getDigitalId(), account.getId());
+            return createValidAccountsSign(account.getDigitalId(), account.getId(), fraudMetaData);
         });
         var savedDuplicateSign = Allure.step("Повторное подписание счёта", () -> {
-            return createAccountSignWithBadRequest(account.getDigitalId(), account.getId());
+            return createAccountSignWithBadRequest(account.getDigitalId(), account.getId(), fraudMetaData);
         });
         List<Descriptions> errorText = Allure.step("Подготовка текста ошибки для проверки", () -> {
             return List.of(
@@ -100,7 +128,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
         var response = Allure.step("Попытка подписания счёта без AccountId", () -> {
-            return createAccountSignWithBadRequest(account.getDigitalId(), "");
+            return createAccountSignWithBadRequest(account.getDigitalId(), "", podamFactory.manufacturePojo(FraudMetaData.class));
         });
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
@@ -124,7 +152,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return "Искомая сущность account с id: " + account.getId() + ", digitalId:  не найдена";
         });
         var response = Allure.step("Попытка подписания счёта без DigitalId", () -> {
-            return createAccountSignWithNotFound("", account.getId());
+            return createAccountSignWithNotFound("", account.getId(), podamFactory.manufacturePojo(FraudMetaData.class));
         });
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
@@ -153,7 +181,11 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
         var response = Allure.step("Попытка подписания счёта с не корректным AccountId", () -> {
-            return createAccountSignWithBadRequest(account.getDigitalId(), RandomStringUtils.randomAlphabetic(37));
+            return createAccountSignWithBadRequest(
+                account.getDigitalId(),
+                RandomStringUtils.randomAlphabetic(37),
+                podamFactory.manufacturePojo(FraudMetaData.class)
+            );
         });
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
@@ -173,7 +205,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36");
         });
         var response = Allure.step("Попытка подписания счёта с не корректным AccountId", () -> {
-            return createAccountSignWithBadRequest("", "");
+            return createAccountSignWithBadRequest("", "", podamFactory.manufacturePojo(FraudMetaData.class));
         });
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
@@ -203,6 +235,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(account.getDigitalId(), account.getId()),
+            getFraudMetaDataHeaders(podamFactory.manufacturePojo(FraudMetaData.class)),
             AccountsSignInfoResponse.class
         ));
         Allure.step("Проверка корректности ответа", () -> {
@@ -236,6 +269,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(account.getDigitalId(), account.getId()),
+            getFraudMetaDataHeaders(podamFactory.manufacturePojo(FraudMetaData.class)),
             AccountsSignInfoResponse.class
         ));
         Allure.step("Проверка корректности ответа", () -> {
@@ -275,6 +309,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(account.getDigitalId(), account.getId()),
+            getFraudMetaDataHeaders(podamFactory.manufacturePojo(FraudMetaData.class)),
             AccountsSignInfoResponse.class
         ));
         Allure.step("Проверка корректности ответа", () -> {
@@ -311,6 +346,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(account.getDigitalId(), account.getId()),
+            getFraudMetaDataHeaders(podamFactory.manufacturePojo(FraudMetaData.class)),
             AccountsSignInfoResponse.class
         ));
         Allure.step("Проверка корректности ответа", () -> {
@@ -349,6 +385,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(account.getDigitalId(), account.getId()),
+            getFraudMetaDataHeaders(podamFactory.manufacturePojo(FraudMetaData.class)),
             AccountsSignInfoResponse.class
         ));
         Allure.step("Проверка корректности ответа", () -> {
@@ -380,7 +417,8 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
         var savedSign = Allure.step("Создание подписанного счёта", () -> {
-            return createValidAccountsSign(account.getDigitalId(), account.getId());
+            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+            return createValidAccountsSign(account.getDigitalId(), account.getId(), fraudMetaData);
         });
         var accountSignDetail = Allure.step("Получение деталей подписи", () -> {
             return savedSign.getAccountsSignDetail().get(0);
@@ -434,7 +472,8 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
         Allure.step("Подписание счёта партнера", () -> {
-            createValidAccountsSign(account.getDigitalId(), account.getId());
+            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+            createValidAccountsSign(account.getDigitalId(), account.getId(), fraudMetaData);
         });
         var accountWithoutSign = Allure.step("Создание счёта без подписи", () -> {
             return createValidAccount(partner.getId(), partner.getDigitalId());

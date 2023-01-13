@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
@@ -60,7 +61,7 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     @Override
     @Transactional
-    public AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign) {
+    public AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign, FraudMetaData fraudMetaData) {
         var response = new AccountsSignInfoResponse();
         var digitalId = accountsSign.getDigitalId();
         response.setDigitalId(digitalId);
@@ -74,7 +75,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             try {
                 fraudServiceManager
                     .getService(FraudEventType.SIGN_ACCOUNT)
-                    .sendEvent(accountsSign.getFraudMetaData(), account);
+                    .sendEvent(fraudMetaData, account);
             } catch (FraudDeniedException | FraudModelArgumentException e) {
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_ERROR)
