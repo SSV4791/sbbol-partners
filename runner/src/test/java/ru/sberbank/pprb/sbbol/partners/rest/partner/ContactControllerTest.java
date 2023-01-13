@@ -49,9 +49,11 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             Contact.class,
             contact.getDigitalId(), contact.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> assertThat(actualContact)
-            .isNotNull()
-            .isEqualTo(contact));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(actualContact)
+                .isNotNull()
+                .isEqualTo(contact);
+        });
     }
 
     @Test
@@ -243,6 +245,45 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /partner/contacts/view Запрос чужих контактов")
+    void testViewContactWithWrongContact() {
+        var partner = Allure.step("Подготовка первого партнера без контактов", () -> {
+            return createValidPartner(randomAlphabetic(10));
+        });
+        var contact = Allure.step("Подготовка второго партнера с контактами", () -> {
+            var partnerWithContact = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partnerWithContact.getId(), partnerWithContact.getDigitalId());
+        });
+        var filter = Allure.step("Подготовка тестовых данных", () -> {
+            return new ContactsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerId(partner.getId())
+                .ids(
+                    List.of(
+                        contact.getId()
+                    )
+                )
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0));
+        });
+        var response = Allure.step("Выполнение post-запроса /partner/contacts/view, код ответа 200", () -> post(
+            baseRoutePath + "/contacts/view",
+            HttpStatus.OK,
+            filter,
+            ContactsResponse.class
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getContacts())
+                .isNull();
+            assertThat(response.getPagination().getHasNextPage())
+                .isEqualTo(Boolean.FALSE);
+        });
+    }
+
+    @Test
     @DisplayName("POST /partner/contact создание контакта")
     void testCreateContact() {
         var expected = Allure.step("Подготовка тестовых данных", () -> {
@@ -311,287 +352,362 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("PUT /partner/contact негативные попытки редактирования контактов")
     void testNegativeUpdateChildContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        HashSet<Phone> newPhones = new HashSet<>();
-        if (contact.getPhones() != null) {
-            for (var phone : contact.getPhones()) {
-                var newPhone = new Phone();
-                newPhone.setVersion(phone.getVersion());
-                newPhone.setId(phone.getId());
-                newPhone.setUnifiedId(phone.getUnifiedId());
-                newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(13));
-                newPhones.add(newPhone);
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var newPhones = Allure.step("Подготовка нового номера телефона", () -> {
+            HashSet<Phone> setNewPhones = new HashSet<>();
+            if (contact.getPhones() != null) {
+                for (var phone : contact.getPhones()) {
+                    var newPhone = new Phone();
+                    newPhone.setVersion(phone.getVersion());
+                    newPhone.setId(phone.getId());
+                    newPhone.setUnifiedId(phone.getUnifiedId());
+                    newPhone.setDigitalId(phone.getDigitalId());
+                    newPhone.setPhone(randomNumeric(13));
+                    setNewPhones.add(newPhone);
+                }
             }
-        }
-        HashSet<Email> newEmails = new HashSet<>();
-        if (contact.getEmails() != null) {
-            for (var email : contact.getEmails()) {
-                var newEmail = new Email();
-                newEmail.setVersion(email.getVersion());
-                newEmail.setId(email.getId());
-                newEmail.setUnifiedId(email.getUnifiedId());
-                newEmail.setDigitalId(email.getDigitalId());
-                newEmail.setEmail(email.getEmail());
-                newEmails.add(newEmail);
+            return setNewPhones;
+        });
+        var newEmails = Allure.step("Подготовка нового емайла", () -> {
+            HashSet<Email> setNewEmails = new HashSet<>();
+            if (contact.getEmails() != null) {
+                for (var email : contact.getEmails()) {
+                    var newEmail = new Email();
+                    newEmail.setVersion(email.getVersion());
+                    newEmail.setId(email.getId());
+                    newEmail.setUnifiedId(email.getUnifiedId());
+                    newEmail.setDigitalId(email.getDigitalId());
+                    newEmail.setEmail(email.getEmail());
+                    setNewEmails.add(newEmail);
+                }
             }
-        }
-        contact.setPhones(newPhones);
-        contact.setEmails(newEmails);
-        var newUpdateContact = put(
+            return setNewEmails;
+        });
+        Allure.step("Подготовка тестовых данных", () -> {
+            contact.setPhones(newPhones);
+            contact.setEmails(newEmails);
+        });
+        var newUpdateContact = Allure.step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
             Contact.class
-        );
-        assertThat(newUpdateContact)
-            .isNotNull();
-        assertThat(newUpdateContact.getFirstName())
-            .isEqualTo(newUpdateContact.getFirstName());
-        assertThat(newUpdateContact.getFirstName())
-            .isNotEqualTo(contact.getFirstName());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateContact)
+                .isNotNull();
+            assertThat(newUpdateContact.getFirstName())
+                .isEqualTo(newUpdateContact.getFirstName());
+            assertThat(newUpdateContact.getFirstName())
+                .isNotEqualTo(contact.getFirstName());
+        });
 
-        HashSet<Phone> newPhones1 = new HashSet<>();
-        if (contact.getPhones() != null) {
-            for (var phone : contact.getPhones()) {
-                var newPhone = new Phone();
-                newPhone.setVersion(phone.getVersion() + 1);
-                newPhone.setId(phone.getId());
-                newPhone.setUnifiedId(phone.getUnifiedId());
-                newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(12));
-                newPhones1.add(newPhone);
+        var newPhones1 = Allure.step("Подготовка нового номера телефона", () -> {
+            HashSet<Phone> setNewPhones1 = new HashSet<>();
+            if (contact.getPhones() != null) {
+                for (var phone : contact.getPhones()) {
+                    var newPhone = new Phone();
+                    newPhone.setVersion(phone.getVersion() + 1);
+                    newPhone.setId(phone.getId());
+                    newPhone.setUnifiedId(phone.getUnifiedId());
+                    newPhone.setDigitalId(phone.getDigitalId());
+                    newPhone.setPhone(randomNumeric(12));
+                    setNewPhones1.add(newPhone);
+                }
             }
-        }
-        HashSet<Email> newEmails1 = new HashSet<>();
-        if (contact.getEmails() != null) {
-            for (var email : contact.getEmails()) {
-                var newEmail = new Email();
-                newEmail.setVersion(email.getVersion() + 10);
-                newEmail.setId(email.getId());
-                newEmail.setUnifiedId(email.getUnifiedId());
-                newEmail.setDigitalId(email.getDigitalId());
-                newEmail.setEmail(email.getEmail());
-                newEmails1.add(newEmail);
+            return setNewPhones1;
+        });
+        var newEmails1 = Allure.step("Подготовка нового емайла", () -> {
+            HashSet<Email> setNewEmails1 = new HashSet<>();
+            if (contact.getEmails() != null) {
+                for (var email : contact.getEmails()) {
+                    var newEmail = new Email();
+                    newEmail.setVersion(email.getVersion() + 10);
+                    newEmail.setId(email.getId());
+                    newEmail.setUnifiedId(email.getUnifiedId());
+                    newEmail.setDigitalId(email.getDigitalId());
+                    newEmail.setEmail(email.getEmail());
+                    setNewEmails1.add(newEmail);
+                }
             }
-        }
-        contact.setPhones(newPhones1);
-        contact.setEmails(newEmails1);
-        contact.setVersion(newUpdateContact.getVersion() + 1);
-        var newUpdateContact1 = put(
+            return setNewEmails1;
+        });
+        Allure.step("Подготовка тестовых данных", () -> {
+            contact.setPhones(newPhones1);
+            contact.setEmails(newEmails1);
+            contact.setVersion(newUpdateContact.getVersion() + 1);
+        });
+        var newUpdateContact1 = Allure.step("Выполнение put-запроса /partner/contact, код ответа 400", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
             updateContact(contact),
             Error.class
-        );
-        assertThat(newUpdateContact1)
-            .isNotNull();
-        assertThat(newUpdateContact1.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateContact1)
+                .isNotNull();
+            assertThat(newUpdateContact1.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/contact успешное редактирования дочерних контактов")
     void testUpdateChildContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        HashSet<Phone> newPhones = new HashSet<>();
-        if (contact.getPhones() != null) {
-            for (var phone : contact.getPhones()) {
-                var newPhone = new Phone();
-                newPhone.setVersion(phone.getVersion());
-                newPhone.setId(phone.getId());
-                newPhone.setUnifiedId(phone.getUnifiedId());
-                newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(13));
-                newPhones.add(newPhone);
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var newPhones = Allure.step("Подготовка нового номера телефона", () -> {
+            HashSet<Phone> setNewPhones = new HashSet<>();
+            if (contact.getPhones() != null) {
+                for (var phone : contact.getPhones()) {
+                    var newPhone = new Phone();
+                    newPhone.setVersion(phone.getVersion());
+                    newPhone.setId(phone.getId());
+                    newPhone.setUnifiedId(phone.getUnifiedId());
+                    newPhone.setDigitalId(phone.getDigitalId());
+                    newPhone.setPhone(randomNumeric(13));
+                    setNewPhones.add(newPhone);
+                }
             }
-        }
-        HashSet<Email> newEmails = new HashSet<>();
-        if (contact.getEmails() != null) {
-            for (var email : contact.getEmails()) {
-                var newEmail = new Email();
-                newEmail.setVersion(email.getVersion());
-                newEmail.setId(email.getId());
-                newEmail.setUnifiedId(email.getUnifiedId());
-                newEmail.setDigitalId(email.getDigitalId());
-                newEmail.setEmail(email.getEmail());
-                newEmails.add(newEmail);
+            return setNewPhones;
+        });
+        var newEmails = Allure.step("Подготовка нового емайла", () -> {
+            HashSet<Email> setNewEmails = new HashSet<>();
+            if (contact.getEmails() != null) {
+                for (var email : contact.getEmails()) {
+                    var newEmail = new Email();
+                    newEmail.setVersion(email.getVersion());
+                    newEmail.setId(email.getId());
+                    newEmail.setUnifiedId(email.getUnifiedId());
+                    newEmail.setDigitalId(email.getDigitalId());
+                    newEmail.setEmail(email.getEmail());
+                    setNewEmails.add(newEmail);
+                }
             }
-        }
-        contact.setPhones(newPhones);
-        contact.setEmails(newEmails);
-        var newUpdateContact = put(
+            return setNewEmails;
+        });
+        Allure.step("Подготовка тестовых данных", () -> {
+            contact.setPhones(newPhones);
+            contact.setEmails(newEmails);
+        });
+        var newUpdateContact = Allure.step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
             Contact.class
-        );
-        assertThat(newUpdateContact)
-            .isNotNull();
-        assertThat(newUpdateContact.getFirstName())
-            .isEqualTo(newUpdateContact.getFirstName());
-        assertThat(newUpdateContact.getFirstName())
-            .isNotEqualTo(contact.getFirstName());
-
-        HashSet<Phone> newPhones1 = new HashSet<>();
-        if (contact.getPhones() != null) {
-            for (var phone : contact.getPhones()) {
-                var newPhone = new Phone();
-                newPhone.setVersion(phone.getVersion() + 1);
-                newPhone.setId(phone.getId());
-                newPhone.setUnifiedId(phone.getUnifiedId());
-                newPhone.setDigitalId(phone.getDigitalId());
-                newPhone.setPhone(randomNumeric(13));
-                newPhones1.add(newPhone);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateContact)
+                .isNotNull();
+            assertThat(newUpdateContact.getFirstName())
+                .isEqualTo(newUpdateContact.getFirstName());
+            assertThat(newUpdateContact.getFirstName())
+                .isNotEqualTo(contact.getFirstName());
+        });
+        var newPhones1 = Allure.step("Подготовка нового номера телефона", () -> {
+            HashSet<Phone> setNewPhones1 = new HashSet<>();
+            if (contact.getPhones() != null) {
+                for (var phone : contact.getPhones()) {
+                    var newPhone = new Phone();
+                    newPhone.setVersion(phone.getVersion() + 1);
+                    newPhone.setId(phone.getId());
+                    newPhone.setUnifiedId(phone.getUnifiedId());
+                    newPhone.setDigitalId(phone.getDigitalId());
+                    newPhone.setPhone(randomNumeric(13));
+                    setNewPhones1.add(newPhone);
+                }
             }
-        }
-        HashSet<Email> newEmails1 = new HashSet<>();
-        if (contact.getEmails() != null) {
-            for (var email : contact.getEmails()) {
-                var newEmail1 = new Email();
-                newEmail1.setVersion(email.getVersion() + 1);
-                newEmail1.setId(email.getId());
-                newEmail1.setUnifiedId(email.getUnifiedId());
-                newEmail1.setDigitalId(email.getDigitalId());
-                newEmail1.setEmail(randomAlphabetic(64) + "@mail.ru");
-                newEmails1.add(newEmail1);
+            return setNewPhones1;
+        });
+        var newEmails1 = Allure.step("Подготовка нового емайла", () -> {
+            HashSet<Email> setNewEmails1 = new HashSet<>();
+            if (contact.getEmails() != null) {
+                for (var email : contact.getEmails()) {
+                    var newEmail1 = new Email();
+                    newEmail1.setVersion(email.getVersion() + 1);
+                    newEmail1.setId(email.getId());
+                    newEmail1.setUnifiedId(email.getUnifiedId());
+                    newEmail1.setDigitalId(email.getDigitalId());
+                    newEmail1.setEmail(randomAlphabetic(64) + "@mail.ru");
+                    setNewEmails1.add(newEmail1);
+                }
             }
-        }
-        contact.setPhones(newPhones1);
-        contact.setEmails(newEmails1);
-        contact.setVersion(contact.getVersion() + 1);
-        var newUpdateContact1 = put(
+            return setNewEmails1;
+        });
+        Allure.step("Подготовка тестовых данных", () -> {
+            contact.setPhones(newPhones1);
+            contact.setEmails(newEmails1);
+            contact.setVersion(contact.getVersion() + 1);
+        });
+        var newUpdateContact1 = Allure.step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
             Contact.class
-        );
-        assertThat(newUpdateContact1)
-            .isNotNull();
-        assertThat(newUpdateContact1.getFirstName())
-            .isEqualTo(newUpdateContact1.getFirstName());
-        assertThat(newUpdateContact1.getFirstName())
-            .isNotEqualTo(contact.getFirstName());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateContact1)
+                .isNotNull();
+            assertThat(newUpdateContact1.getFirstName())
+                .isEqualTo(newUpdateContact1.getFirstName());
+            assertThat(newUpdateContact1.getFirstName())
+                .isNotEqualTo(contact.getFirstName());
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/contacts Обновление контактов")
     void testUpdateContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var newUpdateContact = put(
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var newUpdateContact = Allure.step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
             Contact.class
-        );
-        assertThat(newUpdateContact)
-            .isNotNull();
-        assertThat(newUpdateContact.getFirstName())
-            .isEqualTo(newUpdateContact.getFirstName());
-        assertThat(newUpdateContact.getFirstName())
-            .isNotEqualTo(contact.getFirstName());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateContact)
+                .isNotNull();
+            assertThat(newUpdateContact.getFirstName())
+                .isEqualTo(newUpdateContact.getFirstName());
+            assertThat(newUpdateContact.getFirstName())
+                .isNotEqualTo(contact.getFirstName());
+        });
     }
 
     @Test
-    void testUpdateContact2() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var contactUpdate = updateContact(contact);
-        contactUpdate.setEmails(null);
-        contactUpdate.setPhones(null);
-        var newUpdateContact = put(
+    @DisplayName("PUT /partner/contacts Обновление контактов с пустым емейлом и телефоном")
+    void testUpdateContactWithoutEmailsAndPhones() {
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var contactUpdate = Allure.step("Подготовка тестовых данных", () -> {
+            var contactForUpdate = updateContact(contact);
+            contactForUpdate.setEmails(null);
+            contactForUpdate.setPhones(null);
+            return contactForUpdate;
+        });
+        var newUpdateContact = Allure.step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             contactUpdate,
             Contact.class
-        );
-        assertThat(newUpdateContact)
-            .isNotNull();
-        assertThat(newUpdateContact.getFirstName())
-            .isEqualTo(newUpdateContact.getFirstName());
-        assertThat(newUpdateContact.getFirstName())
-            .isNotEqualTo(contact.getFirstName());
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateContact)
+                .isNotNull();
+            assertThat(newUpdateContact.getFirstName())
+                .isEqualTo(newUpdateContact.getFirstName());
+            assertThat(newUpdateContact.getFirstName())
+                .isNotEqualTo(contact.getFirstName());
+        });
     }
 
     @Test
+    @DisplayName("NEG PUT /partner/contacts Не успешное повышение версии контактов")
     void negativeTestUpdateContactVersion() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        Long version = contact.getVersion() + 1;
-        contact.setVersion(version);
-        var contactError = put(
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        long version = Allure.step("Подготовка тестовых данных", () -> {
+            Long versionForUpdate = contact.getVersion() + 1;
+            contact.setVersion(versionForUpdate);
+            return versionForUpdate;
+        });
+        var contactError = Allure.step("Выполнение put-запроса /partner/contact, код ответа 400", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
             updateContact(contact),
             Error.class
-        );
-        assertThat(contactError.getCode())
-            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
-        assertThat(contactError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .contains("Версия записи в базе данных " + (contact.getVersion() - 1) +
-                " не равна версии записи в запросе version=" + version);
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(contactError.getCode())
+                .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
+            assertThat(contactError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+                .contains("Версия записи в базе данных " + (contact.getVersion() - 1) +
+                    " не равна версии записи в запросе version=" + version);
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/contacts Повышение версии контактов")
     void positiveTestUpdateContactVersion() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var contactUpdate = put(
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var contactUpdate = Allure.step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
             Contact.class
-        );
-        var checkContact = get(
+        ));
+        var checkContact = Allure.step("Выполнение get-запроса /partner/contacts, код ответа 200", () -> get(
             baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Contact.class,
-            contactUpdate.getDigitalId(), contactUpdate.getId());
-        assertThat(checkContact)
-            .isNotNull();
-        assertThat(checkContact.getVersion())
-            .isEqualTo(contact.getVersion() + 1);
+            contactUpdate.getDigitalId(), contactUpdate.getId()
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(checkContact)
+                .isNotNull();
+            assertThat(checkContact.getVersion())
+                .isEqualTo(contact.getVersion() + 1);
+        });
     }
 
     @Test
+    @DisplayName("DELETE /partner/contacts/{digitalId} Удаление контактов")
     void testDeleteContact() {
-        var partner = createValidPartner(randomAlphabetic(10));
-        var contact = createValidContact(partner.getId(), partner.getDigitalId());
-        var actualContact =
-            get(
-                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
-                HttpStatus.OK,
-                Contact.class,
-                contact.getDigitalId(), contact.getId()
-            );
-        assertThat(actualContact)
-            .isNotNull()
-            .isEqualTo(contact);
-
-        var deleteContact =
-            delete(
-                baseRoutePath + "/contacts" + "/{digitalId}",
-                HttpStatus.NO_CONTENT,
-                Map.of("ids", actualContact.getId()),
-                actualContact.getDigitalId()
-            ).getBody();
-
-        assertThat(deleteContact)
-            .isNotNull();
-
-        var searchContact =
-            get(
-                baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
-                HttpStatus.NOT_FOUND,
-                Error.class,
-                contact.getDigitalId(), contact.getId()
-            );
-        assertThat(searchContact)
-            .isNotNull();
-        assertThat(searchContact.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        var contact = Allure.step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            return createValidContact(partner.getId(), partner.getDigitalId());
+        });
+        var actualContact = Allure.step("Выполнение get-запроса /partner/contacts/{digitalId}/{id}, код ответа 200", () -> get(
+            baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
+            HttpStatus.OK,
+            Contact.class,
+            contact.getDigitalId(), contact.getId()
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(actualContact)
+                .isNotNull()
+                .isEqualTo(contact);
+        });
+        var deleteContact = Allure.step("Выполнение delete-запроса /partner/contacts/{digitalId}, код ответа 204", () -> delete(
+            baseRoutePath + "/contacts" + "/{digitalId}",
+            HttpStatus.NO_CONTENT,
+            Map.of("ids", actualContact.getId()),
+            actualContact.getDigitalId()
+        ).getBody());
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(deleteContact)
+                .isNotNull();
+        });
+        var searchContact = Allure.step("Выполнение get-запроса /partner/contacts/{digitalId}/{id}, код ответа 400", () -> get(
+            baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
+            HttpStatus.NOT_FOUND,
+            Error.class,
+            contact.getDigitalId(), contact.getId()
+        ));
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(searchContact)
+                .isNotNull();
+            assertThat(searchContact.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
     }
 
     @Test
