@@ -23,6 +23,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class AccountServiceImpl implements AccountService {
     public static final String DOCUMENT_NAME = "account";
 
     private final AccountRepository accountRepository;
+    private final PartnerRepository partnerRepository;
     private final AccountSignRepository accountSignRepository;
     private final ReplicationService replicationService;
     private final BudgetMaskService budgetMaskService;
@@ -43,6 +45,7 @@ public class AccountServiceImpl implements AccountService {
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
+        PartnerRepository partnerRepository,
         AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
@@ -50,6 +53,7 @@ public class AccountServiceImpl implements AccountService {
         AccountMapper accountMapper
     ) {
         this.accountRepository = accountRepository;
+        this.partnerRepository = partnerRepository;
         this.accountSignRepository = accountSignRepository;
         this.replicationService = replicationService;
         this.budgetMaskService = budgetMaskService;
@@ -91,6 +95,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public Account saveAccount(AccountCreate account) {
+        var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
+        if (foundPartner.isEmpty()) {
+            throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
+        }
         var accountEntity = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(accountEntity);

@@ -177,6 +177,7 @@ public class PartnerServiceConfiguration {
     @Bean
     AccountService accountService(
         AccountRepository accountRepository,
+        PartnerRepository partnerRepository,
         AccountSignRepository accountSignRepository,
         ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
@@ -185,6 +186,7 @@ public class PartnerServiceConfiguration {
     ) {
         return new AccountServiceImpl(
             accountRepository,
+            partnerRepository,
             accountSignRepository,
             replicationService,
             budgetMaskService,
@@ -248,16 +250,14 @@ public class PartnerServiceConfiguration {
     @Bean
     ContactService contactService(
         ContactRepository contactRepository,
-        EmailRepository emailRepository,
-        PhoneRepository phoneRepository,
+        PartnerRepository partnerRepository,
         AddressRepository addressRepository,
         DocumentRepository documentRepository,
         ContactMapper contactMapper
     ) {
         return new ContactServiceImpl(
             contactRepository,
-            emailRepository,
-            phoneRepository,
+            partnerRepository,
             addressRepository,
             documentRepository,
             contactMapper)
