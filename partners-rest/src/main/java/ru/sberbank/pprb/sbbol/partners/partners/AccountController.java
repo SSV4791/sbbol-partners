@@ -5,9 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAccountsApi;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
+import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
@@ -37,6 +39,11 @@ public class AccountController implements PartnerAccountsApi {
     public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
         accountService.deleteAccounts(digitalId, ids);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<List<AccountWithPartnerResponse>> getAtRequisites(AccountAndPartnerRequest request) {
+        return ResponseEntity.ok(accountService.getAtRequisites(request));
     }
 
     @Override

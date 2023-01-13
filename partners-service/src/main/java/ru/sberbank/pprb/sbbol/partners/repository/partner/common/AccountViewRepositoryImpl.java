@@ -61,7 +61,7 @@ public class AccountViewRepositoryImpl
         predicates.add(builder.equal(root.get(AccountEntity_.DIGITAL_ID), filter.getDigitalId()));
         var filterSearch = filter.getSearch();
         if (filterSearch != null && StringUtils.hasText(filterSearch.getSearch())) {
-            var searchPattern = accountMapper.prepareSearchString(filterSearch.getSearch())
+            var searchPattern = accountMapper.saveSearchString(filterSearch.getSearch())
                 .toLowerCase(Locale.getDefault());
             predicates.add(
                 builder.like(

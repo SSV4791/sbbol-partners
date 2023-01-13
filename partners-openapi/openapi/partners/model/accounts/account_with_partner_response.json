@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Параметры запроса Счета Партнера с реквизитами Партнера",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор партнера"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json",
+      "description": "Организационно-правовая форма"
+    },
+    "orgName": {
+      "maxLength": 350,
+      "title": "Наименование организации партнера",
+      "type": "string"
+    },
+    "firstName": {
+      "maxLength": 50,
+      "title": "Имя партнера",
+      "type": "string"
+    },
+    "secondName": {
+      "maxLength": 50,
+      "title": "Фамилия партнера",
+      "type": "string"
+    },
+    "middleName": {
+      "maxLength": 50,
+      "title": "Отчество партнера",
+      "type": "string"
+    },
+    "inn": {
+      "maxLength": 12,
+      "minLength": 5,
+      "title": "ИНН",
+      "type": "string"
+    },
+    "kpp": {
+      "maxLength": 9,
+      "minLength": 9,
+      "title": "КПП",
+      "type": "string"
+    },
+    "comment": {
+      "maxLength": 255,
+      "title": "Комментарий пользователя",
+      "type": "string"
+    },
+    "account": {
+      "$ref": "account.json",
+      "description": "Счет партнера"
+    }
+  }
+}
+
+

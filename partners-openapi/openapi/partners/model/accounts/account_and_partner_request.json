@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Параметры запроса Счета Партнера с реквизитами Партнера",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "example": 34534523,
+      "description": "Идентификатор личного кабинета клиента"
+    },
+    "inn": {
+      "type": "string",
+      "example": 8608052141,
+      "description": "ИНН"
+    },
+    "kpp": {
+      "type": "string",
+      "example": 123456789,
+      "description": "КПП"
+    },
+    "name": {
+      "type": "string",
+      "example": "ООО 'Ромашка' или ФИО",
+      "description": "Имя контрагента"
+    },
+    "account": {
+      "type": "string",
+      "example": 40802810100007800000,
+      "description": "Номер счета"
+    },
+    "bic": {
+      "type": "string",
+      "example": 368574256,
+      "description": "БИК банка"
+    },
+    "bankAccount": {
+      "type": "string",
+      "example": 40802810100007800000,
+      "description": "Корр. счет"
+    }
+  },
+  "required": [
+    "digitalId",
+    "name",
+    "bic"
+  ]
+}

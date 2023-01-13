@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorresponde
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
@@ -123,9 +124,9 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             }
         }
         var search =
-            migrationPartnerMapper.saveSearchString(correspondent.getInn(), correspondent.getKpp(), correspondent.getName());
+            migrationPartnerMapper.prepareSearchString(correspondent.getInn(), correspondent.getKpp(), correspondent.getName());
         AccountEntity savedAccount;
-        var searchPartner = partnerRepository.findByDigitalIdAndSearch(digitalId, search);
+        var searchPartner = partnerRepository.findByDigitalIdAndSearchContainsAndType(digitalId, search, PartnerType.PARTNER);
         if (searchPartner == null) {
             var partnerEntity = migrationPartnerMapper.toPartnerEntity(digitalId, correspondent);
             var save = partnerRepository.save(partnerEntity);
@@ -135,7 +136,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             var bic = correspondent.getBic();
             var account = correspondent.getAccount();
             var bankAccount = correspondent.getBankAccount();
-            var searchAccount = migrationPartnerMapper.prepareSearchString(searchPartner.getUuid().toString(), account, bic, bankAccount);
+            var searchAccount = migrationPartnerMapper.saveSearchString(searchPartner.getUuid().toString(), account, bic, bankAccount);
             var foundAccount =
                 accountRepository.findByDigitalIdAndSearch(digitalId, searchAccount);
             if (foundAccount == null) {

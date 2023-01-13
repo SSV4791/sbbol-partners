@@ -7,7 +7,10 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -15,9 +18,11 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
+import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -29,6 +34,7 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Loggable
 public class AccountServiceImpl implements AccountService {
@@ -194,5 +200,49 @@ public class AccountServiceImpl implements AccountService {
         foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());
         var savedAccount = accountRepository.save(foundAccount);
         return accountMapper.toAccount(savedAccount, budgetMaskService);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AccountWithPartnerResponse> getAtRequisites(AccountAndPartnerRequest request) {
+        List<AccountEntity> accounts = accountRepository.findByRequest(request);
+        if (CollectionUtils.isEmpty(accounts)) {
+            var search =
+                accountMapper.prepareSearchString(request.getInn(), request.getKpp(), request.getName());
+            PartnerEntity partner = partnerRepository.findByDigitalIdAndSearchContainsAndType(request.getDigitalId(), search, PartnerType.PARTNER);
+            if (Objects.isNull(partner)) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
+            }
+            return accountMapper.toAccountsWithPartner(partner);
+        }
+        if (accounts.size() == 1) {
+            AccountEntity account = accounts.get(0);
+            if (account.getAccount() != null || account.getPartner().getInn() != null) {
+                return accountMapper.toAccountsWithPartner(accounts);
+            }
+        }
+        List<AccountEntity> accountsWithKppField = accounts;
+        if (Objects.nonNull(request.getKpp()) && !Objects.equals(request.getKpp(), "0")) {
+            accountsWithKppField = accounts.stream()
+                .filter(value -> Objects.equals(value.getPartner().getKpp(), request.getKpp()))
+                .collect(Collectors.toList());
+            if (accountsWithKppField.size() == 1) {
+                return accountMapper.toAccountsWithPartner(accountsWithKppField);
+            }
+        }
+
+        List<AccountEntity> accountsWithPartnerNameField = accountsWithKppField.stream()
+            .filter(value -> {
+                PartnerEntity partner = value.getPartner();
+                String fio =
+                    accountMapper.prepareSearchString(partner.getSecondName(), partner.getFirstName(), partner.getMiddleName());
+                return Objects.equals(partner.getOrgName(), request.getName()) ||
+                    Objects.equals(fio, request.getName());
+            })
+            .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(accountsWithPartnerNameField)) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
+        }
+        return accountMapper.toAccountsWithPartner(accountsWithPartnerNameField);
     }
 }

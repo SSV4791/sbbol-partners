@@ -107,7 +107,7 @@ public interface BaseFraudMetaDataMapper extends BaseMapper {
     }
 
     default String getPartnerName(PartnerEntity partner) {
-        return saveSearchString(
+        return prepareSearchString(
             partner.getOrgName(),
             partner.getSecondName(),
             partner.getFirstName(),

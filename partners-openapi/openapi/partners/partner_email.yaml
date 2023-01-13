@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners email
-  version: 1.0.5
+  version: 1.0.6
   description: OpenAPI Specification for Partner email
 
 servers:
@@ -28,8 +28,6 @@ paths:
             application/json:
               schema:
                 $ref: 'model/email/emails_response.json'
-        404:
-          description: Not Found
         400:
           description: Bad Request
           content:

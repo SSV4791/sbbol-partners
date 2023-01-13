@@ -26,7 +26,7 @@ public interface BaseMapper {
     }
 
     @NotNull
-    default String prepareSearchString(String... search) {
+    default String saveSearchString(String... search) {
         return Stream.of(
                 search
             )
@@ -36,7 +36,7 @@ public interface BaseMapper {
     }
 
     @NotNull
-    default String saveSearchString(String... search) {
+    default String prepareSearchString(String... search) {
         return Stream.of(
                 search
             )

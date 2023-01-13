@@ -12,11 +12,13 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
@@ -143,20 +145,20 @@ public interface AccountMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var searchSubString = prepareSearchString(
+        var searchSubString = saveSearchString(
             account.getPartnerUuid().toString(),
             account.getAccount()
         );
         var bank = account.getBank();
         if (bank != null) {
             bank.setAccount(account);
-            searchSubString = prepareSearchString(
+            searchSubString = saveSearchString(
                 searchSubString,
                 bank.getBic()
             );
             var bankAccount = bank.getBankAccount();
             if (bankAccount != null) {
-                searchSubString = prepareSearchString(
+                searchSubString = saveSearchString(
                     searchSubString,
                     bankAccount.getAccount()
                 );
@@ -235,4 +237,29 @@ public interface AccountMapper extends BaseMapper {
         }
         return params;
     }
+
+    List<AccountWithPartnerResponse> toAccountsWithPartner(List<AccountEntity> accounts);
+
+    @Mapping(target = "account", source = "accountDto")
+    @Mapping(target = "id", expression = "java(accountDto.getPartner().getUuid().toString())")
+    @Mapping(target = "digitalId", source = "partner.digitalId")
+    @Mapping(target = "legalForm", source = "partner.legalType")
+    @Mapping(target = "orgName", source = "partner.orgName")
+    @Mapping(target = "firstName", source = "partner.firstName")
+    @Mapping(target = "secondName", source = "partner.secondName")
+    @Mapping(target = "middleName", source = "partner.middleName")
+    @Mapping(target = "inn", source = "partner.inn")
+    @Mapping(target = "kpp", source = "partner.kpp")
+    @Mapping(target = "comment", source = "partner.comment")
+    AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto);
+
+    default List<AccountWithPartnerResponse> toAccountsWithPartner(PartnerEntity partner) {
+        return List.of(toAccountWithPartner(partner));
+    }
+
+    @Mapping(target = "id",
+        expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
+    @Mapping(target = "legalForm", source = "legalType")
+    @Mapping(target = "account", ignore = true)
+    AccountWithPartnerResponse toAccountWithPartner(PartnerEntity partner);
 }

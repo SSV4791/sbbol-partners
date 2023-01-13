@@ -174,7 +174,7 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
         var searchSubString =
-            saveSearchString(partner.getInn(),
+            prepareSearchString(partner.getInn(),
                 partner.getKpp(),
                 partner.getOrgName(),
                 partner.getSecondName(),
@@ -202,20 +202,20 @@ public interface MigrationPartnerMapper extends BaseMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var searchSubString = prepareSearchString(
+        var searchSubString = saveSearchString(
             account.getPartnerUuid().toString(),
             account.getAccount()
         );
         var bank = account.getBank();
         if (bank != null) {
             bank.setAccount(account);
-            searchSubString = prepareSearchString(
+            searchSubString = saveSearchString(
                 searchSubString,
                 bank.getBic()
             );
             var bankAccount = bank.getBankAccount();
             if (bankAccount != null) {
-                searchSubString = prepareSearchString(
+                searchSubString = saveSearchString(
                     searchSubString,
                     bankAccount.getAccount()
                 );

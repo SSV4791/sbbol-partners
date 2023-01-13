@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners account
-  version: 1.0.5
+  version: 1.0.6
   description: OpenAPI Specification for partners account
 
 servers:
@@ -28,8 +28,6 @@ paths:
             application/json:
               schema:
                 $ref: 'model/accounts/accounts_response.json'
-        404:
-          description: Not Found
         400:
           description: Bad Request
           content:
@@ -214,3 +212,36 @@ paths:
           description: Unauthorized
         403:
           description: Forbidden
+
+  /partner/account/get-at-requisites:
+    post:
+      tags:
+        - Partner Accounts
+      description: Получение информации по счету и партнеры по запросу
+      operationId: getAtRequisites
+      requestBody:
+        description: Счёта
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/accounts/account_and_partner_request.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {
+                  $ref: 'model/accounts/account_with_partner_response.json'
+                }
+                minimum: 1
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: 'model/common/error.json'
