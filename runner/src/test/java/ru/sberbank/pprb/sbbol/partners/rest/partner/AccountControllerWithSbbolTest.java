@@ -19,7 +19,6 @@ import java.util.UUID;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.getValidAccount;
 
 @ContextConfiguration(classes = SbbolIntegrationWithSbbolConfiguration.class)
@@ -61,11 +60,11 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     @Test
     void testCreateAccount() {
         var account = getValidAccount("bcd979a0-47ab-4337-84b8-8b4160448391", randomAlphabetic(10));
-        var response = post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+        var response = post(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     @Test
@@ -84,11 +83,11 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
                     new BankAccount()
                         .bankAccount("30101810145250000411"))
             );
-        var response = put(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
+        var response = put(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
             .isNotNull();
         assertThat(response.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
     @Test

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Счёт партнера",
-  "x-extra-class-annotation": "@AccountKeyValidation @AccountBalanceValidation @AccountRubCodeCurrencyValidation @BalanceTreasureAccountValidation @TreasureAccountCodeCurrencyValidation @BankAccountKeyValidation @TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation",
+  "x-extra-class-annotation": "@AccountKeyValidation @AccountRubCodeCurrencyValidation @BalanceTreasureAccountValidation @TreasureAccountCodeCurrencyValidation @BankAccountKeyValidation @TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation",
   "properties": {
     "id": {
       "type": "string",
