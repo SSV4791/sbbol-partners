@@ -16,8 +16,6 @@ import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisites;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 
-import java.util.StringJoiner;
-
 @Loggable
 @Mapper(
     componentModel = "spring",
@@ -62,19 +60,13 @@ public interface CounterpartyMapper extends BaseMapper {
     void toCounterparty(PartnerEntity partner, AccountEntity account, @MappingTarget Counterparty counterparty);
 
     @Named("toName")
-    static String toName(PartnerEntity partner) {
+    default String toName(PartnerEntity partner) {
         if (LegalType.PHYSICAL_PERSON == partner.getLegalType()) {
-            StringJoiner fioJoiner = new StringJoiner(" ");
-            if (partner.getFirstName() != null) {
-                fioJoiner.add(partner.getFirstName());
-            }
-            if (partner.getSecondName() != null) {
-                fioJoiner.add(partner.getSecondName());
-            }
-            if (partner.getMiddleName() != null) {
-                fioJoiner.add(partner.getMiddleName());
-            }
-            return fioJoiner.toString();
+            return saveSearchString(
+                partner.getSecondName(),
+                partner.getFirstName(),
+                partner.getMiddleName()
+            );
         }
         return partner.getOrgName();
     }

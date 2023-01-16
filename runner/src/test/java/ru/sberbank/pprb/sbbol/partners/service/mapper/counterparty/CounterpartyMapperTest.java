@@ -42,7 +42,8 @@ class CounterpartyMapperTest extends BaseUnitConfiguration {
         account.setBank(bank);
         Counterparty response = mapper.toCounterparty(partner, account);
         if (LegalType.PHYSICAL_PERSON.equals(partner.getLegalType())) {
-            assertThat(response.getName()).isEqualTo(partner.getFirstName() + " " + partner.getSecondName() + " " + partner.getMiddleName());
+            assertThat(response.getName())
+                .isEqualTo(partner.getSecondName() + " " + partner.getFirstName() + " " + partner.getMiddleName());
         } else {
             assertThat(response.getName()).isEqualTo(partner.getOrgName());
         }
