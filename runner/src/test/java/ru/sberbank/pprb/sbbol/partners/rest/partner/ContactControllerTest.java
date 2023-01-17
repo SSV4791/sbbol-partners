@@ -358,8 +358,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
-        var newPhones = Allure.step("Подготовка нового номера телефона", () -> {
-            HashSet<Phone> setNewPhones = new HashSet<>();
+        var newPhones = Allure.step("Подготовка новых номеров телефонов", () -> {
+            Set<Phone> phones = new HashSet<>();
             if (contact.getPhones() != null) {
                 for (var phone : contact.getPhones()) {
                     var newPhone = new Phone();
@@ -368,13 +368,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newPhone.setUnifiedId(phone.getUnifiedId());
                     newPhone.setDigitalId(phone.getDigitalId());
                     newPhone.setPhone(randomNumeric(13));
-                    setNewPhones.add(newPhone);
+                   phones.add(newPhone);
                 }
             }
-            return setNewPhones;
+            return phones;
         });
-        var newEmails = Allure.step("Подготовка нового емайла", () -> {
-            HashSet<Email> setNewEmails = new HashSet<>();
+        var newEmails = Allure.step("Подготовка новых емайлов", () -> {
+            Set<Email> emails = new HashSet<>();
             if (contact.getEmails() != null) {
                 for (var email : contact.getEmails()) {
                     var newEmail = new Email();
@@ -383,10 +383,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newEmail.setUnifiedId(email.getUnifiedId());
                     newEmail.setDigitalId(email.getDigitalId());
                     newEmail.setEmail(email.getEmail());
-                    setNewEmails.add(newEmail);
+                    emails.add(newEmail);
                 }
             }
-            return setNewEmails;
+            return emails;
         });
         Allure.step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones);
@@ -407,8 +407,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 .isNotEqualTo(contact.getFirstName());
         });
 
-        var newPhones1 = Allure.step("Подготовка нового номера телефона", () -> {
-            HashSet<Phone> setNewPhones1 = new HashSet<>();
+        var newPhones1 = Allure.step("Подготовка новых номеров телефонов", () -> {
+            Set<Phone> phones1 = new HashSet<>();
             if (contact.getPhones() != null) {
                 for (var phone : contact.getPhones()) {
                     var newPhone = new Phone();
@@ -417,13 +417,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newPhone.setUnifiedId(phone.getUnifiedId());
                     newPhone.setDigitalId(phone.getDigitalId());
                     newPhone.setPhone(randomNumeric(12));
-                    setNewPhones1.add(newPhone);
+                    phones1.add(newPhone);
                 }
             }
-            return setNewPhones1;
+            return phones1;
         });
-        var newEmails1 = Allure.step("Подготовка нового емайла", () -> {
-            HashSet<Email> setNewEmails1 = new HashSet<>();
+        var newEmails1 = Allure.step("Подготовка новых емайлов", () -> {
+            Set<Email>  emails1 = new HashSet<>();
             if (contact.getEmails() != null) {
                 for (var email : contact.getEmails()) {
                     var newEmail = new Email();
@@ -432,10 +432,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newEmail.setUnifiedId(email.getUnifiedId());
                     newEmail.setDigitalId(email.getDigitalId());
                     newEmail.setEmail(email.getEmail());
-                    setNewEmails1.add(newEmail);
+                    emails1.add(newEmail);
                 }
             }
-            return setNewEmails1;
+            return emails1;
         });
         Allure.step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones1);
@@ -463,8 +463,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
-        var newPhones = Allure.step("Подготовка нового номера телефона", () -> {
-            HashSet<Phone> setNewPhones = new HashSet<>();
+        var newPhones = Allure.step("Подготовка новых номеров телефонов", () -> {
+            Set<Phone> phones = new HashSet<>();
             if (contact.getPhones() != null) {
                 for (var phone : contact.getPhones()) {
                     var newPhone = new Phone();
@@ -473,13 +473,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newPhone.setUnifiedId(phone.getUnifiedId());
                     newPhone.setDigitalId(phone.getDigitalId());
                     newPhone.setPhone(randomNumeric(13));
-                    setNewPhones.add(newPhone);
+                    phones.add(newPhone);
                 }
             }
-            return setNewPhones;
+            return phones;
         });
-        var newEmails = Allure.step("Подготовка нового емайла", () -> {
-            HashSet<Email> setNewEmails = new HashSet<>();
+        var newEmails = Allure.step("Подготовка новых емайлов", () -> {
+            Set<Email> emails = new HashSet<>();
             if (contact.getEmails() != null) {
                 for (var email : contact.getEmails()) {
                     var newEmail = new Email();
@@ -488,10 +488,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newEmail.setUnifiedId(email.getUnifiedId());
                     newEmail.setDigitalId(email.getDigitalId());
                     newEmail.setEmail(email.getEmail());
-                    setNewEmails.add(newEmail);
+                    emails.add(newEmail);
                 }
             }
-            return setNewEmails;
+            return emails;
         });
         Allure.step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones);
@@ -511,8 +511,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             assertThat(newUpdateContact.getFirstName())
                 .isNotEqualTo(contact.getFirstName());
         });
-        var newPhones1 = Allure.step("Подготовка нового номера телефона", () -> {
-            HashSet<Phone> setNewPhones1 = new HashSet<>();
+        var newPhones1 = Allure.step("Подготовка новых номеров телефонов", () -> {
+            Set<Phone> phones1 = new HashSet<>();
             if (contact.getPhones() != null) {
                 for (var phone : contact.getPhones()) {
                     var newPhone = new Phone();
@@ -521,13 +521,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newPhone.setUnifiedId(phone.getUnifiedId());
                     newPhone.setDigitalId(phone.getDigitalId());
                     newPhone.setPhone(randomNumeric(13));
-                    setNewPhones1.add(newPhone);
+                    phones1.add(newPhone);
                 }
             }
-            return setNewPhones1;
+            return phones1;
         });
-        var newEmails1 = Allure.step("Подготовка нового емайла", () -> {
-            HashSet<Email> setNewEmails1 = new HashSet<>();
+        var newEmails1 = Allure.step("Подготовка новых емайлов", () -> {
+            Set<Email> emails1 = new HashSet<>();
             if (contact.getEmails() != null) {
                 for (var email : contact.getEmails()) {
                     var newEmail1 = new Email();
@@ -536,10 +536,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newEmail1.setUnifiedId(email.getUnifiedId());
                     newEmail1.setDigitalId(email.getDigitalId());
                     newEmail1.setEmail(randomAlphabetic(64) + "@mail.ru");
-                    setNewEmails1.add(newEmail1);
+                    emails1.add(newEmail1);
                 }
             }
-            return setNewEmails1;
+            return emails1;
         });
         Allure.step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones1);
