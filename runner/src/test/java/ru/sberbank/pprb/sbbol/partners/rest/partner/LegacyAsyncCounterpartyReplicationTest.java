@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.config.props.ReplicationKafkaSecurityProp
 import ru.sberbank.pprb.sbbol.partners.config.props.ValidationInterceptorProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 import java.util.List;
 
@@ -75,7 +76,7 @@ class LegacyAsyncCounterpartyReplicationTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
 
         changeAccount(updateAccount(account));
-        createValidAccountsSign(account.getDigitalId(), account.getId());
+        createValidAccountsSign(account.getDigitalId(), account.getId(), podamFactory.manufacturePojo(FraudMetaData.class));
         deleteAccountSign(account.getDigitalId(), account.getId());
         deleteAccount(account.getDigitalId(), account.getId());
 

@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -541,7 +542,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
-            createValidAccountsSign(partner.getDigitalId(), account);
+            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+            createValidAccountsSign(partner.getDigitalId(), account, fraudMetaData);
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
 
             return new AccountsFilter()
@@ -581,7 +583,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
             for (int i = 0; i < 4; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
-            createValidAccountsSign(partner.getDigitalId(), account);
+            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+            createValidAccountsSign(partner.getDigitalId(), account, fraudMetaData);
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
@@ -620,7 +623,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
             for (int i = 0; i < 4; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
-            createValidAccountsSign(partner.getDigitalId(), account);
+            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+            createValidAccountsSign(partner.getDigitalId(), account, fraudMetaData);
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())

@@ -11,7 +11,8 @@
     },
     "epkId": {
       "type": "string",
-      "title": "Идентификатор ЕПК ЮЛ"
+      "title": "Идентификатор ЕПК ЮЛ",
+      "x-not-empty": true
     },
     "login": {
       "type": "string",
@@ -43,19 +44,19 @@
       "maxLength": 320,
       "x-not-empty": true
     },
-    "terBankCode": {
+    "terBankNumber": {
       "type": "string",
       "title": "Код территориального банка",
       "maxLength": 50,
       "x-not-empty": true
     },
-    "terBankGosb": {
+    "gosbNumber": {
       "type": "string",
       "title": "Номер ОСБ",
       "maxLength": 2000,
       "x-not-empty": true
     },
-    "terBankVsp": {
+    "vspNumber": {
       "type": "string",
       "title": "Номер ВСП",
       "maxLength": 2000,
@@ -70,8 +71,8 @@
     "orgName",
     "phone",
     "email",
-    "terBankCode",
-    "terBankGosb",
-    "terBankVsp"
+    "terBankNumber",
+    "gosbNumber",
+    "vspNumber"
   ]
 }

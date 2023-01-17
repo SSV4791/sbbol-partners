@@ -17,17 +17,23 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 @SuppressWarnings("java:S2187")
 public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
 
     protected static final String baseRoutePath = "/partner/accounts/sign";
 
-    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, String accountId) {
+    public static AccountsSignInfoResponse createValidAccountsSign(
+        String digitalId,
+        String accountId,
+        FraudMetaData fraudMetaData
+    ) {
         var createAccountSign = post(
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(digitalId, accountId),
+            getFraudMetaDataHeaders(fraudMetaData),
             AccountsSignInfoResponse.class
         );
         assertThat(createAccountSign)
@@ -35,15 +41,44 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return createAccountSign;
     }
 
-    public static Error createAccountSignWithBadRequest(String digitalId, String accountId) {
-        var response = post(baseRoutePath, HttpStatus.BAD_REQUEST, getValidAccountsSign(digitalId, accountId), Error.class);
+    public static Error createInvalidAccountsSignWithInvalidFraudMetaData(
+        String digitalId,
+        String accountId,
+        FraudMetaData invalidFraudMetaData
+    ) {
+        var response = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            getValidAccountsSign(digitalId, accountId),
+            getFraudMetaDataHeaders(invalidFraudMetaData),
+            Error.class
+        );
         assertThat(response)
             .isNotNull();
         return response;
     }
 
-    public static Error createAccountSignWithNotFound(String digitalId, String accountId) {
-        var response = post(baseRoutePath, HttpStatus.NOT_FOUND, getValidAccountsSign(digitalId, accountId), Error.class);
+    public static Error createAccountSignWithBadRequest(String digitalId, String accountId, FraudMetaData fraudMetaData) {
+        var response = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            getValidAccountsSign(digitalId, accountId),
+            getFraudMetaDataHeaders(fraudMetaData),
+            Error.class
+        );
+        assertThat(response)
+            .isNotNull();
+        return response;
+    }
+
+    public static Error createAccountSignWithNotFound(String digitalId, String accountId, FraudMetaData fraudMetaData) {
+        var response = post(
+            baseRoutePath,
+            HttpStatus.NOT_FOUND,
+            getValidAccountsSign(digitalId, accountId),
+            getFraudMetaDataHeaders(fraudMetaData),
+            Error.class
+        );
         assertThat(response)
             .isNotNull();
         return response;
@@ -62,16 +97,21 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return deleteAccountSign;
     }
 
-    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, List<String> accountsId) {
+    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, List<String> accountsId, FraudMetaData fraudMetaData) {
         var createAccountSign = post(
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(digitalId, accountsId),
+            getFraudMetaDataHeaders(fraudMetaData),
             AccountsSignInfoResponse.class
         );
         assertThat(createAccountSign)
             .isNotNull();
         return createAccountSign;
+    }
+
+    public static Map<String, FraudMetaData> getFraudMetaDataHeaders(FraudMetaData fraudMetaData) {
+        return Map.of("Fraud-Meta-Data", fraudMetaData);
     }
 
     public static AccountsSignInfo getValidAccountsSign(String digitalId, String accountId) {

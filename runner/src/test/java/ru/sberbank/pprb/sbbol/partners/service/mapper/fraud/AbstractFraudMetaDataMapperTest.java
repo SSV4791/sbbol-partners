@@ -52,7 +52,7 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
         assertThat(actualIdentificationData.getClientTransactionId())
             .isEqualTo(clientTransactionId);
         assertThat(actualIdentificationData.getOrgName())
-            .isEqualTo(clientData.getTerBankCode());
+            .isEqualTo(clientData.getTerBankNumber());
         assertThat(actualIdentificationData.getUserName())
             .isEqualTo(clientData.getEpkId());
         assertThat(actualIdentificationData.getUserLoginName())
@@ -137,9 +137,9 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
         assertThat(actualClientDefinedAttributeList.getPayerName())
             .isEqualTo(clientData.getOrgName());
         assertThat(actualClientDefinedAttributeList.getOsbNumber())
-            .isEqualTo(clientData.getTerBankGosb());
+            .isEqualTo(clientData.getGosbNumber());
         assertThat(actualClientDefinedAttributeList.getVspNumber())
-            .isEqualTo(clientData.getTerBankVsp());
+            .isEqualTo(clientData.getVspNumber());
         assertThat(actualClientDefinedAttributeList.getDboOperationName())
             .isEqualTo(DBO_OPERATION_NAME);
         assertThat(actualClientDefinedAttributeList.getPrivateIpAddress())

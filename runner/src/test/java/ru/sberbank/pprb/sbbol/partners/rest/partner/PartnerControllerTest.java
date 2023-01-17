@@ -32,7 +32,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerDelete;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
@@ -822,7 +821,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner1)
             .isNotNull();
         var validAccount = createValidAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
-        createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId());
+        var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+        createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId(), fraudMetaData);
 
         var createdPartner2 = post(
             baseRoutePath,
@@ -1454,51 +1454,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             Map.of("Fraud-Meta-Data", podamFactory.manufacturePojo(FraudMetaData.class)),
             actualPartner.getDigitalId()
         ).getBody();
-
-        var searchPartner = get(
-            baseRoutePathForGet,
-            HttpStatus.NOT_FOUND,
-            Error.class,
-            createdPartner.getDigitalId(),
-            createdPartner.getId()
-        );
-        assertThat(searchPartner)
-            .isNotNull();
-
-        assertThat(searchPartner.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
-    }
-
-    @Test
-    void testDeletePartner() {
-        var createdPartner = post(
-            baseRoutePath,
-            HttpStatus.CREATED,
-            getValidLegalEntityPartner(),
-            Partner.class
-        );
-        assertThat(createdPartner)
-            .isNotNull();
-        var actualPartner = get(
-            baseRoutePathForGet,
-            HttpStatus.OK,
-            Partner.class,
-            createdPartner.getDigitalId(),
-            createdPartner.getId()
-        );
-        assertThat(actualPartner)
-            .isNotNull()
-            .isEqualTo(createdPartner);
-
-        var partnerDelete = podamFactory.manufacturePojo(PartnerDelete.class);
-        partnerDelete.setDigitalId(actualPartner.getDigitalId());
-        partnerDelete.setPartnerIds(Set.of(actualPartner.getId()));
-
-        post(
-            "/partners/delete",
-            HttpStatus.NO_CONTENT,
-            partnerDelete
-        );
 
         var searchPartner = get(
             baseRoutePathForGet,

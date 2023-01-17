@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for dictionary documents
-  version: 1.0.5
+  version: 1.0.6
   description: OpenAPI Specification for document
 
 servers:

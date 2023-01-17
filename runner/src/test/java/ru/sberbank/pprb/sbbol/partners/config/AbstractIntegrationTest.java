@@ -14,6 +14,7 @@ import io.restassured.specification.ResponseSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Map;
 
@@ -65,6 +67,9 @@ public abstract class AbstractIntegrationTest {
     protected static ResponseSpecification internalServerErrorResponseSpec;
 
     protected static ResponseSpecification methodNotAllowedResponseSpec;
+
+    @Autowired
+    protected PodamFactory podamFactory;
 
     @BeforeAll
     final void setup() {
@@ -139,6 +144,19 @@ public abstract class AbstractIntegrationTest {
     protected static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
         return given()
             .spec(requestSpec)
+            .body(body)
+            .when()
+            .post(url)
+            .then()
+            .spec(specResponseHandler(responseHttpStatus))
+            .extract()
+            .as(response);
+    }
+
+    protected static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Map<String, ?> headers, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .headers(headers)
             .body(body)
             .when()
             .post(url)
