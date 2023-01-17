@@ -28,8 +28,6 @@ paths:
             application/json:
               schema:
                 $ref: 'model/documents/documents_response.json'
-        404:
-          description: Not Found
         400:
           description: Bad Request
           content:

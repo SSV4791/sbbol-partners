@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
@@ -32,7 +33,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isNotNull();
         assertThat(expected)
             .hasSameSizeAs(actual);
-        for(int i = 0; i < expected.size(); i++) {
+        for (int i = 0; i < expected.size(); i++) {
             assertThat(expected.get(i).getDigitalId())
                 .isEqualTo(actual.get(i).getDigitalId());
             assertThat(expected.get(i).getAccount())
@@ -185,5 +186,43 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "lastModifiedDate"
             )
             .isEqualTo(mapper.toBankAccount(actual));
+    }
+
+    @Test
+    void testToAccountWithPartner() {
+        AccountEntity expected = factory.manufacturePojo(AccountEntity.class);
+        AccountWithPartnerResponse actual = mapper.toAccountWithPartner(expected);
+        assertThat(actual.getId())
+            .isEqualTo(expected.getPartner().getUuid().toString());
+        assertThat(actual.getOrgName())
+            .isEqualTo(expected.getPartner().getOrgName());
+        assertThat(actual.getFirstName())
+            .isEqualTo(expected.getPartner().getFirstName());
+        assertThat(actual.getSecondName())
+            .isEqualTo(expected.getPartner().getSecondName());
+        assertThat(actual.getMiddleName())
+            .isEqualTo(expected.getPartner().getMiddleName());
+        assertThat(actual.getInn())
+            .isEqualTo(expected.getPartner().getInn());
+        assertThat(actual.getKpp())
+            .isEqualTo(expected.getPartner().getKpp());
+        assertThat(actual.getComment())
+            .isEqualTo(expected.getPartner().getComment());
+        assertThat(actual.getAccount().getPartnerId() )
+            .hasToString(expected.getPartnerUuid().toString());
+        assertThat(actual.getAccount().getId())
+            .hasToString(expected.getUuid().toString());
+        assertThat(actual.getAccount().getDigitalId())
+            .isEqualTo(expected.getDigitalId() );
+        assertThat(actual.getAccount().getAccount())
+            .isEqualTo(expected.getAccount() );
+        assertThat(actual.getAccount().getBank().getName())
+            .isEqualTo(expected.getBank().getName() );
+        assertThat(expected.getBank().getBic())
+            .isEqualTo(actual.getAccount().getBank().getBic());
+        assertThat(expected.getBank().getIntermediary())
+            .isEqualTo(actual.getAccount().getBank().getMediary());
+        assertThat(expected.getBank().getBankAccount().getAccount())
+            .isEqualTo(actual.getAccount().getBank().getBankAccount().getBankAccount());
     }
 }

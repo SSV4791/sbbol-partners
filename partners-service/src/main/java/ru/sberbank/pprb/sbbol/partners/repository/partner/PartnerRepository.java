@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.PartnerViewRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.RenterViewRepository;
 
@@ -36,5 +37,5 @@ public interface PartnerRepository extends CrudRepository<PartnerEntity, UUID>, 
      * @param digitalId Идентификатор личного кабинета
      * @param search    Данные для поиска партнера
      */
-    PartnerEntity findByDigitalIdAndSearch(String digitalId, String search);
+    PartnerEntity findByDigitalIdAndSearchContainsAndType(String digitalId, String search, PartnerType type);
 }

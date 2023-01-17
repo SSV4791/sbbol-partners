@@ -12,6 +12,7 @@
     },
     "partnerIds": {
       "type": "array",
+      "maximum": 30,
       "items": {
         "type": "string",
         "minLength": 36,
@@ -23,6 +24,7 @@
     "accountIds": {
       "title": "Идентификаторы счетов",
       "type": "array",
+      "maximum": 30,
       "items": {
         "type": "string",
         "minLength": 36,

@@ -1,9 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
+import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 
@@ -62,4 +64,10 @@ public interface AccountService {
      */
     Account changePriority(AccountPriority accountPriority);
 
+    /**
+     * Получение счетов партнера с партнером по запросу
+     *
+     * @param request параметры поиска счета с партнером
+     */
+    List<AccountWithPartnerResponse> getAtRequisites(AccountAndPartnerRequest request);
 }

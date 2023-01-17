@@ -62,7 +62,7 @@ public interface CounterpartyMapper extends BaseMapper {
     @Named("toName")
     default String toName(PartnerEntity partner) {
         if (LegalType.PHYSICAL_PERSON == partner.getLegalType()) {
-            return saveSearchString(
+            return prepareSearchString(
                 partner.getSecondName(),
                 partner.getFirstName(),
                 partner.getMiddleName()

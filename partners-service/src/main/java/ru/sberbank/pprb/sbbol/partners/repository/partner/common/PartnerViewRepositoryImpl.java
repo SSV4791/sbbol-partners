@@ -76,7 +76,7 @@ public class PartnerViewRepositoryImpl
         predicates.add(builder.equal(root.get(PartnerEntity_.TYPE), PartnerType.PARTNER));
         var filterSearch = filter.getSearch();
         if (filterSearch != null && StringUtils.hasText(filterSearch.getSearch())) {
-            var searchPattern = partnerMapper.prepareSearchString(filterSearch.getSearch())
+            var searchPattern = partnerMapper.saveSearchString(filterSearch.getSearch())
                 .toLowerCase(Locale.getDefault());
             predicates.add(
                 builder.like(
@@ -145,7 +145,7 @@ public class PartnerViewRepositoryImpl
         CriteriaBuilder builder
     ) {
         List<BudgetMaskEntity> bicMasks = dictionaryRepository.findAllByType(BudgetMaskType.BIC);
-        var maskBicPredicates = new ArrayList<>(bicMasks.size());
+        var maskBicPredicates = new ArrayList<Predicate>(bicMasks.size());
         for (var mask : bicMasks) {
             maskBicPredicates.add(
                 builder.or(
@@ -154,7 +154,7 @@ public class PartnerViewRepositoryImpl
                         mask.getCondition().toUpperCase(Locale.getDefault()))));
         }
         List<BudgetMaskEntity> gisGmlMasks = dictionaryRepository.findAllByType(BudgetMaskType.GIS_GMP_ACCOUNT);
-        var gisGmpAccountPredicates = new ArrayList<>(gisGmlMasks.size());
+        var gisGmpAccountPredicates = new ArrayList<Predicate>(gisGmlMasks.size());
         for (var mask : gisGmlMasks) {
             gisGmpAccountPredicates.add(
                 builder.or(
@@ -174,7 +174,7 @@ public class PartnerViewRepositoryImpl
         CriteriaBuilder builder
     ) {
         var taxAccountMasks = dictionaryRepository.findAllByType(BudgetMaskType.TAX_ACCOUNT_RECEIVER);
-        var taxAccountPredicates = new ArrayList<>(taxAccountMasks.size());
+        var taxAccountPredicates = new ArrayList<Predicate>(taxAccountMasks.size());
         for (var mask : taxAccountMasks) {
             taxAccountPredicates.add(
                 builder.or(
@@ -191,7 +191,7 @@ public class PartnerViewRepositoryImpl
         CriteriaBuilder builder
     ) {
         var accountMasks = dictionaryRepository.findAllByType(BudgetMaskType.BUDGET_ACCOUNT);
-        var budgetAccountPredicates = new ArrayList<>(accountMasks.size());
+        var budgetAccountPredicates = new ArrayList<Predicate>(accountMasks.size());
         for (var mask : accountMasks) {
             budgetAccountPredicates.add(
                 builder.or(
@@ -200,7 +200,7 @@ public class PartnerViewRepositoryImpl
                         mask.getCondition().toUpperCase(Locale.getDefault()))));
         }
         var budgetCorrAccountMasks = dictionaryRepository.findAllByType(BudgetMaskType.BUDGET_CORR_ACCOUNT);
-        var budgetCorAccountPredicates = new ArrayList<>(budgetCorrAccountMasks.size());
+        var budgetCorAccountPredicates = new ArrayList<Predicate>(budgetCorrAccountMasks.size());
         for (var mask : budgetCorrAccountMasks) {
             budgetCorAccountPredicates.add(
                 builder.or(
