@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner.enums;
 
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
+
 /**
  * Тип правовой формы Партнера
  */
@@ -18,5 +20,13 @@ public enum LegalType {
 
     public String getDesc() {
         return desc;
+    }
+
+    public static LegalType of(LegalForm form) {
+        return switch (form) {
+            case PHYSICAL_PERSON -> LegalType.PHYSICAL_PERSON;
+            case LEGAL_ENTITY -> LegalType.LEGAL_ENTITY;
+            case ENTREPRENEUR -> LegalType.ENTREPRENEUR;
+        };
     }
 }

@@ -4,15 +4,13 @@ import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
-import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
-import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
-import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
-import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
@@ -40,6 +38,7 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterLegalFormArgumentsProvider;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import uk.co.jemos.podam.api.PodamFactory;
 
@@ -57,6 +56,11 @@ import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOkpoNumber;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
@@ -70,8 +74,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRe
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class PartnerControllerTest extends AbstractIntegrationTest {
-
-    private static final String VALID_PHYSICAL_OKPO = "1234567890";
 
     public static final String baseRoutePath = "/partner";
     public static final String baseRoutePathForGet = "/partners/{digitalId}/{id}";
@@ -95,6 +97,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             innDictionaryRepository.delete(gkuInnEntity2);
         }
     }
+
     @Test
     void testCreatePartnerWithoutDigitalId() {
         var partner = getValidLegalEntityPartner("");
@@ -219,7 +222,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isEqualTo(createdPartner);
     }
 
-        @Test
+    @Test
     void testCreatePartnerWithoutLegalForm() {
         var partner = getValidLegalEntityPartner(randomAlphabetic(10))
             .legalForm(null);
@@ -852,6 +855,44 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
         assertThat(response.getPartners().size())
             .isOne();
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(PartnerFilterLegalFormArgumentsProvider.class)
+    void testGetPartners_whenUsePartnerType(PartnersFilter filter) {
+        post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(filter.getDigitalId(), LegalForm.LEGAL_ENTITY),
+            Partner.class
+        );
+        post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(filter.getDigitalId(), LegalForm.ENTREPRENEUR),
+            Partner.class
+        );
+        post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidPartner(filter.getDigitalId(), LegalForm.PHYSICAL_PERSON),
+            Partner.class
+        );
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        List<Partner> partners = response.getPartners();
+        assertThat(partners.size())
+            .isEqualTo(filter.getLegalForms().size());
+        for (Partner partner : partners) {
+            assertThat(filter.getLegalForms())
+                .contains(partner.getLegalForm());
+        }
     }
 
     @Test
@@ -2049,10 +2090,8 @@ class PartnerControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testSavePartner_whenLegalFormIsNull() {
-        var partner = getValidLegalEntityPartner();
+        var partner = getValidPhysicalPersonPartner();
         partner.setLegalForm(null);
-        partner.setInn(getValidInnNumber(LegalForm.PHYSICAL_PERSON));
-        partner.setOkpo(VALID_PHYSICAL_OKPO);
         var error = given()
             .spec(requestSpec)
             .body(partner)
@@ -2074,7 +2113,7 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidFullModelLegalEntityPartner();
         partner.setLegalForm(null);
         partner.setInn(getValidInnNumber(LegalForm.PHYSICAL_PERSON));
-        partner.setOkpo(VALID_PHYSICAL_OKPO);
+        partner.setOkpo(getValidOkpoNumber(LegalForm.PHYSICAL_PERSON));
         var error = given()
             .spec(requestSpec)
             .body(partner)
@@ -2161,30 +2200,46 @@ class PartnerControllerTest extends AbstractIntegrationTest {
             .contains("Поле содержит недопустимый(-е) символ(-ы): АБВ");
     }
 
+    public static PartnerCreate getValidPartner(String digitalId, LegalForm form) {
+        return new PartnerCreate()
+            .digitalId(digitalId)
+            .legalForm(form)
+            .orgName(randomAlphabetic(10))
+            .firstName(randomAlphabetic(10))
+            .secondName(randomAlphabetic(10))
+            .middleName(randomAlphabetic(10))
+            .inn(getValidInnNumber(form))
+            .kpp("123456789")
+            .ogrn(getValidOgrnNumber(form))
+            .okpo(getValidOkpoNumber(form))
+            .phones(new HashSet<>(List.of("0079241111111")))
+            .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
+            .comment("555555");
+    }
+
+
     public static PartnerCreate getValidLegalEntityPartner() {
         return getValidLegalEntityPartner(randomAlphabetic(10));
     }
 
     public static PartnerCreate getValidLegalEntityPartner(String digitalId) {
-        var partner = new PartnerCreate()
-            .legalForm(LegalForm.LEGAL_ENTITY)
-            .orgName(randomAlphabetic(10))
-            .firstName(randomAlphabetic(10))
-            .secondName(randomAlphabetic(10))
-            .middleName(randomAlphabetic(10))
-            .inn(getValidInnNumber(LegalForm.LEGAL_ENTITY))
-            .kpp("123456789")
-            .ogrn(getValidOgrnNumber(LegalForm.LEGAL_ENTITY))
-            .okpo("12345678")
-            .phones(new HashSet<>(List.of("0079241111111")))
-            .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
-            .comment("555555");
-        partner.setDigitalId(digitalId);
-        return partner;
+        return getValidPartner(digitalId, LegalForm.LEGAL_ENTITY);
     }
 
     public static PartnerCreateFullModel getValidFullModelLegalEntityPartner() {
         return getValidFullModelLegalEntityPartner(randomAlphabetic(10));
+    }
+
+    public static PartnerCreate getValidPhysicalPersonPartner() {
+        return getValidPhysicalPersonPartner(randomAlphabetic(10));
+    }
+
+    private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {
+        return getValidPartner(digitalId, LegalForm.PHYSICAL_PERSON);
+    }
+
+    private static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
+        return getValidPartner(digitalId, LegalForm.ENTREPRENEUR);
     }
 
     public static PartnerCreateFullModel getValidFullModelLegalEntityPartner(String digitalId) {
@@ -2261,26 +2316,6 @@ class PartnerControllerTest extends AbstractIntegrationTest {
                         ))
                 )
             );
-    }
-
-    public static PartnerCreate getValidPhysicalPersonPartner() {
-        return getValidPhysicalPersonPartner(randomAlphabetic(10));
-    }
-
-    private static PartnerCreate getValidPhysicalPersonPartner(String digitalId) {
-        var partner = getValidLegalEntityPartner(digitalId);
-        partner.setLegalForm(LegalForm.PHYSICAL_PERSON);
-        partner.setInn(getValidInnNumber(LegalForm.PHYSICAL_PERSON));
-        return partner;
-    }
-
-    private static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
-        var partner = getValidLegalEntityPartner(digitalId);
-        partner.setLegalForm(LegalForm.ENTREPRENEUR);
-        partner.setOkpo(VALID_PHYSICAL_OKPO);
-        partner.setInn(getValidInnNumber(LegalForm.ENTREPRENEUR));
-        partner.setOgrn(getValidOgrnNumber(LegalForm.ENTREPRENEUR));
-        return partner;
     }
 
     protected static Partner createValidPartner() {

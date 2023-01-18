@@ -231,4 +231,11 @@ public class PodamConfiguration {
         var key = randomNumeric(3);
         return key + bic;
     }
+
+    public static String getValidOkpoNumber(LegalForm form) {
+        return switch (form) {
+            case LEGAL_ENTITY, PHYSICAL_PERSON -> randomNumeric(8);
+            case ENTREPRENEUR -> randomNumeric(10);
+        };
+    }
 }

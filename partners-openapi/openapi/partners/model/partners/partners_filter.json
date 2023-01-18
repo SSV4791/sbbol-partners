@@ -15,10 +15,20 @@
       "type": "object",
       "$ref": "../search/search_partners.json"
     },
+    "legalForms": {
+      "type": "array",
+      "title": "Фильтр по организационно-правовой форме партнера",
+      "items": {
+        "$ref": "../common/legal_form.json"
+      }
+    },
     "partnersFilter": {
+      "deprecated": true,
+      "description": "Будут исключены типы LEGAL_ENTITY, ENTREPRENEUR, PHYSICAL_PERSON",
       "$ref": "../common/partner_filter_type.json"
     },
     "accountSignType": {
+      "deprecation": true,
       "$ref": "../common/sign_type.json"
     },
     "pagination": {
