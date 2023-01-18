@@ -12,8 +12,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class PhoneViewRepositoryImpl extends BaseRepository<PhoneEntity, PhonesFilter> implements PhoneViewRepository {
 
@@ -35,11 +33,7 @@ public class PhoneViewRepositoryImpl extends BaseRepository<PhoneEntity, PhonesF
         PhonesFilter filter
     ) {
         predicates.add(builder.equal(root.get(PhoneEntity_.DIGITAL_ID), filter.getDigitalId()));
-        if (filter.getUnifiedIds() != null) {
-            predicates.add(
-                root.get(PhoneEntity_.UNIFIED_UUID)
-                    .in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
-        }
+        inPredicate(builder, predicates, root, PhoneEntity_.UNIFIED_UUID, filter.getUnifiedIds());
     }
 
     @Override

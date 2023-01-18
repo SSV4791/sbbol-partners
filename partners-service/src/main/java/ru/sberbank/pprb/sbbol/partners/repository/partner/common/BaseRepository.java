@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 
+import org.springframework.util.CollectionUtils;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -10,6 +12,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 abstract class BaseRepository<T, F> {
 
@@ -51,4 +55,19 @@ abstract class BaseRepository<T, F> {
     abstract List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root);
 
     abstract void pagination(TypedQuery<T> query, F filter);
+
+    protected void inPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<?> root, String field, List<String> ids) {
+        if (!CollectionUtils.isEmpty(ids)) {
+            List<UUID> uuids = ids.stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList());
+            if (ids.size() == 1) {
+                predicates.add(builder.equal(root.get(field), uuids.get(0)));
+            } else {
+                predicates.add(
+                    root.get(field).in(uuids)
+                );
+            }
+        }
+    }
 }

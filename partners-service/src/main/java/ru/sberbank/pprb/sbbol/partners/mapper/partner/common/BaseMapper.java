@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner.common;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.StringUtils;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,7 +33,8 @@ public interface BaseMapper {
             )
             .filter(Objects::nonNull)
             .map(it -> it.replace(SPACE, EMPTY))
-            .collect(Collectors.joining(EMPTY));
+            .collect(Collectors.joining(EMPTY))
+            .toLowerCase(Locale.ROOT);
     }
 
     @NotNull

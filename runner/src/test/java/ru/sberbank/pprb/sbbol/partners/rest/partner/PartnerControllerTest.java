@@ -38,6 +38,7 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterIdsArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterLegalFormArgumentsProvider;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -73,7 +74,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignController
 import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
-class PartnerControllerTest extends AbstractIntegrationTest {
+public class PartnerControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner";
     public static final String baseRoutePathForGet = "/partners/{digitalId}/{id}";
@@ -892,6 +893,26 @@ class PartnerControllerTest extends AbstractIntegrationTest {
         for (Partner partner : partners) {
             assertThat(filter.getLegalForms())
                 .contains(partner.getLegalForm());
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(PartnerFilterIdsArgumentsProvider.class)
+    void testGetPartners_whenUsePartnerIds(PartnersFilter filter) {
+        var response = post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        );
+        assertThat(response)
+            .isNotNull();
+        List<Partner> partners = response.getPartners();
+        assertThat(partners.size())
+            .isEqualTo(filter.getIds().size());
+        for (Partner partner : partners) {
+            assertThat(filter.getIds())
+                .contains(partner.getId());
         }
     }
 

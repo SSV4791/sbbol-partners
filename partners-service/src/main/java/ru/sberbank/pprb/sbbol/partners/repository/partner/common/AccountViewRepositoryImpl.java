@@ -23,8 +23,6 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
@@ -70,13 +68,8 @@ public class AccountViewRepositoryImpl
                 )
             );
         }
-        if (filter.getPartnerIds() != null) {
-            predicates.add(root.get(AccountEntity_.PARTNER_UUID)
-                .in(filter.getPartnerIds().stream().map(UUID::fromString).collect(Collectors.toSet())));
-        }
-        if (filter.getAccountIds() != null) {
-            predicates.add(root.get(AccountEntity_.UUID).in(filter.getAccountIds().stream().map(UUID::fromString).collect(Collectors.toSet())));
-        }
+        inPredicate(builder, predicates, root, AccountEntity_.PARTNER_UUID, filter.getPartnerIds());
+        inPredicate(builder, predicates, root, AccountEntity_.UUID, filter.getAccountIds());
         if (isNotEmpty(filter.getState())) {
             predicates.add(builder.equal(root.get(AccountEntity_.STATE), filter.getState()));
         }

@@ -13,8 +13,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, AddressesFilter> implements AddressViewRepository {
 
@@ -36,10 +34,7 @@ public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, Add
         AddressesFilter filter
     ) {
         predicates.add(builder.equal(root.get(AddressEntity_.DIGITAL_ID), filter.getDigitalId()));
-        if (filter.getUnifiedIds() != null) {
-            predicates.add(root.get(AddressEntity_.UNIFIED_UUID)
-                .in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
-        }
+        inPredicate(builder, predicates, root, AddressEntity_.UNIFIED_UUID, filter.getUnifiedIds());
         if (filter.getType() != null) {
             predicates.add(builder.equal(root.get(AddressEntity_.TYPE), AddressType.valueOf(filter.getType().getValue())));
         }

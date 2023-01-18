@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
@@ -36,10 +37,16 @@ import javax.persistence.criteria.Subquery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
+import static ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType.ENTREPRENEUR;
+import static ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType.LEGAL_ENTITY;
+import static ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType.PHYSICAL_PERSON;
+import static ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType.BUDGET;
+import static ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType.GKU;
 
 public class PartnerViewRepositoryImpl
     extends BaseRepository<PartnerEntity, PartnersFilter> implements PartnerViewRepository {
@@ -66,7 +73,6 @@ public class PartnerViewRepositoryImpl
     }
 
     @Override
-    @SuppressWarnings("java:S1120")
     void createPredicate(
         CriteriaBuilder builder,
         CriteriaQuery<PartnerEntity> criteria,
@@ -74,12 +80,31 @@ public class PartnerViewRepositoryImpl
         Root<PartnerEntity> root,
         PartnersFilter filter
     ) {
+        addDigitalIdPredicate(builder, predicates, root, filter);
+        addIdsPredicate(builder, predicates, root, filter);
+        addTypePredicate(builder, predicates, root);
+        addSearchPredicate(builder, predicates, root, filter);
+        addAccountSignPredicate(predicates, root, filter);
+        addLegalFormPredicate(builder, predicates, root, filter);
+        addPartnerFilterPredicate(builder, criteria, predicates, root, filter);
+    }
+
+    private void addDigitalIdPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
         predicates.add(builder.equal(root.get(PartnerEntity_.DIGITAL_ID), filter.getDigitalId()));
+    }
+
+    private void addIdsPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
+        inPredicate(builder, predicates, root, PartnerEntity_.UUID, filter.getIds());
+    }
+
+    private void addTypePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root) {
         predicates.add(builder.equal(root.get(PartnerEntity_.TYPE), PartnerType.PARTNER));
+    }
+
+    private void addSearchPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
         var filterSearch = filter.getSearch();
         if (filterSearch != null && StringUtils.hasText(filterSearch.getSearch())) {
-            var searchPattern = partnerMapper.saveSearchString(filterSearch.getSearch())
-                .toLowerCase(Locale.getDefault());
+            var searchPattern = partnerMapper.saveSearchString(filterSearch.getSearch());
             predicates.add(
                 builder.like(
                     builder.function("replace",
@@ -92,6 +117,9 @@ public class PartnerViewRepositoryImpl
                 )
             );
         }
+    }
+
+    private void addAccountSignPredicate(List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
         if (filter.getAccountSignType() != null) {
             var accounts = switch (filter.getAccountSignType()) {
                 case SIGNED -> accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.SIGNED);
@@ -99,6 +127,9 @@ public class PartnerViewRepositoryImpl
             };
             predicates.add(root.get(PartnerEntity_.UUID).in(accounts.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
         }
+    }
+
+    private void addLegalFormPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
         List<LegalForm> legalForms = filter.getLegalForms();
         if (!CollectionUtils.isEmpty(legalForms)) {
             List<Predicate> partnerLegalTypePredicate = new ArrayList<>(legalForms.size());
@@ -109,18 +140,31 @@ public class PartnerViewRepositoryImpl
             }
             predicates.add(builder.or(partnerLegalTypePredicate.toArray(Predicate[]::new)));
         }
+    }
 
-        if (filter.getPartnersFilter() != null) {
-            switch (filter.getPartnersFilter()) {
-                case GKU -> {
-                    Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.INNER);
-                    predicates.add(builder.equal(root.get(PartnerEntity_.INN), join.get(GkuInnEntity_.INN)));
-                }
-                case BUDGET -> addBudgetPredicate(builder, criteria, predicates, root);
-                case ENTREPRENEUR -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.ENTREPRENEUR));
-                case PHYSICAL_PERSON -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.PHYSICAL_PERSON));
-                case LEGAL_ENTITY -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.LEGAL_ENTITY));
-            }
+    private void addPartnerFilterPredicate(
+        CriteriaBuilder builder,
+        CriteriaQuery<PartnerEntity> criteria,
+        List<Predicate> predicates,
+        Root<PartnerEntity> root,
+        PartnersFilter filter
+    ) {
+        PartnerFilterType partnerFilter = filter.getPartnersFilter();
+        if (Objects.equals(partnerFilter, GKU)) {
+            Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.INNER);
+            predicates.add(builder.equal(root.get(PartnerEntity_.INN), join.get(GkuInnEntity_.INN)));
+        }
+        if (Objects.equals(partnerFilter, BUDGET)) {
+            addBudgetPredicate(builder, criteria, predicates, root);
+        }
+        if (Objects.equals(partnerFilter, PartnerFilterType.ENTREPRENEUR)) {
+            predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), ENTREPRENEUR));
+        }
+        if (Objects.equals(partnerFilter, PartnerFilterType.PHYSICAL_PERSON)) {
+            predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), PHYSICAL_PERSON));
+        }
+        if (Objects.equals(partnerFilter, PartnerFilterType.LEGAL_ENTITY)) {
+            predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LEGAL_ENTITY));
         }
     }
 
