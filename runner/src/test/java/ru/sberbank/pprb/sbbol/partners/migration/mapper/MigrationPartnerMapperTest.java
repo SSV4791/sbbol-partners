@@ -1,9 +1,17 @@
 package ru.sberbank.pprb.sbbol.partners.migration.mapper;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapper;
+import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapperImpl;
+import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapperImpl_;
+import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.decorator.MigrationPartnerMapperDecorator;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
@@ -12,10 +20,18 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ContextConfiguration(
+    classes = {
+        MigrationPartnerMapperImpl.class,
+        MigrationPartnerMapperImpl_.class
+    }
+)
 class MigrationPartnerMapperTest extends BaseUnitConfiguration {
 
-    private static final MigrationPartnerMapper mapper = Mappers.getMapper(MigrationPartnerMapper.class);
     private static final String DIGITAL_ID = RandomStringUtils.random(20);
+
+    @Autowired
+    private MigrationPartnerMapper mapper;
 
     @Test
     void toMigrationPartnerEntityTest() {
@@ -102,7 +118,7 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
         var migrationCorrespondentCandidate =
             factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setInn("012345678912");
-        migrationCorrespondentCandidate.setAccount("40800000000000000001");
+        migrationCorrespondentCandidate.setAccount("40817000000000000001");
         var migrationPartnerEntity = mapper.toPartnerEntity(DIGITAL_ID, migrationCorrespondentCandidate);
         assertThat(migrationPartnerEntity.getFirstName()).isEqualTo(migrationCorrespondentCandidate.getName());
         assertThat(migrationPartnerEntity.getOrgName()).isNull();

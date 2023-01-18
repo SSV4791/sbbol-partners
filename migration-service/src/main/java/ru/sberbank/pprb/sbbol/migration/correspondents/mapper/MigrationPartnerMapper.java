@@ -3,11 +3,14 @@ package ru.sberbank.pprb.sbbol.migration.correspondents.mapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
+import org.mapstruct.DecoratedWith;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.migration.correspondents.enums.MigrationLegalType;
+import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.decorator.MigrationPartnerMapperDecorator;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
@@ -34,8 +37,10 @@ import java.util.stream.Stream;
         AccountMapper.class,
         PartnerMapper.class,
         MigrationLegalType.class
-    }
+    },
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
+@DecoratedWith(MigrationPartnerMapperDecorator.class)
 public interface MigrationPartnerMapper extends BaseMapper {
 
     @Mapping(target = "uuid", ignore = true)
@@ -44,14 +49,14 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @Mapping(target = "inn", expression = "java(stringNotEmpty(source.getInn()))")
     @Mapping(target = "kpp", expression = "java(stringNotEmpty(source.getKpp()))")
     @Mapping(target = "comment", expression = "java(stringNotEmpty(source.getDescription()))")
-    @Mapping(target = "legalType", expression = "java(toLegalType(source.getInn(), source.getAccount()))")
+    @Mapping(target = "legalType", ignore = true)
     @Mapping(target = "version", source = "source.version")
     @Mapping(target = "phones", expression = "java(toPhone(source.getCorrPhoneNumber(), digitalId))")
     @Mapping(target = "emails", expression = "java(toEmail(source.getCorrEmail(), digitalId))")
-    @Mapping(target = "orgName",
-        expression = "java(toLegalType(source.getInn(), source.getAccount()) != LegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "firstName",
-        expression = "java(toLegalType(source.getInn(), source.getAccount()) == LegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "orgName", ignore = true)
+    @Mapping(target = "firstName", ignore = true)
+    @Mapping(target = "secondName", ignore = true)
+    @Mapping(target = "middleName", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerEntity toPartnerEntity(String digitalId, MigrationCorrespondentCandidate source);
@@ -97,33 +102,20 @@ public interface MigrationPartnerMapper extends BaseMapper {
         }
     }
 
-    default LegalType toLegalType(String inn, String account) {
-        if (StringUtils.isNotEmpty(account) && StringUtils.isNotEmpty(inn)) {
-            if (inn.length() == 12) {
-                if (account.startsWith("407")) {
-                    return LegalType.ENTREPRENEUR;
-                }
-                if (account.startsWith("408")) {
-                    return LegalType.PHYSICAL_PERSON;
-                }
-            }
-        }
-        return LegalType.LEGAL_ENTITY;
-    }
 
     @Mapping(target = "type", constant = "PARTNER")
     @Mapping(target = "citizenship", constant = "UNKNOWN")
     @Mapping(target = "comment", source = "source.description")
     @Mapping(target = "inn", expression = "java(stringNotEmpty(source.getInn()))")
     @Mapping(target = "kpp", expression = "java(stringNotEmpty(source.getKpp()))")
-    @Mapping(target = "legalType", expression = "java(toLegalType(source.getInn(), source.getAccount()))")
+    @Mapping(target = "legalType", ignore = true)
     @Mapping(target = "version", source = "source.version")
     @Mapping(target = "phones", expression = "java(toPhone(partner.getPhones(), source.getCorrPhoneNumber(), digitalId))")
     @Mapping(target = "emails", expression = "java(toEmail(partner.getEmails(), source.getCorrEmail(), digitalId))")
-    @Mapping(target = "orgName",
-        expression = "java(toLegalType(source.getInn(), source.getAccount()) != LegalType.PHYSICAL_PERSON ? source.getName() : null)")
-    @Mapping(target = "firstName",
-        expression = "java(toLegalType(source.getInn(), source.getAccount()) == LegalType.PHYSICAL_PERSON ? source.getName() : null)")
+    @Mapping(target = "orgName", ignore = true)
+    @Mapping(target = "firstName", ignore = true)
+    @Mapping(target = "secondName", ignore = true)
+    @Mapping(target = "middleName", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updatePartnerEntity(String digitalId, MigrationCorrespondentCandidate source, @MappingTarget PartnerEntity partner);
@@ -170,35 +162,6 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updateAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source, @MappingTarget AccountEntity account);
-
-    @AfterMapping
-    default void mapBidirectional(@MappingTarget PartnerEntity partner) {
-        var searchSubString =
-            prepareSearchString(partner.getInn(),
-                partner.getKpp(),
-                partner.getOrgName(),
-                partner.getSecondName(),
-                partner.getFirstName(),
-                partner.getMiddleName()
-            );
-        partner.setSearch(searchSubString);
-        var phones = partner.getPhones();
-        if (phones != null) {
-            for (var phone : phones) {
-                if (phone != null) {
-                    phone.setPartner(partner);
-                }
-            }
-        }
-        var emails = partner.getEmails();
-        if (emails != null) {
-            for (var email : emails) {
-                if (email != null) {
-                    email.setPartner(partner);
-                }
-            }
-        }
-    }
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
