@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
@@ -17,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
@@ -97,6 +99,17 @@ public class PartnerViewRepositoryImpl
             };
             predicates.add(root.get(PartnerEntity_.UUID).in(accounts.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
         }
+        List<LegalForm> legalForms = filter.getLegalForms();
+        if (!CollectionUtils.isEmpty(legalForms)) {
+            List<Predicate> partnerLegalTypePredicate = new ArrayList<>(legalForms.size());
+            for (LegalForm form : legalForms) {
+                partnerLegalTypePredicate.add(
+                    builder.or(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LegalType.of(form)))
+                );
+            }
+            predicates.add(builder.or(partnerLegalTypePredicate.toArray(Predicate[]::new)));
+        }
+
         if (filter.getPartnersFilter() != null) {
             switch (filter.getPartnersFilter()) {
                 case GKU -> {
