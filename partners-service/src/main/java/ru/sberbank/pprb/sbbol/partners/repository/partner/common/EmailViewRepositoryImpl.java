@@ -12,8 +12,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class EmailViewRepositoryImpl extends BaseRepository<EmailEntity, EmailsFilter> implements EmailViewRepository {
 
@@ -35,10 +33,7 @@ public class EmailViewRepositoryImpl extends BaseRepository<EmailEntity, EmailsF
         EmailsFilter filter
     ) {
         predicates.add(builder.equal(root.get(EmailEntity_.DIGITAL_ID), filter.getDigitalId()));
-        if (filter.getUnifiedIds() != null) {
-            predicates.add(root.get(EmailEntity_.UNIFIED_UUID)
-                .in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
-        }
+        inPredicate(builder, predicates, root, EmailEntity_.UNIFIED_UUID, filter.getUnifiedIds());
     }
 
     @Override

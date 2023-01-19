@@ -121,11 +121,11 @@ public abstract class AbstractIntegrationTest {
     protected void initTest() {
     }
 
-    protected static <T> T get(String url, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
+    public static <T> T get(String url, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
         return get(url, null, responseHttpStatus, response, params);
     }
 
-    protected static <T> T get(String url, Header header, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
+    public static <T> T get(String url, Header header, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
         var specification = given()
             .spec(requestSpec)
             .when();
@@ -141,7 +141,7 @@ public abstract class AbstractIntegrationTest {
             ;
     }
 
-    protected static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
+    public static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
         return given()
             .spec(requestSpec)
             .body(body)
@@ -153,7 +153,7 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
-    protected static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Map<String, ?> headers, Class<T> response) {
+    public static <T, BODY> T post(String url, HttpStatus responseHttpStatus, BODY body, Map<String, ?> headers, Class<T> response) {
         return given()
             .spec(requestSpec)
             .headers(headers)
@@ -166,7 +166,7 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
-    protected static <T, BODY> T post(String url, BODY body, TypeRef<T> response) {
+    public static <T, BODY> T post(String url, BODY body, TypeRef<T> response) {
         return given()
             .spec(requestSpec)
             .body(body)
@@ -178,7 +178,7 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
-    protected static <BODY> Response post(String url, HttpStatus responseHttpStatus, BODY body) {
+    public static <BODY> Response post(String url, HttpStatus responseHttpStatus, BODY body) {
         return given()
             .spec(requestSpec)
             .body(body)
@@ -190,7 +190,7 @@ public abstract class AbstractIntegrationTest {
             .response();
     }
 
-    protected static <BODY> void postWithInternalServerErrorExpected(String url, BODY body) {
+    public static <BODY> void postWithInternalServerErrorExpected(String url, BODY body) {
         given()
             .spec(requestSpec)
             .body(body)
@@ -201,18 +201,7 @@ public abstract class AbstractIntegrationTest {
             .extract();
     }
 
-    protected static <BODY> void postWithMethodNotAllowedExpected(String url, BODY body) {
-        given()
-            .spec(requestSpec)
-            .body(body)
-            .when()
-            .post(url)
-            .then()
-            .spec(methodNotAllowedResponseSpec)
-            .extract();
-    }
-
-    protected static <T, BODY> T put(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
+    public static <T, BODY> T put(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
         return given()
             .spec(requestSpec)
             .body(body)
@@ -224,7 +213,7 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
-    protected static Response delete(String url, HttpStatus responseHttpStatus, Object... params) {
+    public static Response delete(String url, HttpStatus responseHttpStatus, Object... params) {
         return given()
             .spec(requestSpec)
             .when()
@@ -235,7 +224,7 @@ public abstract class AbstractIntegrationTest {
             .response();
     }
 
-    protected static Response delete(String url, HttpStatus responseHttpStatus, Map<String, ?> queryParams, Object... params) {
+    public static Response delete(String url, HttpStatus responseHttpStatus, Map<String, ?> queryParams, Object... params) {
         return given()
             .spec(requestSpec)
             .when()
@@ -247,7 +236,7 @@ public abstract class AbstractIntegrationTest {
             .response();
     }
 
-    protected static Response delete(String url, HttpStatus responseHttpStatus, Map<String, ?> queryParams,
+    public static Response delete(String url, HttpStatus responseHttpStatus, Map<String, ?> queryParams,
                                      Map<String, ?> headers, Object... params) {
         return given()
             .spec(requestSpec)

@@ -15,8 +15,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class DocumentViewRepositoryImpl extends BaseRepository<DocumentEntity, DocumentsFilter> implements DocumentViewRepository {
 
@@ -38,10 +36,7 @@ public class DocumentViewRepositoryImpl extends BaseRepository<DocumentEntity, D
         DocumentsFilter filter
     ) {
         predicates.add(builder.equal(root.get(DocumentEntity_.DIGITAL_ID), filter.getDigitalId()));
-        if (filter.getUnifiedIds() != null) {
-            predicates.add(root.get(DocumentEntity_.UNIFIED_UUID)
-                .in(filter.getUnifiedIds().stream().map(UUID::fromString).collect(Collectors.toList())));
-        }
+        inPredicate(builder, predicates, root, DocumentEntity_.UNIFIED_UUID, filter.getUnifiedIds());
         if (filter.getDocumentType() != null) {
             Join<DocumentEntity, DocumentTypeEntity> type = root.join(DocumentEntity_.TYPE);
             predicates.add(builder.equal(type.get(DocumentTypeEntity_.SYSTEM_NAME), (filter.getDocumentType())));

@@ -10,6 +10,13 @@
       "maxLength": 40,
       "x-not-empty": true
     },
+    "ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maximum": 30
+    },
     "search": {
       "title": "Поиск партнера по имени, названию компании, инн",
       "type": "object",
