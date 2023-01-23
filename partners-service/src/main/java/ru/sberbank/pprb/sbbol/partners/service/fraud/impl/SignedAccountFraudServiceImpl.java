@@ -18,6 +18,8 @@ import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
 
+import java.util.List;
+
 import static java.util.Objects.isNull;
 
 @Loggable
@@ -25,7 +27,9 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
 
     private static final Logger LOG = LoggerFactory.getLogger(SignedAccountFraudServiceImpl.class);
 
-    private final String ANALYZE_RESPONSE_ACTION_CODE_ALLOW = "ALLOW";
+    private final String ANALYZE_RESPONSE_ACTION_CODE_REVIEW = "REVIEW";
+
+    private final String ANALYZE_RESPONSE_ACTION_CODE_DENY = "DENY";
 
     protected final FraudProperties properties;
 
@@ -34,6 +38,11 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
     protected final SignedAccountFraudMetaDataMapper fraudMapper;
 
     private final PartnerRepository partnerRepository;
+
+    private final List<String> forbiddenFraudActionCodes = List.of(
+        ANALYZE_RESPONSE_ACTION_CODE_DENY,
+        ANALYZE_RESPONSE_ACTION_CODE_REVIEW
+    );
 
     public SignedAccountFraudServiceImpl(
         FraudProperties properties,
@@ -64,8 +73,8 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
             LOG.debug("Отправляем запрос В АС Агрегатор данных ФРОД-мониторинг: {}", request);
             var response = adapter.send(request);
             LOG.debug("Получили ответ от АС Агрегатора данных ФРОД-мониторинг: {}", response);
-            if (!ANALYZE_RESPONSE_ACTION_CODE_ALLOW.equalsIgnoreCase(response.getActionCode())) {
-                throw new FraudDeniedException(response.getComment());
+            if (forbiddenFraudActionCodes.contains(response.getActionCode().toUpperCase())) {
+                throw new FraudDeniedException(response.getDetailledComment());
             }
         } catch (FraudModelArgumentException e) {
             throw new FraudModelValidationException(e.getMessage(), e);

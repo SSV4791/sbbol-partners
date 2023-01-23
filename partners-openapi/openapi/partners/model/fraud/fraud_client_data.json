@@ -53,14 +53,12 @@
     "gosbNumber": {
       "type": "string",
       "title": "Номер ОСБ",
-      "maxLength": 2000,
-      "x-not-empty": true
+      "maxLength": 2000
     },
     "vspNumber": {
       "type": "string",
       "title": "Номер ВСП",
-      "maxLength": 2000,
-      "x-not-empty": true
+      "maxLength": 2000
     }
   },
   "required": [
@@ -71,8 +69,6 @@
     "orgName",
     "phone",
     "email",
-    "terBankNumber",
-    "gosbNumber",
-    "vspNumber"
+    "terBankNumber"
   ]
 }
