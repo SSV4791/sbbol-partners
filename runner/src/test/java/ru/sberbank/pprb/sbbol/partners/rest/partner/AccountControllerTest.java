@@ -18,14 +18,12 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
-import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,9 +48,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 class AccountControllerTest extends BaseAccountControllerTest {
 
     private static final String KPP_WITHOUT_ACCOUNT = "618243879";
-
-    @Autowired
-    private PodamFactory podamFactory;
 
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут ЖКУ = true")
@@ -550,8 +545,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
-            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
-            createValidAccountsSign(partner.getDigitalId(), account, fraudMetaData);
+            createValidAccountsSign(partner.getDigitalId(), account, getBase64FraudMetaData());
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
 
             return new AccountsFilter()
@@ -591,8 +585,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             for (int i = 0; i < 4; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
-            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
-            createValidAccountsSign(partner.getDigitalId(), account, fraudMetaData);
+            createValidAccountsSign(partner.getDigitalId(), account, getBase64FraudMetaData());
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
@@ -631,8 +624,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             for (int i = 0; i < 4; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
-            var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
-            createValidAccountsSign(partner.getDigitalId(), account, fraudMetaData);
+            createValidAccountsSign(partner.getDigitalId(), account, getBase64FraudMetaData());
             account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())

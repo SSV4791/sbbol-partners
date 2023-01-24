@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -23,8 +25,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.ApiTestLayer;
 import ru.dcbqa.coverage.swagger.reporter.reporters.RestAssuredCoverageReporter;
+import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -67,6 +72,9 @@ public abstract class AbstractIntegrationTest {
     protected static ResponseSpecification internalServerErrorResponseSpec;
 
     protected static ResponseSpecification methodNotAllowedResponseSpec;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @Autowired
     protected PodamFactory podamFactory;
@@ -248,6 +256,21 @@ public abstract class AbstractIntegrationTest {
             .spec(specResponseHandler(responseHttpStatus))
             .extract()
             .response();
+    }
+
+    public String getBase64FraudMetaData() throws JsonProcessingException {
+        var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+        var fraudMetaDataValue = objectMapper.writeValueAsString(fraudMetaData);
+        var base64FraudMetaData = Base64.getEncoder().encode(fraudMetaDataValue.getBytes(StandardCharsets.UTF_8));
+        return new String(base64FraudMetaData);
+    }
+
+    public String getBase64InvalidFraudMetaData() throws JsonProcessingException {
+        var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
+        fraudMetaData.getClientData().setTerBankNumber(null);
+        var fraudMetaDataValue = objectMapper.writeValueAsString(fraudMetaData);
+        var base64FraudMetaData = Base64.getEncoder().encode(fraudMetaDataValue.getBytes(StandardCharsets.UTF_8));
+        return new String(base64FraudMetaData);
     }
 
     private static ResponseSpecification specResponseHandler(HttpStatus httpStatus) {
