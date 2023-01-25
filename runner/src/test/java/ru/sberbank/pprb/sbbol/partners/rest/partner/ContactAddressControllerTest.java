@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.Allure;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
@@ -14,10 +13,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
-import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +31,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 public class ContactAddressControllerTest extends AbstractIntegrationTest {
 
     public static final String baseRoutePath = "/partner/contact";
-
-    @Autowired
-    private PodamFactory podamFactory;
 
     @Test
     @DisplayName("GET /partner/contact/addresses/{digitalId}/{id} Получение адреса")
@@ -233,7 +227,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
                 "/partners/{digitalId}",
                 HttpStatus.NO_CONTENT,
                 Map.of("ids", createPartner.getId()),
-                Map.of("Fraud-Meta-Data", podamFactory.manufacturePojo(FraudMetaData.class)),
+                Map.of("Fraud-Meta-Data", getBase64FraudMetaData()),
                 createPartner.getDigitalId()
             ).getBody();
             return createPartner;

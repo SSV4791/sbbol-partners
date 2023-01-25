@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -23,7 +24,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -41,7 +41,6 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterIdsArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterLegalFormArgumentsProvider;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
-import uk.co.jemos.podam.api.PodamFactory;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -80,14 +79,10 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePathForGet = "/partners/{digitalId}/{id}";
 
     @Autowired
-    private PodamFactory podamFactory;
-
-    @Autowired
     private GkuInnDictionaryRepository innDictionaryRepository;
 
     private GkuInnEntity gkuInnEntity1;
     private GkuInnEntity gkuInnEntity2;
-
 
     @AfterEach
     void after() {
@@ -814,7 +809,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testGetPartnersSignedAccount() {
+    void testGetPartnersSignedAccount() throws JsonProcessingException {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
             baseRoutePath,
@@ -825,8 +820,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner1)
             .isNotNull();
         var validAccount = createValidAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
-        var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
-        createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId(), fraudMetaData);
+        createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId(), getBase64FraudMetaData());
 
         var createdPartner2 = post(
             baseRoutePath,
@@ -1439,15 +1433,14 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testDeletePartner_whenInvalidFraudMetaDataHeader_thenBadRequest() {
-        var fraudMetaData = podamFactory.manufacturePojo(String.class);
+    void testDeletePartner_whenInvalidFraudMetaDataHeader_thenBadRequest() throws JsonProcessingException {
         var uuid = podamFactory.manufacturePojo(UUID.class);
         var digitalId = podamFactory.manufacturePojo(String.class);
         var error = delete(
             "/partners/{digitalId}",
             HttpStatus.BAD_REQUEST,
             Map.of("ids", uuid.toString()),
-            Map.of("Fraud-Meta-Data", fraudMetaData),
+            Map.of("Fraud-Meta-Data", "invalid-fraud-meta-data"),
             digitalId
         ).getBody().as(Error.class);
         assertThat(error)
@@ -1461,16 +1454,14 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testDeletePartner_whenInvalidFraudMetaData_thenBadRequest() {
-        var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
-        fraudMetaData.getClientData().setDigitalId(null);
+    void testDeletePartner_whenInvalidFraudMetaData_thenBadRequest() throws JsonProcessingException {
         var uuid = podamFactory.manufacturePojo(UUID.class);
         var digitalId = podamFactory.manufacturePojo(String.class);
         var error = delete(
             "/partners/{digitalId}",
             HttpStatus.BAD_REQUEST,
             Map.of("ids", uuid.toString()),
-            Map.of("Fraud-Meta-Data", fraudMetaData),
+            Map.of("Fraud-Meta-Data", getBase64InvalidFraudMetaData()),
             digitalId
         ).getBody().as(Error.class);
         assertThat(error)
@@ -1482,14 +1473,14 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error.getDescriptions())
             .hasSize(1);
         assertThat(error.getDescriptions().get(0).getField())
-            .isEqualTo("fraudMetaData.clientData.digitalId");
+            .isEqualTo("fraudMetaData.clientData.terBankNumber");
         assertThat(error.getDescriptions().get(0).getMessage())
             .contains("Поле обязательно для заполнения");
 
     }
 
     @Test
-    void testDeprecatedDeletePartner() {
+    void testDeprecatedDeletePartner() throws JsonProcessingException {
         var createdPartner = post(
             baseRoutePath,
             HttpStatus.CREATED,
@@ -1513,7 +1504,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             "/partners/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", actualPartner.getId()),
-            Map.of("Fraud-Meta-Data", podamFactory.manufacturePojo(FraudMetaData.class)),
+            Map.of("Fraud-Meta-Data", getBase64FraudMetaData()),
             actualPartner.getDigitalId()
         ).getBody();
 

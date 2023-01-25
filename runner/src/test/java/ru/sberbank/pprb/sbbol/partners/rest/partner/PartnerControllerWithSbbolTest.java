@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -97,12 +97,12 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testDeletePartner() {
+    void testDeletePartner() throws JsonProcessingException {
         var response = delete(
             "/partners/{digitalId}",
             HttpStatus.NOT_FOUND,
             Map.of("ids", RandomStringUtils.randomAlphabetic(10)),
-            Map.of("Fraud-Meta-Data", podamFactory.manufacturePojo(FraudMetaData.class)),
+            Map.of("Fraud-Meta-Data", getBase64FraudMetaData()),
             RandomStringUtils.randomAlphabetic(10)
         ).as(Error.class);
         assertThat(response)

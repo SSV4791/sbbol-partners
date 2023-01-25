@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -10,7 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.config.props.ReplicationKafkaSecurityProp
 import ru.sberbank.pprb.sbbol.partners.config.props.ValidationInterceptorProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
-import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ class LegacyAsyncCounterpartyReplicationTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testAsyncCounterpartyReplication() {
+    void testAsyncCounterpartyReplication() throws JsonProcessingException {
         doReturn(false)
             .when(legacySbbolAdapter)
             .checkNotMigration(any());
@@ -76,7 +76,7 @@ class LegacyAsyncCounterpartyReplicationTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
 
         changeAccount(updateAccount(account));
-        createValidAccountsSign(account.getDigitalId(), account.getId(), podamFactory.manufacturePojo(FraudMetaData.class));
+        createValidAccountsSign(account.getDigitalId(), account.getId(), getBase64FraudMetaData());
         deleteAccountSign(account.getDigitalId(), account.getId());
         deleteAccount(account.getDigitalId(), account.getId());
 

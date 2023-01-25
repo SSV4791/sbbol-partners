@@ -17,7 +17,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
-import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 @SuppressWarnings("java:S2187")
 public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
@@ -27,13 +26,13 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
     public static AccountsSignInfoResponse createValidAccountsSign(
         String digitalId,
         String accountId,
-        FraudMetaData fraudMetaData
+        String base64FraudMetaData
     ) {
         var createAccountSign = post(
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(digitalId, accountId),
-            getFraudMetaDataHeaders(fraudMetaData),
+            getFraudMetaDataHeaders(base64FraudMetaData),
             AccountsSignInfoResponse.class
         );
         assertThat(createAccountSign)
@@ -44,13 +43,13 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
     public static Error createInvalidAccountsSignWithInvalidFraudMetaData(
         String digitalId,
         String accountId,
-        FraudMetaData invalidFraudMetaData
+        String base64InvalidFraudMetaData
     ) {
         var response = post(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
             getValidAccountsSign(digitalId, accountId),
-            getFraudMetaDataHeaders(invalidFraudMetaData),
+            getFraudMetaDataHeaders(base64InvalidFraudMetaData),
             Error.class
         );
         assertThat(response)
@@ -58,12 +57,12 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    public static Error createAccountSignWithBadRequest(String digitalId, String accountId, FraudMetaData fraudMetaData) {
+    public static Error createAccountSignWithBadRequest(String digitalId, String accountId, String base64FraudMetaData) {
         var response = post(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
             getValidAccountsSign(digitalId, accountId),
-            getFraudMetaDataHeaders(fraudMetaData),
+            getFraudMetaDataHeaders(base64FraudMetaData),
             Error.class
         );
         assertThat(response)
@@ -71,12 +70,12 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    public static Error createAccountSignWithNotFound(String digitalId, String accountId, FraudMetaData fraudMetaData) {
+    public static Error createAccountSignWithNotFound(String digitalId, String accountId, String base64FraudMetaData) {
         var response = post(
             baseRoutePath,
             HttpStatus.NOT_FOUND,
             getValidAccountsSign(digitalId, accountId),
-            getFraudMetaDataHeaders(fraudMetaData),
+            getFraudMetaDataHeaders(base64FraudMetaData),
             Error.class
         );
         assertThat(response)
@@ -97,12 +96,12 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return deleteAccountSign;
     }
 
-    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, List<String> accountsId, FraudMetaData fraudMetaData) {
+    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, List<String> accountsId, String base64FraudMetaData) {
         var createAccountSign = post(
             baseRoutePath,
             HttpStatus.OK,
             getValidAccountsSign(digitalId, accountsId),
-            getFraudMetaDataHeaders(fraudMetaData),
+            getFraudMetaDataHeaders(base64FraudMetaData),
             AccountsSignInfoResponse.class
         );
         assertThat(createAccountSign)
@@ -110,8 +109,8 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return createAccountSign;
     }
 
-    public static Map<String, FraudMetaData> getFraudMetaDataHeaders(FraudMetaData fraudMetaData) {
-        return Map.of("Fraud-Meta-Data", fraudMetaData);
+    public static Map<String, String> getFraudMetaDataHeaders(String base64FraudMetaData) {
+        return Map.of("Fraud-Meta-Data", base64FraudMetaData);
     }
 
     public static AccountsSignInfo getValidAccountsSign(String digitalId, String accountId) {
