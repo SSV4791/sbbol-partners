@@ -166,7 +166,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         LOG.error(FRAUD_MODEL_VALIDATION_ERROR, ex);
         return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
-            BUSINESS,
+            CRITICAL,
             FRAUD_MODEL_VALIDATION_EXCEPTION.getValue(),
             ex.getMessage(),
             Collections.emptyMap(),

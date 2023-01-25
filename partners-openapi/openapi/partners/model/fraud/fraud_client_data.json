@@ -47,8 +47,7 @@
     "terBankNumber": {
       "type": "string",
       "title": "Код территориального банка",
-      "maxLength": 50,
-      "x-not-empty": true
+      "maxLength": 50
     },
     "gosbNumber": {
       "type": "string",
@@ -59,6 +58,11 @@
       "type": "string",
       "title": "Номер ВСП",
       "maxLength": 2000
+    },
+    "imsi": {
+      "type": "string",
+      "title": "Mеждународный идентификатор мобильного абонента",
+      "maxLength": 255
     }
   },
   "required": [
@@ -68,7 +72,6 @@
     "inn",
     "orgName",
     "phone",
-    "email",
-    "terBankNumber"
+    "email"
   ]
 }

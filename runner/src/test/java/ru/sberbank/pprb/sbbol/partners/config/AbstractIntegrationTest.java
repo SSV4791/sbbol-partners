@@ -267,7 +267,7 @@ public abstract class AbstractIntegrationTest {
 
     public String getBase64InvalidFraudMetaData() throws JsonProcessingException {
         var fraudMetaData = podamFactory.manufacturePojo(FraudMetaData.class);
-        fraudMetaData.getClientData().setTerBankNumber(null);
+        fraudMetaData.getClientData().setDigitalId(null);
         var fraudMetaDataValue = objectMapper.writeValueAsString(fraudMetaData);
         var base64FraudMetaData = Base64.getEncoder().encode(fraudMetaDataValue.getBytes(StandardCharsets.UTF_8));
         return new String(base64FraudMetaData);
