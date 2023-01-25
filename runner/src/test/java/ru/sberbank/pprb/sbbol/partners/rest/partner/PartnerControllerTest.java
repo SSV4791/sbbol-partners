@@ -1473,7 +1473,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error.getDescriptions())
             .hasSize(1);
         assertThat(error.getDescriptions().get(0).getField())
-            .isEqualTo("fraudMetaData.clientData.terBankNumber");
+            .isEqualTo("fraudMetaData.clientData.digitalId");
         assertThat(error.getDescriptions().get(0).getMessage())
             .contains("Поле обязательно для заполнения");
 

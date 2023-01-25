@@ -59,6 +59,7 @@ public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMappe
             counterPartyClientDefinedAttributes.setFirstSignLogin(metaData.getClientData().getLogin());
             counterPartyClientDefinedAttributes.setFirstSignPhone(metaData.getClientData().getPhone());
             counterPartyClientDefinedAttributes.setFirstSignEmail(metaData.getClientData().getEmail());
+            counterPartyClientDefinedAttributes.setFirstSignImsi(metaData.getClientData().getImsi());
         }
         if (metaData.getCryptoProfileData() != null) {
             counterPartyClientDefinedAttributes.setFirstSignCryptoprofile(metaData.getCryptoProfileData().getName());

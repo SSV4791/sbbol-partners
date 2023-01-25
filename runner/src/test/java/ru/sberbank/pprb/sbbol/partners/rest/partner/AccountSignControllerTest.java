@@ -79,7 +79,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             assertThat(errorSign.getDescriptions())
                 .hasSize(1);
             assertThat(errorSign.getDescriptions().get(0).getField())
-                .isEqualTo("fraudMetaData.clientData.terBankNumber");
+                .isEqualTo("fraudMetaData.clientData.digitalId");
             assertThat(errorSign.getDescriptions().get(0).getMessage())
                 .contains("Поле обязательно для заполнения");
         });

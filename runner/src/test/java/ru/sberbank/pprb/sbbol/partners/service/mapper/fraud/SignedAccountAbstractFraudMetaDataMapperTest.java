@@ -101,6 +101,8 @@ class SignedAccountAbstractFraudMetaDataMapperTest extends AbstractFraudMetaData
             .isEqualTo(clientData.getPhone());
         assertThat(actualClientDefinedAttributeList.getFirstSignEmail())
             .isEqualTo(clientData.getEmail());
+        assertThat(actualClientDefinedAttributeList.getFirstSignImsi())
+            .isEqualTo(clientData.getImsi());
         assertThat(actualClientDefinedAttributeList.getFirstSignSource())
             .isEqualTo(PPRB_BROWSER);
     }
