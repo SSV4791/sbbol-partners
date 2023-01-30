@@ -6,32 +6,22 @@
     "name": {
       "type": "string",
       "title": "Наименование криптопрофиля",
-      "maxLength": 255,
-      "x-not-empty": true
+      "maxLength": 255
     },
     "type": {
       "type": "string",
       "title": "Тип криптопрофиля",
-      "maxLength": 255,
-      "x-not-empty": true
+      "maxLength": 255
     },
     "signChannel": {
       "type": "string",
       "title": "Канал подписи",
-      "maxLength": 255,
-      "x-not-empty": true
+      "maxLength": 255
     },
     "titleName": {
       "type": "string",
       "title": "Тип подписи",
-      "maxLength": 2000,
-      "x-not-empty": true
+      "maxLength": 2000
     }
-  },
-  "required": [
-    "name",
-    "type",
-    "signChannel",
-    "titleName"
-  ]
+  }
 }
