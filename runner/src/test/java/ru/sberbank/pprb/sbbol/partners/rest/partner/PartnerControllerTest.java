@@ -1306,7 +1306,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void testCreatePartnerInvalidCharsInOrgName() {
         var partner = getValidLegalEntityPartner();
-        partner.setOrgName("[Наименование] [§±]");
+        partner.setOrgName("[Наименование Ёё\\] [§±]");
         var error = given()
             .spec(requestSpec)
             .body(partner)
@@ -1319,7 +1319,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): [][§±]");
+            .contains("Поле содержит недопустимый(-е) символ(-ы): §±");
     }
 
     @Test
@@ -1868,7 +1868,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void savePartnerFullModelInvalidOrgName() {
         var partner = getValidFullModelLegalEntityPartner();
-        partner.setOrgName("[Наименование] §±`~><");
+        partner.setOrgName("[Наименование Ёё \\] §±`~><");
         var error = post(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
@@ -1877,7 +1877,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
+            .contains("Поле содержит недопустимый(-е) символ(-ы): §±");
     }
 
     @Test
@@ -1935,7 +1935,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void savePhysicalPartnerInvalidName() {
         var partner = getValidPhysicalPersonPartner();
-        partner.setFirstName("[Имя] §±`~><");
+        partner.setFirstName("[Имя Ёё] \\ §±`~><");
         var error = post(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
@@ -1945,7 +1945,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): []§±");
+            .contains("Поле содержит недопустимый(-е) символ(-ы): §±");
     }
 
     @Test
