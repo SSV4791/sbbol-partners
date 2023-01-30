@@ -17,7 +17,7 @@
     "orgName": {
       "type": "string",
       "title": "Наименование организации партнера",
-      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]+",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
       "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 160,
       "x-length-message": "{validation.partner.max_symbols}"
@@ -25,7 +25,7 @@
     "firstName": {
       "type": "string",
       "title": "Имя партнера",
-      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]+",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
       "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 50,
       "x-length-message": "{validation.partner.max_symbols}"
@@ -33,7 +33,7 @@
     "secondName": {
       "type": "string",
       "title": "Фамилия партнера",
-      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]*",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]*",
       "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 50,
       "x-length-message": "{validation.partner.max_symbols}"
@@ -41,7 +41,7 @@
     "middleName": {
       "type": "string",
       "title": "Отчество партнера",
-      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]*",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]*",
       "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 50,
       "x-length-message": "{validation.partner.max_symbols}"
