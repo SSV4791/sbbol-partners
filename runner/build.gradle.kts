@@ -7,13 +7,24 @@ plugins {
 }
 
 tasks {
+    register<Test>("generateVectorTest") {
+        useJUnitPlatform()
+        filter { includeTestsMatching("**changevector.generate.*") }
+    }
+    register<Test>("applyVectorTest") {
+        useJUnitPlatform()
+        filter { includeTestsMatching("**changevector.apply.*") }
+    }
     jar {
         enabled = false
     }
     clean {
         delete("allure-results")
+        delete("vectors")
     }
     test {
+        useJUnitPlatform()
+        exclude("**/changevector/**")
         if (project.hasProperty("spring.datasource.url"))
             systemProperty("spring.datasource.url", project.properties["spring.datasource.url"] as String)
         if (project.hasProperty("spring.datasource.username"))

@@ -36,6 +36,23 @@ pr_check:
         - 'jenkins/resources/openshift/'
     server: dev-terra000006-idm.ocp
     namespace: ci02281165-sbbol-partners
+  vector:
+    compare:
+      release_uri: ''
+    workdir: vectors
+    match:
+      files:
+        - 'src/main/java/ru/sberbank/pprb/sbbol/partners/entity'
+        - 'src/test/java/ru/sberbank/pprb/sbbol/partners/replication/changevector'
+    command: >-
+      ./gradlew
+      -PtokenName=${env.TOKEN_NAME}
+      -PtokenPassword=${env.TOKEN_PASSWORD}
+      -Dgradle.wrapperUser=${env.TOKEN_NAME}
+      -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
+      -Dtest.results.enabled=true
+      -Dtest-layer=unit
+      applyVectorTest --info
   build_gradle:
     match:
       files:
@@ -140,7 +157,7 @@ release:
       -Pversion=${env.VERSION}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=release
-      build -x test --parallel --info
+      assemble generateVectorTest --parallel --info
   run_backend_tests: 'true'
   run_frontend_tests: 'false'
   test:
