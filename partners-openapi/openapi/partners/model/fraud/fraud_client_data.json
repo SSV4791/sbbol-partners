@@ -11,38 +11,32 @@
     },
     "epkId": {
       "type": "string",
-      "title": "Идентификатор ЕПК ЮЛ",
-      "x-not-empty": true
+      "title": "Идентификатор ЕПК ЮЛ"
     },
     "login": {
       "type": "string",
       "title": "Логин пользователя",
-      "maxLength": 50,
-      "x-not-empty": true
+      "maxLength": 50
     },
     "inn": {
       "type": "string",
       "title": "ИНН клиента",
-      "maxLength": 2000,
-      "x-not-empty": true
+      "maxLength": 2000
     },
     "orgName": {
       "type": "string",
       "title": "Наименование организации",
-      "maxLength": 2000,
-      "x-not-empty": true
+      "maxLength": 2000
     },
     "phone": {
       "type": "string",
       "title": "Номер телефона",
-      "maxLength": 13,
-      "x-not-empty": true
+      "maxLength": 13
     },
     "email": {
       "type": "string",
       "title": "Электронный адрес",
-      "maxLength": 320,
-      "x-not-empty": true
+      "maxLength": 320
     },
     "terBankNumber": {
       "type": "string",
@@ -66,12 +60,6 @@
     }
   },
   "required": [
-    "digitalId",
-    "epkId",
-    "login",
-    "inn",
-    "orgName",
-    "phone",
-    "email"
+    "digitalId"
   ]
 }
