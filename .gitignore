@@ -17,4 +17,8 @@
 /logs/
 **/target/
 
+# tests
+**/vectors/
+
+# allure
 **/allure-results/

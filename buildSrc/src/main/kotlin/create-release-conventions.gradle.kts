@@ -19,4 +19,7 @@ tasks.register<Zip>("fullDistrib") {
     from("${project(":partners-adapter").projectDir}/src/main/resources/audit/") {
         into("package/conf/data/audit_metamodel/")
     }
+    from("${project(":runner").projectDir}/vectors/") {
+        into("vectors")
+    }
 }

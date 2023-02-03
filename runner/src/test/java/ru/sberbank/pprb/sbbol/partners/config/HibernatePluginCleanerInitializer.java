@@ -11,7 +11,7 @@ import org.springframework.lang.NonNull;
  * помеченных аннотацией {@code @DirtiesContext}, так как между запусками копятся контексты в плагине
  * {@link com.sbt.pprb.integration.hibernate.standin.plugin.StandinPluginImpl}
  */
-class HibernatePluginCleanerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class HibernatePluginCleanerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     @Override
     public void initialize(@NonNull ConfigurableApplicationContext applicationContext) {

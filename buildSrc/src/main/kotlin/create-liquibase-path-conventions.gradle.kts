@@ -7,11 +7,11 @@ tasks.register("newpatch") {
             throw IllegalArgumentException("Property patchname not provided")
         }
         val patchName = project.property("patchname")
-        if (project.hasProperty("releaseversion")) {
-            currentVersion = project.property("releaseversion").toString()
+        currentVersion = if (project.hasProperty("releaseversion")) {
+            project.property("releaseversion").toString()
         } else {
             try {
-                currentVersion = project.property("version").toString().split("-")[0]
+                project.property("version").toString().split("-")[0]
             } catch (e: Exception) {
                 throw GradleException("Unable to parse version parameter value $version from gradle.properties", e)
             }
