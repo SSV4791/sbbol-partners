@@ -120,7 +120,7 @@ pr_check:
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
-  version_init: 02.001.00_0000
+  version_init: 02.004.00_0000
   repository: maven-distr-dev
   artifact_id: CI02792425
   group_id: CI00908578
@@ -138,8 +138,8 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: '2.3'
-    commit_or_tag: '02.002.01_0004_i-2.3'
-    release_key:
+    commit_or_tag: '02.003.00_0033_i-2.3'
+    release_key: DCBBRAIN-3910
     reverse_and_publish: false
     type: release
   jobs:
@@ -157,7 +157,7 @@ release:
       -Pversion=${env.VERSION}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=release
-      assemble generateVectorTest --parallel --info
+      build -x test --parallel --info
   run_backend_tests: 'true'
   run_frontend_tests: 'false'
   test:
