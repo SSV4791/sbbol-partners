@@ -172,7 +172,7 @@ release:
         -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
         -PsonarToken=${env.SONAR_TOKEN}
         -Pversion=${env.VERSION}
-        build qaReporterUpload sonarCoverage
+        build generateVectorTest qaReporterUpload sonarCoverage
         -Dtest-layer=unit,api,configuration,cdcConsumer,cdcProvider
         -Dsonar.branch.name=${params.branch}
         -Dpactbroker.url=${env.PACT_BROKER_URL}
