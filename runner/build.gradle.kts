@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":partners-rest"))
     implementation(project(":partners-service"))
     implementation(project(":migration-service"))
+    implementation(project(":partners-scheduler"))
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -64,6 +65,7 @@ dependencies {
     // postgres для prod-сборки
     runtimeOnly(liveLibs.postgresql.core)
 
+    testImplementation(project(":partners-replication"))
     testImplementation(project(":partners-service"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

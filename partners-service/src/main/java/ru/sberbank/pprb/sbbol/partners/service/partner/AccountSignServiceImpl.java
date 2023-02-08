@@ -35,28 +35,28 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
-    private final ReplicationService replicationService;
     private final FraudServiceManager fraudServiceManager;
     private final AuditAdapter auditAdapter;
     private final AccountSingMapper accountSingMapper;
     private final AccountMapper accountMapper;
+    private final ReplicationService replicationService;
 
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        ReplicationService replicationService,
         FraudServiceManager fraudServiceManager,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
-        AccountSingMapper accountSingMapper
+        AccountSingMapper accountSingMapper,
+        ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
-        this.replicationService = replicationService;
         this.fraudServiceManager = fraudServiceManager;
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
         this.accountSingMapper = accountSingMapper;
+        this.replicationService = replicationService;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             }
             try {
                 var savedSign = accountSignRepository.save(sign);
-                replicationService.saveSign(accountsSign.getDigitalId(), accountsSign.getDigitalUserId(), sign);
+                replicationService.saveSign(digitalId, savedSign.getAccountUuid());
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(savedSign))

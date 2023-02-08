@@ -11,11 +11,11 @@ dependencies {
 
     implementation(project(":partners-adapter"))
     implementation(project(":partners-api"))
+    implementation(project(":partners-replication"))
 
     implementation(platform(liveLibs.spring.boot.dependencies))
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.kafka:spring-kafka")
 
     implementation(liveLibs.antifraud.api)
     implementation(liveLibs.bundles.micrometer)
@@ -25,7 +25,6 @@ dependencies {
     implementation(liveLibs.sbp.hibernate.standin)
     //Поддержка генераторов ID на время перехода.
     implementation(liveLibs.sbp.jpa.model.support)
-    implementation(liveLibs.sbt.kafka.validator.interceptor)
 
     compileOnly(liveLibs.hibernate.jpamodelgen)
     runtimeOnly(liveLibs.ehcache.org.core)

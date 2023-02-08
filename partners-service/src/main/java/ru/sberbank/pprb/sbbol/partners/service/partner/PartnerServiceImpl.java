@@ -50,13 +50,13 @@ public class PartnerServiceImpl implements PartnerService {
     private final PartnerRepository partnerRepository;
     private final GkuInnDictionaryRepository gkuInnDictionaryRepository;
     private final BudgetMaskService budgetMaskService;
-    private final ReplicationService replicationService;
     private final FraudServiceManager fraudServiceManager;
     private final AccountMapper accountMapper;
     private final DocumentMapper documentMapper;
     private final AddressMapper addressMapper;
     private final ContactMapper contactMapper;
     private final PartnerMapper partnerMapper;
+    private final ReplicationService replicationService;
 
     public PartnerServiceImpl(
         AccountRepository accountRepository,
@@ -66,13 +66,13 @@ public class PartnerServiceImpl implements PartnerService {
         PartnerRepository partnerRepository,
         GkuInnDictionaryRepository gkuInnDictionaryRepository,
         BudgetMaskService budgetMaskService,
-        ReplicationService replicationService,
         FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
         DocumentMapper documentMapper,
         AddressMapper addressMapper,
         ContactMapper contactMapper,
-        PartnerMapper partnerMapper
+        PartnerMapper partnerMapper,
+        ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.documentRepository = documentRepository;
@@ -81,13 +81,13 @@ public class PartnerServiceImpl implements PartnerService {
         this.partnerRepository = partnerRepository;
         this.gkuInnDictionaryRepository = gkuInnDictionaryRepository;
         this.budgetMaskService = budgetMaskService;
-        this.replicationService = replicationService;
         this.fraudServiceManager = fraudServiceManager;
         this.accountMapper = accountMapper;
         this.documentMapper = documentMapper;
         this.addressMapper = addressMapper;
         this.contactMapper = contactMapper;
         this.partnerMapper = partnerMapper;
+        this.replicationService = replicationService;
     }
 
     @Override
@@ -154,7 +154,7 @@ public class PartnerServiceImpl implements PartnerService {
             .map(contactMapper::toContact)
             .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(accounts)) {
-            replicationService.saveCounterparty(accounts);
+            replicationService.createCounterparty(accounts);
         }
         return partnerMapper.toPartnerMullResponse(savedPartner)
             .gku(getGku(savedPartner.getInn()))

@@ -302,7 +302,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         );
     }
 
-    public static void changeAccount(AccountChange account) {
+    public static Account changeAccount(AccountChange account) {
         var updatedAccount = put(
             baseRoutePath + "/account",
             HttpStatus.OK,
@@ -311,6 +311,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         );
         assertThat(updatedAccount)
             .isNotNull();
+        return updatedAccount;
     }
 
     public static void deleteAccount(String digitalId, String accountId) {

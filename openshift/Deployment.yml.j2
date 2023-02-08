@@ -104,9 +104,6 @@ spec:
             - name: app-config
               mountPath: /deployments/config
               readOnly: true
-            - name: synapse-integration-kafka-config
-              mountPath: /deployments/config/synapse_integration_kafka
-              readOnly: true
             - name: logback-config
               mountPath: /deployments/config/logback
               readOnly: true
@@ -207,13 +204,6 @@ spec:
         - name: app-config
           configMap:
             name: cm-app-properties-{{ canary_suffix }}
-            defaultMode: 0400
-            items:
-              - key: application.properties
-                path: application.properties
-        - name: synapse-integration-kafka-config
-          configMap:
-            name: cm-synapse-integration-kafka-properties-{{ canary_suffix }}
             defaultMode: 0400
             items:
               - key: application.properties
