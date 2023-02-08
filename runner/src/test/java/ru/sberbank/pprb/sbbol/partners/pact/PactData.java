@@ -104,7 +104,6 @@ public class PactData {
             .emails(Set.of(email()))
             .comment(COMMENT)
             .gku(GKU)
-            .budget(BUDGET)
             .citizenship(Citizenship.fromValue(PactData.CITIZENSHIP));
     }
 
