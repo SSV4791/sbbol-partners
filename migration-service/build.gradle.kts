@@ -13,7 +13,6 @@ dependencies {
     implementation(project(":partners-service"))
 
     implementation(platform(liveLibs.spring.boot.dependencies))
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     // решает ошибку при старте приложения: java.lang.ClassNotFoundException: javax.jws.WebParam
     implementation(liveLibs.jaxws) {
         // решает ошибку: Could not find ha-api-3.1.12.hk2-jar (org.glassfish.ha:ha-api:3.1.12)
@@ -22,6 +21,7 @@ dependencies {
     implementation(liveLibs.jsonrpc4j.client)
     implementation(liveLibs.mapstruct.core)
     implementation(liveLibs.sbp.hibernate.standin)
+    implementation(liveLibs.spring.boot.starter.data.jpa)
 
     compileOnly(liveLibs.hibernate.jpamodelgen)
 }

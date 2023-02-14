@@ -5,9 +5,9 @@ spring-boot = "2.5.5"
 antifraud = "D-02.003.00_0003"
 
 [libraries]
-apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.9" }
 antifraud-api = { module = "ru.sberbank.pprb.antifraud:antifraud-api", version.ref = "antifraud"}
 antifraud-rpc-api = { module = "ru.sberbank.pprb.antifraud:antifraud-rpc-api", version.ref = "antifraud"}
+apache-commons-lang3 = { module = "org.apache.commons:commons-lang3", version = "3.9" }
 aspectjrt = { module = "org.aspectj:aspectjrt", version = "1.9.7" }
 ehcache-net-core = { module = "net.sf.ehcache:ehcache", version = "2.10.4" }
 ehcache-org-core = { module = "org.ehcache:ehcache", version = "3.9.2" }
@@ -34,10 +34,16 @@ sbp-jpa-model-support = { module = "sbp.com.sbt.dataspace:jpa-model-support", ve
 shedlock-spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version = "4.44.0" }
 shedlock-provider-jdbc-template = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version = "4.44.0" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "1.7.32" }
-spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-context-core = { module = "org.springframework:spring-context", version = "5.3.12" }
 spring-context-support = { module = "org.springframework:spring-context-support", version = "5.3.12" }
+spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
 springfox-boot-starter = { module = "io.springfox:springfox-boot-starter", version = "3.0.0" }
 swagger-annotations-core = { module = "io.swagger:swagger-annotations", version = "1.6.3" }
 

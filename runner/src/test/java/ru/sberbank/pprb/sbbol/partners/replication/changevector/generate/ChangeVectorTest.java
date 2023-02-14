@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.replication.changevector.generate;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.sbt.pprb.integration.changevector.ChangeSet;
 import com.sbt.pprb.integration.changevector.ChangeVector;
 import com.sbt.pprb.integration.changevector.building.CreateEventImplementor;
@@ -18,12 +20,19 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.type.BasicType;
 import org.hibernate.type.Type;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 import ru.sberbank.pprb.sbbol.partners.config.HibernatePluginCleanerInitializer;
+import ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.metamodel.EntityType;
@@ -41,16 +50,31 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @SpringBootTest
+@UnitTestLayer
+@ExtendWith({SpringExtension.class})
 @ContextConfiguration(
-    initializers = {HibernatePluginCleanerInitializer.class}
+    initializers = {HibernatePluginCleanerInitializer.class},
+    classes = {
+        PodamConfiguration.class
+    }
 )
-class ChangeVectorTest extends BaseUnitConfiguration {
+@ActiveProfiles("cv")
+class ChangeVectorTest {
 
     @Autowired
     private EntityManagerFactory emf;
 
     @Autowired
     private SessionFactoryImplementor sessionFactory;
+
+    @Autowired
+    protected PodamFactory factory;
+
+    @BeforeAll
+    static void setup() {
+        Logger logger = (Logger) LoggerFactory.getLogger("uk.co.jemos.podam.api");
+        logger.setLevel(Level.OFF);
+    }
 
     @Test
     public void generateVectorsTest() throws Exception {

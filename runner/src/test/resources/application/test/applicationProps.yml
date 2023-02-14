@@ -1,0 +1,13 @@
+standin:
+  datasource:
+    url: jdbc:tc:pg:13-alpine:///main
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
+
+spring:
+  datasource:
+    url: jdbc:tc:pg:13-alpine:///si
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test

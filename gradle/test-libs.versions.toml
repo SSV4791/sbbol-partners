@@ -11,10 +11,12 @@ mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = 
 mockserver-spring-test-listener = { module = "org.mock-server:mockserver-spring-test-listener", version.ref = "mockserver" }
 orm-tests-common = { module = "sbp.integration.orm:orm-tests-common", version = "4.2.1" }
 podam-core = { module = "uk.co.jemos.podam:podam", version = "7.2.7.RELEASE" }
+postgresql = { module = "org.testcontainers:postgresql", version = "1.17.3" }
 rest-assured = { module = "io.rest-assured:rest-assured", version.ref = "assured" }
 rest-assured-allure = { module = "io.qameta.allure:allure-rest-assured", version = "2.13.6" }
 rest-assured-common = { module = "io.rest-assured:rest-assured-common", version.ref = "assured" }
 rest-assured-json-assert = { module = "com.jayway.jsonpath:json-path-assert", version = "2.7.0" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 
 [bundles]
 mockserver = ["mockserver-client-java", "mockserver-netty", "mockserver-spring-test-listener"]
