@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -25,8 +26,14 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Loggable
 @Mapper(
@@ -195,4 +202,15 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "address", ignore = true)
     @Mapping(target = "contacts", ignore = true)
     PartnerCreateFullModelResponse toPartnerMullResponse(PartnerEntity partner);
+
+    @NotNull
+    @Override
+    default String saveSearchString(String... search) {
+        return Stream.of(search)
+            .filter(Objects::nonNull)
+            .map(it -> it.replace(SPACE, EMPTY))
+            .map(it -> it.replaceAll("\\\\", "\\\\\\\\"))
+            .collect(Collectors.joining(EMPTY))
+            .toLowerCase(Locale.ROOT);
+    }
 }
