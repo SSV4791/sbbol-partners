@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: 1675674210531_add_shedlock.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1675674210532_add_sbbol_replicatition.sql
+      relativeToChangelogFile: true

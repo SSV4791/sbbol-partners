@@ -26,13 +26,15 @@ import java.util.Properties;
 @EnableTransactionManagement
 @EnableJpaRepositories(value = {
     "ru.sberbank.pprb.sbbol.migration.gku.repository",
-    "ru.sberbank.pprb.sbbol.partners.repository"
+    "ru.sberbank.pprb.sbbol.partners.repository",
+    "ru.sberbank.pprb.sbbol.partners.replication.repository",
 })
 public class DataSourceConfiguration {
 
     private static final String[] PACKAGES_TO_SCAN = {
         "ru.sberbank.pprb.sbbol.migration.gku.entity",
-        "ru.sberbank.pprb.sbbol.partners.entity"
+        "ru.sberbank.pprb.sbbol.partners.entity",
+        "ru.sberbank.pprb.sbbol.partners.replication.entity"
     };
 
     // MAIN DATASOURCE CONFIGS

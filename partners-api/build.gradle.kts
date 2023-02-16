@@ -109,9 +109,11 @@ sourceSets {
 
 dependencies {
     implementation(liveLibs.apache.commons.lang3)
+    implementation(liveLibs.aspectjrt)
     implementation(liveLibs.jackson.databind.nullable)
     implementation(liveLibs.javax.annotation.api)
     implementation(liveLibs.javax.validation.api)
+    implementation(liveLibs.slf4j.api)
     implementation(liveLibs.spring.context.core)
     implementation(liveLibs.swagger.annotations.core)
 }

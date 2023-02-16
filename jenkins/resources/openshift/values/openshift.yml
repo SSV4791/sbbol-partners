@@ -61,16 +61,11 @@ os_project:
     endpoint: /antifraud/v2/counterparty
 
   replication:
-    kafka:
-      producer:
-        enable: false
-        server: replication-kafka-server
-        topic: replication-kafka-topic
-        security:
-          enable: false
-        interceptor:
-          validator:
-            enable: false
+    sbbol:
+      enable: false
+      crown: '0 0 23 * * *'
+      batchSize: 1000
+      retry: 4
 
 registry_area: registry.sigma.sbrf.ru
 nexus_area: Nexus_PROD/CI02792425_sbbol-partners

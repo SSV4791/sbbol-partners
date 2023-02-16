@@ -44,27 +44,27 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final PartnerRepository partnerRepository;
     private final AccountSignRepository accountSignRepository;
-    private final ReplicationService replicationService;
     private final BudgetMaskService budgetMaskService;
     private final AuditAdapter auditAdapter;
     private final AccountMapper accountMapper;
+    private final ReplicationService replicationService;
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
         PartnerRepository partnerRepository,
         AccountSignRepository accountSignRepository,
-        ReplicationService replicationService,
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter,
-        AccountMapper accountMapper
+        AccountMapper accountMapper,
+        ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.partnerRepository = partnerRepository;
         this.accountSignRepository = accountSignRepository;
-        this.replicationService = replicationService;
         this.budgetMaskService = budgetMaskService;
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
+        this.replicationService = replicationService;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class AccountServiceImpl implements AccountService {
                 .eventParams(accountMapper.toEventParams(savedAccount))
             );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
-            replicationService.saveCounterparty(response);
+            replicationService.createCounterparty(response);
             return response;
         } catch (DataIntegrityViolationException e) {
             throw e;
@@ -146,7 +146,7 @@ public class AccountServiceImpl implements AccountService {
             );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             response.setVersion(response.getVersion() + 1);
-            replicationService.saveCounterparty(response);
+            replicationService.updateCounterparty(response);
             return response;
         } catch (DataIntegrityViolationException e) {
             throw e;
@@ -175,7 +175,7 @@ public class AccountServiceImpl implements AccountService {
                 var accountSignEntity =
                     accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccount.getUuid());
                 accountSignEntity.ifPresent(accountSignRepository::delete);
-                replicationService.deleteCounterparty(foundAccount);
+                replicationService.deleteCounterparty(digitalId, id);
             } catch (RuntimeException e) {
                 auditAdapter.send(new Event()
                     .eventType(EventType.ACCOUNT_DELETE_ERROR)
