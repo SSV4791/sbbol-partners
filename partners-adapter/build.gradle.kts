@@ -47,6 +47,8 @@ sourceSets {
 dependencies {
     annotationProcessor(liveLibs.mapstruct.processor)
 
+    implementation(project(":partners-api"))
+
     implementation(platform(liveLibs.spring.boot.dependencies))
     implementation(liveLibs.antifraud.api)
     implementation(liveLibs.antifraud.rpc.api)

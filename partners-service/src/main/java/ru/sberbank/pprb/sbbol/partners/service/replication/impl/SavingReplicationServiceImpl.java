@@ -52,7 +52,7 @@ public class SavingReplicationServiceImpl extends AbstractReplicationService {
     protected void handleCreatingCounterparty(String digitalId, Counterparty counterparty) {
         saveReplicationEntityToMessageQueue(
             digitalId,
-            UUID.fromString(counterparty.getPprbGuid()),
+            toUUID(counterparty.getPprbGuid()),
             CREATING_COUNTERPARTY,
             counterparty
         );
@@ -62,7 +62,7 @@ public class SavingReplicationServiceImpl extends AbstractReplicationService {
     protected void handleUpdatingCounterparty(String digitalId, Counterparty counterparty) {
         saveReplicationEntityToMessageQueue(
             digitalId,
-            UUID.fromString(counterparty.getPprbGuid()),
+            toUUID(counterparty.getPprbGuid()),
             UPDATING_COUNTERPARTY,
             counterparty
         );
@@ -72,7 +72,7 @@ public class SavingReplicationServiceImpl extends AbstractReplicationService {
     protected void handleDeletingCounterparty(String digitalId, String counterpartyId) {
         saveReplicationEntityToMessageQueue(
             digitalId,
-            UUID.fromString(counterpartyId),
+            toUUID(counterpartyId),
             DELETING_COUNTERPARTY,
             counterpartyId
         );
@@ -92,7 +92,7 @@ public class SavingReplicationServiceImpl extends AbstractReplicationService {
     protected void handleDeletingSign(String digitalId, String counterpartyId) {
         saveReplicationEntityToMessageQueue(
             digitalId,
-            UUID.fromString(counterpartyId),
+            toUUID(counterpartyId),
             DELETING_SIGN,
             counterpartyId
         );

@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.ContactDocumentApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
@@ -13,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
 
 import java.util.List;
 
+@Loggable
 @RestController
 public class ContactDocumentController implements ContactDocumentApi {
 

@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.legacy.exception.SbbolException;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisites;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@Loggable
 public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
 
     private static final String ROOT_URL = "/counterparty";

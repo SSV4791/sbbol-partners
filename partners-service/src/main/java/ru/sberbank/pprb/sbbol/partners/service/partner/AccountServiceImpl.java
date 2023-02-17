@@ -175,7 +175,7 @@ public class AccountServiceImpl implements AccountService {
                 var accountSignEntity =
                     accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccount.getUuid());
                 accountSignEntity.ifPresent(accountSignRepository::delete);
-                replicationService.deleteCounterparty(digitalId, id);
+                replicationService.deleteCounterparty(digitalId, uuid.toString());
             } catch (RuntimeException e) {
                 auditAdapter.send(new Event()
                     .eventType(EventType.ACCOUNT_DELETE_ERROR)

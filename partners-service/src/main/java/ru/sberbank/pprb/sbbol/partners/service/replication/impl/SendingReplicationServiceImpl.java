@@ -12,8 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.AbstractReplicationService;
 
-import java.util.UUID;
-
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_COUNTERPARTY;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_SIGN;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.DELETING_COUNTERPARTY;
@@ -44,19 +42,19 @@ public class SendingReplicationServiceImpl extends AbstractReplicationService {
     @Override
     protected void handleCreatingCounterparty(String digitalId, Counterparty counterparty) {
         legacySbbolAdapter.create(digitalId, counterparty);
-        raceConditionResolver.resolve(CREATING_COUNTERPARTY, UUID.fromString(counterparty.getPprbGuid()), digitalId);
+        raceConditionResolver.resolve(CREATING_COUNTERPARTY, toUUID(counterparty.getPprbGuid()), digitalId);
     }
 
     @Override
     protected void handleUpdatingCounterparty(String digitalId, Counterparty counterparty) {
         legacySbbolAdapter.update(digitalId, counterparty);
-        raceConditionResolver.resolve(UPDATING_COUNTERPARTY, UUID.fromString(counterparty.getPprbGuid()), digitalId);
+        raceConditionResolver.resolve(UPDATING_COUNTERPARTY, toUUID(counterparty.getPprbGuid()), digitalId);
     }
 
     @Override
     protected void handleDeletingCounterparty(String digitalId, String counterpartyId) {
         legacySbbolAdapter.delete(digitalId, counterpartyId);
-        raceConditionResolver.resolve(DELETING_COUNTERPARTY, UUID.fromString(counterpartyId), digitalId);
+        raceConditionResolver.resolve(DELETING_COUNTERPARTY, toUUID(counterpartyId), digitalId);
     }
 
     @Override
@@ -69,6 +67,6 @@ public class SendingReplicationServiceImpl extends AbstractReplicationService {
     @Override
     protected void handleDeletingSign(String digitalId, String counterpartyId) {
         legacySbbolAdapter.removeSign(digitalId, counterpartyId);
-        raceConditionResolver.resolve(DELETING_SIGN, UUID.fromString(counterpartyId), digitalId);
+        raceConditionResolver.resolve(DELETING_SIGN, toUUID(counterpartyId), digitalId);
     }
 }

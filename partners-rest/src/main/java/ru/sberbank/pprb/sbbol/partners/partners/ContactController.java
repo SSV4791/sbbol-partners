@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerContactsApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
@@ -12,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.ContactService;
 
 import java.util.List;
 
+@Loggable
 @RestController
 public class ContactController implements PartnerContactsApi {
 

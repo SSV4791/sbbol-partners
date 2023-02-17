@@ -6,10 +6,12 @@ import ru.sberbank.pprb.sbbol.antifraud.api.exception.AnalyzeException;
 import ru.sberbank.pprb.sbbol.antifraud.api.exception.ApplicationException;
 import ru.sberbank.pprb.sbbol.antifraud.api.exception.ModelArgumentException;
 import ru.sberbank.pprb.sbbol.antifraud.rpc.counterparty.CounterPartyService;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudAdapterException;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudApplicationException;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudModelArgumentException;
 
+@Loggable
 public class FraudAdapterImpl implements FraudAdapter{
 
     private final CounterPartyService fraudRpcProxy;

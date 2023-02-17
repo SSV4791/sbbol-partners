@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
 import ru.sberbank.pprb.sbbol.audit.api.DefaultApi;
 import ru.sberbank.pprb.sbbol.audit.model.AuditMetamodel;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.audit.exception.AuditSendException;
 import ru.sberbank.pprb.sbbol.partners.audit.mapper.AuditMapper;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
@@ -17,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+@Loggable
 public class AuditAdapterImpl implements AuditAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditAdapterImpl.class);
