@@ -74,5 +74,7 @@ public interface ReplicationService {
      * @param accountUuid Идентификатор контрагента
      */
     void deleteSign(String digitalId, UUID accountUuid);
+
+    UUID toUUID (String id);
 }
 

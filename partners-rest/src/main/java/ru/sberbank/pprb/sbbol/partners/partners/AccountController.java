@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerAccountsApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -16,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 
 import java.util.List;
 
+@Loggable
 @RestController
 public class AccountController implements PartnerAccountsApi {
 

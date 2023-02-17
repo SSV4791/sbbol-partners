@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -319,7 +320,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
             delete(
                 baseRoutePath + "/accounts" + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
-                Map.of("ids", accountId),
+                Map.of("ids", List.of(accountId)),
                 digitalId
             ).getBody();
         assertThat(deleteAccount)

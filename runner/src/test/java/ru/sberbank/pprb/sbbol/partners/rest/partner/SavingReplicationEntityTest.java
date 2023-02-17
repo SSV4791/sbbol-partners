@@ -236,7 +236,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         delete(
             "/partners/{digitalId}",
             HttpStatus.NO_CONTENT,
-            Map.of("ids", partner.getId()),
+            Map.of("ids", List.of(partner.getId())),
             Map.of("Fraud-Meta-Data", getBase64FraudMetaData()),
             partner.getDigitalId()
         ).getBody();

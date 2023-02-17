@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnerPhoneApi;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
@@ -12,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.PhoneService;
 
 import java.util.List;
 
+@Loggable
 @RestController
 public class PartnerPhoneController implements PartnerPhoneApi {
 

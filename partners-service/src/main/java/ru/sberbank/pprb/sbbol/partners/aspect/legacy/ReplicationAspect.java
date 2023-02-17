@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.util.CollectionUtils;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BaseEntity;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
+@Loggable
 @Aspect
 public class ReplicationAspect {
 
@@ -100,7 +102,7 @@ public class ReplicationAspect {
         List<String> accountIds = new ArrayList<>();
         for (var partnerId : partnersIds) {
             if (nonNull(partnerId)) {
-                var partnerUuid = UUID.fromString(partnerId);
+                var partnerUuid = replicationService.toUUID(partnerId);
                 var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
                 var ids = accounts.stream()
                     .map(BaseEntity::getUuid)
@@ -121,7 +123,7 @@ public class ReplicationAspect {
         var  accountsSignDetail = accountsSignInfoResponse.getAccountsSignDetail();
         for (var accountSignDetail : accountsSignDetail) {
             var accountId = accountSignDetail.getAccountId();
-            asyncCreateSign(digitalId, UUID.fromString(accountId));
+            asyncCreateSign(digitalId, replicationService.toUUID(accountId));
         }
     }
 
@@ -130,7 +132,7 @@ public class ReplicationAspect {
         if (CollectionUtils.isEmpty(accountIds)) {
             return;
         }
-        accountIds.forEach(accountId -> asyncDeleteSign(digitalId, UUID.fromString(accountId)));
+        accountIds.forEach(accountId -> asyncDeleteSign(digitalId, replicationService.toUUID(accountId)));
     }
 
     private void asyncCreateCounterparty(Account account) {

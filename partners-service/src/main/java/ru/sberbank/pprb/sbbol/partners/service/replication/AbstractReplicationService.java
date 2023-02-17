@@ -56,8 +56,8 @@ public abstract class AbstractReplicationService implements ReplicationService {
 
     @Override
     public void createCounterparty(Account account) {
-        var partnerUuid = UUID.fromString(account.getPartnerId());
-        var accountUuid = UUID.fromString(account.getId());
+        var partnerUuid = toUUID(account.getPartnerId());
+        var accountUuid = toUUID(account.getId());
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .orElseThrow();
@@ -80,8 +80,8 @@ public abstract class AbstractReplicationService implements ReplicationService {
 
     @Override
     public void updateCounterparty(Account account) {
-        var partnerUuid = UUID.fromString(account.getPartnerId());
-        var accountUuid = UUID.fromString(account.getId());
+        var partnerUuid = toUUID(account.getPartnerId());
+        var accountUuid = toUUID(account.getId());
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .orElseThrow();
@@ -140,6 +140,11 @@ public abstract class AbstractReplicationService implements ReplicationService {
         } catch (SbbolException e) {
             LOG.warn(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
+    }
+
+    @Override
+    public UUID toUUID (String id) {
+        return counterpartyMapper.mapUuid(id);
     }
 
     protected abstract void handleCreatingCounterparty(String digitalId, Counterparty counterparty);
