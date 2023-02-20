@@ -537,6 +537,39 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/view аттрибут partnerSearch с некорректным счетом")
+    void testViewFilter_whenPartnerSearchAttributeIsDefinedAndMatchWithName() {
+        var accountsFilter = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            List<String> accounts = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+            }
+            return new AccountsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerSearch(partner.getOrgName())
+                .state(SignType.NOT_SIGNED)
+                .pagination(new Pagination()
+                    .count(30)
+                    .offset(0));
+        });
+        var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            accountsFilter,
+            AccountsResponse.class
+        ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getAccounts())
+                .hasSize(5);
+            assertThat(response.getPagination().getHasNextPage())
+                .isFalse();
+        });
+    }
+
+    @Test
     @DisplayName("POST /partner/accounts/view с 5 подписанными счетами")
     void testViewFilterSignFiveAccount() {
         var filter = step("Подготовка тестовых данных", () -> {

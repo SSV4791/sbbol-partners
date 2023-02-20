@@ -94,12 +94,10 @@ public class AccountViewRepositoryImpl
         }
         if (isNotEmpty(filter.getPartnerSearch())) {
             Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
-            var expression1 = builder.concat(partner.get(PartnerEntity_.ORG_NAME), partner.get(PartnerEntity_.SECOND_NAME));
-            var expression2 = builder.concat(expression1, partner.get(PartnerEntity_.FIRST_NAME));
-            var expression3 = builder.concat(expression2, partner.get(PartnerEntity_.MIDDLE_NAME));
-            var expression4 = builder.concat(expression3, partner.get(PartnerEntity_.INN));
-            var expression5 = builder.concat(expression4, partner.get(PartnerEntity_.KPP));
-            var expression = builder.concat(expression5, root.get(AccountEntity_.ACCOUNT));
+            var expression = builder.concat(
+                builder.coalesce(partner.get(PartnerEntity_.SEARCH), ""),
+                builder.coalesce(root.get(AccountEntity_.ACCOUNT), "")
+            );
             predicates.add(
                 builder.like(
                     builder.upper(expression), "%" + filter.getPartnerSearch().toUpperCase(Locale.getDefault()) + "%")
