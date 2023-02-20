@@ -190,6 +190,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidLegalEntityPartner(randomAlphabetic(10))
             .legalForm(LegalForm.PHYSICAL_PERSON)
             .orgName(null)
+            .firstName(randomAlphabetic(10))
+            .secondName(randomAlphabetic(10))
             .middleName(null)
             .inn(null)
             .kpp(null)
@@ -553,7 +555,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var createdPartner1 = post(
             baseRoutePath,
             HttpStatus.CREATED,
-            getValidLegalEntityPartner(digitalId),
+            getValidPhysicalPersonPartner(digitalId),
             Partner.class
         );
         assertThat(createdPartner1)
@@ -854,7 +856,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
     @ParameterizedTest
     @ArgumentsSource(PartnerFilterLegalFormArgumentsProvider.class)
-    void testGetPartners_whenUsePartnerType(PartnersFilter filter) {
+    void  testSavePartner_whenLegalFormIsNull(PartnersFilter filter) {
         post(
             baseRoutePath,
             HttpStatus.CREATED,
@@ -2102,7 +2104,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testSavePartner_whenLegalFormIsNull() {
-        var partner = getValidPhysicalPersonPartner();
+        var partner = getValidLegalEntityPartner();
         partner.setLegalForm(null);
         var error = given()
             .spec(requestSpec)
@@ -2213,20 +2215,33 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     public static PartnerCreate getValidPartner(String digitalId, LegalForm form) {
-        return new PartnerCreate()
-            .digitalId(digitalId)
-            .legalForm(form)
-            .orgName(randomAlphabetic(10))
-            .firstName(randomAlphabetic(10))
-            .secondName(randomAlphabetic(10))
-            .middleName(randomAlphabetic(10))
-            .inn(getValidInnNumber(form))
-            .kpp("123456789")
-            .ogrn(getValidOgrnNumber(form))
-            .okpo(getValidOkpoNumber(form))
-            .phones(new HashSet<>(List.of("0079241111111")))
-            .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
-            .comment("555555");
+        if (form == LegalForm.LEGAL_ENTITY || form == LegalForm.ENTREPRENEUR) {
+            return new PartnerCreate()
+                .digitalId(digitalId)
+                .legalForm(form)
+                .orgName(randomAlphabetic(10))
+                .inn(getValidInnNumber(form))
+                .kpp("123456789")
+                .ogrn(getValidOgrnNumber(form))
+                .okpo(getValidOkpoNumber(form))
+                .phones(new HashSet<>(List.of("0079241111111")))
+                .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
+                .comment("555555");
+        } else {
+            return new PartnerCreate()
+                .digitalId(digitalId)
+                .legalForm(form)
+                .firstName(randomAlphabetic(10))
+                .secondName(randomAlphabetic(10))
+                .middleName(randomAlphabetic(10))
+                .inn(getValidInnNumber(form))
+                .kpp("123456789")
+                .ogrn(getValidOgrnNumber(form))
+                .okpo(getValidOkpoNumber(form))
+                .phones(new HashSet<>(List.of("0079241111111")))
+                .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
+                .comment("555555");
+        }
     }
 
 

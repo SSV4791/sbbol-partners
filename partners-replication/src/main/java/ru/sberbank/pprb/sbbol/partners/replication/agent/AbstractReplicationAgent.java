@@ -2,6 +2,8 @@ package ru.sberbank.pprb.sbbol.partners.replication.agent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.ReplicationEntity;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus;
@@ -11,6 +13,10 @@ import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.Replicati
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.SUCCESS;
 
 public abstract class AbstractReplicationAgent implements ReplicationAgent {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractReplicationAgent.class);
+
+    private static final String ERROR_MESSAGE_FOR_SBBOL_EXCEPTION = "Ошибка репликации в СББОЛ Legacy. {}";
 
     protected final LegacySbbolAdapter sbbolAdapter;
 
@@ -34,6 +40,7 @@ public abstract class AbstractReplicationAgent implements ReplicationAgent {
             replicateToSbbol(entity);
             updateReplicationEntity(entity, SUCCESS);
         } catch (Exception e) {
+            LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
             updateReplicationEntity(entity, ERROR);
         }
     }

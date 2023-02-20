@@ -21,7 +21,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractReplicationService.class);
 
-    private static final String ERROR_MESSAGE_FOR_SBBOL_EXCEPTION = "Ошибка репликации в СББОЛ Legacy. ";
+    private static final String ERROR_MESSAGE_FOR_SBBOL_EXCEPTION = "Ошибка репликации в СББОЛ Legacy. {}";
 
     private final PartnerRepository partnerRepository;
 
@@ -138,7 +138,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
         try {
             handleDeletingSign(digitalId, accountId);
         } catch (SbbolException e) {
-            LOG.warn(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
+            LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }
 
