@@ -91,10 +91,10 @@ public class AccountSignServiceImpl implements AccountSignService {
                 var savedSign = accountSignRepository.save(sign);
                 replicationServiceRegistry.findService(SAVING_MESSAGE)
                     .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
-                    .saveSign(digitalId, savedSign.getAccountUuid());
+                    .saveSign(digitalId, accountsSign.getDigitalUserId(), savedSign.getAccountUuid());
                 replicationServiceRegistry.findService(SENDING_MESSAGE)
                     .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
-                    .saveSign(digitalId, savedSign.getAccountUuid());
+                    .saveSign(digitalId, accountsSign.getDigitalUserId(), savedSign.getAccountUuid());
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(savedSign))

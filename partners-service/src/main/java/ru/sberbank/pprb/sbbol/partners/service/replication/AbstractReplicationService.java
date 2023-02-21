@@ -140,12 +140,12 @@ public abstract class AbstractReplicationService implements ReplicationService {
     }
 
     @Override
-    public void saveSign(String digitalId, UUID accountUuid) {
+    public void saveSign(String digitalId, String digitalUserId, UUID accountUuid) {
         var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountUuid)
             .orElseThrow(() -> new EntryNotFoundException(ACCOUNT_SIGN_ENTRY, accountUuid));
         var counterpartySignData = accountSingMapper.toCounterpartySignData(sign);
         try {
-            handleCreatingSign(digitalId, counterpartySignData);
+            handleCreatingSign(digitalUserId, counterpartySignData);
         } catch (SbbolException e) {
             if (!replicationProperties.isEnable()) {
                 throw e;

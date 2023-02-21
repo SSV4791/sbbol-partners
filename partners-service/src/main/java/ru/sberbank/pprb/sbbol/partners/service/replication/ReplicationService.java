@@ -67,7 +67,7 @@ public interface ReplicationService {
      * @param digitalId Цифровой идентификатор клиента
      * @param accountUuid Идентификатор контрагента
      */
-    void saveSign(String digitalId, UUID accountUuid);
+    void saveSign(String digitalId, String digitalUserId, UUID accountUuid);
 
     /**
      * Удаление подписи контрагента в СББОЛ
