@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.replication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.legacy.exception.SbbolException;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
@@ -20,6 +21,12 @@ import java.util.UUID;
 public abstract class AbstractReplicationService implements ReplicationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractReplicationService.class);
+
+    private static final String PARTNER_ENTRY = "partner";
+
+    private static final String ACCOUNT_ENTRY = "account";
+
+    private static final String ACCOUNT_SIGN_ENTRY = "account_sign";
 
     private static final String ERROR_MESSAGE_FOR_SBBOL_EXCEPTION = "Ошибка репликации в СББОЛ Legacy. {}";
 
@@ -60,9 +67,9 @@ public abstract class AbstractReplicationService implements ReplicationService {
         var accountUuid = toUUID(account.getId());
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
-            .orElseThrow();
+            .orElseThrow(() -> new EntryNotFoundException(PARTNER_ENTRY, partnerUuid));
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountUuid)
-            .orElseThrow();
+            .orElseThrow(() -> new EntryNotFoundException(ACCOUNT_ENTRY, accountUuid));
         Counterparty counterparty = counterpartyMapper.toCounterparty(foundPartner, foundAccount);
         try {
             handleCreatingCounterparty(digitalId, counterparty);
@@ -84,9 +91,9 @@ public abstract class AbstractReplicationService implements ReplicationService {
         var accountUuid = toUUID(account.getId());
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
-            .orElseThrow();
+            .orElseThrow(() -> new EntryNotFoundException(PARTNER_ENTRY, partnerUuid));
         var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountUuid)
-            .orElseThrow();
+            .orElseThrow(() -> new EntryNotFoundException(ACCOUNT_ENTRY, accountUuid));
         Counterparty counterparty = counterpartyMapper.toCounterparty(foundPartner, foundAccount);
         try {
             handleUpdatingCounterparty(digitalId, counterparty);
@@ -121,14 +128,12 @@ public abstract class AbstractReplicationService implements ReplicationService {
     @Override
     public void saveSign(String digitalId, UUID accountUuid) {
         var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountUuid)
-            .orElse(null);
-        if (sign != null) {
-            var counterpartySignData = accountSingMapper.toCounterpartySignData(sign);
-            try {
-                handleCreatingSign(digitalId, counterpartySignData);
-            } catch (SbbolException e) {
-                LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
-            }
+            .orElseThrow(() -> new EntryNotFoundException(ACCOUNT_SIGN_ENTRY, accountUuid));
+        var counterpartySignData = accountSingMapper.toCounterpartySignData(sign);
+        try {
+            handleCreatingSign(digitalId, counterpartySignData);
+        } catch (SbbolException e) {
+            LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }
 
