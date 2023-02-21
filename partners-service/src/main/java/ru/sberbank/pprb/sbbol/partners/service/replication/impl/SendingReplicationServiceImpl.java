@@ -8,17 +8,20 @@ import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
+import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
 import ru.sberbank.pprb.sbbol.partners.replication.resolver.ReplicationRaceConditionResolver;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.AbstractReplicationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType;
 
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_COUNTERPARTY;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_SIGN;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.DELETING_COUNTERPARTY;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.DELETING_SIGN;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.UPDATING_COUNTERPARTY;
+import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SENDING_MESSAGE;
 
 @Loggable
 public class SendingReplicationServiceImpl extends AbstractReplicationService {
@@ -36,11 +39,24 @@ public class SendingReplicationServiceImpl extends AbstractReplicationService {
         AccountSingMapper accountSingMapper,
         CounterpartyMapper counterpartyMapper,
         LegacySbbolAdapter legacySbbolAdapter,
+        ReplicationProperties replicationProperties,
         ReplicationRaceConditionResolver raceConditionResolver
     ) {
-        super(partnerRepository, accountRepository, accountSignRepository, accountSingMapper, counterpartyMapper);
+        super(
+            partnerRepository,
+            accountRepository,
+            accountSignRepository,
+            accountSingMapper,
+            counterpartyMapper,
+            replicationProperties
+        );
         this.legacySbbolAdapter = legacySbbolAdapter;
         this.raceConditionResolver = raceConditionResolver;
+    }
+
+    @Override
+    public ReplicationServiceType getServiceType() {
+        return SENDING_MESSAGE;
     }
 
     @Override
