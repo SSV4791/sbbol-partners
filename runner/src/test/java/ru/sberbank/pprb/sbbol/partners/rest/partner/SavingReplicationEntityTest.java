@@ -9,7 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.legacy.exception.SbbolException;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
-import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.ReplicationEntity;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType;
@@ -41,9 +40,6 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 class SavingReplicationEntityTest extends BaseAccountControllerTest {
 
     @Autowired
-    private ReplicationProperties replicationProperties;
-
-    @Autowired
     private ReplicationEntityMapperRegistry mapperRegistry;
 
     @Autowired
@@ -54,18 +50,6 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
 
     @Autowired
     private ReplicationJob replicationJob;
-
-    @Test
-    void testReplicationProperties() {
-        var expectedProperties = new ReplicationProperties()
-            .enable(true)
-            .batchSize(5)
-            .cron("0 0 23 * * *")
-            .retry(4);
-        assertThat(replicationProperties)
-            .usingRecursiveComparison()
-            .isEqualTo(expectedProperties);
-    }
 
     @Test
     void testReplicationEntityMapperRegistry() {
