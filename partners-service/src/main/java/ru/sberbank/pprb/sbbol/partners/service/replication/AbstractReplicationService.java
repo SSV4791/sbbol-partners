@@ -67,7 +67,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
         try {
             handleCreatingCounterparty(digitalId, counterparty);
         } catch (SbbolException e) {
-            LOG.warn(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
+            LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
         try {
             handleUpdatingCounterparty(digitalId, counterparty);
         } catch (SbbolException e) {
-            LOG.warn(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
+            LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
             try {
                 handleDeletingCounterparty(digitalId, accountId);
             } catch (SbbolException e) {
-                LOG.warn(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
+                LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
             }
         }
     }
@@ -127,7 +127,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
             try {
                 handleCreatingSign(digitalId, counterpartySignData);
             } catch (SbbolException e) {
-                LOG.warn(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
+                LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
             }
         }
     }

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.aspect.logger;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -26,8 +27,8 @@ public final class LoggerAspect {
     }
 
     @Around(
-        "(within(ru.sberbank.pprb.sbbol.partners.service..*) && loggable()) || " +
-        "execution(* ru.sberbank.pprb.sbbol.partners.mapper..*Mapper*.*(..))"
+        "(execution(* ru.sberbank.pprb.sbbol.partners..*(..)) && loggable()) || " +
+            "execution(* ru.sberbank.pprb.sbbol.partners.mapper..*Mapper*.*(..))"
     )
     public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
         var signature = joinPoint.getSignature();
@@ -42,9 +43,14 @@ public final class LoggerAspect {
             level = nonNull(loggableMethodAnnotation) ? loggableMethodAnnotation.level() : loggableClassAnnotation.level();
         }
         logInvocation(signature, args, isLogged, level);
-        Object result = joinPoint.proceed();
-        logResult(signature, result, isLogged, level);
-        return result;
+        try {
+            Object result = joinPoint.proceed();
+            logResult(signature, result, isLogged, level);
+            return result;
+        } catch (Throwable ex) {
+            logException(signature, ex, isLogged, level);
+            throw ex;
+        }
     }
 
     private void logInvocation(Signature signature, Object[] args, boolean isLogged, Level level) {
@@ -69,6 +75,22 @@ public final class LoggerAspect {
                 case INFO -> LOGGER.info(messagePattern, signature, arg);
                 case WARN -> LOGGER.warn(messagePattern, signature, arg);
                 case ERROR -> LOGGER.error(messagePattern, signature, arg);
+            }
+        }
+    }
+
+    private void logException(Signature signature, Throwable ex, boolean isLogged, Level level) {
+        var messagePattern = "Метод {} Класс исключения {} Сообщение об ошибке {} StackTrace {}";
+        if (isLogged) {
+            var exceptionClassName = ex.getClass().getName();
+            var exceptionMessage = ex.getMessage();
+            var stackTrace = ExceptionUtils.getStackTrace(ex);
+            switch (level) {
+                case TRACE -> LOGGER.trace(messagePattern, signature, exceptionClassName, exceptionMessage, stackTrace);
+                case DEBUG -> LOGGER.debug(messagePattern, signature, exceptionClassName, exceptionMessage, stackTrace);
+                case INFO -> LOGGER.info(messagePattern, signature, exceptionClassName, exceptionMessage, stackTrace);
+                case WARN -> LOGGER.warn(messagePattern, signature, exceptionClassName, exceptionMessage, stackTrace);
+                case ERROR -> LOGGER.error(messagePattern, signature, exceptionClassName, exceptionMessage, stackTrace);
             }
         }
     }
