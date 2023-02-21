@@ -15,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.exception.NotFoundReplicationServiceException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
@@ -29,12 +30,15 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceRegistry;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SAVING_MESSAGE;
+import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SENDING_MESSAGE;
 
 @Loggable
 public class AccountServiceImpl implements AccountService {
@@ -47,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
     private final BudgetMaskService budgetMaskService;
     private final AuditAdapter auditAdapter;
     private final AccountMapper accountMapper;
-    private final ReplicationService replicationService;
+    private final ReplicationServiceRegistry replicationServiceRegistry;
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
@@ -56,7 +60,7 @@ public class AccountServiceImpl implements AccountService {
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
-        ReplicationService replicationService
+        ReplicationServiceRegistry replicationServiceRegistry
     ) {
         this.accountRepository = accountRepository;
         this.partnerRepository = partnerRepository;
@@ -64,7 +68,7 @@ public class AccountServiceImpl implements AccountService {
         this.budgetMaskService = budgetMaskService;
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
-        this.replicationService = replicationService;
+        this.replicationServiceRegistry = replicationServiceRegistry;
     }
 
     @Override
@@ -113,7 +117,12 @@ public class AccountServiceImpl implements AccountService {
                 .eventParams(accountMapper.toEventParams(savedAccount))
             );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
-            replicationService.createCounterparty(response);
+            replicationServiceRegistry.findService(SAVING_MESSAGE)
+                .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
+                .createCounterparty(response);
+            replicationServiceRegistry.findService(SENDING_MESSAGE)
+                .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
+                .createCounterparty(response);
             return response;
         } catch (DataIntegrityViolationException e) {
             throw e;
@@ -146,7 +155,12 @@ public class AccountServiceImpl implements AccountService {
             );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             response.setVersion(response.getVersion() + 1);
-            replicationService.updateCounterparty(response);
+            replicationServiceRegistry.findService(SAVING_MESSAGE)
+                .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
+                .updateCounterparty(response);
+            replicationServiceRegistry.findService(SENDING_MESSAGE)
+                .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
+                .updateCounterparty(response);
             return response;
         } catch (DataIntegrityViolationException e) {
             throw e;
@@ -175,7 +189,13 @@ public class AccountServiceImpl implements AccountService {
                 var accountSignEntity =
                     accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccount.getUuid());
                 accountSignEntity.ifPresent(accountSignRepository::delete);
-                replicationService.deleteCounterparty(digitalId, uuid.toString());
+                replicationServiceRegistry.findService(SAVING_MESSAGE)
+                    .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
+                    .deleteCounterparty(digitalId, uuid.toString());
+                replicationServiceRegistry.findService(SENDING_MESSAGE)
+                    .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
+                    .deleteCounterparty(digitalId, uuid.toString());
+
             } catch (RuntimeException e) {
                 auditAdapter.send(new Event()
                     .eventType(EventType.ACCOUNT_DELETE_ERROR)

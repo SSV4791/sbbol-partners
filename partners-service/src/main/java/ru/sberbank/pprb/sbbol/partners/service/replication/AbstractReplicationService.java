@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
@@ -40,18 +41,22 @@ public abstract class AbstractReplicationService implements ReplicationService {
 
     private final CounterpartyMapper counterpartyMapper;
 
+    protected final ReplicationProperties replicationProperties;
+
     public AbstractReplicationService(
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         AccountSingMapper accountSingMapper,
-        CounterpartyMapper counterpartyMapper
+        CounterpartyMapper counterpartyMapper,
+        ReplicationProperties replicationProperties
     ) {
         this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
         this.accountSingMapper = accountSingMapper;
         this.counterpartyMapper = counterpartyMapper;
+        this.replicationProperties = replicationProperties;
     }
 
     @Override
@@ -74,6 +79,9 @@ public abstract class AbstractReplicationService implements ReplicationService {
         try {
             handleCreatingCounterparty(digitalId, counterparty);
         } catch (SbbolException e) {
+            if (!replicationProperties.isEnable()) {
+                throw e;
+            }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }
@@ -98,6 +106,9 @@ public abstract class AbstractReplicationService implements ReplicationService {
         try {
             handleUpdatingCounterparty(digitalId, counterparty);
         } catch (SbbolException e) {
+            if (!replicationProperties.isEnable()) {
+                throw e;
+            }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }
@@ -108,6 +119,9 @@ public abstract class AbstractReplicationService implements ReplicationService {
             try {
                 handleDeletingCounterparty(digitalId, accountId);
             } catch (SbbolException e) {
+                if (!replicationProperties.isEnable()) {
+                    throw e;
+                }
                 LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
             }
         }
@@ -133,6 +147,9 @@ public abstract class AbstractReplicationService implements ReplicationService {
         try {
             handleCreatingSign(digitalId, counterpartySignData);
         } catch (SbbolException e) {
+            if (!replicationProperties.isEnable()) {
+                throw e;
+            }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }
@@ -143,6 +160,9 @@ public abstract class AbstractReplicationService implements ReplicationService {
         try {
             handleDeletingSign(digitalId, accountId);
         } catch (SbbolException e) {
+            if (!replicationProperties.isEnable()) {
+                throw e;
+            }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
         }
     }

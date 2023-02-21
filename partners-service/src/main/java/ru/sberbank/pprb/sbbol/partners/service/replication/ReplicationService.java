@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public interface ReplicationService {
 
+    ReplicationServiceType getServiceType();
+
     /**
      * Создание контрагентов в СББОЛ
      *

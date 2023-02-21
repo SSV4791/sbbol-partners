@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
-import ru.sberbank.pprb.sbbol.partners.aspect.legacy.ReplicationAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValidatorAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
@@ -77,6 +76,8 @@ import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceRegistry;
+import ru.sberbank.pprb.sbbol.partners.service.replication.impl.ReplicationServiceRegistryImpl;
 import ru.sberbank.pprb.sbbol.partners.service.replication.impl.SavingReplicationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.replication.impl.SendingReplicationServiceImpl;
 
@@ -104,14 +105,6 @@ public class PartnerServiceConfiguration {
         LegacySbbolAdapter legacySbbolAdapter
     ) {
         return new LegacyCheckAspect(servletRequest, legacySbbolAdapter);
-    }
-
-    @Bean
-    ReplicationAspect replicationAspect(
-        AccountRepository accountRepository,
-        ReplicationService sendingReplicationService
-    ) {
-        return new ReplicationAspect(accountRepository, sendingReplicationService);
     }
 
     @Bean
@@ -150,7 +143,7 @@ public class PartnerServiceConfiguration {
         BudgetMaskService budgetMaskService,
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
-        ReplicationService savingReplicationService
+        ReplicationServiceRegistry replicationServiceRegistry
     ) {
         return new AccountServiceImpl(
             accountRepository,
@@ -159,7 +152,7 @@ public class PartnerServiceConfiguration {
             budgetMaskService,
             auditAdapter,
             accountMapper,
-            savingReplicationService
+            replicationServiceRegistry
         );
     }
 
@@ -171,7 +164,7 @@ public class PartnerServiceConfiguration {
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         AccountSingMapper accountSingMapper,
-        ReplicationService savingReplicationService
+        ReplicationServiceRegistry replicationServiceRegistry
     ) {
         return new AccountSignServiceImpl(
             accountRepository,
@@ -180,7 +173,7 @@ public class PartnerServiceConfiguration {
             auditAdapter,
             accountMapper,
             accountSingMapper,
-            savingReplicationService
+            replicationServiceRegistry
         );
     }
 
@@ -316,7 +309,7 @@ public class PartnerServiceConfiguration {
         AddressMapper addressMapper,
         ContactMapper contactMapper,
         PartnerMapper partnerMapper,
-        ReplicationService savingReplicationService
+        ReplicationServiceRegistry replicationServiceRegistry
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
             accountRepository,
@@ -332,7 +325,7 @@ public class PartnerServiceConfiguration {
             addressMapper,
             contactMapper,
             partnerMapper,
-            savingReplicationService
+            replicationServiceRegistry
         );
     }
 
@@ -400,6 +393,7 @@ public class PartnerServiceConfiguration {
         AccountSingMapper accountSingMapper,
         CounterpartyMapper counterpartyMapper,
         LegacySbbolAdapter legacySbbolAdapter,
+        ReplicationProperties replicationProperties,
         ReplicationRaceConditionResolver replicationRaceConditionResolver
     ) {
         return new SendingReplicationServiceImpl(
@@ -409,7 +403,13 @@ public class PartnerServiceConfiguration {
             accountSingMapper,
             counterpartyMapper,
             legacySbbolAdapter,
+            replicationProperties,
             replicationRaceConditionResolver
         );
+    }
+
+    @Bean
+    ReplicationServiceRegistry replicationServiceRegistry(List<ReplicationService> replicationServices) {
+        return new ReplicationServiceRegistryImpl(replicationServices);
     }
 }

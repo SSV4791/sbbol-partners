@@ -6,6 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.NotFoundReplicationServiceException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
@@ -28,7 +29,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
-import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceRegistry;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +38,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
+import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SAVING_MESSAGE;
+import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SENDING_MESSAGE;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -56,7 +59,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final AddressMapper addressMapper;
     private final ContactMapper contactMapper;
     private final PartnerMapper partnerMapper;
-    private final ReplicationService replicationService;
+    private final ReplicationServiceRegistry replicationServiceRegistry;
 
     public PartnerServiceImpl(
         AccountRepository accountRepository,
@@ -72,7 +75,7 @@ public class PartnerServiceImpl implements PartnerService {
         AddressMapper addressMapper,
         ContactMapper contactMapper,
         PartnerMapper partnerMapper,
-        ReplicationService replicationService
+        ReplicationServiceRegistry replicationServiceRegistry
     ) {
         this.accountRepository = accountRepository;
         this.documentRepository = documentRepository;
@@ -87,7 +90,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.addressMapper = addressMapper;
         this.contactMapper = contactMapper;
         this.partnerMapper = partnerMapper;
-        this.replicationService = replicationService;
+        this.replicationServiceRegistry = replicationServiceRegistry;
     }
 
     @Override
@@ -154,7 +157,12 @@ public class PartnerServiceImpl implements PartnerService {
             .map(contactMapper::toContact)
             .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(accounts)) {
-            replicationService.createCounterparty(accounts);
+            replicationServiceRegistry.findService(SAVING_MESSAGE)
+                .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
+                .createCounterparty(accounts);
+            replicationServiceRegistry.findService(SENDING_MESSAGE)
+                .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
+                .createCounterparty(accounts);
         }
         return partnerMapper.toPartnerMullResponse(savedPartner)
             .gku(getGku(savedPartner.getInn()))
@@ -215,7 +223,12 @@ public class PartnerServiceImpl implements PartnerService {
             var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
             if (!CollectionUtils.isEmpty(accounts)) {
                 accountRepository.deleteAll(accounts);
-                replicationService.deleteCounterparties(accounts);
+                replicationServiceRegistry.findService(SAVING_MESSAGE)
+                    .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
+                    .deleteCounterparties(accounts);
+                replicationServiceRegistry.findService(SENDING_MESSAGE)
+                    .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
+                    .deleteCounterparties(accounts);
             }
         }
     }

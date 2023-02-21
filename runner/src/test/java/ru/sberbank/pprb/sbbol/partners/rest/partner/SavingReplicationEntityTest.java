@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.ERROR;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.CANCEL;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.INIT;
@@ -304,7 +305,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testRaceConditionResolver() throws JsonProcessingException, InterruptedException {
+    void testRaceConditionResolver_whenUpdatingAccount() throws JsonProcessingException, InterruptedException {
         doReturn(false)
             .when(legacySbbolAdapter)
             .checkNotMigration(any());
@@ -349,13 +350,43 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .when(legacySbbolAdapter)
             .update(any(), any());
         changeAccount(updateAccount(updatedAccount));
-        Thread.sleep(10000);
         actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
         assertThat(actualReplicationEntities)
             .isNotNull();
         checkReplicationEntityList(
             actualReplicationEntities,
             UPDATING_COUNTERPARTY,
+            account.getDigitalId(),
+            account.getId(),
+            CANCEL
+        );
+    }
+
+    @Test
+    void testRaceConditionResolver_whenCreatingAccount() throws JsonProcessingException, InterruptedException {
+        doReturn(false)
+            .when(legacySbbolAdapter)
+            .checkNotMigration(any());
+        doReturn(null)
+            .when(legacySbbolAdapter)
+            .getByPprbGuid(any(), any());
+        when(legacySbbolAdapter.create(any(), any()))
+            .thenReturn(new Counterparty());
+        var partner = createValidPartner();
+        doReturn(new Counterparty())
+            .when(legacySbbolAdapter)
+            .getByPprbGuid(any(), any());
+        var account = createValidAccount(
+            partner.getId(),
+            partner.getDigitalId()
+        );
+        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        assertThat(actualReplicationEntities)
+            .isNotNull();
+        checkReplicationEntityList(
+            actualReplicationEntities,
+            CREATING_COUNTERPARTY,
             account.getDigitalId(),
             account.getId(),
             CANCEL

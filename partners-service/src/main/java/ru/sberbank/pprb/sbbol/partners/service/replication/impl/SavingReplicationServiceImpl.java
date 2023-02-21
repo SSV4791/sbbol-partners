@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.AbstractReplicationService;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType;
 
 import java.util.UUID;
 
@@ -22,11 +23,10 @@ import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.Replicati
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.DELETING_COUNTERPARTY;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.DELETING_SIGN;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.UPDATING_COUNTERPARTY;
+import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SAVING_MESSAGE;
 
 @Loggable
 public class SavingReplicationServiceImpl extends AbstractReplicationService {
-
-    private final ReplicationProperties replicationProperties;
 
     private final ReplicationEntityMapperRegistry mapperRegistry;
 
@@ -42,10 +42,21 @@ public class SavingReplicationServiceImpl extends AbstractReplicationService {
         ReplicationEntityMapperRegistry mapperRegistry,
         ReplicationRepository replicationRepository
     ) {
-        super(partnerRepository, accountRepository, accountSignRepository, accountSingMapper, counterpartyMapper);
-        this.replicationProperties = replicationProperties;
+        super(
+            partnerRepository,
+            accountRepository,
+            accountSignRepository,
+            accountSingMapper,
+            counterpartyMapper,
+            replicationProperties
+        );
         this.mapperRegistry = mapperRegistry;
         this.replicationRepository = replicationRepository;
+    }
+
+    @Override
+    public ReplicationServiceType getServiceType() {
+        return SAVING_MESSAGE;
     }
 
     @Override
