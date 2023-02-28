@@ -3,10 +3,10 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import io.qameta.allure.Allure;
 import io.restassured.common.mapper.TypeRef;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
@@ -954,6 +954,60 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 "bank.bankAccount.uuid",
                 "bank.bankAccount.bankUuid")
             .isEqualTo(account));
+    }
+
+    @Test
+    @DisplayName("POST /partner/accounts дублирование счета когда account = '' и account = null")
+    void testCreateAccount_whenDuplicationByEmptyAndNullAccount() {
+        var expectedAccount = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            var account = getValidAccount(partner.getId(), partner.getDigitalId());
+            account.setAccount(StringUtils.EMPTY);
+            createValidAccount(account);
+            return account;
+        });
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () -> {
+            expectedAccount.setAccount(null);
+            return post(
+                baseRoutePath + "/account",
+                HttpStatus.BAD_REQUEST,
+                expectedAccount,
+                Error.class
+            );
+        });
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+        });
+    }
+
+    @Test
+    @DisplayName("POST /partner/accounts дублирование счета когда bankAccount = '' и bankAccount = null")
+    void testCreateAccount_whenDuplicationByEmptyAndNullBankAccount() {
+        var expectedAccount = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            var account = getValidAccount(partner.getId(), partner.getDigitalId());
+            account.getBank().getBankAccount().setBankAccount(StringUtils.EMPTY);
+            createValidAccount(account);
+            return account;
+        });
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () -> {
+            expectedAccount.getBank().getBankAccount().setBankAccount(null);
+            return post(
+                baseRoutePath + "/account",
+                HttpStatus.BAD_REQUEST,
+                expectedAccount,
+                Error.class
+            );
+        });
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+        });
     }
 
     @Test

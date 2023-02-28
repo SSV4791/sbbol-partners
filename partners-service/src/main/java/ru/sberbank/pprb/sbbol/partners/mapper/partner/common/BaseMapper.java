@@ -43,6 +43,7 @@ public interface BaseMapper {
                 search
             )
             .filter(Objects::nonNull)
+            .filter(it -> !EMPTY.equals(it))
             .collect(Collectors.joining(SPACE));
     }
 }

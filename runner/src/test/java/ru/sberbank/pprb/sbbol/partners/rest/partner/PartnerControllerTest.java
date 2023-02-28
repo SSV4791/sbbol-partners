@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -1259,6 +1260,42 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 "phones.uuid"
             )
             .isEqualTo(partner);
+    }
+
+    @Test
+    void testCreatePartner_whenDuplicationByEmptyAndNullKpp() {
+        var partner = getValidLegalEntityPartner();
+        partner.setKpp(StringUtils.EMPTY);
+        createValidPartner(partner);
+        partner.setKpp(null);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+    }
+
+    @Test
+    void testCreatePartner_whenDuplicationByEmptyAndNullInn() {
+        var partner = getValidPhysicalPersonPartner();
+        partner.setInn(StringUtils.EMPTY);
+        createValidPartner(partner);
+        partner.setInn(null);
+        var error = post(
+            baseRoutePath,
+            HttpStatus.BAD_REQUEST,
+            partner,
+            Error.class
+        );
+        assertThat(error)
+            .isNotNull();
+        assertThat(error.getCode())
+            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
