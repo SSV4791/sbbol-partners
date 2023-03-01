@@ -22,6 +22,7 @@ public abstract class AbstractReplicationEntityMapper<T> implements ReplicationE
     @Override
     public ReplicationEntity map(
         String digitalId,
+        String digitalUserId,
         UUID entityId,
         ReplicationEntityType entityType,
         T entity
@@ -29,6 +30,7 @@ public abstract class AbstractReplicationEntityMapper<T> implements ReplicationE
         try {
             return new ReplicationEntity()
                 .digitalId(digitalId)
+                .digitalUserId(digitalUserId)
                 .entityId(entityId)
                 .entityType(entityType)
                 .entityStatus(INIT)

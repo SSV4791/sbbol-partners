@@ -116,7 +116,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
     public static AccountsSignInfo getValidAccountsSign(String digitalId, String accountId) {
         return new AccountsSignInfo()
             .digitalId(digitalId)
-            .digitalUserId(digitalId)
+            .digitalUserId(RandomStringUtils.randomAlphabetic(10))
             .accountsSignDetail(
                 List.of(
                     new AccountSignDetail()
@@ -149,7 +149,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         }
         return new AccountsSignInfo()
             .digitalId(digitalId)
-            .digitalUserId(digitalId)
+            .digitalUserId(RandomStringUtils.randomAlphabetic(10))
             .accountsSignDetail(accountSignDetails);
     }
 }

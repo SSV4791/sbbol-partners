@@ -90,9 +90,10 @@ public class SavingReplicationServiceImpl extends AbstractReplicationService {
     }
 
     @Override
-    protected void handleCreatingSign(String digitalId, CounterpartySignData signData) {
+    protected void handleCreatingSign(String digitalId, String digitalUserId, CounterpartySignData signData) {
         saveReplicationEntityToMessageQueue(
             digitalId,
+            digitalUserId,
             signData.getPprbGuid(),
             CREATING_SIGN,
             signData
@@ -115,11 +116,28 @@ public class SavingReplicationServiceImpl extends AbstractReplicationService {
         ReplicationEntityType replicationEntityType,
         T replicationEntity
     ) {
+        saveReplicationEntityToMessageQueue(
+            digitalId,
+            null,
+            entityId,
+            replicationEntityType,
+            replicationEntity
+        );
+    }
+
+    private <T> void saveReplicationEntityToMessageQueue(
+        String digitalId,
+        String digitalUserId,
+        UUID entityId,
+        ReplicationEntityType replicationEntityType,
+        T replicationEntity
+    ) {
         if (replicationProperties.isEnable()) {
             var mapper = mapperRegistry.findMapper(replicationEntityType)
                 .orElseThrow(() -> new NotFoundReplicationEntityMapperException(replicationEntityType));
             var entity = mapper.map(
                 digitalId,
+                digitalUserId,
                 entityId,
                 replicationEntityType,
                 replicationEntity);

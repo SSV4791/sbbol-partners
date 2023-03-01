@@ -145,7 +145,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
             .orElseThrow(() -> new EntryNotFoundException(ACCOUNT_SIGN_ENTRY, accountUuid));
         var counterpartySignData = accountSingMapper.toCounterpartySignData(sign);
         try {
-            handleCreatingSign(digitalUserId, counterpartySignData);
+            handleCreatingSign(digitalId, digitalUserId, counterpartySignData);
         } catch (SbbolException e) {
             if (!replicationProperties.isEnable()) {
                 throw e;
@@ -178,7 +178,7 @@ public abstract class AbstractReplicationService implements ReplicationService {
 
     protected abstract void handleDeletingCounterparty(String digitalId, String counterpartyId);
 
-    protected abstract void handleCreatingSign(String digitalId, CounterpartySignData signData);
+    protected abstract void handleCreatingSign(String digitalId, String digitalUserId, CounterpartySignData signData);
 
     protected abstract void  handleDeletingSign(String digitalId, String counterpartyId);
 }

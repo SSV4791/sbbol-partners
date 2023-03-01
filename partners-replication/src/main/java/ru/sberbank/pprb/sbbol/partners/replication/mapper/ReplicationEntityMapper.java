@@ -9,6 +9,7 @@ public interface ReplicationEntityMapper<T> extends ReplicationEntityDefiner {
 
     ReplicationEntity map(
         String digitalId,
+        String digitalUserId,
         UUID entityId,
         ReplicationEntityType entityType,
         T entity
