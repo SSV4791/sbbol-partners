@@ -433,12 +433,25 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             expectedReplicationEntity.setRetry(retry);
             assertThat(actualReplicationEntity)
                 .usingRecursiveComparison()
-                .ignoringFields("uuid", "version", "lastModifiedDate", "entityData", "createDate")
+                .ignoringFields(
+                    "uuid",
+                    "digitalUserId",
+                    "version",
+                    "lastModifiedDate",
+                    "entityData",
+                    "createDate")
                 .isEqualTo(expectedReplicationEntity);
         } else {
             assertThat(actualReplicationEntity)
                 .usingRecursiveComparison()
-                .ignoringFields("uuid", "version", "lastModifiedDate", "entityData", "createDate", "retry")
+                .ignoringFields(
+                    "uuid",
+                    "digitalUserId",
+                    "version",
+                    "lastModifiedDate",
+                    "entityData",
+                    "createDate",
+                    "retry")
                 .isEqualTo(expectedReplicationEntity);
         }
     }

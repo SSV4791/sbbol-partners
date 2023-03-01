@@ -84,10 +84,10 @@ public class SendingReplicationServiceImpl extends AbstractReplicationService {
     }
 
     @Override
-    protected void handleCreatingSign(String digitalId, CounterpartySignData signData) {
+    protected void handleCreatingSign(String digitalId, String digitalUserId, CounterpartySignData signData) {
         var counterpartyId = signData.getPprbGuid();
         LOG.debug("Отправляем реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
-        legacySbbolAdapter.saveSign(digitalId, signData);
+        legacySbbolAdapter.saveSign(digitalUserId, signData);
         LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
         raceConditionResolver.resolve(CREATING_SIGN, counterpartyId, digitalId);
     }

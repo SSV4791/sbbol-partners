@@ -23,6 +23,9 @@ public class ReplicationEntity extends BaseEntity {
     @Column(name = "digital_id", nullable = false)
     private String digitalId;
 
+    @Column(name = "digital_user_id")
+    private String digitalUserId;
+
     @Column(name = "entity_id", nullable = false)
     private UUID entityId;
 
@@ -45,6 +48,11 @@ public class ReplicationEntity extends BaseEntity {
 
     public ReplicationEntity digitalId(String digitalId) {
         this.digitalId = digitalId;
+        return this;
+    }
+
+    public ReplicationEntity digitalUserId(String digitalUserId) {
+        this.digitalUserId = digitalUserId;
         return this;
     }
 
@@ -79,6 +87,14 @@ public class ReplicationEntity extends BaseEntity {
 
     public void setDigitalId(String digitalId) {
         this.digitalId = digitalId;
+    }
+
+    public String getDigitalUserId() {
+        return digitalUserId;
+    }
+
+    public void setDigitalUserId(String digitalUserId) {
+        this.digitalUserId = digitalUserId;
     }
 
     public UUID getEntityId() {
@@ -158,6 +174,7 @@ public class ReplicationEntity extends BaseEntity {
     public String toString() {
         return "ReplicationEntity{" +
             "digitalId='" + digitalId + '\'' +
+            ", digitalUserId='" + digitalUserId + '\'' +
             ", entityId=" + entityId +
             ", entityType=" + entityType +
             ", entityData='" + entityData + '\'' +
