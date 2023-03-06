@@ -17,6 +17,11 @@
       "maxLength": 36,
       "x-not-empty": true
     },
+    "accountVersion": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия счета"
+    },
     "digest": {
       "type": "string",
       "title": "Дайджест"
@@ -44,6 +49,7 @@
     }
   },
   "required": [
-    "accountId"
+    "accountId",
+    "accountVersion"
   ]
 }

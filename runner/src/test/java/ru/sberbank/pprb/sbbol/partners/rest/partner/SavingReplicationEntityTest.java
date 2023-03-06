@@ -296,7 +296,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         doReturn(new Counterparty())
             .when(legacySbbolAdapter)
             .getByPprbGuid(any(), any());
-        createValidAccountsSign(account.getDigitalId(), account.getId(), getBase64FraudMetaData());
+        createValidAccountsSign(account.getDigitalId(), account.getId(), account.getVersion(), getBase64FraudMetaData());
         var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
         checkReplicationEntityList(
             actualReplicationEntities,
@@ -329,7 +329,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         doReturn(new Counterparty())
             .when(legacySbbolAdapter)
             .getByPprbGuid(any(), any());
-        createValidAccountsSign(account.getDigitalId(), account.getId(), getBase64FraudMetaData());
+        createValidAccountsSign(account.getDigitalId(), account.getId(), account.getVersion(), getBase64FraudMetaData());
         deleteAccountSign(account.getDigitalId(), account.getId());
         var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
         checkReplicationEntityList(
