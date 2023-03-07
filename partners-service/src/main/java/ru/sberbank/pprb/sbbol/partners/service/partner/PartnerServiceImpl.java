@@ -6,7 +6,6 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.NotFoundReplicationServiceException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
@@ -29,7 +28,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
-import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceRegistry;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,8 +37,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
-import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SAVING_MESSAGE;
-import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SENDING_MESSAGE;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -59,7 +56,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final AddressMapper addressMapper;
     private final ContactMapper contactMapper;
     private final PartnerMapper partnerMapper;
-    private final ReplicationServiceRegistry replicationServiceRegistry;
+    private final ReplicationService replicationService;
 
     public PartnerServiceImpl(
         AccountRepository accountRepository,
@@ -75,7 +72,7 @@ public class PartnerServiceImpl implements PartnerService {
         AddressMapper addressMapper,
         ContactMapper contactMapper,
         PartnerMapper partnerMapper,
-        ReplicationServiceRegistry replicationServiceRegistry
+        ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.documentRepository = documentRepository;
@@ -90,7 +87,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.addressMapper = addressMapper;
         this.contactMapper = contactMapper;
         this.partnerMapper = partnerMapper;
-        this.replicationServiceRegistry = replicationServiceRegistry;
+        this.replicationService = replicationService;
     }
 
     @Override
@@ -157,12 +154,7 @@ public class PartnerServiceImpl implements PartnerService {
             .map(contactMapper::toContact)
             .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(accounts)) {
-            replicationServiceRegistry.findService(SAVING_MESSAGE)
-                .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
-                .createCounterparty(accounts);
-            replicationServiceRegistry.findService(SENDING_MESSAGE)
-                .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
-                .createCounterparty(accounts);
+            replicationService.createCounterparty(accounts);
         }
         return partnerMapper.toPartnerMullResponse(savedPartner)
             .gku(getGku(savedPartner.getInn()))
@@ -185,14 +177,21 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     public Partner updatePartner(Partner partner) {
-        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(partner.getDigitalId(), UUID.fromString(partner.getId()))
+        var digitalId = partner.getDigitalId();
+        var partnerUuid = UUID.fromString(partner.getId());
+        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, partner.getDigitalId(), partner.getId()));
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partner.getId()));
         if (!Objects.equals(partner.getVersion(), foundPartner.getVersion())) {
             throw new OptimisticLockException(foundPartner.getVersion(), partner.getVersion());
         }
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
+        var accountEntities = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
+        if (!CollectionUtils.isEmpty(accountEntities)) {
+            var accounts = accountMapper.toAccounts(accountEntities);
+            replicationService.updateCounterparty(accounts);
+        }
         var response = partnerMapper.toPartner(savePartner);
         response.setVersion(response.getVersion() + 1);
         response.setGku(getGku(response.getInn()));
@@ -223,12 +222,7 @@ public class PartnerServiceImpl implements PartnerService {
             var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
             if (!CollectionUtils.isEmpty(accounts)) {
                 accountRepository.deleteAll(accounts);
-                replicationServiceRegistry.findService(SAVING_MESSAGE)
-                    .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
-                    .deleteCounterparties(accounts);
-                replicationServiceRegistry.findService(SENDING_MESSAGE)
-                    .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
-                    .deleteCounterparties(accounts);
+                replicationService.deleteCounterparties(accounts);
             }
         }
     }
