@@ -112,11 +112,11 @@ dependencies {
     implementation(project(":partners-api"))
     implementation(project(":partners-service"))
 
-    implementation(platform(liveLibs.spring.boot.dependencies))
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(liveLibs.javax.validation.api)
+    implementation(liveLibs.spring.boot.starter.data.jpa)
+    implementation(liveLibs.spring.boot.starter.web)
     implementation(liveLibs.springfox.boot.starter)
+    implementation(platform(liveLibs.spring.boot.dependencies))
 }
 
 description = "REST Controllers ППРБ.Digital.Партнеры"

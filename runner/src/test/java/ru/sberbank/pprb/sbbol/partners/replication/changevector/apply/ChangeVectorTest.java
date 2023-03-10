@@ -9,9 +9,12 @@ import com.sbt.pprb.integration.hibernate.changes.transform.EventResolver;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 import ru.sberbank.pprb.sbbol.partners.config.DataSourceConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.HibernatePluginCleanerInitializer;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
@@ -24,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
+@UnitTestLayer
 @ContextConfiguration(
     initializers = {HibernatePluginCleanerInitializer.class},
     classes = {
@@ -34,7 +38,9 @@ import java.util.stream.Collectors;
         PartnerPhoneMapperImpl.class,
     }
 )
-class ChangeVectorTest extends BaseUnitConfiguration {
+@ExtendWith({SpringExtension.class})
+@ActiveProfiles("cv")
+class ChangeVectorTest {
 
     @Autowired
     private SessionFactoryImplementor sessionFactory;

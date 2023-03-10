@@ -14,9 +14,6 @@ dependencies {
     implementation(project(":partners-replication"))
 
     implementation(platform(liveLibs.spring.boot.dependencies))
-    implementation("org.springframework.boot:spring-boot-starter-aop")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
     implementation(liveLibs.antifraud.api)
     implementation(liveLibs.bundles.micrometer)
     implementation(liveLibs.hibernate.jcache)
@@ -25,6 +22,8 @@ dependencies {
     implementation(liveLibs.sbp.hibernate.standin)
     //Поддержка генераторов ID на время перехода.
     implementation(liveLibs.sbp.jpa.model.support)
+    implementation(liveLibs.spring.boot.starter.aop)
+    implementation(liveLibs.spring.boot.starter.data.jpa)
 
     compileOnly(liveLibs.hibernate.jpamodelgen)
     runtimeOnly(liveLibs.ehcache.org.core)

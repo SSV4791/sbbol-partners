@@ -152,7 +152,7 @@ release:
       wait: true
   build_gradle:
     cpu: 2
-    mem: '4g'
+    mem: '8g'
     command: >-
       ./gradlew
       -PtokenName=${env.TOKEN_NAME}
@@ -162,7 +162,7 @@ release:
       -Pversion=${env.VERSION}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=release
-      build -x test --parallel --info
+      build -x test generateVectorTest --parallel --info
   run_backend_tests: 'true'
   run_frontend_tests: 'false'
   test:
@@ -177,7 +177,7 @@ release:
         -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
         -PsonarToken=${env.SONAR_TOKEN}
         -Pversion=${env.VERSION}
-        build generateVectorTest qaReporterUpload sonarCoverage
+        build qaReporterUpload sonarCoverage
         -Dtest-layer=unit,api,configuration,cdcConsumer,cdcProvider
         -Dsonar.branch.name=${params.branch}
         -Dpactbroker.url=${env.PACT_BROKER_URL}
@@ -190,12 +190,6 @@ release:
         -Dversion=${env.VERSION}
         -Dbuild.link=${env.BUILD_URL}
         -Dbuild.type=release
-        -Pspring.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_MAIN}/${env.POSTGRES_DB_NAME}
-        -Pspring.datasource.username=${env.POSTGRES_DB_USER}
-        -Pspring.datasource.password=${env.POSTGRES_DB_PASSWORD}
-        -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
-        -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
-        -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
         -Dallure.jobrunId=${launch.jobRunId}
   notification:
     message_template: Релиз партнеров закончил сборку со статусом ${result}

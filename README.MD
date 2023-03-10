@@ -68,7 +68,7 @@ tokenPassword=<Your user token pass code>
 
 ### Сборка проекта с отключенным кешом и без запуска тестов
 
-./gradlew clean build --no-build-cache -x test
+`./gradlew clean build --no-build-cache -x test`
 
 ### Запуск приложения локально
 
@@ -101,3 +101,26 @@ tokenPassword=<Your user token pass code>
 Для изменения директории создания патча использовать с флагом
 
 `./gradlew newpatch -Ppatchname=newpatch -Preleaseversion='02.000.00'` или изменить версию в gradle.properties
+
+### Переопределение конфигурации
+
+`./gradlew createCustom` создание каталога custom в котором можно переопределить конфигурацию для локального использования
+
+### Запуск тестов
+
+В тестах используется фреймворк testcontainers, который поднимает в Docker контейнеры с БД Postgres.
+
+В случае использования удаленного Docker (на виртуалке из ДИ), необходимо в домашнюю директорию добавить файл
+`.testcontainers.properties` (если файл уже есть, необходимо заменить) со следующим содержимым:
+
+```
+docker.client.strategy=org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy
+docker.tls.verify=1
+# указать IP виртуальной машины, полученной из ДИ
+docker.host=tcp\://{url}\:2376
+# указать полный путь к папке с сертификатами, полученными из ДИ
+docker.cert.path=/Users/{login}/.docker/tls
+```
+
+Для настройки Docker-Client необходимо воспользоваться инструкцией
+https://confluence.sberbank.ru/pages/viewpage.action?pageId=9293898048
