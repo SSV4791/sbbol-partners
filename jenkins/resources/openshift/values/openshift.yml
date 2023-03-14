@@ -66,6 +66,10 @@ os_project:
       crown: '0 0 23 * * *'
       batchSize: 1000
       retry: 4
+      cleaner:
+        enable: false
+        cron: '0 0 23 * * *'
+        expired-period: 30
 
 registry_area: registry.sigma.sbrf.ru
 nexus_area: Nexus_PROD/CI02792425_sbbol-partners

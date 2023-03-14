@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJob;
+import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
+import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobRegistry;
 import ru.sberbank.pprb.sbbol.partners.scheduler.ReplicationScheduler;
 
 import javax.sql.DataSource;
@@ -30,7 +31,10 @@ public class ReplicationSchedulerConfig {
     }
 
     @Bean
-    public ReplicationScheduler replicationScheduler(ReplicationJob replicationJob) {
-        return new ReplicationScheduler(replicationJob);
+    public ReplicationScheduler replicationScheduler(
+        ReplicationProperties replicationProperties,
+        ReplicationJobRegistry replicationJobRegistry
+    ) {
+        return new ReplicationScheduler(replicationProperties, replicationJobRegistry);
     }
 }
