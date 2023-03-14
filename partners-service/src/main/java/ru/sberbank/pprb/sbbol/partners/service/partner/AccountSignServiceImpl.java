@@ -12,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryDeleteException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
-import ru.sberbank.pprb.sbbol.partners.exception.NotFoundReplicationServiceException;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudModelArgumentException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
@@ -24,13 +23,10 @@ import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
-import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceRegistry;
+import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.UUID;
-
-import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SAVING_MESSAGE;
-import static ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationServiceType.SENDING_MESSAGE;
 
 @Loggable
 public class AccountSignServiceImpl implements AccountSignService {
@@ -43,7 +39,7 @@ public class AccountSignServiceImpl implements AccountSignService {
     private final AuditAdapter auditAdapter;
     private final AccountSingMapper accountSingMapper;
     private final AccountMapper accountMapper;
-    private final ReplicationServiceRegistry replicationServiceRegistry;
+    private final ReplicationService replicationService;
 
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
@@ -52,7 +48,7 @@ public class AccountSignServiceImpl implements AccountSignService {
         AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         AccountSingMapper accountSingMapper,
-        ReplicationServiceRegistry replicationServiceRegistry
+        ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
@@ -60,7 +56,7 @@ public class AccountSignServiceImpl implements AccountSignService {
         this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
         this.accountSingMapper = accountSingMapper;
-        this.replicationServiceRegistry = replicationServiceRegistry;
+        this.replicationService = replicationService;
     }
 
     @Override
@@ -89,12 +85,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             }
             try {
                 var savedSign = accountSignRepository.save(sign);
-                replicationServiceRegistry.findService(SAVING_MESSAGE)
-                    .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
-                    .saveSign(digitalId, accountsSign.getDigitalUserId(), savedSign.getAccountUuid());
-                replicationServiceRegistry.findService(SENDING_MESSAGE)
-                    .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
-                    .saveSign(digitalId, accountsSign.getDigitalUserId(), savedSign.getAccountUuid());
+                replicationService.saveSign(digitalId, accountsSign.getDigitalUserId(), savedSign.getAccountUuid());
                 auditAdapter.send(new Event()
                     .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
                     .eventParams(accountSingMapper.toEventParams(savedSign))
@@ -153,12 +144,7 @@ public class AccountSignServiceImpl implements AccountSignService {
             try {
                 account.setState(AccountStateType.NOT_SIGNED);
                 var saveAccount = accountRepository.save(account);
-                replicationServiceRegistry.findService(SAVING_MESSAGE)
-                    .orElseThrow(() -> new NotFoundReplicationServiceException(SAVING_MESSAGE))
-                    .deleteSign(digitalId, accountUuid);
-                replicationServiceRegistry.findService(SENDING_MESSAGE)
-                    .orElseThrow(() -> new NotFoundReplicationServiceException(SENDING_MESSAGE))
-                    .deleteSign(digitalId, accountUuid);
+                replicationService.deleteSign(digitalId, accountUuid);
                 auditAdapter.send(new Event()
                     .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
                     .eventParams(accountMapper.toEventParams(saveAccount))

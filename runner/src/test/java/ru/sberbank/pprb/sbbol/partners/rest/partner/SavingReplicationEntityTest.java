@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.legacy.exception.SbbolException;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.ReplicationEntity;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -126,6 +128,42 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
                 0
             );
         }
+    }
+
+    @Test
+    void testUpdatingCounterpartyReplica_whenUpdatingPartner() {
+        doReturn(false)
+            .when(legacySbbolAdapter)
+            .checkNotMigration(any());
+        doReturn(null)
+            .when(legacySbbolAdapter)
+            .getByPprbGuid(any(), any());
+        doThrow(SbbolException.class)
+            .when(legacySbbolAdapter)
+            .create(any(), any());
+        doThrow(SbbolException.class)
+            .when(legacySbbolAdapter)
+            .update(any(), any());
+        var partner = createValidPartner();
+        var account = createValidAccount(
+            partner.getId(),
+            partner.getDigitalId()
+        );
+        put(
+            baseRoutePath,
+            HttpStatus.OK,
+            partner,
+            Partner.class
+        );
+        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        checkReplicationEntityList(
+            actualReplicationEntities,
+            UPDATING_COUNTERPARTY,
+            account.getDigitalId(),
+            account.getId(),
+            INIT,
+            0
+        );
     }
 
     @Test
@@ -393,7 +431,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         );
     }
 
-    void checkReplicationEntityList(
+    private void checkReplicationEntityList(
         List<ReplicationEntity> actualEntities,
         ReplicationEntityType expectedEntityType,
         String expectedDigitalId,
@@ -410,7 +448,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         );
     }
 
-    void checkReplicationEntityList(
+    private void checkReplicationEntityList(
         List<ReplicationEntity> actualEntities,
         ReplicationEntityType expectedEntityType,
         String expectedDigitalId,
@@ -420,39 +458,40 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
     ) {
         assertThat(actualEntities).asList()
             .isNotEmpty();
-        var actualReplicationEntity = actualEntities.stream()
-            .filter(it -> it.getEntityType() == expectedEntityType)
-            .findAny()
-            .orElse(null);
         var expectedReplicationEntity = new ReplicationEntity()
             .digitalId(expectedDigitalId)
             .entityId(UUID.fromString(expectedAccountId))
             .entityType(expectedEntityType)
             .entityStatus(entityStatus);
-        if (Objects.nonNull(retry)) {
-            expectedReplicationEntity.setRetry(retry);
-            assertThat(actualReplicationEntity)
-                .usingRecursiveComparison()
-                .ignoringFields(
-                    "uuid",
-                    "digitalUserId",
-                    "version",
-                    "lastModifiedDate",
-                    "entityData",
-                    "createDate")
-                .isEqualTo(expectedReplicationEntity);
-        } else {
-            assertThat(actualReplicationEntity)
-                .usingRecursiveComparison()
-                .ignoringFields(
-                    "uuid",
-                    "digitalUserId",
-                    "version",
-                    "lastModifiedDate",
-                    "entityData",
-                    "createDate",
-                    "retry")
-                .isEqualTo(expectedReplicationEntity);
+        var actualReplicationEntities = actualEntities.stream()
+            .filter(it -> it.getEntityType() == expectedEntityType)
+            .collect(Collectors.toList());
+        for (var actualReplicationEntity : actualReplicationEntities) {
+            if (Objects.nonNull(retry)) {
+                expectedReplicationEntity.setRetry(retry);
+                assertThat(actualReplicationEntity)
+                    .usingRecursiveComparison()
+                    .ignoringFields(
+                        "uuid",
+                        "digitalUserId",
+                        "version",
+                        "lastModifiedDate",
+                        "entityData",
+                        "createDate")
+                    .isEqualTo(expectedReplicationEntity);
+            } else {
+                assertThat(actualReplicationEntity)
+                    .usingRecursiveComparison()
+                    .ignoringFields(
+                        "uuid",
+                        "digitalUserId",
+                        "version",
+                        "lastModifiedDate",
+                        "entityData",
+                        "createDate",
+                        "retry")
+                    .isEqualTo(expectedReplicationEntity);
+            }
         }
     }
 }
