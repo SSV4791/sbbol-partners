@@ -54,6 +54,13 @@ os_project:
   audit:
     enabled: false
     time_out: 5000
+    event:
+      publish:
+        executor:
+          threads: 2
+        retry:
+          max_attempts: 10
+          interval: 5000
 
   fraud:
     enabled: false
