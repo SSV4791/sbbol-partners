@@ -165,7 +165,6 @@ release:
   run_frontend_tests: 'false'
   test:
     allure_dir: build/allure-results
-    email_list: DCB_BRAIN_NEW@sberbank.ru
     backend:
       command: >-
         ./gradlew

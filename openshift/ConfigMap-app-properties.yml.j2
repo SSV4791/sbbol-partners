@@ -32,18 +32,11 @@ data:
 
     management.endpoints.enabled-by-default=true
     management.endpoints.web.exposure.include=health,prometheus
-    management.endpoints.web.base-path={{ context_prefix }}actuator
     management.endpoints.jmx.exposure.include=*
-    management.endpoint.metrics.enabled=true
-    management.endpoint.prometheus.enabled=true
+    management.endpoint.health.probes.enabled=true
     management.endpoint.health.show-details=always
-    management.endpoint.health.cache.time-to-live=60000
-
-    management.endpoint.health.enabled=true
-    management.endpoint.health.group.readiness.show-details=always
-    management.endpoint.health.group.liveness.include=ping
-    management.endpoint.health.group.liveness.show-details=always
-    management.health.db.enabled=false
+    management.metrics.tags.application={{ os_project.name }}
+    management.metrics.export.prometheus.enabled=true
 
     # Service Cache
     service.legacy.default.cache.time={{ service.legacy.default.cache.time | default('300')}}
@@ -56,10 +49,10 @@ data:
     audit.enabled={{ os_project.audit.enabled | default('false')}}
     audit.time_out={{ os_project.audit.time_out | default('10000')}}
     audit.x-node-id={{ openshift.env }}
-    audit.url={% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.host }}{% else %}{{ int_entry.pprb.audit | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.istio_mesh_port }}{% else %}{{ int_entry.pprb.audit | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
     audit.event.publish.retry.max_attempts={{ os_project.audit.event.publish.retry.max_attempts | default('10')}}
     audit.event.publish.retry.interval={{ os_project.audit.event.publish.retry.interval | default('5000')}}
     audit.event.publish.executor.threads={{ os_project.audit.event.publish.executor.threads | default('2')}}
+    audit.url={% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.host }}{% else %}{{ int_entry.pprb.audit | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.istio_mesh_port }}{% else %}{{ int_entry.pprb.audit | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
 
     # Sbbol connect
     sbbol.url={% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.host }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='host') | first }}{% endif %}:{% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.istio_mesh_port | default('80') }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}/ss-rest/api
