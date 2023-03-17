@@ -9,18 +9,14 @@ import com.sbt.pprb.integration.hibernate.changes.transform.EventResolver;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 import ru.sberbank.pprb.sbbol.partners.config.DataSourceConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.HibernatePluginCleanerInitializer;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapperImpl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,18 +24,12 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 @UnitTestLayer
-@ContextConfiguration(
-    initializers = {HibernatePluginCleanerInitializer.class},
-    classes = {
-        AccountMapperImpl.class,
-        DataSourceConfiguration.class,
-        PartnerEmailMapperImpl.class,
-        PartnerMapperImpl.class,
-        PartnerPhoneMapperImpl.class,
-    }
-)
-@ExtendWith({SpringExtension.class})
 @ActiveProfiles("cv")
+@Import(DataSourceConfiguration.class)
+@ContextConfiguration(
+    initializers = {HibernatePluginCleanerInitializer.class}
+)
+@SpringBootTest
 class ChangeVectorTest {
 
     @Autowired
@@ -50,7 +40,7 @@ class ChangeVectorTest {
         HibernateMetadataSource metadataSource = new HibernateMetadataSource(sessionFactory);
         Serializer<ChangeVector> serializer = new ChangeVectorSerializer(metadataSource);
 
-        Files.list(Paths.get("vectors")).forEach(v -> {
+        Files.list(Paths.get("../vectors")).forEach(v -> {
             String vector;
             try {
                 vector = Files.readString(v.toAbsolutePath());

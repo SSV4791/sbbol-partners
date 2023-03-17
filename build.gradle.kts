@@ -35,6 +35,10 @@ tasks {
         dependsOn(subprojects.flatMap { it.tasks.withType<Test>() })
     }
 
+    clean {
+        delete("vectors")
+    }
+
 }
 project
     .tasks["sonarqube"]
