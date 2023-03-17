@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryDeleteException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudModelArgumentException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
@@ -26,6 +27,7 @@ import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Loggable
@@ -70,6 +72,9 @@ public class AccountSignServiceImpl implements AccountSignService {
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountSign.getAccountId()));
             if (account.getState() == AccountStateType.SIGNED) {
                 throw new AccountAlreadySignedException(account.getAccount());
+            }
+            if (!Objects.equals(account.getVersion(), accountSign.getAccountVersion())) {
+                throw new OptimisticLockException(account.getVersion(), accountSign.getAccountVersion());
             }
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
             try {

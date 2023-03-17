@@ -574,17 +574,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilterSignFiveAccount() {
         var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<Account> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
-                account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+                accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()));
             }
-            createValidAccountsSign(partner.getDigitalId(), account, getBase64FraudMetaData());
-            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
-
+            createValidAccountsSign(partner.getDigitalId(), accounts, getBase64FraudMetaData());
+            accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()));
+            var accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
-                .accountIds(account)
+                .accountIds(accountIds)
                 .state(SignType.SIGNED)
                 .pagination(new Pagination()
                     .count(4)
@@ -614,16 +614,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilterNotSignAccount() {
         var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<Account> accounts = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
-                account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+                accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()));
             }
-            createValidAccountsSign(partner.getDigitalId(), account, getBase64FraudMetaData());
-            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+            createValidAccountsSign(partner.getDigitalId(), accounts, getBase64FraudMetaData());
+            accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()));
+            var accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
-                .accountIds(account)
+                .accountIds(accountIds)
                 .state(SignType.NOT_SIGNED)
                 .pagination(new Pagination()
                     .count(5)
@@ -653,16 +654,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilterSignFourAccount() {
         var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<Account> accounts = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
-                account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+                accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()));
             }
-            createValidAccountsSign(partner.getDigitalId(), account, getBase64FraudMetaData());
-            account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+            createValidAccountsSign(partner.getDigitalId(), accounts, getBase64FraudMetaData());
+            accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()));
+            var accountIds = accounts.stream().map(Account::getId).collect(Collectors.toList());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
-                .accountIds(account)
+                .accountIds(accountIds)
                 .state(SignType.SIGNED)
                 .pagination(new Pagination()
                     .count(5)

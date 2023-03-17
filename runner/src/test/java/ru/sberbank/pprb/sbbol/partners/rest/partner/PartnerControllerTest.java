@@ -823,7 +823,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner1)
             .isNotNull();
         var validAccount = createValidAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
-        createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId(), getBase64FraudMetaData());
+        createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId(), validAccount.getVersion(), getBase64FraudMetaData());
 
         var createdPartner2 = post(
             baseRoutePath,

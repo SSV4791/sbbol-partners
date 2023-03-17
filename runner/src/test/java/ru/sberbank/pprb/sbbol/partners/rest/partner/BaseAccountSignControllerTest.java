@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
@@ -26,12 +27,13 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
     public static AccountsSignInfoResponse createValidAccountsSign(
         String digitalId,
         String accountId,
+        Long version,
         String base64FraudMetaData
     ) {
         var createAccountSign = post(
             baseRoutePath,
             HttpStatus.OK,
-            getValidAccountsSign(digitalId, accountId),
+            getValidAccountsSign(digitalId, accountId, version),
             getFraudMetaDataHeaders(base64FraudMetaData),
             AccountsSignInfoResponse.class
         );
@@ -43,12 +45,13 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
     public static Error createInvalidAccountsSignWithInvalidFraudMetaData(
         String digitalId,
         String accountId,
+        Long version,
         String base64InvalidFraudMetaData
     ) {
         var response = post(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
-            getValidAccountsSign(digitalId, accountId),
+            getValidAccountsSign(digitalId, accountId, version),
             getFraudMetaDataHeaders(base64InvalidFraudMetaData),
             Error.class
         );
@@ -57,11 +60,11 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    public static Error createAccountSignWithBadRequest(String digitalId, String accountId, String base64FraudMetaData) {
+    public static Error createAccountSignWithBadRequest(String digitalId, String accountId, Long version, String base64FraudMetaData) {
         var response = post(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
-            getValidAccountsSign(digitalId, accountId),
+            getValidAccountsSign(digitalId, accountId, version),
             getFraudMetaDataHeaders(base64FraudMetaData),
             Error.class
         );
@@ -70,11 +73,11 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    public static Error createAccountSignWithNotFound(String digitalId, String accountId, String base64FraudMetaData) {
+    public static Error createAccountSignWithNotFound(String digitalId, String accountId, Long version, String base64FraudMetaData) {
         var response = post(
             baseRoutePath,
             HttpStatus.NOT_FOUND,
-            getValidAccountsSign(digitalId, accountId),
+            getValidAccountsSign(digitalId, accountId, version),
             getFraudMetaDataHeaders(base64FraudMetaData),
             Error.class
         );
@@ -96,11 +99,11 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return deleteAccountSign;
     }
 
-    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, List<String> accountsId, String base64FraudMetaData) {
+    public static AccountsSignInfoResponse createValidAccountsSign(String digitalId, List<Account> accounts, String base64FraudMetaData) {
         var createAccountSign = post(
             baseRoutePath,
             HttpStatus.OK,
-            getValidAccountsSign(digitalId, accountsId),
+            getValidAccountsSign(digitalId, accounts),
             getFraudMetaDataHeaders(base64FraudMetaData),
             AccountsSignInfoResponse.class
         );
@@ -113,7 +116,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return Map.of("Fraud-Meta-Data", base64FraudMetaData);
     }
 
-    public static AccountsSignInfo getValidAccountsSign(String digitalId, String accountId) {
+    public static AccountsSignInfo getValidAccountsSign(String digitalId, String accountId, Long version) {
         return new AccountsSignInfo()
             .digitalId(digitalId)
             .digitalUserId(RandomStringUtils.randomAlphabetic(10))
@@ -122,6 +125,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
                     new AccountSignDetail()
                         .entityId(UUID.randomUUID().toString())
                         .accountId(accountId)
+                        .accountVersion(version)
                         .digest(RandomStringUtils.randomAlphabetic(10))
                         .sign(RandomStringUtils.randomAlphabetic(10))
                         .signProfileId(String.valueOf(RandomUtils.nextLong()))
@@ -132,13 +136,14 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
             );
     }
 
-    public static AccountsSignInfo getValidAccountsSign(String digitalId, List<String> accountsId) {
+    public static AccountsSignInfo getValidAccountsSign(String digitalId, List<Account> accounts) {
         List<AccountSignDetail> accountSignDetails = new ArrayList<>();
-        for (var accountId : accountsId) {
+        for (var account : accounts) {
             accountSignDetails.add(
                 new AccountSignDetail()
                     .entityId(UUID.randomUUID().toString())
-                    .accountId(accountId)
+                    .accountId(account.getId())
+                    .accountVersion(account.getVersion())
                     .digest(RandomStringUtils.randomAlphabetic(10))
                     .sign(RandomStringUtils.randomAlphabetic(10))
                     .signProfileId(String.valueOf(RandomUtils.nextLong()))
