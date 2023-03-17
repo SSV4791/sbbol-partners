@@ -60,6 +60,7 @@ dependencies {
     implementation(liveLibs.mapstruct.core)
     implementation(liveLibs.spring.boot.starter.web)
     implementation(liveLibs.spring.context.support)
+    implementation(liveLibs.spring.retry)
     implementation(liveLibs.swagger.annotations.core)
 }
 

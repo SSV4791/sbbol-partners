@@ -93,6 +93,7 @@ dependencies {
         exclude("com.h2database", "h2")
         exclude("com.vaadin.external.google", "android-json")
     }
+    testImplementation(liveLibs.spring.retry)
 }
 
 description = "ППРБ.Digital.Партнеры"

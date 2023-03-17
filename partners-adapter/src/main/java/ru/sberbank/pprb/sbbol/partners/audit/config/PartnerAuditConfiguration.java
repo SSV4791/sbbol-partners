@@ -5,6 +5,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.sberbank.pprb.sbbol.audit.api.DefaultApi;
 import ru.sberbank.pprb.sbbol.audit.invoker.ApiClient;
@@ -14,6 +16,8 @@ import ru.sberbank.pprb.sbbol.partners.audit.mapper.AuditMapper;
 import ru.sberbank.pprb.sbbol.partners.audit.mapper.AuditMapperImpl;
 
 import java.time.Duration;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class PartnerAuditConfiguration {
@@ -54,8 +58,39 @@ public class PartnerAuditConfiguration {
         @Value("${audit.enabled}") boolean auditEnabled,
         @Value("classpath:/audit/auditMetamodel.json") Resource metaModel,
         @Value("${audit.x-node-id}") String defaultXNodeId,
-        DefaultApi auditApi
+        DefaultApi auditApi,
+        RetryTemplate auditPublishEventRetryTemplate,
+        ExecutorService auditPublishExecutorService
+
     ) {
-        return new AuditAdapterImpl(auditEnabled, metaModel, defaultXNodeId, auditApi, auditMapper());
+        return new AuditAdapterImpl(
+            auditEnabled,
+            metaModel,
+            defaultXNodeId,
+            auditApi,
+            auditMapper(),
+            auditPublishEventRetryTemplate,
+            auditPublishExecutorService
+        );
+    }
+
+    @Bean
+    public RetryTemplate auditPublishEventRetryTemplate(
+        @Value("${audit.event.publish.retry.max_attempts:10}") Integer maxAttempts,
+        @Value("${audit.event.publish.retry.interval:5000}") Long retryTimeInterval
+    ) {
+        return RetryTemplate.builder()
+            .notRetryOn(HttpClientErrorException.BadRequest.class)
+            .traversingCauses()
+            .maxAttempts(maxAttempts)
+            .fixedBackoff(retryTimeInterval)
+            .build();
+    }
+
+    @Bean
+    public ExecutorService auditPublishExecutorService(
+        @Value("${audit.event.publish.executor.threads:2}") Integer threads
+    ) {
+        return Executors.newFixedThreadPool(threads);
     }
 }

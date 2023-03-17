@@ -57,6 +57,9 @@ data:
     audit.time_out={{ os_project.audit.time_out | default('10000')}}
     audit.x-node-id={{ openshift.env }}
     audit.url={% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.host }}{% else %}{{ int_entry.pprb.audit | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.audit is mapping %}{{ int_entry.pprb.audit.istio_mesh_port }}{% else %}{{ int_entry.pprb.audit | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
+    audit.event.publish.retry.max_attempts={{ os_project.audit.event.publish.retry.max_attempts | default('10')}}
+    audit.event.publish.retry.interval={{ os_project.audit.event.publish.retry.interval | default('5000')}}
+    audit.event.publish.executor.threads={{ os_project.audit.event.publish.executor.threads | default('2')}}
 
     # Sbbol connect
     sbbol.url={% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.host }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='host') | first }}{% endif %}:{% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.istio_mesh_port | default('80') }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}/ss-rest/api

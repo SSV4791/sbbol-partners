@@ -10,6 +10,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.sberbank.pprb.sbbol.audit.api.DefaultApi;
@@ -21,6 +23,9 @@ import ru.sberbank.pprb.sbbol.partners.audit.mapper.AuditMapper;
 import ru.sberbank.pprb.sbbol.partners.audit.mapper.AuditMapperImpl;
 
 import javax.annotation.PostConstruct;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.mockito.Mockito.when;
 
@@ -54,9 +59,39 @@ public class AuditAdapterConfiguration {
     }
 
     @Bean
-    AuditAdapter auditAdapter(
-        @Value("classpath:/audit/auditMetamodelTest.json") Resource metaModel
+    public RetryTemplate auditRetryTemplate(
+        @Value("${audit.event.publish.retry.max_attempts:1}") Integer maxAttempts,
+        @Value("${audit.event.publish.retry.interval:100}") Long retryTimeInterval
     ) {
-        return new AuditAdapterImpl(true, metaModel, "local", auditApi(), auditMapper());
+        return RetryTemplate.builder()
+            .notRetryOn(HttpClientErrorException.BadRequest.class)
+            .traversingCauses()
+            .maxAttempts(maxAttempts)
+            .fixedBackoff(retryTimeInterval)
+            .build();
+    }
+
+    @Bean
+    public ExecutorService auditExecutorService(
+        @Value("${audit.event.publish.executor.threads:1}") Integer threads
+    ) {
+        return Executors.newFixedThreadPool(threads);
+    }
+
+    @Bean
+    AuditAdapter auditAdapter(
+        @Value("classpath:/audit/auditMetamodelTest.json") Resource metaModel,
+        RetryTemplate auditRetryTemplate,
+        ExecutorService auditExecutorService
+    ) {
+        return new AuditAdapterImpl(
+            true,
+            metaModel,
+            "local",
+            auditApi(),
+            auditMapper(),
+            auditRetryTemplate,
+            auditExecutorService
+        );
     }
 }

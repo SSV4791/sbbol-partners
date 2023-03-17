@@ -44,6 +44,7 @@ spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-start
 spring-context-core = { module = "org.springframework:spring-context", version = "5.3.12" }
 spring-context-support = { module = "org.springframework:spring-context-support", version = "5.3.12" }
 spring-kafka = { module = "org.springframework.kafka:spring-kafka" }
+spring-retry = { module = "org.springframework.retry:spring-retry", version = "1.3.1" }
 springfox-boot-starter = { module = "io.springfox:springfox-boot-starter", version = "3.0.0" }
 swagger-annotations-core = { module = "io.swagger:swagger-annotations", version = "1.6.3" }
 
