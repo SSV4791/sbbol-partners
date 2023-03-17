@@ -2,7 +2,6 @@ docker:
   images:
     java: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
     postgres: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/postgres:13-alpine
-    liquibase: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/liquibase/liquibase:3.10.3
     docs: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
 
 credentials:
@@ -28,13 +27,16 @@ pr_check:
     url_api: https://api.dev-terra000006-idm.ocp.delta.sbrf.ru:6443
     namespace: ci02281165-sbbol-partners
   vector:
-    compare:
-      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.004.00_0008/CI02792425-D-02.004.00_0008-distrib.zip'
-    workdir: vectors
     match:
       files:
+        - 'jenkins'
         - 'src/main/java/ru/sberbank/pprb/sbbol/partners/entity'
         - 'src/test/java/ru/sberbank/pprb/sbbol/partners/replication/changevector'
+    compare:
+      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.005.00_0000/CI02792425-D-02.005.00_0000-distrib.zip'
+    workdir: vectors
+    cpu: 2
+    memory: '4g'
     command: >-
       ./gradlew
       -PtokenName=${env.TOKEN_NAME}
@@ -44,6 +46,12 @@ pr_check:
       -Dtest.results.enabled=true
       -Dtest-layer=unit
       applyVectorTest --info
+  liquibase:
+    match:
+      files:
+        - 'buildSrc/'
+        - 'jenkins'
+        - 'runner/src/main/resources/db/changelog'
   build_gradle:
     match:
       files:
@@ -73,7 +81,6 @@ pr_check:
       -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
       clean build -x test
   test:
-    postgres: true
     match:
       files:
         - 'buildSrc/'
@@ -105,24 +112,15 @@ pr_check:
       -Dallure.jobrunId=${launch.jobRunId}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=prCheck
-      -Pspring.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_MAIN}/${env.POSTGRES_DB_NAME}
-      -Pspring.datasource.username=${env.POSTGRES_DB_USER}
-      -Pspring.datasource.password=${env.POSTGRES_DB_PASSWORD}
-      -Pstandin.datasource.url=jdbc:postgresql://${env.NETWORK_ALIAS_SI}/${env.POSTGRES_DB_NAME}
-      -Pstandin.datasource.username=${env.POSTGRES_DB_USER}
-      -Pstandin.datasource.password=${env.POSTGRES_DB_PASSWORD}
       qaReporterUpload sonarCoverage --info
+
 liquibase:
-  match:
-    files:
-      - 'buildSrc/'
-      - 'jenkins'
-      - 'runner/src/main/resources/db/changelog'
   changelog:
     path: runner/src/main/resources/db/changelog/changelog.yaml
   defaults_file:
     path: jenkins/resources/liquibase/liquibase.properties
   command_type: update
+
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
   version_init: 02.005.00_0000
@@ -144,7 +142,7 @@ release:
     params_folder: develop
     istio_tag: '2.4'
     commit_or_tag: '02.004.01_0002_i-2.4'
-    release_key:
+    release_key: DCBBRAIN-4121
     reverse_and_publish: false
     type: release
   jobs:

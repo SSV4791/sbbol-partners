@@ -78,7 +78,7 @@ class ChangeVectorTest {
 
     @Test
     public void generateVectorsTest() throws Exception {
-        Path path = Paths.get("vectors");
+        Path path = Paths.get("../vectors");
         if (!Files.exists(path)) {
             Files.createDirectories(path);
         }
