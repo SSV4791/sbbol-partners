@@ -53,23 +53,22 @@ tasks {
 dependencies {
     implementation(platform(liveLibs.spring.boot.dependencies))
 
+    implementation(project(":migration-service"))
     implementation(project(":partners-adapter"))
     implementation(project(":partners-api"))
     implementation(project(":partners-rest"))
-    implementation(project(":partners-service"))
-    implementation(project(":migration-service"))
     implementation(project(":partners-scheduler"))
+    implementation(project(":partners-service"))
 
-    implementation(liveLibs.spring.boot.starter)
-    implementation(liveLibs.spring.boot.starter.actuator)
-    implementation(liveLibs.spring.boot.starter.data.jpa)
-    implementation(liveLibs.spring.boot.starter.validation)
-    implementation(liveLibs.spring.boot.starter.web)
     implementation(liveLibs.hibernate.jcache)
+    implementation(liveLibs.http.healthcheck.starter)
     implementation(liveLibs.liquibase.core)
     implementation(liveLibs.logstash.logback.encoder)
     implementation(liveLibs.sbp.hibernate.standin)
-
+    implementation(liveLibs.spring.boot.starter)
+    implementation(liveLibs.spring.boot.starter.data.jpa)
+    implementation(liveLibs.spring.boot.starter.validation)
+    implementation(liveLibs.spring.boot.starter.web)
     // реализация кэша
     runtimeOnly(liveLibs.ehcache.org.core)
     // postgres для prod-сборки
