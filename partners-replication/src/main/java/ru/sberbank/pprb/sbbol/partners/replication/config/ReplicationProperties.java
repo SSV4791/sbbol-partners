@@ -15,6 +15,8 @@ public class ReplicationProperties {
 
     private int retry;
 
+    private ReplicationCleaner cleaner;
+
     public ReplicationProperties enable(boolean enable) {
         this.enable = enable;
         return this;
@@ -32,6 +34,11 @@ public class ReplicationProperties {
 
     public ReplicationProperties retry(int retry) {
         this.retry = retry;
+        return this;
+    }
+
+    public ReplicationProperties cleaner(ReplicationCleaner cleaner) {
+        this.cleaner = cleaner;
         return this;
     }
 
@@ -67,6 +74,14 @@ public class ReplicationProperties {
         this.retry = retry;
     }
 
+    public ReplicationCleaner getCleaner() {
+        return cleaner;
+    }
+
+    public void setCleaner(ReplicationCleaner cleaner) {
+        this.cleaner = cleaner;
+    }
+
     @Override
     public String toString() {
         return "ReplicationProperties{" +
@@ -74,6 +89,64 @@ public class ReplicationProperties {
             ", cron='" + cron + '\'' +
             ", batchSize=" + batchSize +
             ", retry=" + retry +
+            ", cleaner=" + cleaner +
             '}';
+    }
+
+    public static class ReplicationCleaner {
+
+        private Boolean enable;
+
+        private String cron;
+
+        private Integer expiredPeriod;
+
+        public ReplicationCleaner enable(Boolean enable) {
+            this.enable = enable;
+            return this;
+        }
+
+        public ReplicationCleaner cron(String cron) {
+            this.cron = cron;
+            return this;
+        }
+
+        public ReplicationCleaner expiredPeriod(Integer expiredPeriod) {
+            this.expiredPeriod = expiredPeriod;
+            return this;
+        }
+
+        public Boolean getEnable() {
+            return enable;
+        }
+
+        public void setEnable(Boolean enable) {
+            this.enable = enable;
+        }
+
+        public String getCron() {
+            return cron;
+        }
+
+        public void setCron(String cron) {
+            this.cron = cron;
+        }
+
+        public Integer getExpiredPeriod() {
+            return expiredPeriod;
+        }
+
+        public void setExpiredPeriod(Integer expiredPeriod) {
+            this.expiredPeriod = expiredPeriod;
+        }
+
+        @Override
+        public String toString() {
+            return "ReplicationCleaner{" +
+                "enable=" + enable +
+                ", cron='" + cron + '\'' +
+                ", expiredPeriod=" + expiredPeriod +
+                '}';
+        }
     }
 }

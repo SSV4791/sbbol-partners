@@ -4,9 +4,11 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
 import ru.sberbank.pprb.sbbol.partners.replication.handler.ReplicationQueueHandler;
 import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJob;
+import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobType;
 
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.ERROR;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.INIT;
+import static ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobType.REPLICATION;
 
 @Loggable
 public class ReplicationJobImpl implements ReplicationJob {
@@ -20,7 +22,12 @@ public class ReplicationJobImpl implements ReplicationJob {
     }
 
     @Override
-    public void execute() {
+    public ReplicationJobType getJobType() {
+        return REPLICATION;
+    }
+
+    @Override
+    public void run() {
         handleErrorQueues();
         handleMainQueue();
     }

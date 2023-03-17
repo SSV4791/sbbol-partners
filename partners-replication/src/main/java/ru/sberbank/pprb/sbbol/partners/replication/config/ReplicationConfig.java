@@ -10,14 +10,19 @@ import ru.sberbank.pprb.sbbol.partners.replication.agent.impl.CreatingSignReplic
 import ru.sberbank.pprb.sbbol.partners.replication.agent.impl.DeletingSignReplicationAgent;
 import ru.sberbank.pprb.sbbol.partners.replication.agent.impl.ReplicationAgentRegistryImpl;
 import ru.sberbank.pprb.sbbol.partners.replication.handler.ReplicationEntityHandler;
+import ru.sberbank.pprb.sbbol.partners.replication.handler.ReplicationQueueCleaner;
 import ru.sberbank.pprb.sbbol.partners.replication.handler.ReplicationQueueHandler;
 import ru.sberbank.pprb.sbbol.partners.replication.handler.impl.ReplicationEntityHandlerImpl;
+import ru.sberbank.pprb.sbbol.partners.replication.handler.impl.ReplicationQueueCleanerImpl;
 import ru.sberbank.pprb.sbbol.partners.replication.handler.impl.ReplicationQueueHandlerImpl;
 import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJob;
+import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobRegistry;
+import ru.sberbank.pprb.sbbol.partners.replication.job.impl.ReplicationCleanerJobImpl;
 import ru.sberbank.pprb.sbbol.partners.replication.job.impl.ReplicationJobImpl;
 import ru.sberbank.pprb.sbbol.partners.replication.agent.ReplicationAgent;
 import ru.sberbank.pprb.sbbol.partners.replication.agent.impl.DeletingCounterpartyReplicationAgent;
 import ru.sberbank.pprb.sbbol.partners.replication.agent.impl.UpdatingCounterpartyReplicationAgent;
+import ru.sberbank.pprb.sbbol.partners.replication.job.impl.ReplicationJobRegistryImpl;
 import ru.sberbank.pprb.sbbol.partners.replication.mapper.ReplicationEntityMapper;
 import ru.sberbank.pprb.sbbol.partners.replication.mapper.ReplicationEntityMapperRegistry;
 import ru.sberbank.pprb.sbbol.partners.replication.mapper.impl.CreatingCounterpartyReplicationMapper;
@@ -42,11 +47,29 @@ public class ReplicationConfig {
     }
 
     @Bean
+    ReplicationJobRegistry replicationJobRegistry(List<ReplicationJob> jobs) {
+        return new ReplicationJobRegistryImpl(jobs);
+    }
+
+    @Bean
     public ReplicationJob replicationJob(ReplicationQueueHandler replicationQueueHandler) {
         return new ReplicationJobImpl(
             replicationProperty,
             replicationQueueHandler
         );
+    }
+
+    @Bean
+    public ReplicationJob replicationCleanerJob(ReplicationQueueCleaner queueCleaner) {
+        return new ReplicationCleanerJobImpl(
+            replicationProperty,
+            queueCleaner
+        );
+    }
+
+    @Bean
+    public ReplicationQueueCleaner replicationQueueCleaner(ReplicationRepository replicationRepository) {
+        return new ReplicationQueueCleanerImpl(replicationRepository);
     }
 
     @Bean

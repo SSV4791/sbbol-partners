@@ -374,7 +374,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             INIT,
             0
         );
-        replicationJob.execute();
+        replicationJob.run();
         actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
         checkReplicationEntityList(
             actualReplicationEntities,
