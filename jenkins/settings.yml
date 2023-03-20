@@ -81,6 +81,7 @@ pr_check:
       -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
       clean build -x test
   test:
+    postgres: false
     match:
       files:
         - 'buildSrc/'
