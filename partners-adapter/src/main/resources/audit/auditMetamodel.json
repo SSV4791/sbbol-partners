@@ -10,7 +10,7 @@
       "params": [
         {
           "name": "uuid",
-          "description": "Идентификатор сущности"
+          "description": "Уникальный идентификатор счёта"
         },
         {
           "name": "version",
@@ -118,7 +118,7 @@
       "params": [
         {
           "name": "uuid",
-          "description": "Идентификатор сущности"
+          "description": "Уникальный идентификатор счёта"
         },
         {
           "name": "version",
@@ -230,7 +230,7 @@
       "params": [
         {
           "name": "uuid",
-          "description": "Идентификатор сущности"
+          "description": "Уникальный идентификатор счёта"
         },
         {
           "name": "version",
@@ -286,7 +286,7 @@
       "params": [
         {
           "name": "uuid",
-          "description": "Идентификатор сущности"
+          "description": "Уникальный идентификатор счёта"
         },
         {
           "name": "version",
