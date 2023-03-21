@@ -4,20 +4,20 @@ import java.util.Map;
 
 public class Event {
 
-    private EventType eventType;
+    private String eventName;
 
     private Map<String, String> eventParams;
 
-    public EventType getEventType() {
-        return eventType;
+    public String getEventName() {
+        return eventName;
     }
 
-    public void setEventType(EventType eventType) {
-        this.eventType = eventType;
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 
-    public Event eventType(EventType eventType) {
-        this.eventType = eventType;
+    public Event eventName(String eventName) {
+        this.eventName = eventName;
         return this;
     }
 

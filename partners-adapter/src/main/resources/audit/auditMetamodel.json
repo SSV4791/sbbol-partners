@@ -1,5 +1,5 @@
 {
-  "metamodelVersion": "2",
+  "metamodelVersion": "3",
   "module": "pprb4-digital-partners",
   "events": [
     {
@@ -9,52 +9,44 @@
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
+          "name": "id",
           "description": "Уникальный идентификатор счёта"
         },
         {
-          "name": "version",
-          "description": "Версия документа"
+          "name": "partnerId",
+          "description": "Уникальный идентификатор партнера"
         },
         {
           "name": "digitalId",
           "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "createDate",
-          "description": "Время создания записи"
+          "name": "version",
+          "description": "Версия документа"
         },
         {
-          "name": "lastModifiedDate",
-          "description": "Время изменения записи"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор партнера"
-        },
-        {
-          "name": "comment",
-          "description": "Комментарий счёта"
+          "name": "budget",
+          "description": "Признак бюджетности, если есть хотя бы один бюджетный счет"
         },
         {
           "name": "account",
           "description": "Счёт"
         },
         {
+          "name": "priorityAccount",
+          "description": "Признак приоритетности счета"
+        },
+        {
+          "name": "bank",
+          "description": "Информация о банке с реквизитами"
+        },
+        {
           "name": "state",
           "description": "Состояние \"Подписан\""
         },
         {
-          "name": "bankName",
-          "description": "Наименование банка"
-        },
-        {
-          "name": "bankBic",
-          "description": "БИК банка"
-        },
-        {
-          "name": "bankAccount",
-          "description": "Кор. счёт банка"
+          "name": "comment",
+          "description": "Комментарий счёта"
         }
       ]
     },
@@ -65,48 +57,24 @@
       "mode": "reliability",
       "params": [
         {
-          "name": "version",
-          "description": "Версия документа"
+          "name": "partnerId",
+          "description": "Уникальный идентификатор партнера"
         },
         {
           "name": "digitalId",
           "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "createDate",
-          "description": "Время создания записи"
-        },
-        {
-          "name": "lastModifiedDate",
-          "description": "Время изменения записи"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор партнера"
-        },
-        {
-          "name": "comment",
-          "description": "Комментарий счёта"
-        },
-        {
           "name": "account",
           "description": "Счёт"
         },
         {
-          "name": "state",
-          "description": "Состояние \"Подписан\""
+          "name": "bank",
+          "description": "Информация о банке с реквизитами"
         },
         {
-          "name": "bankName",
-          "description": "Наименование банка"
-        },
-        {
-          "name": "bankBic",
-          "description": "БИК банка"
-        },
-        {
-          "name": "bankAccount",
-          "description": "Кор. счёт банка"
+          "name": "comment",
+          "description": "Комментарий счёта"
         }
       ]
     },
@@ -117,52 +85,44 @@
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
+          "name": "id",
           "description": "Уникальный идентификатор счёта"
         },
         {
-          "name": "version",
-          "description": "Версия документа"
+          "name": "partnerId",
+          "description": "Уникальный идентификатор партнера"
         },
         {
           "name": "digitalId",
           "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "createDate",
-          "description": "Время создания записи"
+          "name": "version",
+          "description": "Версия документа"
         },
         {
-          "name": "lastModifiedDate",
-          "description": "Время изменения записи"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор партнера"
-        },
-        {
-          "name": "comment",
-          "description": "Комментарий счёта"
+          "name": "budget",
+          "description": "Признак бюджетности, если есть хотя бы один бюджетный счет"
         },
         {
           "name": "account",
           "description": "Счёт"
         },
         {
+          "name": "priorityAccount",
+          "description": "Признак приоритетности счета"
+        },
+        {
+          "name": "bank",
+          "description": "Информация о банке с реквизитами"
+        },
+        {
           "name": "state",
           "description": "Состояние \"Подписан\""
         },
         {
-          "name": "bankName",
-          "description": "Наименование банка"
-        },
-        {
-          "name": "bankBic",
-          "description": "БИК банка"
-        },
-        {
-          "name": "bankAccount",
-          "description": "Кор. счёт банка"
+          "name": "comment",
+          "description": "Комментарий счёта"
         }
       ]
     },
@@ -173,256 +133,100 @@
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
-          "description": "Идентификатор сущности"
+          "name": "id",
+          "description": "Уникальный идентификатор счёта"
         },
         {
-          "name": "version",
-          "description": "Версия документа"
+          "name": "partnerId",
+          "description": "Уникальный идентификатор партнера"
         },
         {
           "name": "digitalId",
           "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "createDate",
-          "description": "Время создания записи"
-        },
-        {
-          "name": "lastModifiedDate",
-          "description": "Время изменения записи"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор партнера"
-        },
-        {
-          "name": "comment",
-          "description": "Комментарий счёта"
+          "name": "version",
+          "description": "Версия документа"
         },
         {
           "name": "account",
           "description": "Счёт"
         },
         {
-          "name": "state",
-          "description": "Состояние \"Подписан\""
+          "name": "bank",
+          "description": "Информация о банке с реквизитами"
         },
         {
-          "name": "bankName",
-          "description": "Наименование банка"
-        },
-        {
-          "name": "bankBic",
-          "description": "БИК банка"
-        },
-        {
-          "name": "bankAccount",
-          "description": "Кор. счёт банка"
+          "name": "comment",
+          "description": "Комментарий счёта"
         }
       ]
     },
     {
-      "name": "account_delete_success",
-      "description": "Успешное удаление счёта Партнера",
+      "name": "accounts_delete_success",
+      "description": "Успешное удаление счётов Партнера",
       "success": "true",
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
-          "description": "Уникальный идентификатор счёта"
-        },
-        {
-          "name": "version",
-          "description": "Версия документа"
-        },
-        {
           "name": "digitalId",
           "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "createDate",
-          "description": "Время создания записи"
-        },
-        {
-          "name": "lastModifiedDate",
-          "description": "Время изменения записи"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор партнера"
-        },
-        {
-          "name": "comment",
-          "description": "Комментарий счёта"
-        },
-        {
-          "name": "account",
-          "description": "Счёт"
-        },
-        {
-          "name": "state",
-          "description": "Состояние \"Подписан\""
-        },
-        {
-          "name": "bankName",
-          "description": "Наименование банка"
-        },
-        {
-          "name": "bankBic",
-          "description": "БИК банка"
-        },
-        {
-          "name": "bankAccount",
-          "description": "Кор. счёт банка"
+          "name": "ids",
+          "description": "Массив уникальных идентификаторов удаляемых счетов"
         }
       ]
     },
     {
-      "name": "account_delete_error",
-      "description": "Не успешное удаление счёта Партнера",
+      "name": "accounts_delete_error",
+      "description": "Не успешное удаление счётов Партнера",
       "success": "false",
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
-          "description": "Уникальный идентификатор счёта"
-        },
-        {
-          "name": "version",
-          "description": "Версия документа"
-        },
-        {
           "name": "digitalId",
           "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "createDate",
-          "description": "Время создания записи"
-        },
-        {
-          "name": "lastModifiedDate",
-          "description": "Время изменения записи"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор партнера"
-        },
-        {
-          "name": "comment",
-          "description": "Комментарий счёта"
-        },
-        {
-          "name": "account",
-          "description": "Счёт"
-        },
-        {
-          "name": "state",
-          "description": "Состояние \"Подписан\""
-        },
-        {
-          "name": "bankName",
-          "description": "Наименование банка"
-        },
-        {
-          "name": "bankBic",
-          "description": "БИК банка"
-        },
-        {
-          "name": "bankAccount",
-          "description": "Кор. счёт банка"
+          "name": "ids",
+          "description": "Массив уникальных идентификаторов удаляемых счетов"
         }
       ]
     },
     {
-      "name": "sign_account_create_success",
+      "name": "sign_accounts_create_success",
       "description": "Успешное подписание счёта Партнера",
       "success": "true",
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
-          "description": "Идентификатор сущности"
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "version",
-          "description": "Версия документа"
-        },
-        {
-          "name": "entityUuid",
-          "description": "Глобальный уникальный идентификатор объекта"
-        },
-        {
-          "name": "digest",
-          "description": "Дайджест"
-        },
-        {
-          "name": "sign",
-          "description": "Подпись"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор Партнера"
-        },
-        {
-          "name": "accountUuid",
-          "description": "Уникальный идентификатор счёта"
-        },
-        {
-          "name": "externalDataFileId",
-          "description": "Идентификатор созданного документа в ЕСМ"
-        },
-        {
-          "name": "externalDataSignFileId",
-          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
-        },
-        {
-          "name": "dateTimeOfSign",
-          "description": "Дата подписания документа"
+          "name": "accountsSignDetail",
+          "description": "Массив с детальной информацией о подписываемых счетах"
         }
       ]
     },
     {
-      "name": "sign_account_create_error",
+      "name": "sign_accounts_create_error",
       "description": "Не успешное подписание счёта Партнера",
       "success": "false",
       "mode": "reliability",
       "params": [
         {
-          "name": "version",
-          "description": "Версия документа"
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "entityUuid",
-          "description": "Глобальный уникальный идентификатор объекта"
+          "name": "digitalUserId",
+          "description": "Идентификатор личного кабинета пользователя"
         },
         {
-          "name": "digest",
-          "description": "Дайджест"
-        },
-        {
-          "name": "sign",
-          "description": "Подпись"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор Партнера"
-        },
-        {
-          "name": "accountUuid",
-          "description": "Уникальный идентификатор счёта"
-        },
-        {
-          "name": "externalDataFileId",
-          "description": "Идентификатор созданного документа в ЕСМ"
-        },
-        {
-          "name": "externalDataSignFileId",
-          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
-        },
-        {
-          "name": "dateTimeOfSign",
-          "description": "Дата подписания документа"
+          "name": "accountsSignDetail",
+          "description": "Массив с детальной информацией о подписываемых счетах"
         }
       ]
     },
@@ -433,44 +237,12 @@
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
-          "description": "Идентификатор сущности"
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "version",
-          "description": "Версия документа"
-        },
-        {
-          "name": "entityUuid",
-          "description": "Глобальный уникальный идентификатор объекта"
-        },
-        {
-          "name": "digest",
-          "description": "Дайджест"
-        },
-        {
-          "name": "sign",
-          "description": "Подпись"
-        },
-        {
-          "name": "partnerUuid",
-          "description": "Уникальный идентификатор Партнера"
-        },
-        {
-          "name": "accountUuid",
-          "description": "Уникальный идентификатор счёта"
-        },
-        {
-          "name": "externalDataFileId",
-          "description": "Идентификатор созданного документа в ЕСМ"
-        },
-        {
-          "name": "externalDataSignFileId",
-          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
-        },
-        {
-          "name": "dateTimeOfSign",
-          "description": "Дата подписания документа"
+          "name": "ids",
+          "description": "Массив уникальных идентификаторов счетов, по которым удаляется подпись"
         }
       ]
     },
@@ -481,44 +253,512 @@
       "mode": "reliability",
       "params": [
         {
-          "name": "uuid",
-          "description": "Идентификатор сущности"
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "ids",
+          "description": "Массив уникальных идентификаторов счетов, по которым удаляется подпись"
+        }
+      ]
+    },
+    {
+      "name": "partner_full_model_create_success",
+      "description": "Успешное создание Партнера полной модели",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "id",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "legalForm",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
         },
         {
           "name": "version",
           "description": "Версия документа"
         },
         {
-          "name": "entityUuid",
-          "description": "Глобальный уникальный идентификатор объекта"
+          "name": "orgName",
+          "description": "Наименование организации партнера"
         },
         {
-          "name": "digest",
-          "description": "Дайджест"
+          "name": "firstName",
+          "description": "Имя партнера"
         },
         {
-          "name": "sign",
-          "description": "Подпись"
+          "name": "secondName",
+          "description": "Фамилия партнера"
         },
         {
-          "name": "partnerUuid",
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "accounts",
+          "description": "Список счетов с реквизитами"
+        },
+        {
+          "name": "documents",
+          "description": "Документы физического лица"
+        },
+        {
+          "name": "address",
+          "description": "Массив с юридическими\\фактическими адресами партнера"
+        },
+        {
+          "name": "contacts",
+          "description": "Контактные лица партнера"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "gku",
+          "description": "Признак поставщика ЖКУ"
+        },
+        {
+          "name": "budget",
+          "description": "Признак бюджетности, если есть хотя бы один бюджетный счет"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        }
+      ]
+    },
+    {
+      "name": "partner_full_model_create_error",
+      "description": "Неуспешное создание Партнера полной модели",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "legalForm",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
+        },
+        {
+          "name": "orgName",
+          "description": "Наименование организации партнера"
+        },
+        {
+          "name": "firstName",
+          "description": "Имя партнера"
+        },
+        {
+          "name": "secondName",
+          "description": "Фамилия партнера"
+        },
+        {
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        },
+        {
+          "name": "accounts",
+          "description": "Список счетов с реквизитами"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        },
+        {
+          "name": "contacts",
+          "description": "Контактные лица партнера"
+        },
+        {
+          "name": "address",
+          "description": "Массив с юридическими\\фактическими адресами партнера"
+        },
+        {
+          "name": "documents",
+          "description": "Документы физического лица"
+        }
+      ]
+    },
+    {
+      "name": "partner_create_success",
+      "description": "Успешное создание Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "create_date",
+          "description": "Дата создания"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "type",
+          "description": "Тип партнёра: Партнер\\Бенефициар\\Арендатор"
+        },
+        {
+          "name": "legalType",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
+        },
+        {
+          "name": "orgName",
+          "description": "Наименование организации партнера"
+        },
+        {
+          "name": "firstName",
+          "description": "Имя партнера"
+        },
+        {
+          "name": "secondName",
+          "description": "Фамилия партнера"
+        },
+        {
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "gkuInnEntity",
+          "description": "ИНН ЖКУ"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        }
+      ]
+    },
+    {
+      "name": "partner_create_error",
+      "description": "Неуспешное создание Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "legalType",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
+        },
+        {
+          "name": "orgName",
+          "description": "Наименование организации партнера"
+        },
+        {
+          "name": "firstName",
+          "description": "Имя партнера"
+        },
+        {
+          "name": "secondName",
+          "description": "Фамилия партнера"
+        },
+        {
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        }
+      ]
+    },
+    {
+      "name": "partner_update_success",
+      "description": "Успешное обновление Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "id",
           "description": "Уникальный идентификатор Партнера"
         },
         {
-          "name": "accountUuid",
-          "description": "Уникальный идентификатор счёта"
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "externalDataFileId",
-          "description": "Идентификатор созданного документа в ЕСМ"
+          "name": "version",
+          "description": "Версия документа"
         },
         {
-          "name": "externalDataSignFileId",
-          "description": "Идентификатор созданного файла клиентской подписи документа в ЕСМ"
+          "name": "legalType",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
         },
         {
-          "name": "dateTimeOfSign",
-          "description": "Дата подписания документа"
+          "name": "orgName",
+          "description": "Наименование организации партнера"
+        },
+        {
+          "name": "firstName",
+          "description": "Имя партнера"
+        },
+        {
+          "name": "secondName",
+          "description": "Фамилия партнера"
+        },
+        {
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "gku",
+          "description": "Признак поставщика ЖКУ"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        }
+      ]
+    },
+    {
+      "name": "partner_update_error",
+      "description": "Неуспешное обновление Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "id",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "legalType",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
+        },
+        {
+          "name": "orgName",
+          "description": "Наименование организации партнера"
+        },
+        {
+          "name": "firstName",
+          "description": "Имя партнера"
+        },
+        {
+          "name": "secondName",
+          "description": "Фамилия партнера"
+        },
+        {
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "gku",
+          "description": "Признак поставщика ЖКУ"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        }
+      ]
+    },
+    {
+      "name": "partner_delete_success",
+      "description": "Успешное удаление Партнера",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "ids",
+          "description": "Массив id удаляемых Партнеров"
+        }
+      ]
+    },
+    {
+      "name": "partner_delete_error",
+      "description": "Неуспешное удаление Партнера",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "ids",
+          "description": "Массив id удаляемых Партнеров"
         }
       ]
     }

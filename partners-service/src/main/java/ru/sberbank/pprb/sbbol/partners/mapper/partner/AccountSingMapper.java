@@ -12,10 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 
 import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Loggable
@@ -60,43 +57,5 @@ public interface AccountSingMapper extends BaseMapper {
     @Named("toSignDate")
     default Date toSignDate(OffsetDateTime dateTimeOfSign) {
         return Date.from(dateTimeOfSign.toInstant());
-    }
-
-    default Map<String, String> toEventParams(SignEntity sign) {
-        if (sign == null) {
-            return Collections.emptyMap();
-        }
-        var params = new HashMap<String, String>();
-        if (sign.getUuid() != null) {
-            params.put("uuid", sign.getUuid().toString());
-        }
-        if (sign.getVersion() != null) {
-            params.put("version", sign.getVersion().toString());
-        }
-        if (sign.getEntityUuid() != null) {
-            params.put("entityUuid", sign.getEntityUuid().toString());
-        }
-        if (sign.getDigest() != null) {
-            params.put("digest", sign.getDigest());
-        }
-        if (sign.getSign() != null) {
-            params.put("sign", sign.getSign());
-        }
-        if (sign.getPartnerUuid() != null) {
-            params.put("partnerUuid", sign.getPartnerUuid().toString());
-        }
-        if (sign.getAccountUuid() != null) {
-            params.put("accountUuid", sign.getAccountUuid().toString());
-        }
-        if (sign.getExternalDataFileId() != null) {
-            params.put("externalDataFileId", sign.getExternalDataFileId());
-        }
-        if (sign.getExternalDataSignFileId() != null) {
-            params.put("externalDataSignFileId", sign.getExternalDataSignFileId());
-        }
-        if (sign.getDateTimeOfSign() != null) {
-            params.put("dateTimeOfSign", sign.getDateTimeOfSign().toString());
-        }
-        return params;
     }
 }

@@ -3,10 +3,8 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
-import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
-import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
@@ -37,6 +35,10 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_CREATE;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_UPDATE;
+
 @Loggable
 public class AccountServiceImpl implements AccountService {
 
@@ -46,7 +48,6 @@ public class AccountServiceImpl implements AccountService {
     private final PartnerRepository partnerRepository;
     private final AccountSignRepository accountSignRepository;
     private final BudgetMaskService budgetMaskService;
-    private final AuditAdapter auditAdapter;
     private final AccountMapper accountMapper;
     private final ReplicationService replicationService;
 
@@ -55,7 +56,6 @@ public class AccountServiceImpl implements AccountService {
         PartnerRepository partnerRepository,
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
-        AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         ReplicationService replicationService
     ) {
@@ -63,7 +63,6 @@ public class AccountServiceImpl implements AccountService {
         this.partnerRepository = partnerRepository;
         this.accountSignRepository = accountSignRepository;
         this.budgetMaskService = budgetMaskService;
-        this.auditAdapter = auditAdapter;
         this.accountMapper = accountMapper;
         this.replicationService = replicationService;
     }
@@ -101,6 +100,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
+    @Audit(eventType = ACCOUNT_CREATE)
     public Account saveAccount(AccountCreate account) {
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
         if (foundPartner.isEmpty()) {
@@ -109,26 +109,19 @@ public class AccountServiceImpl implements AccountService {
         var accountEntity = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(accountEntity);
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_CREATE_SUCCESS)
-                .eventParams(accountMapper.toEventParams(savedAccount))
-            );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             replicationService.createCounterparty(response);
             return response;
         } catch (DataIntegrityViolationException e) {
             throw e;
         } catch (RuntimeException e) {
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_CREATE_ERROR)
-                .eventParams(accountMapper.toEventParams(accountEntity))
-            );
             throw new EntrySaveException(DOCUMENT_NAME, e);
         }
     }
 
     @Override
     @Transactional
+    @Audit(eventType = ACCOUNT_UPDATE)
     public Account updateAccount(AccountChange account) {
         var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
@@ -141,10 +134,6 @@ public class AccountServiceImpl implements AccountService {
         }
         try {
             var savedAccount = accountRepository.save(foundAccount);
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
-                .eventParams(accountMapper.toEventParams(foundAccount))
-            );
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             response.setVersion(response.getVersion() + 1);
             replicationService.updateCounterparty(response);
@@ -152,16 +141,13 @@ public class AccountServiceImpl implements AccountService {
         } catch (DataIntegrityViolationException e) {
             throw e;
         } catch (RuntimeException e) {
-            auditAdapter.send(new Event()
-                .eventType(EventType.ACCOUNT_UPDATE_ERROR)
-                .eventParams(accountMapper.toEventParams(foundAccount))
-            );
             throw new EntrySaveException(DOCUMENT_NAME, e);
         }
     }
 
     @Override
     @Transactional
+    @Audit(eventType = ACCOUNTS_DELETE)
     public void deleteAccounts(String digitalId, List<String> ids) {
         for (String id : ids) {
             var uuid = accountMapper.mapUuid(id);
@@ -169,19 +155,11 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
             try {
                 accountRepository.delete(foundAccount);
-                auditAdapter.send(new Event()
-                    .eventType(EventType.ACCOUNT_DELETE_SUCCESS)
-                    .eventParams(accountMapper.toEventParams(foundAccount))
-                );
                 var accountSignEntity =
                     accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccount.getUuid());
                 accountSignEntity.ifPresent(accountSignRepository::delete);
                 replicationService.deleteCounterparty(digitalId, uuid.toString());
             } catch (RuntimeException e) {
-                auditAdapter.send(new Event()
-                    .eventType(EventType.ACCOUNT_DELETE_ERROR)
-                    .eventParams(accountMapper.toEventParams(foundAccount))
-                );
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
         }

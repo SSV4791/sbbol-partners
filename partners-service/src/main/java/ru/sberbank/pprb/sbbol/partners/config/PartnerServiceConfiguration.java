@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValidatorAspect;
-import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapter;
 import ru.sberbank.pprb.sbbol.partners.fraud.config.FraudProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
@@ -87,7 +86,7 @@ import java.util.List;
 public class PartnerServiceConfiguration {
 
     @Bean
-    FraudValidatorAspect fraudValidatorAspect (Validator validator) {
+    FraudValidatorAspect fraudValidatorAspect(Validator validator) {
         return new FraudValidatorAspect(validator);
     }
 
@@ -138,7 +137,6 @@ public class PartnerServiceConfiguration {
         PartnerRepository partnerRepository,
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
-        AuditAdapter auditAdapter,
         AccountMapper accountMapper,
         ReplicationService replicationService
     ) {
@@ -147,7 +145,6 @@ public class PartnerServiceConfiguration {
             partnerRepository,
             accountSignRepository,
             budgetMaskService,
-            auditAdapter,
             accountMapper,
             replicationService
         );
@@ -158,8 +155,6 @@ public class PartnerServiceConfiguration {
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         FraudServiceManager fraudServiceManager,
-        AuditAdapter auditAdapter,
-        AccountMapper accountMapper,
         AccountSingMapper accountSingMapper,
         ReplicationService replicationService
     ) {
@@ -167,8 +162,6 @@ public class PartnerServiceConfiguration {
             accountRepository,
             accountSignRepository,
             fraudServiceManager,
-            auditAdapter,
-            accountMapper,
             accountSingMapper,
             replicationService
         );
