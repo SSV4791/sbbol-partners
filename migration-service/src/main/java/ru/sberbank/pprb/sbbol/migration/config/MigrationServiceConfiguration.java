@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.migration.config;
 
 import com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceImplExporter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapper;
@@ -13,6 +14,9 @@ import ru.sberbank.pprb.sbbol.migration.gku.service.GkuMigrationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Configuration
 public class MigrationServiceConfiguration {
@@ -33,10 +37,19 @@ public class MigrationServiceConfiguration {
     }
 
     @Bean
+    public ExecutorService gkuExecutorService(
+        @Value("${replication.sbbol.gku.executor.threads:1}") int threads
+    ) {
+        return Executors.newFixedThreadPool(threads);
+    }
+
+    @Bean
     GkuMigrationService gkuMigrationService(
         MigrationGkuRepository migrationGkuRepository,
-        MigrationGkuMapper migrationGkuMapper) {
-        return new GkuMigrationServiceImpl(migrationGkuMapper, migrationGkuRepository);
+        MigrationGkuMapper migrationGkuMapper,
+        ExecutorService gkuExecutorService
+    ) {
+        return new GkuMigrationServiceImpl(migrationGkuMapper, migrationGkuRepository, gkuExecutorService);
     }
 
     @Bean
