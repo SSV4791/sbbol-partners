@@ -21,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
@@ -2150,5 +2151,209 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error.getCode())
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
         });
+    }
+
+
+    @Test
+    @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса " +
+        "когда все атрибуты запроса валидные")
+    void testGetAtAllRequisites_whenAllAttributesIsValid_thenFindPartner() {
+        var partner =
+            step("Создание партнера",
+                (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+
+        Account account =
+            step("Создание счета",
+                () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+
+        var request =
+            step("Подготовка тестовых данных",
+                () ->
+                    new AccountAndPartnerRequest()
+                        .digitalId(partner.getDigitalId())
+                        .account(account.getAccount())
+                        .bic(account.getBank().getBic())
+                        .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                        .inn(partner.getInn())
+                        .kpp(partner.getKpp())
+                        .name(partner.getOrgName())
+            );
+
+        AccountWithPartnerResponse accountWithPartnerActual =
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
+                () ->
+                    post(
+                        baseRoutePath + "/account/get-at-all-requisites",
+                        request,
+                        new TypeRef<>() {
+                        }
+                    ));
+
+        step("Проверка корректности ответа",
+            () -> {
+                assertThat(accountWithPartnerActual)
+                    .isNotNull();
+                assertThat(accountWithPartnerActual.getId())
+                    .isEqualTo(partner.getId());
+                assertThat(accountWithPartnerActual.getInn())
+                    .isEqualTo(partner.getInn());
+                assertThat(accountWithPartnerActual.getKpp())
+                    .isEqualTo(partner.getKpp());
+                Account actualAccount = accountWithPartnerActual.getAccount();
+                assertThat(actualAccount)
+                    .isNotNull();
+            });
+    }
+
+    @Test
+    @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса. " +
+        "КПП не определен у контрагента и не задан в запросе")
+    void testGetAtAllRequisites_whenKppIsNull_thenFindPartner() {
+        var creatingPartner =
+            step("Подготовка данных о партнере",
+                () -> {
+                    var partner = PartnerControllerTest.getValidLegalEntityPartner();
+                    partner.setKpp(null);
+                    return partner;
+                });
+
+        var partner =
+            step("Создание партнера",
+                () -> PartnerControllerTest.createValidPartner(creatingPartner));
+
+        Account account =
+            step("Создание счета",
+                () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+
+        var request =
+            step("Подготовка тестовых данных",
+                () ->
+                    new AccountAndPartnerRequest()
+                        .digitalId(partner.getDigitalId())
+                        .account(account.getAccount())
+                        .bic(account.getBank().getBic())
+                        .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                        .inn(partner.getInn())
+                        .kpp(null)
+                        .name(partner.getOrgName()));
+
+        AccountWithPartnerResponse accountWithPartnerActual =
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
+                () ->
+                    post(
+                        baseRoutePath + "/account/get-at-all-requisites",
+                        request,
+                        new TypeRef<>() {
+                        }
+                    ));
+
+        step("Проверка корректности ответа",
+            () -> {
+                assertThat(accountWithPartnerActual)
+                    .isNotNull();
+                assertThat(accountWithPartnerActual.getId())
+                    .isEqualTo(partner.getId());
+                assertThat(accountWithPartnerActual.getInn())
+                    .isEqualTo(partner.getInn());
+                assertThat(accountWithPartnerActual.getKpp())
+                    .isNull();
+                Account actualAccount = accountWithPartnerActual.getAccount();
+                assertThat(actualAccount)
+                    .isNotNull();
+            });
+    }
+
+    @Test
+    @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса. " +
+        "КПП определен у контрагента и не задан в запросе")
+    void testGetAtAllRequisites_whenKppIsNull_thenNotFindPartner() {
+        var creatingPartner =
+            step("Подготовка данных о партнере",
+                (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
+
+        var partner =
+            step("Создание партнера",
+                () -> PartnerControllerTest.createValidPartner(creatingPartner));
+
+        Account account =
+            step("Создание счета",
+                () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+
+        var request =
+            step("Подготовка тестовых данных",
+                () ->
+                    new AccountAndPartnerRequest()
+                        .digitalId(partner.getDigitalId())
+                        .account(account.getAccount())
+                        .bic(account.getBank().getBic())
+                        .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                        .inn(partner.getInn())
+                        .kpp(null)
+                        .name(partner.getOrgName()));
+
+        Error error =
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
+                () ->
+                    post(
+                        baseRoutePath + "/account/get-at-all-requisites",
+                        HttpStatus.NOT_FOUND,
+                        request,
+                        Error.class
+                    ));
+
+        step("Проверка корректности ответа",
+            () -> {
+                assertThat(error)
+                    .isNotNull();
+                assertThat(error.getCode())
+                    .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            });
+    }
+
+    @Test
+    @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса. " +
+        "Неопределен ряд атрибутов в запросе поиска")
+    void testGetAtAllRequisites_whenAnyAttributesIsInvalid_thenNotFindPartner() {
+        var creatingPartner =
+            step("Подготовка данных о партнере",
+                (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
+
+        var partner =
+            step("Создание партнера",
+                () -> PartnerControllerTest.createValidPartner(creatingPartner));
+
+        Account account =
+            step("Создание счета",
+                () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+
+        var request =
+            step("Подготовка тестовых данных",
+                () ->
+                    new AccountAndPartnerRequest()
+                        .digitalId(partner.getDigitalId())
+                        .account(account.getAccount())
+                        .bic(account.getBank().getBic())
+                        .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                        .inn(null)
+                        .kpp(null)
+                        .name(partner.getOrgName()));
+
+        Error error =
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
+                () ->
+                    post(
+                        baseRoutePath + "/account/get-at-all-requisites",
+                        HttpStatus.NOT_FOUND,
+                        request,
+                        Error.class
+                    ));
+
+        step("Проверка корректности ответа",
+            () -> {
+                assertThat(error)
+                    .isNotNull();
+                assertThat(error.getCode())
+                    .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            });
     }
 }

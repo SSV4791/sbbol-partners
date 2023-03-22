@@ -70,4 +70,11 @@ public interface AccountService {
      * @param request параметры поиска счета с партнером
      */
     List<AccountWithPartnerResponse> getAtRequisites(AccountAndPartnerRequest request);
+
+    /**
+     * Получение счета партнера с партнером анализируя все реквизиты запроса
+     *
+     * @param request параметры поиска счета с партнером
+     */
+    AccountWithPartnerResponse getAtAllRequisites(AccountAndPartnerRequest request);
 }

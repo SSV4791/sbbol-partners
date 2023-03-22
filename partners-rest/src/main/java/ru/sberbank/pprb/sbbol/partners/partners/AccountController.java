@@ -49,6 +49,11 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
+    public ResponseEntity<AccountWithPartnerResponse> getAtAllRequisites(AccountAndPartnerRequest request) {
+        return ResponseEntity.ok(accountService.getAtAllRequisites(request));
+    }
+
+    @Override
     public ResponseEntity<Account> getById(String digitalId, String id) {
         return ResponseEntity.ok(accountService.getAccount(digitalId, id));
     }
