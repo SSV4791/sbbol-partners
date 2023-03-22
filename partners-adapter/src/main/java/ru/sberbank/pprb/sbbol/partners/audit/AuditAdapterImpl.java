@@ -43,7 +43,7 @@ public class AuditAdapterImpl implements AuditAdapter {
         DefaultApi auditApi,
         AuditMapper auditMapper,
         RetryTemplate retryTemplate,
-        ExecutorService executorService
+        ExecutorService auditPublishExecutorService
     ) {
         this.auditEnabled = auditEnabled;
         this.metaModel = metaModel;
@@ -51,7 +51,7 @@ public class AuditAdapterImpl implements AuditAdapter {
         this.auditApi = auditApi;
         this.auditMapper = auditMapper;
         this.retryTemplate = retryTemplate;
-        this.executorService = executorService;
+        this.executorService = auditPublishExecutorService;
     }
 
     @PostConstruct

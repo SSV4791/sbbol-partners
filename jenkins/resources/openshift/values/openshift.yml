@@ -76,7 +76,8 @@ os_project:
       cleaner:
         enable: false
         cron: '0 0 23 * * *'
-        expired-period: 30
+        expired_period: 30
+        threads: 1
 
 registry_area: registry.sigma.sbrf.ru
 nexus_area: Nexus_PROD/CI02792425_sbbol-partners

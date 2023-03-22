@@ -18,6 +18,8 @@ import ru.sberbank.pprb.sbbol.migration.gku.repository.MigrationGkuRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,16 +30,19 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
 
     private final MigrationGkuMapper migrationGkuMapper;
     private final MigrationGkuRepository migrationGkuRepository;
+    private final ExecutorService executorService;
 
     @Value("${migrate.gku.batch_size}")
     private int batchSize;
 
     public GkuMigrationServiceImpl(
         MigrationGkuMapper migrationGkuMapper,
-        MigrationGkuRepository migrationGkuRepository
+        MigrationGkuRepository migrationGkuRepository,
+        ExecutorService gkuExecutorService
     ) {
         this.migrationGkuMapper = migrationGkuMapper;
         this.migrationGkuRepository = migrationGkuRepository;
+        this.executorService = gkuExecutorService;
     }
 
     @Override
@@ -64,14 +69,19 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
     @Override
     public void delete() {
         LOGGER.info("Начало процедуры удаления записей ЖКУ");
-        Page<MigrationGkuInnEntity> inns;
-        do {
-            inns = migrationGkuRepository.findAllByModifiedDateBefore(
-                LocalDate.now(),
-                PageRequest.of(0, batchSize, Sort.by(MigrationGkuInnEntity_.INN))
-            );
-            delete(inns.getContent());
-        } while (inns.hasNext());
+        CompletableFuture.runAsync(() -> {
+                Page<MigrationGkuInnEntity> inns;
+                do {
+                    inns = migrationGkuRepository.findAllByModifiedDateBefore(
+                        LocalDate.now(),
+                        PageRequest.of(0, batchSize, Sort.by(MigrationGkuInnEntity_.INN))
+                    );
+                    delete(inns.getContent());
+                } while (inns.hasNext());
+                LOGGER.info("Окончание работы процедуры удаления заисей ЖКУ, проведено удаление {} записей", inns.getTotalElements());
+            },
+            executorService
+        );
         LOGGER.info("Окончание процедуры удаления записей ЖКУ");
     }
 
