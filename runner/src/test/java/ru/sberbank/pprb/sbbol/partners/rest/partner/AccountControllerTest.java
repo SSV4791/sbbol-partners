@@ -940,6 +940,38 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("POST /partner/accounts/view проверка в ответе признака бюджетности для бюджетного счета")
+    void testGetAccounts_whenBudget40101Account_thenBudgetAttributeIsTrue() {
+        var filter = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            createValidBudgetAccountWith40101Balance(partner.getId(), partner.getDigitalId());
+
+            return new AccountsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerIds(List.of(partner.getId()))
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0));
+        });
+        var accountsResponse = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter,
+            AccountsResponse.class
+        ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountsResponse)
+                .isNotNull();
+            assertThat(accountsResponse.getAccounts())
+                .hasSize(1);
+            var account = accountsResponse.getAccounts().get(0);
+            assertThat(account.getBudget())
+                .isTrue();
+        });
+    }
+
+
+    @Test
     @DisplayName("POST /partner/accounts создание счета")
     void testCreateAccount() {
         var expected = step("Подготовка тестовых данных", () -> {

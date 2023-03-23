@@ -26,6 +26,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
 
     protected static final String baseRoutePath = "/partner";
     protected static final String BUDGET_ACCOUNT_VALID = "03010643100000000001";
+    protected static final String BUDGET_40101_ACCOUNT_VALID = "40101810822805200005";
     protected static final String BUDGET_CORR_ACCOUNT_VALID = "40102810300000000001";
 
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
@@ -208,11 +209,30 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         return account;
     }
 
+    protected static AccountCreate getValidBudgetAccountWith40101Balance(String partnerUuid, String digitalId) {
+        var account = getValidAccount(partnerUuid, digitalId);
+        account.setAccount(BUDGET_40101_ACCOUNT_VALID);
+        account.getBank().setBic("044525000");
+        account.getBank().getBankAccount().setBankAccount("");
+        return account;
+    }
+
     public static void createValidBudgetAccount(String partnerUuid, String digitalId) {
         var createAccount = post(
             baseRoutePath + "/account",
             HttpStatus.CREATED,
             getValidBudgetAccount(partnerUuid, digitalId),
+            Account.class
+        );
+        assertThat(createAccount)
+            .isNotNull();
+    }
+
+    public static void createValidBudgetAccountWith40101Balance(String partnerUuid, String digitalId) {
+        var createAccount = post(
+            baseRoutePath + "/account",
+            HttpStatus.CREATED,
+            getValidBudgetAccountWith40101Balance(partnerUuid, digitalId),
             Account.class
         );
         assertThat(createAccount)
