@@ -106,7 +106,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
      * @return true если счёт или бик попадает под одну из масок
      */
     private boolean checkMask(String param, List<BudgetMaskEntity> masks) {
-        if (!StringUtils.hasText(param) || !CollectionUtils.isEmpty(masks)) {
+        if (!StringUtils.hasText(param) || CollectionUtils.isEmpty(masks)) {
             return false;
         }
         MaskFormatter maskFormatter = new MaskFormatter();
@@ -115,9 +115,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
                 maskFormatter.setMask(mask.getMask());
                 maskFormatter.valueToString(param);
                 return true;
-            } catch (ParseException e) {
-                throw new BadRequestException(e);
-            }
+            } catch (ParseException ignored) {}
         }
         return false;
     }
