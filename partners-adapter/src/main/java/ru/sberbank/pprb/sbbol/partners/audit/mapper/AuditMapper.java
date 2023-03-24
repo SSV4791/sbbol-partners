@@ -8,7 +8,6 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.audit.model.AuditEvent;
 import ru.sberbank.pprb.sbbol.audit.model.AuditEventParams;
 import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
-import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 public interface AuditMapper {
 
     @Mapping(target = "metamodelVersion", source = "params", qualifiedByName = "toMetamodelVersion")
-    @Mapping(target = "name", source = "auditEvent.eventType", qualifiedByName = "toName")
+    @Mapping(target = "name", source = "auditEvent.eventName")
     @Mapping(target = "module", source = "params", qualifiedByName = "toModelName")
     @Mapping(target = "createdAt", expression = "java(System.currentTimeMillis())")
     @Mapping(target = "userLogin", source = "params", qualifiedByName = "toModelName")
@@ -36,14 +35,6 @@ public interface AuditMapper {
             return null;
         }
         return params.get("metamodelVersion");
-    }
-
-    @Named("toName")
-    static String toName(EventType eventType) {
-        if (eventType == null) {
-            return null;
-        }
-        return eventType.getDesc();
     }
 
     @Named("toModelName")

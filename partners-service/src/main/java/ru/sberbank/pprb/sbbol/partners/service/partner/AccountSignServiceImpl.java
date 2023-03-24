@@ -1,20 +1,15 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
+import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
-import ru.sberbank.pprb.sbbol.partners.audit.model.Event;
-import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
-import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryDeleteException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
-import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudModelArgumentException;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
@@ -30,6 +25,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_CREATE;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_DELETE;
+
 @Loggable
 public class AccountSignServiceImpl implements AccountSignService {
 
@@ -38,31 +36,26 @@ public class AccountSignServiceImpl implements AccountSignService {
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
     private final FraudServiceManager fraudServiceManager;
-    private final AuditAdapter auditAdapter;
     private final AccountSingMapper accountSingMapper;
-    private final AccountMapper accountMapper;
     private final ReplicationService replicationService;
 
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         FraudServiceManager fraudServiceManager,
-        AuditAdapter auditAdapter,
-        AccountMapper accountMapper,
         AccountSingMapper accountSingMapper,
         ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
         this.fraudServiceManager = fraudServiceManager;
-        this.auditAdapter = auditAdapter;
-        this.accountMapper = accountMapper;
         this.accountSingMapper = accountSingMapper;
         this.replicationService = replicationService;
     }
 
     @Override
     @Transactional
+    @Audit(eventType = SIGN_ACCOUNTS_CREATE)
     public AccountsSignInfoResponse createAccountsSign(AccountsSignInfo accountsSign, FraudMetaData fraudMetaData) {
         var response = new AccountsSignInfoResponse();
         var digitalId = accountsSign.getDigitalId();
@@ -77,44 +70,16 @@ public class AccountSignServiceImpl implements AccountSignService {
                 throw new OptimisticLockException(account.getVersion(), accountSign.getAccountVersion());
             }
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
-            try {
-                fraudServiceManager
-                    .getService(FraudEventType.SIGN_ACCOUNT)
-                    .sendEvent(fraudMetaData, account);
-            } catch (FraudDeniedException | FraudModelArgumentException e) {
-                auditAdapter.send(new Event()
-                    .eventType(EventType.SIGN_ACCOUNT_CREATE_ERROR)
-                    .eventParams(accountSingMapper.toEventParams(sign))
-                );
-                throw e;
-            }
+            fraudServiceManager
+                .getService(FraudEventType.SIGN_ACCOUNT)
+                .sendEvent(fraudMetaData, account);
             try {
                 var savedSign = accountSignRepository.save(sign);
                 replicationService.saveSign(digitalId, accountsSign.getDigitalUserId(), savedSign.getAccountUuid());
-                auditAdapter.send(new Event()
-                    .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
-                    .eventParams(accountSingMapper.toEventParams(savedSign))
-                );
                 response.addAccountsSignDetailItem(accountSingMapper.toSignAccount(savedSign));
-            } catch (RuntimeException e) {
-                auditAdapter.send(new Event()
-                    .eventType(EventType.SIGN_ACCOUNT_CREATE_ERROR)
-                    .eventParams(accountSingMapper.toEventParams(sign))
-                );
-                throw new EntrySaveException(DOCUMENT_NAME, e);
-            }
-            try {
                 account.setState(AccountStateType.SIGNED);
-                var saveAccount = accountRepository.save(account);
-                auditAdapter.send(new Event()
-                    .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
-                    .eventParams(accountMapper.toEventParams(saveAccount))
-                );
+                accountRepository.save(account);
             } catch (RuntimeException e) {
-                auditAdapter.send(new Event()
-                    .eventType(EventType.ACCOUNT_UPDATE_ERROR)
-                    .eventParams(accountMapper.toEventParams(account))
-                );
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
         }
@@ -123,6 +88,7 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     @Override
     @Transactional
+    @Audit(eventType = SIGN_ACCOUNTS_DELETE)
     public void deleteAccountsSign(String digitalId, List<String> accountIds) {
         for (String accountId : accountIds) {
             var accountUuid = accountSingMapper.mapUuid(accountId);
@@ -132,15 +98,7 @@ public class AccountSignServiceImpl implements AccountSignService {
                 SignEntity signEntity = sign.get();
                 try {
                     accountSignRepository.delete(signEntity);
-                    auditAdapter.send(new Event()
-                        .eventType(EventType.SIGN_ACCOUNT_CREATE_SUCCESS)
-                        .eventParams(accountSingMapper.toEventParams(signEntity))
-                    );
                 } catch (RuntimeException e) {
-                    auditAdapter.send(new Event()
-                        .eventType(EventType.SIGN_ACCOUNT_DELETE_ERROR)
-                        .eventParams(accountSingMapper.toEventParams(signEntity))
-                    );
                     throw new EntryDeleteException(DOCUMENT_NAME, signEntity.getEntityUuid(), e);
                 }
             }
@@ -148,17 +106,9 @@ public class AccountSignServiceImpl implements AccountSignService {
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountUuid));
             try {
                 account.setState(AccountStateType.NOT_SIGNED);
-                var saveAccount = accountRepository.save(account);
+                accountRepository.save(account);
                 replicationService.deleteSign(digitalId, accountUuid);
-                auditAdapter.send(new Event()
-                    .eventType(EventType.ACCOUNT_UPDATE_SUCCESS)
-                    .eventParams(accountMapper.toEventParams(saveAccount))
-                );
             } catch (RuntimeException e) {
-                auditAdapter.send(new Event()
-                    .eventType(EventType.ACCOUNT_UPDATE_ERROR)
-                    .eventParams(accountMapper.toEventParams(account))
-                );
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
         }

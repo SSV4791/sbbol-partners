@@ -28,7 +28,7 @@ class AuditMapperTest extends BaseUnitConfiguration {
         );
         var expectedEvent = factory.manufacturePojo(Event.class);
         var event = mapper.toAuditEvent(expectedEvent, expectedParams);
-        assertThat(event.getName()).isEqualTo(AuditMapper.toName(expectedEvent.getEventType()));
+        assertThat(event.getName()).isEqualTo(expectedEvent.getEventName());
         assertThat(event.getMetamodelVersion()).isEqualTo(AuditMapper.toMetamodelVersion(expectedParams));
         assertThat(event.getModule()).isEqualTo(AuditMapper.toModelName(expectedParams));
         assertThat(event.getUserLogin()).isEqualTo(AuditMapper.toModelName(expectedParams));

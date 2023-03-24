@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
@@ -37,6 +38,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_CREATE;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_DELETE;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_CREATE;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -132,6 +137,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
+    @Audit(eventType = PARTNER_FULL_MODEL_CREATE)
     public PartnerCreateFullModelResponse savePartner(PartnerCreateFullModel partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savedPartner = partnerRepository.save(partnerEntity);
@@ -166,6 +172,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
+    @Audit(eventType = PARTNER_CREATE)
     public Partner savePartner(PartnerCreate partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
@@ -176,6 +183,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
+    @Audit(eventType = PARTNER_UPDATE)
     public Partner updatePartner(Partner partner) {
         var digitalId = partner.getDigitalId();
         var partnerUuid = UUID.fromString(partner.getId());
@@ -200,6 +208,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
+    @Audit(eventType = PARTNER_DELETE)
     public void deletePartners(String digitalId, List<String> ids, FraudMetaData fraudMetaData) {
         deletePartners(digitalId, Set.copyOf(ids), fraudMetaData);
     }

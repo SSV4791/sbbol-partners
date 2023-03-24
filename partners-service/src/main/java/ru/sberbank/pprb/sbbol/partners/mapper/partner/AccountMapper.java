@@ -26,9 +26,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -184,58 +182,6 @@ public interface AccountMapper extends BaseMapper {
                 account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getBankAccount()));
             }
         }
-    }
-
-    default Map<String, String> toEventParams(AccountEntity account) {
-        if (account == null) {
-            return Collections.emptyMap();
-        }
-        var params = new HashMap<String, String>();
-        if (account.getUuid() != null) {
-            params.put("uuid", account.getUuid().toString());
-        }
-        if (account.getVersion() != null) {
-            params.put("version", account.getVersion().toString());
-        }
-        if (account.getDigitalId() != null) {
-            params.put("digitalId", account.getDigitalId());
-        }
-        if (account.getCreateDate() != null) {
-            params.put("createDate", account.getCreateDate().toString());
-        }
-        if (account.getLastModifiedDate() != null) {
-            params.put("lastModifiedDate", account.getLastModifiedDate().toString());
-        }
-        if (account.getPartnerUuid() != null) {
-            params.put("partnerUuid", account.getPartnerUuid().toString());
-        }
-        if (account.getAccount() != null) {
-            params.put("account", account.getAccount());
-        }
-        if (account.getState() != null) {
-            params.put("state", account.getState().name());
-        }
-        if (account.getComment() != null) {
-            params.put("comment", account.getComment());
-        }
-        var bank = account.getBank();
-        if (bank == null) {
-            return params;
-        }
-        if (bank.getName() != null) {
-            params.put("bankName", bank.getName());
-        }
-        if (bank.getBic() != null) {
-            params.put("bankBic", bank.getBic());
-        }
-        var bankAccount = account.getBank().getBankAccount();
-        if (bankAccount == null) {
-            return params;
-        }
-        if (bankAccount.getAccount() != null) {
-            params.put("bankAccount", bankAccount.getAccount());
-        }
-        return params;
     }
 
     List<AccountWithPartnerResponse> toAccountsWithPartner(List<AccountEntity> accounts);
