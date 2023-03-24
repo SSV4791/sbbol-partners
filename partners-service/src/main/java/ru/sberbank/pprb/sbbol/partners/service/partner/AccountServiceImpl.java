@@ -15,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
@@ -244,5 +245,18 @@ public class AccountServiceImpl implements AccountService {
             throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
         }
         return accountMapper.toAccountsWithPartner(accountsWithPartnerNameField);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AccountWithPartnerResponse getAtAllRequisites(AccountAndPartnerRequest request) {
+        List<AccountEntity> accounts = accountRepository.findByAllRequestAttributes(request);
+        if (CollectionUtils.isEmpty(accounts)) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
+        }
+        if (accounts.size() > 1) {
+            throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());
+        }
+        return accountMapper.toAccountWithPartner(accounts.get(0));
     }
 }

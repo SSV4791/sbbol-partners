@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 
 import javax.persistence.EntityManager;
@@ -24,15 +25,24 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Objects;
 
-public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntity, AccountAndPartnerRequest>
-    implements AccountAndPartnerRepository {
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
-    protected AccountAndPartnerRepositoryImpl(EntityManager entityManager) {
+public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntity, AccountAndPartnerRequest>
+    implements FullMatchingAccountAndPartnerRepository {
+
+    private final PartnerMapper partnerMapper;
+
+    protected FullMatchingAccountAndPartnerRepositoryImpl(
+        EntityManager entityManager,
+        PartnerMapper partnerMapper
+    ) {
         super(entityManager, AccountEntity.class);
+        this.partnerMapper = partnerMapper;
     }
 
     @Override
-    public List<AccountEntity> findByRequest(AccountAndPartnerRequest request) {
+    public List<AccountEntity> findByAllRequestAttributes(AccountAndPartnerRequest request) {
         return filter(request);
     }
 
@@ -47,11 +57,13 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
         if (Objects.isNull(request)) {
             return;
         }
-
         addDigitalIdPredicate(builder, predicates, root, request.getDigitalId());
+        addAccountPredicate(builder, predicates, root, request.getAccount());
 
         Join<AccountEntity, PartnerEntity> partnerJoin = root.join(AccountEntity_.PARTNER, JoinType.INNER);
         addPartnerInnPredicate(builder, predicates, partnerJoin, request.getInn());
+        addPartnerKppPredicate(builder, predicates, partnerJoin, request.getKpp());
+        addPartnerNamePredicate(builder, predicates, partnerJoin, request.getName());
         addPartnerTypePredicate(builder, predicates, partnerJoin, PartnerType.PARTNER);
 
         Join<AccountEntity, BankEntity> bankJoin = root.join(AccountEntity_.BANK, JoinType.INNER);
@@ -83,6 +95,22 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
         predicates.add(builder.equal(root.get(AccountEntity_.DIGITAL_ID), digitalId));
     }
 
+    private void addAccountPredicate(
+        CriteriaBuilder builder,
+        List<Predicate> predicates,
+        Root<AccountEntity> root,
+        String accountNumber
+    ) {
+        if (Objects.nonNull(accountNumber)) {
+            predicates.add(builder.equal(root.get(AccountEntity_.ACCOUNT), accountNumber));
+        } else {
+            predicates.add(builder.or(
+                builder.equal(root.get(AccountEntity_.ACCOUNT), StringUtils.EMPTY),
+                builder.isNull(root.get(AccountEntity_.ACCOUNT))
+            ));
+        }
+    }
+
     private void addPartnerInnPredicate(
         CriteriaBuilder builder,
         List<Predicate> predicates,
@@ -97,6 +125,42 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
                 builder.isNull(partnerJoin.get(PartnerEntity_.INN))
             ));
         }
+    }
+
+    private void addPartnerKppPredicate(
+        CriteriaBuilder builder,
+        List<Predicate> predicates,
+        Join<AccountEntity, PartnerEntity> partnerJoin,
+        String kpp
+    ) {
+        if (Objects.nonNull(kpp)) {
+            predicates.add(builder.equal(partnerJoin.get(PartnerEntity_.KPP), kpp));
+        } else {
+            predicates.add(builder.or(
+                builder.equal(partnerJoin.get(PartnerEntity_.KPP), StringUtils.EMPTY),
+                builder.isNull(partnerJoin.get(PartnerEntity_.KPP))
+            ));
+        }
+    }
+
+    private void addPartnerNamePredicate(
+        CriteriaBuilder builder,
+        List<Predicate> predicates,
+        Join<AccountEntity, PartnerEntity> partnerJoin,
+        String partnerName
+    ) {
+        var partnerNameSearchPattern = partnerMapper.saveSearchString(partnerName);
+        predicates.add(
+            builder.like(
+                builder.function("replace",
+                    String.class,
+                    builder.lower(partnerJoin.get(PartnerEntity_.SEARCH)),
+                    builder.literal(SPACE),
+                    builder.literal(EMPTY)
+                ),
+                "%" + partnerNameSearchPattern + "%"
+            )
+        );
     }
 
     private void addPartnerTypePredicate(

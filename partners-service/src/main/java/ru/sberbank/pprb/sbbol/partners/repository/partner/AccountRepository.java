@@ -6,14 +6,18 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountAndPartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.AccountViewRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.common.FullMatchingAccountAndPartnerRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AccountRepository
-    extends CrudRepository<AccountEntity, UUID>, AccountViewRepository, AccountAndPartnerRepository {
+public interface AccountRepository extends
+    CrudRepository<AccountEntity, UUID>,
+    AccountViewRepository,
+    AccountAndPartnerRepository,
+    FullMatchingAccountAndPartnerRepository {
 
     /**
      * Получение счёта Партнера

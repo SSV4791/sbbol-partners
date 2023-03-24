@@ -26,6 +26,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudModelValidationException;
+import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
 import ru.sberbank.pprb.sbbol.partners.exception.common.BaseException;
@@ -52,6 +53,7 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_M
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MULTIPLE_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.CRITICAL;
 
@@ -96,6 +98,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus.NOT_FOUND,
             BUSINESS,
             MODEL_NOT_FOUND_EXCEPTION.getValue(),
+            ex.getLocalizedMessage(),
+            Collections.emptyMap(),
+            httpRequest.getRequestURL()
+        );
+    }
+
+    @ExceptionHandler({
+        MultipleEntryFoundException.class
+    })
+    protected ResponseEntity<Object> handleMultipleEntryFoundException(
+        Exception ex,
+        HttpServletRequest httpRequest
+    ) {
+        LOG.error("Найдено более одного объекта:", ex);
+        return buildResponsesEntity(
+            HttpStatus.MULTIPLE_CHOICES,
+            CRITICAL,
+            MULTIPLE_FOUND_EXCEPTION.getValue(),
             ex.getLocalizedMessage(),
             Collections.emptyMap(),
             httpRequest.getRequestURL()
