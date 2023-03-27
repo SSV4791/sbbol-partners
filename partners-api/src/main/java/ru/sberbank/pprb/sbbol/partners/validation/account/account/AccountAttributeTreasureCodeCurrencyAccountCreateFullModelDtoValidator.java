@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.TreasureAccountCodeCurrencyValidation;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
@@ -30,9 +29,6 @@ public class AccountAttributeTreasureCodeCurrencyAccountCreateFullModelDtoValida
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
         if (value == null) {
-            return true;
-        }
-        if (value.getLegalForm() != LegalForm.LEGAL_ENTITY) {
             return true;
         }
         Set<AccountCreateFullModel> accounts = value.getAccounts();

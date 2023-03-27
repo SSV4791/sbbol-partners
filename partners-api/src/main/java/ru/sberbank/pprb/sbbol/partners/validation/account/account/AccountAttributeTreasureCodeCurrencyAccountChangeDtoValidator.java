@@ -36,6 +36,6 @@ public class AccountAttributeTreasureCodeCurrencyAccountChangeDtoValidator exten
         if (bankAccount == null) {
             return true;
         }
-        return validateCodeCurrency(value.getDigitalId(), value.getPartnerId(), value.getAccount(), bankAccount.getBankAccount());
+        return validateCodeCurrency(value.getAccount(), bankAccount.getBankAccount());
     }
 }

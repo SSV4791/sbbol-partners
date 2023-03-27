@@ -27,16 +27,10 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
         String partnerId,
         String corrAccount
     ) {
-        try {
-            Partner partner = partnerService.getPartner(digitalId, partnerId);
-            if (partner.getLegalForm() == LegalForm.PHYSICAL_PERSON ||
-                partner.getLegalForm() == LegalForm.ENTREPRENEUR) {
-                return !isBudgetCorrAccount(corrAccount);
-            }
-            return true;
-        } catch (EntryNotFoundException ignore) {
-            return true;
+        if (isPartnerLegalFormNotLegalEntity(digitalId, partnerId)) {
+            return !isBudgetCorrAccount(corrAccount);
         }
+        return true;
     }
 
     protected boolean isBudgetCorrAccount(String corrAccount) {
@@ -44,18 +38,6 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
             return false;
         }
         return BUDGET_CORR_ACCOUNT_PATTERN.matcher(corrAccount).matches();
-    }
-
-    protected boolean validateBalance(
-        String digitalId,
-        String partnerId,
-        String account,
-        String corrAccount
-    ) {
-        if (isPartnerLegalFormLegalEntity(digitalId, partnerId)) {
-            return true;
-        }
-        return validateBalance(account, corrAccount);
     }
 
     protected boolean validateBalance(
@@ -72,18 +54,6 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
     }
 
     protected boolean validateCodeCurrency(
-        String digitalId,
-        String partnerId,
-        String account,
-        String corrAccount
-    ) {
-        if (isPartnerLegalFormLegalEntity(digitalId, partnerId)) {
-            return true;
-        }
-        return validateCodeCurrency(account, corrAccount);
-    }
-
-    protected boolean validateCodeCurrency(
         String account,
         String corrAccount
     ) {
@@ -94,18 +64,6 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
             return true;
         }
         return BUDGET_ACCOUNT_PATTERN_FOR_CODE_CURRENCY.matcher(account).matches();
-    }
-
-    protected boolean validateCorrAccount(
-        String digitalId,
-        String partnerId,
-        String account,
-        String corrAccount
-    ) {
-        if (isPartnerLegalFormLegalEntity(digitalId, partnerId)) {
-            return true;
-        }
-        return validateCorrAccount(account, corrAccount);
     }
 
     protected boolean validateCorrAccount(
@@ -121,7 +79,7 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
         return isBudgetCorrAccount(corrAccount);
     }
 
-    private boolean isPartnerLegalFormLegalEntity(String digitalId, String partnerId) {
+    private boolean isPartnerLegalFormNotLegalEntity(String digitalId, String partnerId) {
         if (ObjectUtils.isEmpty(digitalId) || ObjectUtils.isEmpty(partnerId)) {
             return true;
         }
