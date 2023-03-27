@@ -37,6 +37,6 @@ public class AccountAttributeTreasureBankCorrAccountAccountCreateDtoValidator ex
         if (bankAccount == null) {
             return true;
         }
-        return validateCorrAccount(value.getDigitalId(), value.getPartnerId(), value.getAccount(), bankAccount.getBankAccount());
+        return validateCorrAccount(value.getAccount(), bankAccount.getBankAccount());
     }
 }

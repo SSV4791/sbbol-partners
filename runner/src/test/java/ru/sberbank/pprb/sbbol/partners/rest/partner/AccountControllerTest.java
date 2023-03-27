@@ -2052,19 +2052,27 @@ class AccountControllerTest extends BaseAccountControllerTest {
 
     @Test
     void testSaveAccountPhysicalPersonNotSetBudgetCorrAccount() {
-        var partner = post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(), Partner.class);
-        assertThat(partner).isNotNull();
-        var account = getValidAccount(partner.getId(), partner.getDigitalId());
-        account.getBank().getBankAccount().setBankAccount("40102643145250000411");
-        var error = post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
-        assertThat(error)
-            .isNotNull();
-        List<String> errorsMessage = error.getDescriptions().stream()
-            .map(Descriptions::getMessage)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-        assertThat(errorsMessage)
-            .contains("Единый казначейский счёт не должен использоваться для физического лица или ИП");
+        var partner =
+            Allure.step("Создание партнера Физ лицо", () -> post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(), Partner.class));
+        var account = Allure.step("Создание тестового счета", () -> {
+            var acc = getValidAccount(partner.getId(), partner.getDigitalId());
+            acc.getBank().getBankAccount().setBankAccount("40102643145250000411");
+            return acc;
+        });
+        var error = Allure.step("Запрос создания счета, невалидный счет",
+            () -> post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class));
+        Allure.step("Проверка результата", () -> {
+            assertThat(error)
+                .isNotNull();
+            List<String> errorsMessage = error.getDescriptions().stream()
+                .map(Descriptions::getMessage)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+            assertThat(errorsMessage)
+                .contains(MessagesTranslator.toLocale("validation.partner.bank_account.not_person_or_entrepreneur_entity_format"))
+                .contains(MessagesTranslator.toLocale("validation.account.treasure_code_currency"))
+                .contains(MessagesTranslator.toLocale("validation.account.treasure_balance"));
+        });
     }
 
     @Test

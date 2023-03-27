@@ -36,6 +36,6 @@ public class AccountAttributeBalanceTreasureAccountCreateDtoValidator extends Ba
         if (ObjectUtils.isEmpty(bankAccount)) {
             return true;
         }
-        return validateBalance(value.getDigitalId(), value.getPartnerId(), value.getAccount(), bankAccount.getBankAccount());
+        return validateBalance(value.getAccount(), bankAccount.getBankAccount());
     }
 }
