@@ -6,16 +6,16 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 import java.util.regex.Pattern;
 
 public class BaseAccountRubCodeCurrencyValidator extends BaseValidator {
-    private static final Pattern BUDGET_ACCOUNT_PATTERN = Pattern.compile("^0\\d{4}643\\d{12}$");
     private static final Pattern RUR_ACCOUNT_PATTERN = Pattern.compile("^.{5}810.*$");
+    private static final Pattern BUDGET_CORR_ACCOUNT_PATTERN = Pattern.compile("^40102\\d{15}$");
 
-    protected boolean validate(String account) {
+    protected boolean validate(String account, String corrAccount) {
         if (StringUtils.isEmpty(account)) {
             return true;
         }
-        if (BUDGET_ACCOUNT_PATTERN.matcher(account).matches()) {
+        if (RUR_ACCOUNT_PATTERN.matcher(account).matches()) {
             return true;
         }
-        return RUR_ACCOUNT_PATTERN.matcher(account).matches();
+        return StringUtils.isNotEmpty(corrAccount) && BUDGET_CORR_ACCOUNT_PATTERN.matcher(corrAccount).matches();
     }
 }
