@@ -53,6 +53,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -71,6 +72,7 @@ import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.createValidBudgetAccountWith40101Balance;
 import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -419,6 +421,80 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
         assertThat(response.getPartners().size())
             .isOne();
+    }
+
+    @Test
+    void testGettingSearchBudgetPartners() {
+        var filter = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            createValidAccount(partner.getId(), partner.getDigitalId());
+            createValidAccount(partner.getId(), partner.getDigitalId());
+            createValidBudgetAccountWith40101Balance(partner.getId(), partner.getDigitalId());
+
+            return new PartnersFilter()
+                .digitalId(partner.getDigitalId())
+                .partnersFilter(PartnerFilterType.BUDGET)
+                .pagination(
+                        new Pagination()
+                            .offset(0)
+                            .count(4)
+                    );
+        });
+        var partnersResponse = step("Выполнение post-запроса /partners/view, код ответа 200", () -> post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(partnersResponse)
+                .isNotNull();
+            assertThat(partnersResponse.getPartners()).asList()
+                .hasSize(1);
+        });
+    }
+
+    @Test
+    void testGettingSearchBudgetPartners_whenPartnerIsCreatingByFullModelAndBankAccountIsNull() {
+        var filter = step("Подготовка тестовых данных", () -> {
+            var partner = getValidFullModelLegalEntityPartner();
+            var account = new AccountCreateFullModel()
+                .account("40101810822805200005")
+                .bank(
+                    new BankCreate()
+                        .name("Банк")
+                        .bic("044525000")
+                );
+            partner.setAccounts(Set.of(account));
+
+            var createdPartner = post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partner,
+                PartnerCreateFullModelResponse.class
+            );
+
+            return new PartnersFilter()
+                .digitalId(createdPartner.getDigitalId())
+                .partnersFilter(PartnerFilterType.BUDGET)
+                .pagination(
+                    new Pagination()
+                        .offset(0)
+                        .count(4)
+                );
+        });
+        var partnersResponse = step("Выполнение post-запроса /partners/view, код ответа 200", () -> post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(partnersResponse)
+                .isNotNull();
+            assertThat(partnersResponse.getPartners()).asList()
+                .hasSize(1);
+        });
     }
 
     @Test
