@@ -177,7 +177,7 @@ public class PartnerViewRepositoryImpl
         Subquery<Integer> subQuery = criteria.subquery(Integer.class);
         Root<AccountEntity> accountRoot = subQuery.from(AccountEntity.class);
         Join<AccountEntity, BankEntity> bankJoin = accountRoot.join(AccountEntity_.BANK, JoinType.INNER);
-        Join<BankEntity, BankAccountEntity> bankAccountJoin = bankJoin.join(BankEntity_.BANK_ACCOUNT, JoinType.INNER);
+        Join<BankEntity, BankAccountEntity> bankAccountJoin = bankJoin.join(BankEntity_.BANK_ACCOUNT, JoinType.LEFT);
         Predicate gisGmpPredicate = gisGmpPredicate(accountRoot, bankJoin, builder);
         Predicate taxAccountPredicate = taxAccountPredicate(accountRoot, builder);
         Predicate okrPredicate = okrPredicate(accountRoot, bankAccountJoin, builder);

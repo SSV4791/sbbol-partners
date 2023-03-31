@@ -7,6 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
@@ -31,6 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.qameta.allure.Allure.step;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
@@ -971,6 +975,43 @@ class AccountControllerTest extends BaseAccountControllerTest {
         });
     }
 
+    @ParameterizedTest
+    @MethodSource("argumentsForGettingAccountByBudgetFilter")
+    void testGetAccounts_whenBudget40101AccountAndBudgetFlagExistInRequest(Boolean isBudget, int responseAccountCount) {
+        var filter = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            createValidAccount(partner.getId(), partner.getDigitalId());
+            createValidAccount(partner.getId(), partner.getDigitalId());
+            createValidBudgetAccountWith40101Balance(partner.getId(), partner.getDigitalId());
+
+            return new AccountsFilter()
+                .digitalId(partner.getDigitalId())
+                .partnerIds(List.of(partner.getId()))
+                .isBudget(isBudget)
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0));
+        });
+        var accountsResponse = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
+            baseRoutePath + "/accounts/view",
+            HttpStatus.OK,
+            filter,
+            AccountsResponse.class
+        ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountsResponse)
+                .isNotNull();
+            assertThat(accountsResponse.getAccounts())
+                .hasSize(responseAccountCount);
+        });
+    }
+
+    static Stream<? extends Arguments> argumentsForGettingAccountByBudgetFilter() {
+        return Stream.of(
+            Arguments.of(Boolean.TRUE, 1),
+            Arguments.of(Boolean.FALSE, 3),
+            Arguments.of(null, 3));
+    }
 
     @Test
     @DisplayName("POST /partner/accounts создание счета")
