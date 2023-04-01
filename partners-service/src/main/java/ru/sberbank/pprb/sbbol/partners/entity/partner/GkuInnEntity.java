@@ -10,6 +10,8 @@ import javax.persistence.Table;
 import java.io.Serial;
 import java.util.Objects;
 
+import static ru.sberbank.pprb.sbbol.partners.entity.partner.common.HashKeyResolver.STATIC;
+
 @Entity
 @DynamicUpdate
 @DynamicInsert
@@ -57,6 +59,6 @@ public class GkuInnEntity extends BaseEntity {
 
     @Override
     public String getHashKey() {
-        return getUuid().toString();
+        return STATIC.getUuid();
     }
 }
