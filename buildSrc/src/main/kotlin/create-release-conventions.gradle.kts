@@ -10,7 +10,7 @@ tasks.register<Zip>("fullDistrib") {
         include("Deployment*")
         filter { line: String -> line.replace("{app_docker_image}", project.properties["dockerImage"] as String) }
     }
-    from("$rootDir/docs") {
+    from("$rootDir/docs/") {
         into("docs")
     }
     from("${project(":runner").projectDir}/src/main/resources/db/changelog/") {
@@ -19,7 +19,7 @@ tasks.register<Zip>("fullDistrib") {
     from("${project(":partners-adapter").projectDir}/src/main/resources/audit/") {
         into("package/conf/data/audit_metamodel/")
     }
-    from("${project(":runner").projectDir}/vectors/") {
+    from("$rootDir/vectors/") {
         into("vectors")
     }
 }

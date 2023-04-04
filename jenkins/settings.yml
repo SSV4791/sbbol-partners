@@ -33,7 +33,7 @@ pr_check:
         - 'src/main/java/ru/sberbank/pprb/sbbol/partners/entity'
         - 'src/test/java/ru/sberbank/pprb/sbbol/partners/replication/changevector'
     compare:
-      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.005.00_0000/CI02792425-D-02.005.00_0000-distrib.zip'
+      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.005.00_0007/CI02792425-D-02.005.00_0007-distrib.zip'
     workdir: vectors
     cpu: 2
     memory: '4g'
@@ -121,7 +121,17 @@ liquibase:
   defaults_file:
     path: jenkins/resources/liquibase/liquibase.properties
   command_type: update
-
+documentation:
+  build:
+    workdir: docs
+    outputdir: docs/build/docs
+    command: >-
+      ./gradlew
+      -PtokenName=${env.TOKEN_NAME}
+      -PtokenPassword=${env.TOKEN_PASSWORD}
+      -Dgradle.wrapperUser=${env.TOKEN_NAME}
+      -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
+      build -x test
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
   version_init: 02.005.00_0000
@@ -148,7 +158,7 @@ release:
     type: release
   jobs:
     test_release:
-      wait: true
+      wait: false
   build_gradle:
     cpu: 2
     mem: '8g'
@@ -166,6 +176,7 @@ release:
   run_frontend_tests: 'false'
   test:
     allure_dir: build/allure-results
+    email_list: DCB_BRAIN_NEW@sberbank.ru
     backend:
       command: >-
         ./gradlew
