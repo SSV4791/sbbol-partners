@@ -19,14 +19,13 @@ class BudgetMaskDictionaryControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("POST /dictionary/budget-mask/view Фильтрация по бюджеткой маске")
     void testViewBudgetMasks() {
-        var filter = Allure.step("Подготовка фильтра с маской бюджетного счёта", () -> {
-            return new BudgetMaskFilter()
+        var filter = Allure.step("Подготовка фильтра с маской бюджетного счёта", () ->
+            new BudgetMaskFilter()
                 .maskType(BudgetMaskForm.BUDGET_ACCOUNT)
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0)
-                );
-        });
+                ));
         var response = Allure.step("Выполнение post-запроса /dictionary/budget-mask/view, код ответа 200", () -> post(
             baseRoutePath + "/view",
             HttpStatus.OK,

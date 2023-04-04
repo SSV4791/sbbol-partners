@@ -45,6 +45,7 @@ data:
 
     # AutoProc params
     migrate.gku.batch_size={{ migrate.gku.batch_size | default('10000')}}
+    migrate.gku.date_before={{ migrate.gku.date_before | default('1')}}
 
     # Audit
     audit.enabled={{ os_project.audit.enabled | default('false')}}

@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.migration.service;
 
 import io.restassured.common.mapper.TypeRef;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
@@ -15,6 +16,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collection;
 
+import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -48,44 +50,66 @@ class GkuMigrationServiceTest extends AbstractIntegrationTest {
     );
 
     @Test
+    @DisplayName("POST /gku/migrate Миграция справочника ЖКУ")
     void migrationGKU() {
-        @SuppressWarnings("unchecked")
-        Collection<MigrationGkuCandidate> collection = podamFactory.manufacturePojo(Collection.class, MigrationGkuCandidate.class);
-        requestMigrate.setParams(new MigrateGkuMigrateRequest(collection));
-        JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestMigrate, new TypeRef<>() {
+        step("Подготовка данных для запроса", () -> {
+            var collection = podamFactory.manufacturePojo(Collection.class, MigrationGkuCandidate.class);
+            requestMigrate.setParams(new MigrateGkuMigrateRequest(collection));
+            return collection;
         });
-        assertNotNull(response);
-        assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
-        assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
+        JsonRpcResponse<Void> response = step("Выполнение post-запроса /gku/migrate, код ответа 200", () ->
+            post(URI_REMOTE_SERVICE, requestMigrate, new TypeRef<>() {
+            })
+        );
+        step("Проверка корректности ответа", () -> {
+            assertNotNull(response);
+            assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
+            assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
+        });
     }
 
     @Test
+    @DisplayName("POST /gku/migrate Миграция справочника ЖКУ удаление")
     void deleteGKU() {
-        var entity = podamFactory.manufacturePojo(GkuInnEntity.class);
-        var savedEntity = gkuInnDictionaryRepository.save(entity);
-        var foundInnBeforeDelete = gkuInnDictionaryRepository.getByInn(savedEntity.getInn());
-        assertNotNull(foundInnBeforeDelete);
-        JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestDelete, new TypeRef<>() {});
-        assertNotNull(response);
-        assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
-        assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
+        GkuInnEntity saved = step("Подготовка данных для запроса", () -> {
+            var entity = podamFactory.manufacturePojo(GkuInnEntity.class);
+            var savedEntity = gkuInnDictionaryRepository.save(entity);
+            var foundInnBeforeDelete = gkuInnDictionaryRepository.getByInn(savedEntity.getInn());
+            assertNotNull(foundInnBeforeDelete);
+            return savedEntity;
+        });
+        JsonRpcResponse<Void> response =
+            step("Выполнение post-запроса /gku/migrate, код ответа 200", () ->
+                post(URI_REMOTE_SERVICE, requestDelete, new TypeRef<>() {
+                }));
+        step("Проверка корректности ответа", () -> {
+            assertNotNull(response);
+            assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
+            assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
 
-        var foundInnAfterDelete = gkuInnDictionaryRepository.getByInn(savedEntity.getInn());
-        assertNotNull(foundInnAfterDelete);
+            var foundInnAfterDelete = gkuInnDictionaryRepository.getByInn(saved.getInn());
+            assertNotNull(foundInnAfterDelete);
+        });
     }
 
     @Test
+    @DisplayName("POST /gku/migrate Миграция справочника ЖКУ удаление")
     void deleteGKU_batch() {
-        for (int i = 0; i < 50; i++) {
-            var entity = podamFactory.manufacturePojo(GkuInnEntity.class);
-            gkuInnDictionaryRepository.save(entity);
-        }
-        JsonRpcResponse<Void> response = post(URI_REMOTE_SERVICE, requestDelete, new TypeRef<>() {});
-        assertNotNull(response);
-        assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
-        assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
-
-        Iterable<GkuInnEntity> allInn = gkuInnDictionaryRepository.findAll();
-        assertThat(allInn).isNotEmpty();
+        step("Подготовка данных для запроса", () -> {
+            for (int i = 0; i < 50; i++) {
+                var entity = podamFactory.manufacturePojo(GkuInnEntity.class);
+                gkuInnDictionaryRepository.save(entity);
+            }
+        });
+        JsonRpcResponse<Void> response = step("Выполнение post-запроса /gku/migrate, код ответа 200", () ->
+            post(URI_REMOTE_SERVICE, requestDelete, new TypeRef<>() {
+            }));
+        step("Проверка корректности ответа", () -> {
+            assertNotNull(response);
+            assertEquals(response.getId(), JSON_RPC_REQUEST_ID);
+            assertEquals(response.getJsonrpc(), JSON_RPC_VERSION);
+            Iterable<GkuInnEntity> allInn = gkuInnDictionaryRepository.findAll();
+            assertThat(allInn).isNotEmpty();
+        });
     }
 }

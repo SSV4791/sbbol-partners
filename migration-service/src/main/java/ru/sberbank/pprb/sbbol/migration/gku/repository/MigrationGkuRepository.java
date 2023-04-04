@@ -1,17 +1,13 @@
 package ru.sberbank.pprb.sbbol.migration.gku.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import ru.sberbank.pprb.sbbol.migration.gku.entity.MigrationGkuInnEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.sberbank.pprb.sbbol.migration.gku.repository.common.MigrationGkuDeleteRepository;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface MigrationGkuRepository extends PagingAndSortingRepository<MigrationGkuInnEntity, UUID> {
+public interface MigrationGkuRepository extends JpaRepository<GkuInnEntity, UUID>, MigrationGkuDeleteRepository {
 
-    Optional<MigrationGkuInnEntity> getByInn(String inn);
-
-    Page<MigrationGkuInnEntity> findAllByModifiedDateBefore(LocalDate lastModifiedDate, Pageable pageable);
+    Optional<GkuInnEntity> getByInn(String inn);
 }

@@ -4,19 +4,16 @@ import com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import ru.sberbank.pprb.sbbol.migration.gku.entity.MigrationGkuInnEntity;
-import ru.sberbank.pprb.sbbol.migration.gku.entity.MigrationGkuInnEntity_;
 import ru.sberbank.pprb.sbbol.migration.gku.mapper.MigrationGkuMapper;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
 import ru.sberbank.pprb.sbbol.migration.gku.repository.MigrationGkuRepository;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BaseEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -52,11 +49,12 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
         if (CollectionUtils.isEmpty(gkuInns)) {
             return;
         }
-        List<MigrationGkuInnEntity> entities = gkuInns.stream()
+        List<GkuInnEntity> entities = gkuInns.stream()
             .map(value ->
                 migrationGkuRepository.getByInn(value.getInn())
                     .orElse(migrationGkuMapper.toDictionary(value)))
             .collect(Collectors.toList());
+        entities.forEach(BaseEntity::updateSysLastChangeDate);
         try {
             migrationGkuRepository.saveAll(entities);
         } catch (Exception ex) {
@@ -70,23 +68,17 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
     public void delete() {
         LOGGER.info("Начало процедуры удаления записей ЖКУ");
         CompletableFuture.runAsync(() -> {
-                Page<MigrationGkuInnEntity> inns;
+                List<GkuInnEntity> inns;
                 do {
-                    inns = migrationGkuRepository.findAllByModifiedDateBefore(
-                        LocalDate.now(),
-                        PageRequest.of(0, batchSize, Sort.by(MigrationGkuInnEntity_.INN))
+                    inns = migrationGkuRepository.findAllOldValue(
+                        PageRequest.of(0, batchSize)
                     );
-                    delete(inns.getContent());
-                } while (inns.hasNext());
-                LOGGER.info("Окончание работы процедуры удаления заисей ЖКУ, проведено удаление {} записей", inns.getTotalElements());
+                    migrationGkuRepository.deleteAll(inns);
+                    LOGGER.info("При работе процедуры удаления записей ЖКУ, проведено удаление {} записей", inns.size());
+                } while (!inns.isEmpty());
             },
             executorService
         );
         LOGGER.info("Окончание процедуры удаления записей ЖКУ");
-    }
-
-    @Transactional
-    public void delete(List<MigrationGkuInnEntity> content) {
-        migrationGkuRepository.deleteAll(content);
     }
 }
