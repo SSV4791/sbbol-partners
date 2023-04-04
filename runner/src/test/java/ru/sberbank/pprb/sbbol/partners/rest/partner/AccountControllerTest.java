@@ -976,6 +976,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @ParameterizedTest
+    @DisplayName("POST /partner/accounts/view проверка получения счёта с маской 40101 с флагом бюджетности")
     @MethodSource("argumentsForGettingAccountByBudgetFilter")
     void testGetAccounts_whenBudget40101AccountAndBudgetFlagExistInRequest(Boolean isBudget, int responseAccountCount) {
         var filter = step("Подготовка тестовых данных", () -> {
@@ -1157,98 +1158,133 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("POST /partner/account с банком равным null")
     void testCreateAccount_whenBankIsNull_thenBadRequest() {
-        var partner = createValidPartner();
-        var error = createAccountEntityWhenBankIsNull(partner.getId(), partner.getDigitalId());
+        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
+            () -> createAccountEntityWhenBankIsNull(partner.getId(), partner.getDigitalId()));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () ->
+            assertThat(error)
+                .isNotNull());
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/account с именем банка равным null")
     void testCreateAccount_whenBankNameIsNull_thenBadRequest() {
-        var partner = createValidPartner();
-        var error = createAccountEntityWhenBankNameIsNull(partner.getId(), partner.getDigitalId());
+        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
+            () -> createAccountEntityWhenBankNameIsNull(partner.getId(), partner.getDigitalId()));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () ->
+            assertThat(error)
+                .isNotNull());
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/account с пустым именем банка")
     void testCreateAccount_whenBankNameIsEmpty_thenBadRequest() {
-        var partner = createValidPartner();
-        var error = createAccountEntityWhenBankNameIsEmpty(partner.getId(), partner.getDigitalId());
+        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
+            () -> createAccountEntityWhenBankNameIsEmpty(partner.getId(), partner.getDigitalId()));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () ->
+            assertThat(error)
+                .isNotNull());
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/account с БИК банка равным null")
     void testCreateAccount_whenBankBicIsNull_thenBadRequest() {
-        var partner = createValidPartner();
-        var error = createAccountEntityWhenBankBicIsNull(partner.getId(), partner.getDigitalId());
+        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
+            () -> createAccountEntityWhenBankBicIsNull(partner.getId(), partner.getDigitalId()));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () ->
+            assertThat(error)
+                .isNotNull());
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/account с пустым БИК банка")
     void testCreateAccount_whenBankBicIsEmpty_thenBadRequest() {
-        var partner = createValidPartner();
-        var error = createAccountEntityWhenBankBicIsEmpty(partner.getId(), partner.getDigitalId());
+        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
+            () -> createAccountEntityWhenBankBicIsEmpty(partner.getId(), partner.getDigitalId()));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () ->
+            assertThat(error)
+                .isNotNull());
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
+        });
     }
 
     @Test
@@ -1368,133 +1404,178 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /partner/account редактирование счета когда банк равен null")
     void testUpdateAccount_whenBankIsNull_thenBadRequest() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
 
-        var error = put(
+        var error = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWhenBankIsNull(account),
             Error.class
-        );
+        ));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+        });
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/account редактирование счета когда наименование банка равно null")
     void testUpdateAccount_whenBankNameIsNull_thenBadRequest() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
 
-        var error = put(
+        var error = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWhenBankNameIsNull(account),
             Error.class
-        );
+        ));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+        });
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/account редактирование счета когда наименование банка пустое")
     void testUpdateAccount_whenBankNameIsEmpty_thenBadRequest() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
 
-        var error = put(
+        var error = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWhenBankNameIsEmpty(account),
             Error.class
-        );
+        ));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+        });
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.name".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/account редактирование счета когда БИК банка равен null")
     void testUpdateAccount_whenBankBicIsNull_thenBadRequest() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
 
-        var error = put(
+        var error = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWhenBankBicIsNull(account),
             Error.class
-        );
+        ));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+        });
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotEmpty.message"));
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/account редактирование счета когда БИК банка пустой")
     void testUpdateAccount_whenBankBicIsEmpty_thenBadRequest() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
 
-        var error = put(
+        var error = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWhenBankBicIsEmpty(account),
             Error.class
-        );
+        ));
 
-        assertThat(error)
-            .isNotNull();
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+        });
 
-        var actualBankDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-            .findAny().orElse(null);
+        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
 
-        assertThat(actualBankDescriptions)
-            .isNotNull();
-        assertThat(actualBankDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankDescriptions)
+                .isNotNull();
+            assertThat(actualBankDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("validation.account.bank.bic.length"));
+        });
     }
 
     @Test
@@ -1521,32 +1602,48 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /partner/account редактирование счета когда не верный номер счёта и номер корр счёта")
     void testUpdateAccountEntityInvalidAccountAndBankAccount() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        var error = put(
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(partner.getId(), partner.getDigitalId());
+        });
+
+        var error = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWithInvalidAccountAndBankAccount(account),
             Error.class
-        );
-        var actualAccountDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "account".equals(descriptions.getField()))
-            .findAny().orElse(null);
-        assertThat(actualAccountDescriptions)
-            .isNotNull();
-        assertThat(actualAccountDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"))
-            .doesNotContainSequence(MessagesTranslator.toLocale("validation.account.rub_code_currency"));
-        var actualBankAccountDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
-            .findAny().orElse(null);
-        assertThat(actualBankAccountDescriptions)
-            .isNotNull();
-        assertThat(actualBankAccountDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+        ));
+
+        var actualAccountDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "account".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualAccountDescriptions)
+                .isNotNull();
+            assertThat(actualAccountDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"))
+                .doesNotContainSequence(MessagesTranslator.toLocale("validation.account.rub_code_currency"));
+        });
+
+        var actualBankAccountDescriptions = step("Подготовка тестовых данных", () -> {
+            return error.getDescriptions().stream()
+                .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
+                .findAny().orElse(null);
+        });
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualBankAccountDescriptions)
+                .isNotNull();
+            assertThat(actualBankAccountDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+        });
     }
 
     @Test
@@ -2048,50 +2145,72 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("POST /partner/account проверка сохранения счёта с не верным кодом валюты и баланса")
     void testSaveAccountNotValidateCodeCurrencyAndBalance() {
-        var partner = createValidPartner();
-        var account = getValidAccount(partner.getId(), partner.getDigitalId());
-        account.setAccount("00101643145250000411");
-        var error = post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class);
-        assertThat(error)
-            .isNotNull();
-        assertThat(error.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        List<String> errorsMessage = error.getDescriptions().stream()
-            .map(Descriptions::getMessage)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-        assertThat(errorsMessage)
-            .asList()
-            .contains("Единый казначейский счёт должен начинаться с 40102");
-    }
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            var validAccount = getValidAccount(partner.getId(), partner.getDigitalId());
+            validAccount.setAccount("00101643145250000411");
+            return validAccount;
+        });
 
-    @Test
-    void testUpdateAccountNotValidateCodeCurrencyAndBalance() {
-        var partner = createValidPartner();
-        var account = createValidAccount(partner.getId(), partner.getDigitalId());
-        AccountChange accountChange = updateAccount(account);
-        accountChange.setAccount("00101643145250000411");
-        var error = put(
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () -> post(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
-            accountChange,
+            account,
             Error.class
-        );
-        assertThat(error)
-            .isNotNull();
-        assertThat(error.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        List<String> errorsMessage = error.getDescriptions().stream()
-            .map(Descriptions::getMessage)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-        assertThat(errorsMessage)
-            .asList()
-            .contains("Единый казначейский счёт должен начинаться с 40102");
+        ));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            List<String> errorsMessage = error.getDescriptions().stream()
+                .map(Descriptions::getMessage)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+            assertThat(errorsMessage)
+                .asList()
+                .contains("Единый казначейский счёт должен начинаться с 40102");
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/account проверка редактирования счёта с не верным кодом валюты и баланса")
+    void testUpdateAccountNotValidateCodeCurrencyAndBalance() {
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            var validAccount = createValidAccount(partner.getId(), partner.getDigitalId());
+            AccountChange accountChange = updateAccount(validAccount);
+            accountChange.setAccount("00101643145250000411");
+            return accountChange;
+        });
+
+        var error = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
+            baseRoutePath + "/account",
+            HttpStatus.BAD_REQUEST,
+            account,
+            Error.class
+        ));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            List<String> errorsMessage = error.getDescriptions().stream()
+                .map(Descriptions::getMessage)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+            assertThat(errorsMessage)
+                .asList()
+                .contains("Единый казначейский счёт должен начинаться с 40102");
+        });
+    }
+
+    @Test
+    @DisplayName("POST /partner/account проверка сохранения счёта физического лица с бюджетным корр счётом")
     void testSaveAccountPhysicalPersonNotSetBudgetCorrAccount() {
         var partner =
             Allure.step("Создание партнера Физ лицо", () -> post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(), Partner.class));

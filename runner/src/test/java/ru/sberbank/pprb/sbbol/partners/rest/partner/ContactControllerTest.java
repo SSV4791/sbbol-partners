@@ -331,6 +331,24 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /partner/contact создание контакта для не существующего контрагента")
+    void testCreateContactForNonExistentCounterparty() {
+        var contactWithoutCounterparty = Allure.step("Подготовка тестовых данных", () -> {
+            var randomValidPartnerUuid = "0a3a0293-6bae-4667-b765-af20c093de12";
+            var randomValidDigitalId = "QeOvUVDbSA";
+            return getValidContact(randomValidPartnerUuid, randomValidDigitalId);
+        });
+        var contact = Allure.step("Выполнение post-запроса /partner/contact, код ответа 404",
+            () -> createContactWithError(contactWithoutCounterparty));
+
+        Allure.step("Проверка корректности ответа", () -> {
+            assertThat(contact).isNotNull();
+            assertThat(contact.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
+    }
+
+    @Test
     @DisplayName("PUT /partner/contact редактирование контакта с невалидным phone")
     void testCreateInvalidContactButValidLength() {
         var contact = Allure.step("Подготовка тестовых данных", () -> {
@@ -368,7 +386,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     newPhone.setUnifiedId(phone.getUnifiedId());
                     newPhone.setDigitalId(phone.getDigitalId());
                     newPhone.setPhone(randomNumeric(13));
-                   phones.add(newPhone);
+                    phones.add(newPhone);
                 }
             }
             return phones;
@@ -423,7 +441,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             return phones1;
         });
         var newEmails1 = Allure.step("Подготовка новых емайлов", () -> {
-            Set<Email>  emails1 = new HashSet<>();
+            Set<Email> emails1 = new HashSet<>();
             if (contact.getEmails() != null) {
                 for (var email : contact.getEmails()) {
                     var newEmail = new Email();
@@ -798,6 +816,15 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             HttpStatus.CREATED,
             contact,
             Contact.class
+        );
+    }
+
+    protected static Error createContactWithError(ContactCreate contact) {
+        return post(
+            baseRoutePath + "/contact",
+            HttpStatus.NOT_FOUND,
+            contact,
+            Error.class
         );
     }
 
