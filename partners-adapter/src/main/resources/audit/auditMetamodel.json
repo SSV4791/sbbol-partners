@@ -1,5 +1,5 @@
 {
-  "metamodelVersion": "3",
+  "metamodelVersion": "4",
   "module": "pprb4-digital-partners",
   "events": [
     {
@@ -457,7 +457,7 @@
           "description": "Тип партнёра: Партнер\\Бенефициар\\Арендатор"
         },
         {
-          "name": "legalType",
+          "name": "legalForm",
           "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
         },
         {
@@ -525,7 +525,7 @@
           "description": "Идентификатор личного кабинета клиента"
         },
         {
-          "name": "legalType",
+          "name": "legalForm",
           "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
         },
         {
@@ -597,7 +597,7 @@
           "description": "Версия документа"
         },
         {
-          "name": "legalType",
+          "name": "legalForm",
           "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
         },
         {
@@ -673,7 +673,7 @@
           "description": "Версия документа"
         },
         {
-          "name": "legalType",
+          "name": "legalForm",
           "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
         },
         {
