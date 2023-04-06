@@ -85,13 +85,14 @@ public class AuditAdapterImpl implements AuditAdapter {
                 "userNode", getXNodeId()
             ));
             CompletableFuture.runAsync(() ->
-                retryTemplate.execute(context ->
-                    auditApi.uploadEventWithHttpInfo(getXNodeId(), event, null)
-                ),
+                    retryTemplate.execute(context ->
+                        auditApi.uploadEvent(getXNodeId(), event, null)
+                    ),
                 executorService
             );
-        } catch (Throwable t) { //любые ошибки аудита не должны влиять на работу клиента
-            LOGGER.error("Ошибка записи в журнал аудита auditEvent = {}",  auditEvent);
+        } catch (Throwable t) {
+            //любые ошибки аудита не должны влиять на работу клиента
+            LOGGER.error("Ошибка записи в журнал аудита auditEvent = {}, ошибка {}", auditEvent, t);
         }
     }
 

@@ -123,7 +123,7 @@ liquibase:
   command_type: update
 documentation:
   build:
-    workdir: docs
+    workdir: ''
     outputdir: docs/build/docs
     command: >-
       ./gradlew
