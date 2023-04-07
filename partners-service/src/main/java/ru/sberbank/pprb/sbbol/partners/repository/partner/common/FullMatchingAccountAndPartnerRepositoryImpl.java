@@ -69,7 +69,7 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         Join<AccountEntity, BankEntity> bankJoin = root.join(AccountEntity_.BANK, JoinType.INNER);
         addBankBicPredicate(builder, predicates, bankJoin, request.getBic());
 
-        Join<BankEntity, BankAccountEntity> bankAccountJoin = bankJoin.join(BankEntity_.BANK_ACCOUNT, JoinType.INNER);
+        Join<BankEntity, BankAccountEntity> bankAccountJoin = bankJoin.join(BankEntity_.BANK_ACCOUNT, JoinType.LEFT);
         addBankAccountPredicate(builder, predicates, bankAccountJoin, request.getBankAccount());
     }
 
