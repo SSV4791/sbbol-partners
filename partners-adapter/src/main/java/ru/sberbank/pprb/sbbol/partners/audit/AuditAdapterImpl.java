@@ -78,22 +78,21 @@ public class AuditAdapterImpl implements AuditAdapter {
             LOGGER.warn("Интеграция c сервисом Audit отключена");
             return;
         }
-        try {
-            var event = auditMapper.toAuditEvent(auditEvent, Map.of(
-                "moduleMame", moduleName,
-                "metamodelVersion", metamodelVersion,
-                "userNode", getXNodeId()
-            ));
-            CompletableFuture.runAsync(() ->
-                    retryTemplate.execute(context ->
-                        auditApi.uploadEvent(getXNodeId(), event, null)
-                    ),
+        var event = auditMapper.toAuditEvent(auditEvent, Map.of(
+            "moduleMame", moduleName,
+            "metamodelVersion", metamodelVersion,
+            "userNode", getXNodeId()
+        ));
+        CompletableFuture
+            .runAsync(() ->
+                retryTemplate.execute(context ->
+                    auditApi.uploadEvent(getXNodeId(), event, null)
+                ),
                 executorService
-            );
-        } catch (Throwable t) {
-            //любые ошибки аудита не должны влиять на работу клиента
-            LOGGER.error("Ошибка записи в журнал аудита auditEvent = {}, ошибка {}", auditEvent, t);
-        }
+            ).exceptionally(ex -> {
+                LOGGER.error("Ошибка записи в журнал аудита auditEvent = {}, ошибка {}", auditEvent, ex);
+                return null;
+            });
     }
 
     private String getXNodeId() {
