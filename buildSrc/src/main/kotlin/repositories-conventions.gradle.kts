@@ -5,9 +5,7 @@ repositories {
     val publicRepositoryUrl: String by project
     listOf(
         publicRepositoryUrl,
-        "https://nexus-ci.delta.sbrf.ru/repository/maven-proxy-lib-internal/",
-        "https://nexus-ci.delta.sbrf.ru/repository/maven-lib-release/"
-
+        "https://nexus-ci.delta.sbrf.ru/repository/maven-lib-int/"
     ).forEach {
         maven {
             url = uri(it)

@@ -90,6 +90,10 @@ tokenPassword=<Your user token pass code>
 
 `./gradlew sonar`
 
+### Создание модели данных
+
+`./gradlew clean build scanMetamodel -x test`
+
 ### Публикация API в META
 
 `./gradlew clean build reverseAndPublish -x test`

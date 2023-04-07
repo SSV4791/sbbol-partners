@@ -12,7 +12,7 @@ pluginManagement {
             isAllowInsecureProtocol = true
         }
         maven {
-            url = uri("https://nexus-ci.delta.sbrf.ru/repository/maven-proxy-lib-internal/")
+            url = uri("https://nexus-ci.delta.sbrf.ru/repository/maven-lib-int/")
             credentials {
                 username = tokenName
                 password = tokenPassword
