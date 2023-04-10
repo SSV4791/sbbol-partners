@@ -1548,7 +1548,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testDeletePartner_whenInvalidFraudMetaDataHeader_thenBadRequest() throws JsonProcessingException {
+    void testDeletePartner_whenInvalidFraudMetaDataHeader_thenBadRequest() {
         var uuid = podamFactory.manufacturePojo(UUID.class);
         var digitalId = podamFactory.manufacturePojo(String.class);
         var error = delete(

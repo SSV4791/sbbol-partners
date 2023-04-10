@@ -2,26 +2,22 @@ plugins {
     `kotlin-dsl`
 }
 
-val tokenName = project.properties["tokenName"] as String?
-val tokenPassword = project.properties["tokenPassword"] as String?
-
 repositories {
-    maven {
-        val publicRepositoryUrl: String by project
-        url = uri(publicRepositoryUrl)
-        credentials {
-            username = tokenName
-            password = tokenPassword
+    val tokenName = project.properties["tokenName"] as String?
+    val tokenPassword = project.properties["tokenPassword"] as String?
+    val publicRepositoryUrl: String by project
+    listOf(
+        publicRepositoryUrl,
+        "https://nexus-ci.delta.sbrf.ru/repository/maven-lib-int/"
+    ).forEach {
+        maven {
+            url = uri(it)
+            credentials {
+                username = tokenName
+                password = tokenPassword
+            }
+            isAllowInsecureProtocol = true
         }
-        isAllowInsecureProtocol = true
-    }
-    maven {
-        url = uri("https://nexus-ci.delta.sbrf.ru/repository/maven-proxy-lib-internal/")
-        credentials {
-            username = tokenName
-            password = tokenPassword
-        }
-        isAllowInsecureProtocol = true
     }
 }
 
@@ -31,4 +27,6 @@ dependencies {
     implementation("org.yaml:snakeyaml:1.24")
     implementation("ru.sbrf.build.gradle.dcb-test-plugin:gradle-plugin:4.1.3")
     implementation("ru.sbt.meta:meta-gradle-plugin:2.0.0")
+    implementation("sbp.eip.metamodel:eip-metamodel-core:3.1.14-jdk11")
+    implementation("sbp.eip.metamodel:eip-metamodel-scanner-gradle-plugin:3.1.14-jdk11")
 }

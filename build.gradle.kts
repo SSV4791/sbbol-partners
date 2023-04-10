@@ -52,7 +52,7 @@ meta {
     nexusUser = nexusLogin
     nexusPassword = nexusPassword
     version = "latest.integration"
-    componentId = "9655c0f1-74bf-11eb-6742-005056b72594"
+    componentId = "${project.properties["metaComponentName"]}"
     ext {
         set("url", "https://meta.sigma.sbrf.ru")
         set(

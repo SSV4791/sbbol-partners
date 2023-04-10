@@ -1,5 +1,6 @@
 plugins {
     id("dependency-locking-conventions")
+    id("eip-metamodel-scanner")
     id("java-conventions")
     id("org.springframework.boot") apply false
     id("test-conventions")
@@ -27,6 +28,19 @@ dependencies {
 
     compileOnly(liveLibs.hibernate.jpamodelgen)
     runtimeOnly(liveLibs.ehcache.org.core)
+}
+
+val componentName = "${project.properties["metaComponentName"]}"
+metamodel {
+    componentCode = componentName
+    isFormattedOutput = true
+}
+
+modelJpa {
+    fileName = "$componentName.ldm.xml"
+    modelName = componentName
+    modelVersion = "${project.version}"
+    packages = "ru.sberbank.pprb.sbbol.partners.entity"
 }
 
 description = "Service ППРБ.Digital.Партнеры"
