@@ -33,6 +33,7 @@ data:
         # Например: logger-endpoint-demo-http-ci00641491-idevlg-pprbtsloggertest.apps.test-ose.ca.sbrf.ru
 {# берем нулевой элемент массива #}
         Host {% if int.pprb.fluentbit.v1_0 is mapping %}{{ int.pprb.fluentbit.v1_0.host }}{% else %}{{ int.pprb.fluentbit.v1_0 | map(attribute='host') | first }}{% endif %}
+
         Port 80
         # Метод сервиса приема событий
         URI /v1/events
