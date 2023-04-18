@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
@@ -11,12 +12,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static org.springframework.http.converter.json.Jackson2ObjectMapperBuilder.json;
@@ -50,15 +51,26 @@ public class PartnerRunnerConfiguration {
 
     @Bean
     GenericFilterBean genericFilterBean() {
-        return new GenericFilterBean() {
+        return new OncePerRequestFilter() {
             @Override
-            public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-                String xRequestId = ((HttpServletRequest) request).getHeader("x-request-id");
-                MDC.put("requestUid", xRequestId);
+            protected void doFilterInternal(
+                @NotNull HttpServletRequest request,
+                @NotNull HttpServletResponse response,
+                @NotNull FilterChain filterChain
+            ) throws ServletException, IOException {
+                MDC.put("requestUid", request.getHeader("x-request-id"));
+                MDC.put("ufsTraceId", request.getHeader("ufs-trace-parent-id"));
+                MDC.put("ufsSessionId", request.getHeader("ufs_forward_sid"));
+                MDC.put("ufsSubsystemCode", request.getHeader("ufs-initiatingsubsystemcode"));
+                MDC.put("pod", request.getHeader("pod"));
                 try {
-                    chain.doFilter(request, response);
+                    filterChain.doFilter(request, response);
                 } finally {
                     MDC.remove("requestUid");
+                    MDC.remove("ufsTraceId");
+                    MDC.remove("ufsSessionId");
+                    MDC.remove("ufsSubsystemCode");
+                    MDC.remove("pod");
                 }
             }
         };
