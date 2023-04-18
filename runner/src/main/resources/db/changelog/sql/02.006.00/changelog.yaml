@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: 1683723052710_change_bank.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1683723052711_change_account.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1683723052712_change_address.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1683723052713_add_account_additional.sql
+      relativeToChangelogFile: true

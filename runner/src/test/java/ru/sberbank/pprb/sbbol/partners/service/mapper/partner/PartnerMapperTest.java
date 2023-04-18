@@ -117,6 +117,8 @@ class PartnerMapperTest extends BaseUnitConfiguration {
                 "uuid",
                 "search",
                 "createDate",
+                "countryCode",
+                "countryName",
                 "phones",
                 "emails",
                 "accounts"

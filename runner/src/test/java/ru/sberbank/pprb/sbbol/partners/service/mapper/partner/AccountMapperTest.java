@@ -7,6 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
@@ -67,14 +68,14 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isEqualTo(actual.getBank().getBic());
         assertThat(expected.getBank().getName())
             .isEqualTo(actual.getBank().getName());
-        assertThat(expected.getBank().getMediary())
-            .isEqualTo(actual.getBank().getIntermediary());
         assertThat(expected.getComment())
             .isEqualTo(actual.getComment());
         assertThat(digitalId)
             .isEqualTo(actual.getDigitalId());
         assertThat(unifiedUuid)
             .isEqualTo(actual.getPartnerUuid());
+        assertThat(actual.getBank().getType())
+            .isEqualTo(expected.getBank().getMediary() ? BankType.AGENT : BankType.DEFAULT);
     }
 
     @Test
@@ -103,10 +104,10 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isNotNull();
         assertThat(expected.getBank().getBic())
             .isEqualTo(actual.getBank().getBic());
-        assertThat(expected.getBank().getIntermediary())
-            .isEqualTo(actual.getBank().getMediary());
         assertThat(expected.getBank().getBankAccount().getAccount())
             .isEqualTo(actual.getBank().getBankAccount().getBankAccount());
+        assertThat(actual.getBank().getMediary())
+            .isEqualTo(expected.getBank().getType() == BankType.AGENT);
     }
 
     @Test
@@ -155,6 +156,14 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .ignoringFields(
                 "account",
                 "lastModifiedDate",
+                "type",
+                "swiftCode",
+                "clearingBankCode",
+                "clearingBankCodeName",
+                "clearingBankSymbolCode",
+                "clearingCountryCode",
+                "filial",
+                "bankOption",
                 "bankAccount.bank",
                 "bankAccount.lastModifiedDate"
             )
@@ -220,9 +229,9 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isEqualTo(expected.getBank().getName() );
         assertThat(expected.getBank().getBic())
             .isEqualTo(actual.getAccount().getBank().getBic());
-        assertThat(expected.getBank().getIntermediary())
-            .isEqualTo(actual.getAccount().getBank().getMediary());
         assertThat(expected.getBank().getBankAccount().getAccount())
             .isEqualTo(actual.getAccount().getBank().getBankAccount().getBankAccount());
+        assertThat(actual.getAccount().getBank().getMediary())
+            .isEqualTo(expected.getBank().getType() == BankType.AGENT);
     }
 }
