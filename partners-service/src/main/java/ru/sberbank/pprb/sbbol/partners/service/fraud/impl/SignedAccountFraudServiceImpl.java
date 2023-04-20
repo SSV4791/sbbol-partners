@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.fraud.impl;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
@@ -79,7 +80,7 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
         } catch (FraudModelArgumentException e) {
             throw new FraudModelValidationException(e.getMessage(), e);
         } catch (FraudAdapterException | FraudApplicationException e) {
-            LOG.error("Ошибка адаптера АС Интегратор с ФМ ЮЛ: {}", e.getLocalizedMessage());
+            LOG.error("Ошибка адаптера АС Интегратор с ФМ ЮЛ: {}", ExceptionUtils.getStackTrace(e));
         }
     }
 }

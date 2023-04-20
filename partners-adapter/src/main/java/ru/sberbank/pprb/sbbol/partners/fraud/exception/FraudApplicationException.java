@@ -1,13 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.fraud.exception;
 
-import static java.lang.String.format;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 
 public class FraudApplicationException extends RuntimeException {
 
-    private static final String ERROR_MESSAGE =
-        "Ошибка в работе приложения со стороны АС Интегратор ФП ЮЛ. Сообщение об ошибке: %s";
+    private static final String ERROR_MESSAGE = "fraud.application.exception";
 
     public FraudApplicationException(String message, Throwable cause) {
-        super(format(ERROR_MESSAGE, message), cause);
+        super(MessagesTranslator.toLocale(ERROR_MESSAGE, message), cause);
     }
 }
