@@ -10,6 +10,9 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudAdapterException;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudApplicationException;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudModelArgumentException;
+import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudResponseException;
+
+import static java.util.Objects.isNull;
 
 @Loggable
 public class FraudAdapterImpl implements FraudAdapter{
@@ -23,7 +26,14 @@ public class FraudAdapterImpl implements FraudAdapter{
     @Override
     public AnalyzeResponse send(CounterPartySendToAnalyzeRq rq) {
         try {
-            return fraudRpcProxy.analyzeOperation(rq);
+            var response = fraudRpcProxy.analyzeOperation(rq);
+            if (isNull(response)) {
+                throw new FraudResponseException("response is null");
+            }
+            if (isNull(response.getActionCode())) {
+                throw new FraudResponseException("response.actionCode is null");
+            }
+            return response;
         } catch (ModelArgumentException e) {
             throw new FraudModelArgumentException(e.getMessage(), e);
         } catch (ApplicationException | AnalyzeException e) {
