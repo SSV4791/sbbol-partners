@@ -37,5 +37,5 @@ public interface PartnerRepository extends CrudRepository<PartnerEntity, UUID>, 
      * @param digitalId Идентификатор личного кабинета
      * @param search    Данные для поиска партнера
      */
-    PartnerEntity findByDigitalIdAndSearchContainsAndType(String digitalId, String search, PartnerType type);
+    PartnerEntity findByDigitalIdAndSearchAndType(String digitalId, String search, PartnerType type);
 }
