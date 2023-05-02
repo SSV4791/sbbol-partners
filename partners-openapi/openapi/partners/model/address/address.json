@@ -47,6 +47,11 @@
       "title": "Код района",
       "maxLength": 10
     },
+    "area": {
+      "type": "string",
+      "title": "Район",
+      "maxLength": 300
+    },
     "city": {
       "type": "string",
       "title": "Город",
@@ -75,7 +80,7 @@
     "flat": {
       "type": "string",
       "title": "Квартира",
-      "maxLength": 20
+      "maxLength": 300
     }
   },
   "required": [

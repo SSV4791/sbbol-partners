@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 1683022500829_update_address.sql
+      relativeToChangelogFile: true
