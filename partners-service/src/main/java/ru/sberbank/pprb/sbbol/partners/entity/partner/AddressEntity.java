@@ -49,6 +49,9 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "region", length = 50)
     private String region;
 
+    @Column(name = "area", length = 300)
+    private String area;
+
     @Column(name = "city", length = 300)
     private String city;
 
@@ -161,6 +164,14 @@ public class AddressEntity extends BaseEntity {
 
     public void setFlat(String flat) {
         this.flat = flat;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
     }
 
     @Override
