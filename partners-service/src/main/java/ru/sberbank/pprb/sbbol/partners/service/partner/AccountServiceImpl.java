@@ -188,7 +188,7 @@ public class AccountServiceImpl implements AccountService {
         if (CollectionUtils.isEmpty(accounts)) {
             var search =
                 accountMapper.prepareSearchString(request.getInn(), request.getKpp(), request.getName());
-            PartnerEntity partner = partnerRepository.findByDigitalIdAndSearchContainsAndType(request.getDigitalId(), search, PartnerType.PARTNER);
+            PartnerEntity partner = partnerRepository.findByDigitalIdAndSearchAndType(request.getDigitalId(), search, PartnerType.PARTNER);
             if (Objects.isNull(partner)) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
             }

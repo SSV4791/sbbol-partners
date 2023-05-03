@@ -126,7 +126,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         var search =
             migrationPartnerMapper.prepareSearchString(correspondent.getInn(), correspondent.getKpp(), correspondent.getName());
         AccountEntity savedAccount;
-        var searchPartner = partnerRepository.findByDigitalIdAndSearchContainsAndType(digitalId, search, PartnerType.PARTNER);
+        var searchPartner = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
         if (searchPartner == null) {
             var partnerEntity = migrationPartnerMapper.toPartnerEntity(digitalId, correspondent);
             var save = partnerRepository.save(partnerEntity);
