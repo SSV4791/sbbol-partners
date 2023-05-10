@@ -1168,11 +1168,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull());
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1194,11 +1193,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull());
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1220,11 +1218,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull());
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1246,11 +1243,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull());
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1272,11 +1268,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull());
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1423,11 +1418,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
         });
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1458,11 +1452,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
         });
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1493,11 +1486,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
         });
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.name".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1528,11 +1520,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
         });
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1563,11 +1554,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
         });
 
-        var actualBankDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.bic".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankDescriptions)
@@ -1616,11 +1606,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Error.class
         ));
 
-        var actualAccountDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualAccountDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "account".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualAccountDescriptions)
@@ -1631,11 +1620,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .doesNotContainSequence(MessagesTranslator.toLocale("validation.account.rub_code_currency"));
         });
 
-        var actualBankAccountDescriptions = step("Подготовка тестовых данных", () -> {
-            return error.getDescriptions().stream()
+        var actualBankAccountDescriptions = step("Подготовка тестовых данных", () ->
+            error.getDescriptions().stream()
                 .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
-                .findAny().orElse(null);
-        });
+                .findAny().orElse(null));
 
         step("Проверка корректности ответа", () -> {
             assertThat(actualBankAccountDescriptions)
@@ -1649,23 +1637,28 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts счет и корр. счет равны null")
     void testUpdateAccountEntityWithNullAccountAndBankAccount() {
-        var account = step("Подготовка тестовых данных", () -> {
+        var accountCreate = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+        var accountChange = step("Подготовка тестовых данных", () ->
+            updateAccountEntityWithNullAccountAndBankAccount(accountCreate)
+        );
         var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
-            updateAccountEntityWithNullAccountAndBankAccount(account),
+            accountChange,
             Account.class
         ));
         step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
             assertThat(updateAccount.getAccount())
-                .isEqualTo(account.getAccount());
+                .isNotEqualTo(accountCreate.getAccount())
+                .isEqualTo(accountChange.getAccount());
             assertThat(updateAccount.getBank().getBankAccount().getBankAccount())
-                .isEqualTo(account.getBank().getBankAccount().getBankAccount());
+                .isNotEqualTo(accountCreate.getBank().getBankAccount().getBankAccount())
+                .isEqualTo(accountChange.getBank().getBankAccount().getBankAccount());
         });
     }
 
@@ -2571,9 +2564,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
         Account account =
             step("Создание счета",
                 () -> {
-                var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
-                creatingAccount.getBank().setBankAccount(null);
-                return createValidAccount(creatingAccount);
+                    var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
+                    creatingAccount.getBank().setBankAccount(null);
+                    return createValidAccount(creatingAccount);
                 });
 
         var request =

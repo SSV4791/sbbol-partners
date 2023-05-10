@@ -36,6 +36,14 @@ metamodel {
     isFormattedOutput = true
 }
 
+tasks {
+    compileJava {
+        options.compilerArgs.add(
+                "-Amapstruct.defaultComponentModel=spring"
+        )
+    }
+}
+
 modelJpa {
     fileName = "$componentName.ldm.xml"
     modelName = componentName

@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
@@ -16,10 +15,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Loggable
-@Mapper(
-    componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+@Mapper
 public interface AccountSingMapper extends BaseMapper {
 
     @Named("toSignAccount")

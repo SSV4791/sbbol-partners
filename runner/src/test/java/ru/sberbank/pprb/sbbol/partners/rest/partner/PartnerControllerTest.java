@@ -1448,33 +1448,9 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         String newKpp = "999999999";
         createdPartner.kpp(newKpp);
-        var newUpdatePartner = put(
-            baseRoutePath,
-            HttpStatus.OK,
-            createdPartner,
-            Partner.class
-        );
-
-        assertThat(createdPartner)
-            .isNotNull();
-        assertThat(newUpdatePartner.getKpp())
-            .isEqualTo(newKpp);
-    }
-
-    @Test
-    void testUpdatePartner2() {
-        var partner = getValidLegalEntityPartner();
-        var createdPartner = post(
-            baseRoutePath,
-            HttpStatus.CREATED,
-            partner,
-            Partner.class
-        );
-        String newKpp = "999999999";
-        createdPartner.kpp(newKpp);
         createdPartner.setPhones(null);
         createdPartner.setEmails(null);
-        Partner newUpdatePartner = put(
+        var newUpdatePartner = put(
             baseRoutePath,
             HttpStatus.OK,
             createdPartner,
