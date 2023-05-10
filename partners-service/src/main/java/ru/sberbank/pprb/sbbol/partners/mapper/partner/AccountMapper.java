@@ -6,7 +6,6 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
@@ -32,10 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Loggable
-@Mapper(
-    componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+@Mapper
 public interface AccountMapper extends BaseMapper {
 
     @InheritConfiguration
@@ -127,19 +123,19 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
-    void updateAccount(AccountChange account, @MappingTarget() AccountEntity accountEntity);
+    void updateAccount(AccountChange account, @MappingTarget AccountEntity accountEntity);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "lastModifiedDate", ignore = true)
-    void updateBank(Bank bank, @MappingTarget() BankEntity bankEntity);
+    void updateBank(Bank bank, @MappingTarget BankEntity bankEntity);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "account", source = "bankAccount")
-    void updateBankAccount(BankAccount bankAccount, @MappingTarget() BankAccountEntity bankAccountEntity);
+    void updateBankAccount(BankAccount bankAccount, @MappingTarget BankAccountEntity bankAccountEntity);
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {

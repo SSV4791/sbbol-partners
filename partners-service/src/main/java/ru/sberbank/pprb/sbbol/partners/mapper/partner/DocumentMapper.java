@@ -5,7 +5,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
@@ -25,8 +24,6 @@ import java.util.stream.Collectors;
 
 @Loggable
 @Mapper(
-    componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
         DocumentTypeMapper.class
     },
@@ -91,6 +88,6 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
-    void updateDocument(DocumentChange document, @MappingTarget() DocumentEntity documentEntity);
+    void updateDocument(DocumentChange document, @MappingTarget DocumentEntity documentEntity);
 
 }

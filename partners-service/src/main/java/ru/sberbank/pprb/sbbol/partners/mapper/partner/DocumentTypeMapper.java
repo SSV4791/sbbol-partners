@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
@@ -13,8 +12,6 @@ import java.util.List;
 
 @Loggable
 @Mapper(
-    componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
         LegalFormMapper.class
     },

@@ -37,7 +37,6 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Loggable
 @Mapper(
-    componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
         PartnerEmailMapper.class,
@@ -151,11 +150,15 @@ public interface PartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "orgName", source = "orgName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "firstName", source = "firstName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "secondName", source = "secondName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "middleName", source = "middleName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
+    @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
-    @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);
