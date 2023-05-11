@@ -2,15 +2,11 @@ package ru.sberbank.pprb.sbbol.partners.rest.renter;
 
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.entity.renter.DulType;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
-import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterIdentifier;
 import ru.sberbank.pprb.sbbol.renter.model.RenterListResponse;
 import ru.sberbank.pprb.sbbol.renter.model.Version;
-
-import java.time.LocalDate;
 
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -95,6 +91,43 @@ class RenterControllerTest extends AbstractIntegrationTest {
         createdRenter.setKpp(newKpp);
         createdRenter.setBankBic(newBic);
         createdRenter.setAccount(newAccount);
+        Renter updated = given()
+            .spec(requestSpec)
+            .body(createdRenter)
+            .when()
+            .post(baseRoutePath + "/update")
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(Renter.class);
+
+        assertThat(updated).isNotNull();
+        assertThat(updated.getCheckResults()).isNull();
+        assertThat(updated.getKpp()).isEqualTo(newKpp);
+        assertThat(updated.getBankBic()).isEqualTo(newBic);
+        assertThat(updated.getAccount()).isEqualTo(newAccount);
+    }
+
+    @Test
+    void testUpdateValidRenter_withoutPhoneNumbers() {
+        Renter renter = getValidRenter()
+            .phoneNumbers(null);
+        Renter createdRenter = given()
+            .spec(requestSpec)
+            .body(renter)
+            .when()
+            .post(baseRoutePath + "/create")
+            .then()
+            .spec(responseSpec)
+            .extract()
+            .as(Renter.class);
+        String newKpp = "999999999";
+        String newBic = "045004641";
+        String newAccount = "40817810788460000076";
+        createdRenter.setKpp(newKpp);
+        createdRenter.setBankBic(newBic);
+        createdRenter.setAccount(newAccount);
+        createdRenter.setPhoneNumbers("+79111111111");
         Renter updated = given()
             .spec(requestSpec)
             .body(createdRenter)
