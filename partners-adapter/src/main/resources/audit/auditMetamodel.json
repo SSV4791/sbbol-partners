@@ -1,5 +1,5 @@
 {
-  "metamodelVersion": "4",
+  "metamodelVersion": "5",
   "module": "pprb4-digital-partners",
   "events": [
     {
@@ -231,7 +231,7 @@
       ]
     },
     {
-      "name": "sign_account_delete_success",
+      "name": "sign_accounts_delete_success",
       "description": "Успешное снятие подписи счёта Партнера",
       "success": "true",
       "mode": "reliability",
@@ -247,7 +247,7 @@
       ]
     },
     {
-      "name": "sign_account_delete_error",
+      "name": "sign_accounts_delete_error",
       "description": "Не успешное снятие подписи счёта Партнера",
       "success": "false",
       "mode": "reliability",
