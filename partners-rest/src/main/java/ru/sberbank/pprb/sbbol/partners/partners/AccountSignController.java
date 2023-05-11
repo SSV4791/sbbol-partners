@@ -25,7 +25,7 @@ public class AccountSignController implements AccountsSignApi {
 
     @FraudValid
     @Override
-    public ResponseEntity<AccountsSignInfoResponse> create(FraudMetaData fraudMetaData,AccountsSignInfo accountsSignInfo) {
+    public ResponseEntity<AccountsSignInfoResponse> create(FraudMetaData fraudMetaData, AccountsSignInfo accountsSignInfo) {
         return ResponseEntity.ok(accountSignService.createAccountsSign(accountsSignInfo, fraudMetaData));
     }
 
