@@ -18,12 +18,14 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
+import ru.sberbank.pprb.sbbol.partners.entity.renter.FlatRenter;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.FOREIGNPASSPORT;
@@ -196,11 +198,12 @@ public interface RenterPartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "uuid", expression = "java(partner.getUuid().toString())")
-    @Mapping(target = "type", source = "legalType")
-    @Mapping(target = "lastName", source = "secondName")
-    @Mapping(target = "legalName", source = "orgName")
-    @Mapping(target = "phoneNumbers", source = "phones", qualifiedByName = "toRenterPhone")
-    @Mapping(target = "emails", source = "emails", qualifiedByName = "toRenterEmail")
+    @Mapping(target = "digitalId", source = "partner.digitalId")
+    @Mapping(target = "type", source = "partner.legalType")
+    @Mapping(target = "lastName", source = "partner.secondName")
+    @Mapping(target = "legalName", source = "partner.orgName")
+    @Mapping(target = "phoneNumbers", expression = "java(toRenterPhone(partner.getPhones(), flatRenter))")
+    @Mapping(target = "emails", expression = "java(toRenterEmail(partner.getEmails(), flatRenter))")
     @Mapping(target = "dulType", ignore = true)
     @Mapping(target = "dulName", ignore = true)
     @Mapping(target = "dulSerie", ignore = true)
@@ -215,20 +218,38 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "legalAddress", ignore = true)
     @Mapping(target = "physicalAddress", ignore = true)
     @Mapping(target = "checkResults", ignore = true)
-    Renter toRenter(PartnerEntity partner);
+    Renter toRenter(PartnerEntity partner, FlatRenter flatRenter);
 
-    @Named("toRenterPhone")
-    static String toRenterPhone(List<PartnerPhoneEntity> phones) {
+    default String toRenterPhone(List<PartnerPhoneEntity> phones, FlatRenter flatRenter) {
         if (CollectionUtils.isEmpty(phones)) {
             return null;
+        }
+        if (flatRenter == null) {
+            return phones.get(0).getPhone();
+        }
+        UUID phoneUuid = flatRenter.getPhoneUuid();
+        if (phoneUuid != null) {
+            return phones.stream()
+                .filter(phone -> Objects.equals(phone.getUuid(), phoneUuid))
+                .map(PartnerPhoneEntity::getPhone)
+                .findFirst().orElse(null);
         }
         return phones.get(0).getPhone();
     }
 
-    @Named("toRenterEmail")
-    static String toRenterEmail(List<PartnerEmailEntity> emails) {
+    default String toRenterEmail(List<PartnerEmailEntity> emails, FlatRenter flatRenter) {
         if (CollectionUtils.isEmpty(emails)) {
             return null;
+        }
+        if (flatRenter == null) {
+            return emails.get(0).getEmail();
+        }
+        UUID emailUuid = flatRenter.getEmailUuid();
+        if (emailUuid != null) {
+            return emails.stream()
+                .filter(email -> Objects.equals(email.getUuid(), emailUuid))
+                .map(PartnerEmailEntity::getEmail)
+                .findFirst().orElse(null);
         }
         return emails.get(0).getEmail();
     }

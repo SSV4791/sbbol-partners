@@ -175,7 +175,7 @@ public class PartnerServiceImpl implements RenterService {
                 flatRenter.setPhoneUuid(savedPartner.getPhones().get(0).getUuid());
             }
             if (!CollectionUtils.isEmpty(savedPartner.getEmails()) && savedPartner.getEmails().get(0) != null) {
-                flatRenter.setPhoneUuid(savedPartner.getEmails().get(0).getUuid());
+                flatRenter.setEmailUuid(savedPartner.getEmails().get(0).getUuid());
             }
             AddressEntity savedLegalAddress = null;
             if (renter.getLegalAddress() != null) {
@@ -294,7 +294,7 @@ public class PartnerServiceImpl implements RenterService {
             DocumentTypeEntity documentType
         ) {
         flatRenterRepository.save(flatRenter);
-        Renter renterResponse = renterPartnerMapper.toRenter(savedPartner);
+        Renter renterResponse = renterPartnerMapper.toRenter(savedPartner, flatRenter);
         renterPartnerMapper.addRenterAccount(savedAccount, renterResponse);
         if (savedLegalAddress != null) {
             renterResponse.setLegalAddress(renterPartnerMapper.toRenterAddress(savedLegalAddress));
@@ -375,7 +375,7 @@ public class PartnerServiceImpl implements RenterService {
         partner.setEmails(partner.getEmails().stream()
             .filter(value -> Objects.equals(value.getUuid(), flatRenter.getEmailUuid()))
             .collect(Collectors.toList()));
-        Renter renter = renterPartnerMapper.toRenter(partner);
+        Renter renter = renterPartnerMapper.toRenter(partner, flatRenter);
         var account = accountRepository.getByDigitalIdAndUuid(partner.getDigitalId(), flatRenter.getAccountUuid());
         account.ifPresent(accountEntity -> renterPartnerMapper.addRenterAccount(accountEntity, renter));
         if (flatRenter.getPhysicalAddressUuid() != null) {

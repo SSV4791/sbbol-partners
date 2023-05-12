@@ -20,7 +20,7 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
     void toPartner() {
         Renter expected = factory.manufacturePojo(Renter.class);
         var renter = mapper.toPartner(expected);
-        Renter actual = mapper.toRenter(renter);
+        Renter actual = mapper.toRenter(renter, null);
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -47,7 +47,7 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
         String phone = RandomStringUtils.randomAlphabetic(10);
         String digitalId = RandomStringUtils.randomAlphabetic(10);
         var phones = mapper.toPhones(phone, digitalId);
-        var actual = RenterPartnerMapper.toRenterPhone(phones);
+        var actual = mapper.toRenterPhone(phones, null);
         assertThat(phone)
             .isEqualTo(actual);
     }
@@ -57,7 +57,7 @@ class RenterPartnerMapperTest extends BaseUnitConfiguration {
         String email = RandomStringUtils.randomAlphabetic(10);
         String digitalId = RandomStringUtils.randomAlphabetic(10);
         var emails = mapper.toEmails(email, digitalId);
-        var actual = RenterPartnerMapper.toRenterEmail(emails);
+        var actual = mapper.toRenterEmail(emails, null);
         assertThat(email)
             .isEqualTo(actual);
     }
