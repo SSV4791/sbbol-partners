@@ -168,14 +168,14 @@ public class PartnerServiceImpl implements RenterService {
             }
             var targetRenter = partners.get(0);
             renterPartnerMapper.updatePartner(renter, targetRenter);
-            var partnerPhoneEntity = updatePhone(flatRenter, renter, targetRenter);
-            var partnerEmailEntity = updateEmail(flatRenter, renter, targetRenter);
+            updatePhone(flatRenter, renter, targetRenter);
+            updateEmail(flatRenter, renter, targetRenter);
             var savedPartner = partnerRepository.save(targetRenter);
-            if (partnerPhoneEntity != null) {
-                flatRenter.setPhoneUuid(partnerPhoneEntity.getUuid());
+            if (!CollectionUtils.isEmpty(savedPartner.getPhones()) && savedPartner.getPhones().get(0) != null) {
+                flatRenter.setPhoneUuid(savedPartner.getPhones().get(0).getUuid());
             }
-            if (partnerEmailEntity != null) {
-                flatRenter.setEmailUuid(partnerEmailEntity.getUuid());
+            if (!CollectionUtils.isEmpty(savedPartner.getEmails()) && savedPartner.getEmails().get(0) != null) {
+                flatRenter.setPhoneUuid(savedPartner.getEmails().get(0).getUuid());
             }
             AddressEntity savedLegalAddress = null;
             if (renter.getLegalAddress() != null) {
