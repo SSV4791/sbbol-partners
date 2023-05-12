@@ -314,6 +314,7 @@ public class PartnerServiceImpl implements RenterService {
         if (flatRenter.getPhoneUuid() == null) {
             var phone = new PartnerPhoneEntity();
             phone.setPhone(renter.getPhoneNumbers());
+            phone.setDigitalId(renter.getDigitalId());
             phone.setPartner(partner);
             partner.getPhones().add(phone);
             return phone;
@@ -335,6 +336,7 @@ public class PartnerServiceImpl implements RenterService {
         if (flatRenter.getEmailUuid() == null) {
             var email = new PartnerEmailEntity();
             email.setEmail(renter.getEmails());
+            email.setDigitalId(renter.getDigitalId());
             email.setPartner(partner);
             partner.getEmails().add(email);
             return email;
