@@ -6,12 +6,15 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -47,8 +50,13 @@ public interface AccountMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")
     @Mapping(target = "accountId", expression = "java(bank.getAccount().getUuid() == null ? null : bank.getAccount().getUuid().toString())")
-    @Mapping(target = "mediary", source = "intermediary")
+    @Mapping(target = "mediary", source = "type", qualifiedByName = "getMediaryByBankType")
     Bank toBank(BankEntity bank);
+
+    @Named("getMediaryByBankType")
+    default boolean getMediaryByBankType(BankType bankType) {
+        return bankType == BankType.AGENT;
+    }
 
     @Mapping(target = "id", expression = "java(bankAccount.getUuid() == null ? null : bankAccount.getUuid().toString())")
     @Mapping(target = "bankId", expression = "java(bankAccount.getBank().getUuid() ==null ? null : bankAccount.getBank().getUuid().toString())")
@@ -89,7 +97,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "partner", ignore = true)
     AccountEntity toAccount(AccountCreate account);
 
-    @Mapping(target = "intermediary", source = "mediary")
+    @Mapping(target = "type", source = "mediary", qualifiedByName = "getBankTypeByMediary")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -97,10 +105,15 @@ public interface AccountMapper extends BaseMapper {
     BankEntity toBank(BankCreate bank);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
-    @Mapping(target = "intermediary", source = "mediary")
+    @Mapping(target = "type", source = "mediary", qualifiedByName = "getBankTypeByMediary")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     BankEntity toBank(Bank bank);
+
+    @Named("getBankTypeByMediary")
+    default BankType getBankTypeByMediary(Boolean mediary) {
+        return Boolean.TRUE.equals(mediary) ? BankType.AGENT : BankType.DEFAULT;
+    }
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -127,7 +140,7 @@ public interface AccountMapper extends BaseMapper {
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "account", ignore = true)
-    @Mapping(target = "intermediary", source = "mediary")
+    @Mapping(target = "type", source = "mediary", qualifiedByName = "getBankTypeByMediary")
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updateBank(Bank bank, @MappingTarget BankEntity bankEntity);
 

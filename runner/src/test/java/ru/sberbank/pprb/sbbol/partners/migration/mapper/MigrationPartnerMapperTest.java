@@ -15,6 +15,7 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.decorator.Migratio
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 
 import java.util.UUID;
 
@@ -59,7 +60,7 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
         assertThat(migrationAccountEntity.getDigitalId()).isEqualTo(DIGITAL_ID);
         assertThat(migrationAccountEntity.getBank().getBic()).isEqualTo(migrationCorrespondentCandidate.getBic());
         assertThat(migrationAccountEntity.getBank().getName()).isEqualTo(migrationCorrespondentCandidate.getBankName());
-        assertThat(migrationAccountEntity.getBank().getIntermediary()).isFalse();
+        assertThat(migrationAccountEntity.getBank().getType()).isEqualTo(BankType.DEFAULT);
         assertThat(migrationAccountEntity.getBank().getBankAccount().getAccount()).isEqualTo(migrationCorrespondentCandidate.getBankAccount());
         assertThat(migrationAccountEntity.getBank().getAccount()).isNotNull();
         assertThat(migrationAccountEntity.getBank().getBankAccount().getBank()).isNotNull();

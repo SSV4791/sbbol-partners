@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
@@ -67,7 +68,7 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @Mapping(target = "account", source = "source.account")
     @Mapping(target = "bank.name", source = "source.bankName")
     @Mapping(target = "bank.bic", source = "source.bic")
-    @Mapping(target = "bank.intermediary", constant = "false")
+    @Mapping(target = "bank.type", expression = "java(getDefaultBankType())")
     @Mapping(target = "bank.bankAccount.account", source = "source.bankAccount")
     @Mapping(target = "priorityAccount", constant = "false")
     @Mapping(target = "state", expression = "java(toSigned(source.isSigned()))")
@@ -75,6 +76,10 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     AccountEntity toAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source);
+
+    default BankType getDefaultBankType() {
+        return BankType.DEFAULT;
+    }
 
     default AccountStateType toSigned(boolean signed) {
         return AccountStateType.of(signed);

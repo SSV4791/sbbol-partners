@@ -43,6 +43,21 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "zip_code", length = 6)
     private String zipCode;
 
+    @Column(name = "country_code")
+    private String countryCode;
+
+    @Column(name = "country_iso_code")
+    private String countryIsoCode;
+
+    @Column(name = "country")
+    private String country;
+
+    @Column(name = "administration_unit_code")
+    private String administrationUnitCode;
+
+    @Column(name = "administration_unit")
+    private String administrationUnit;
+
     @Column(name = "region_code", length = 10)
     private String regionCode;
 
@@ -69,6 +84,9 @@ public class AddressEntity extends BaseEntity {
 
     @Column(name = "flat", length = 20)
     private String flat;
+
+    @Column(name = "full_address")
+    private String fullAddress;
 
     public UUID getUnifiedUuid() {
         return unifiedUuid;
@@ -100,6 +118,46 @@ public class AddressEntity extends BaseEntity {
 
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getCountryIsoCode() {
+        return countryIsoCode;
+    }
+
+    public void setCountryIsoCode(String countryIsoCode) {
+        this.countryIsoCode = countryIsoCode;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getAdministrationUnitCode() {
+        return administrationUnitCode;
+    }
+
+    public void setAdministrationUnitCode(String administrationUnitCode) {
+        this.administrationUnitCode = administrationUnitCode;
+    }
+
+    public String getAdministrationUnit() {
+        return administrationUnit;
+    }
+
+    public void setAdministrationUnit(String administrationUnit) {
+        this.administrationUnit = administrationUnit;
     }
 
     public String getRegionCode() {
@@ -172,6 +230,14 @@ public class AddressEntity extends BaseEntity {
 
     public void setArea(String area) {
         this.area = area;
+    }
+
+    public String getFullAddress() {
+        return fullAddress;
+    }
+
+    public void setFullAddress(String fullAddress) {
+        this.fullAddress = fullAddress;
     }
 
     @Override

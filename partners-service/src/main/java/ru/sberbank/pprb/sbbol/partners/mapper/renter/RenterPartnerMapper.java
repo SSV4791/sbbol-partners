@@ -16,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.renter.FlatRenter;
@@ -443,11 +444,15 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "intermediary", ignore = true)
     @Mapping(target = "bankAccount", ignore = true)
     @Mapping(target = "bic", source = "bankBic")
     @Mapping(target = "name", source = "bankName")
+    @Mapping(target = "type", expression = "java(getDefaultBankType())")
     void updateBank(Renter renter, @MappingTarget BankEntity bank);
+
+    default BankType getDefaultBankType() {
+        return BankType.DEFAULT;
+    }
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "bank", ignore = true)
