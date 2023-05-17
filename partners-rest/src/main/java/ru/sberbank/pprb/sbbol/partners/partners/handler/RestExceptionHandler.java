@@ -22,9 +22,9 @@ import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
-import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudModelValidationException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
@@ -40,6 +40,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,9 +62,6 @@ import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.CRITICAL;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
-    private static final String FILL_OBJECT_MESSAGE_EXCEPTION = "Ошибка заполнения объекта";
-    private static final String FRAUD_DENIED_OPERATION = "Операция запрещена со стороны ФРОД-мониторинга";
-    private static final String FRAUD_MODEL_VALIDATION_ERROR = "Ошибка валидации модели данных, отсылаемой в ППРБ Агрегатор данных ФРОД-мониторинга";
 
     @ExceptionHandler({
         DataIntegrityViolationException.class
@@ -93,7 +91,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Exception ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error("Объект не найден", ex);
+        LOG.warn("Объект не найден", ex);
         return buildResponsesEntity(
             HttpStatus.NOT_FOUND,
             BUSINESS,
@@ -111,7 +109,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Exception ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error("Найдено более одного объекта:", ex);
+        LOG.warn("Найдено более одного объекта:", ex);
         return buildResponsesEntity(
             HttpStatus.MULTIPLE_CHOICES,
             CRITICAL,
@@ -132,7 +130,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         BaseException ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error(ex.getLogMessage(), ex);
+        LOG.warn(ex.getLogMessage(), ex);
         return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
             ex.getType(),
@@ -151,7 +149,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Exception ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error(FILL_OBJECT_MESSAGE_EXCEPTION, ex);
+        LOG.warn("Ошибка заполнения объекта", ex);
         return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
             null,
@@ -167,7 +165,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         FraudDeniedException ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error(FRAUD_DENIED_OPERATION, ex);
+        LOG.warn("Операция запрещена со стороны ФРОД-мониторинга", ex);
         return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
             BUSINESS,
@@ -183,7 +181,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         FraudModelValidationException ex,
         HttpServletRequest httpRequest
     ) {
-        LOG.error(FRAUD_MODEL_VALIDATION_ERROR, ex);
+        LOG.error("Ошибка валидации модели данных, отсылаемой в ППРБ Агрегатор данных ФРОД-мониторинга", ex);
         return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
             CRITICAL,
@@ -200,7 +198,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpServletRequest httpRequest
     ) {
         if (ex.getRequiredType() == FraudMetaData.class) {
-            LOG.error(ex.getCause().getMessage(), ex);
+            LOG.warn(ex.getCause().getMessage(), ex);
             return buildResponsesEntity(
                 HttpStatus.BAD_REQUEST,
                 BUSINESS,
@@ -213,7 +211,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             LOG.error("При выполнении операции произошла ошибка", ex);
             return buildResponsesEntity(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                null,
+                CRITICAL,
                 EXCEPTION.getValue(),
                 ex.getLocalizedMessage(),
                 Collections.emptyMap(),
@@ -230,7 +228,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         LOG.error("При выполнении операции произошла ошибка", ex);
         return buildResponsesEntity(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            null,
+            CRITICAL,
             EXCEPTION.getValue(),
             ex.getLocalizedMessage(),
             Collections.emptyMap(),
@@ -239,7 +237,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @NotNull
-    @Override protected @NonNull
+    @Override
+    protected @NonNull
     ResponseEntity<Object> handleExceptionInternal(
         Exception ex,
         Object body,
@@ -258,7 +257,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @NotNull
-    @Override protected @NonNull
+    @Override
+    protected @NonNull
     ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         @NonNull HttpHeaders headers,
@@ -312,10 +312,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             .message(message)
             .descriptions(descriptions);
         String url = requestUrl.toString().replaceAll("[\n\r\t]", "_");
-        LOG.error("Ошибка вызова \"{}\": {}", url, errorData);
+        sentLog(type, errorData, url);
         return new ResponseEntity<>(
             errorData,
             httpStatus
         );
+    }
+
+    private void sentLog(Error.TypeEnum type, Error errorData, String url) {
+        if (Objects.equals(BUSINESS, type)) {
+            LOG.warn("Ошибка вызова \"{}\": {}", url, errorData);
+        } else {
+            LOG.error("При работе приложения возникла ошибка \"{}\": {}", url, errorData);
+        }
     }
 }
