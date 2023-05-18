@@ -372,6 +372,9 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             .regionCode("7")
             .street("8")
             .type(AddressType.LEGAL_ADDRESS)
+            .countryIsoCode("RU")
+            .countryCode("RUS")
+            .country("Россия")
             .zipCode("9");
     }
 

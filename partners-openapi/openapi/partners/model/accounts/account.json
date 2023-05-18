@@ -29,6 +29,14 @@
       "type": "string",
       "title": "Счёт"
     },
+    "currency_iso_code": {
+      "type": "string",
+      "title": "ISO-код валюты счета"
+    },
+    "currency_code": {
+      "type": "string",
+      "title": "Код валюты счета"
+    },
     "priorityAccount": {
       "type": "boolean",
       "title": "Избранный счёт",

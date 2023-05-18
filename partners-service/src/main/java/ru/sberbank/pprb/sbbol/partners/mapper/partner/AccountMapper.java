@@ -2,29 +2,22 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.AccountMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Bank;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
-import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.Collections;
@@ -34,7 +27,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Loggable
-@Mapper
+@Mapper(uses = {BankMapper.class})
+@DecoratedWith(AccountMapperDecorator.class)
 public interface AccountMapper extends BaseMapper {
 
     @InheritConfiguration
@@ -48,22 +42,6 @@ public interface AccountMapper extends BaseMapper {
     @InheritConfiguration(name = "toAccount")
     Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
 
-    @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")
-    @Mapping(target = "accountId", expression = "java(bank.getAccount().getUuid() == null ? null : bank.getAccount().getUuid().toString())")
-    @Mapping(target = "mediary", source = "type", qualifiedByName = "getMediaryByBankType")
-    Bank toBank(BankEntity bank);
-
-    @Named("getMediaryByBankType")
-    default boolean getMediaryByBankType(BankType bankType) {
-        return bankType == BankType.AGENT;
-    }
-
-    @Mapping(target = "id", expression = "java(bankAccount.getUuid() == null ? null : bankAccount.getUuid().toString())")
-    @Mapping(target = "bankId", expression = "java(bankAccount.getBank().getUuid() ==null ? null : bankAccount.getBank().getUuid().toString())")
-    @Mapping(target = "bankAccount", source = "account")
-    BankAccount toBankAccount(BankAccountEntity bankAccount);
-
-
     default List<AccountEntity> toAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid) {
         if (CollectionUtils.isEmpty(accounts)) {
             return Collections.emptyList();
@@ -73,8 +51,10 @@ public interface AccountMapper extends BaseMapper {
             .collect(Collectors.toList());
     }
 
-    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "partnerUuid", source = "partnerUuid")
+    @Mapping(target = "digitalId", source = "digitalId")
+    @Mapping(target = "account", source = "account.account")
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "createDate", ignore = true)
@@ -82,8 +62,6 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
-    @Mapping(target = "digitalId", source = "digitalId")
-    @Mapping(target = "account", source = "account.account")
     AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
 
     @Mapping(target = "uuid", ignore = true)
@@ -97,37 +75,6 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "partner", ignore = true)
     AccountEntity toAccount(AccountCreate account);
 
-    @Mapping(target = "type", source = "mediary", qualifiedByName = "getBankTypeByMediary")
-    @Mapping(target = "account", ignore = true)
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    BankEntity toBank(BankCreate bank);
-
-    @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
-    @Mapping(target = "type", source = "mediary", qualifiedByName = "getBankTypeByMediary")
-    @Mapping(target = "account", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    BankEntity toBank(Bank bank);
-
-    @Named("getBankTypeByMediary")
-    default BankType getBankTypeByMediary(Boolean mediary) {
-        return Boolean.TRUE.equals(mediary) ? BankType.AGENT : BankType.DEFAULT;
-    }
-
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "bank", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "account", source = "bankAccount")
-    BankAccountEntity toBankAccount(BankAccountCreate bankAccount);
-
-    @Mapping(target = "uuid", expression = "java(mapUuid(bankAccount.getId()))")
-    @Mapping(target = "bank", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "account", source = "bankAccount")
-    BankAccountEntity toBankAccount(BankAccount bankAccount);
-
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
     @Mapping(target = "createDate", ignore = true)
@@ -137,18 +84,6 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget AccountEntity accountEntity);
-
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "account", ignore = true)
-    @Mapping(target = "type", source = "mediary", qualifiedByName = "getBankTypeByMediary")
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    void updateBank(Bank bank, @MappingTarget BankEntity bankEntity);
-
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "bank", ignore = true)
-    @Mapping(target = "account", source = "bankAccount")
-    void updateBankAccount(BankAccount bankAccount, @MappingTarget BankAccountEntity bankAccountEntity);
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
@@ -172,14 +107,6 @@ public interface AccountMapper extends BaseMapper {
             }
         }
         account.setSearch(searchSubString);
-    }
-
-    @AfterMapping
-    default void mapBidirectional(@MappingTarget BankEntity bank) {
-        var bankAccount = bank.getBankAccount();
-        if (bankAccount != null) {
-            bankAccount.setBank(bank);
-        }
     }
 
     @AfterMapping

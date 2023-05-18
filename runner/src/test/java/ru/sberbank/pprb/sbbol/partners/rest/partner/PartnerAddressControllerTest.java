@@ -238,6 +238,9 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             .street("8")
             .type(AddressType.LEGAL_ADDRESS)
             .zipCode("9")
+            .countryCode("RUS")
+            .countryIsoCode("RU")
+            .country("Россия")
             ;
     }
 

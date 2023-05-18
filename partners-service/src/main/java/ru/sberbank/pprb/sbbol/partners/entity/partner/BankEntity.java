@@ -45,8 +45,8 @@ public class BankEntity extends BaseEntity {
     @OneToOne(mappedBy = "bank", cascade = CascadeType.ALL, orphanRemoval = true)
     private BankAccountEntity bankAccount;
 
-    @Column(name = "bank_type")
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "bank_type", nullable = false)
     private BankType type;
 
     @Column(name = "swift_code")

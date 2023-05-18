@@ -57,6 +57,9 @@ public class PartnerEntity extends BaseEntity {
     @Column(name = "org_name", length = 350)
     private String orgName;
 
+    @Column(name = "latin_name", length = 255)
+    private String latinName;
+
     @Column(name = "first_name", length = 50)
     private String firstName;
 
@@ -136,6 +139,14 @@ public class PartnerEntity extends BaseEntity {
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
+    }
+
+    public String getLatinName() {
+        return latinName;
+    }
+
+    public void setLatinName(String latinName) {
+        this.latinName = latinName;
     }
 
     public String getFirstName() {

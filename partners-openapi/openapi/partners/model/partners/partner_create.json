@@ -19,7 +19,15 @@
       "title": "Наименование организации партнера",
       "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
       "x-pattern-message": "{validation.partner.illegal_symbols}",
-      "maxLength": 160,
+      "maxLength": 350,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "latinName": {
+      "type": "string",
+      "title": "Латинское наименование",
+      "pattern": "[A-Za-z0-9!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 255,
       "x-length-message": "{validation.partner.max_symbols}"
     },
     "firstName": {
