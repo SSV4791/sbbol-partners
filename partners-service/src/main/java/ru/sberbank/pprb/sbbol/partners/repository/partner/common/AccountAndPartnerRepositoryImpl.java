@@ -89,7 +89,7 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
         Join<AccountEntity, PartnerEntity> partnerJoin,
         String inn
     ) {
-        if (Objects.nonNull(inn)) {
+        if (StringUtils.isNotEmpty(inn)) {
             predicates.add(builder.equal(partnerJoin.get(PartnerEntity_.INN), inn));
         } else {
             predicates.add(builder.or(
@@ -114,7 +114,7 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
         Join<AccountEntity, BankEntity> bankJoin,
         String bic
     ) {
-        if (Objects.nonNull(bic)) {
+        if (StringUtils.isNotEmpty(bic)) {
             predicates.add(builder.equal(bankJoin.get(BankEntity_.BIC), bic));
         } else {
             predicates.add(builder.or(
@@ -130,7 +130,7 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
         Join<BankEntity, BankAccountEntity> bankAccountJoin,
         String bankAccount
     ) {
-        if (Objects.nonNull(bankAccount)) {
+        if (StringUtils.isNotEmpty(bankAccount)) {
             predicates.add(builder.equal(bankAccountJoin.get(BankAccountEntity_.ACCOUNT), bankAccount));
         } else {
             predicates.add(builder.or(
