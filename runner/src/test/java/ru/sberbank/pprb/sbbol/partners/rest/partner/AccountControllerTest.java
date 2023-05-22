@@ -2398,26 +2398,24 @@ class AccountControllerTest extends BaseAccountControllerTest {
             });
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса. " +
-        "КПП не определен у контрагента и не задан в запросе")
-    void testGetAtAllRequisites_whenKppIsNull_thenFindPartner() {
+        "КПП имеет значение null или empty")
+    @MethodSource("nullAndEmptyArguments")
+    void testGetAtAllRequisites_whenKppIsNullOrEmpty_thenFindPartner(String dbKppValue, String requestKppValue) {
         var creatingPartner =
             step("Подготовка данных о партнере",
                 () -> {
                     var partner = PartnerControllerTest.getValidLegalEntityPartner();
-                    partner.setKpp(null);
+                    partner.setKpp(dbKppValue);
                     return partner;
                 });
-
         var partner =
             step("Создание партнера",
                 () -> PartnerControllerTest.createValidPartner(creatingPartner));
-
         Account account =
             step("Создание счета",
                 () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-
         var request =
             step("Подготовка тестовых данных",
                 () ->
@@ -2427,9 +2425,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
                         .bic(account.getBank().getBic())
                         .bankAccount(account.getBank().getBankAccount().getBankAccount())
                         .inn(partner.getInn())
-                        .kpp(null)
+                        .kpp(requestKppValue)
                         .name(partner.getOrgName()));
-
         AccountWithPartnerResponse accountWithPartnerActual =
             step("Выполнение post-запроса /partner/account/get-at-all-requisites",
                 () ->
@@ -2439,7 +2436,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
                         new TypeRef<>() {
                         }
                     ));
-
         step("Проверка корректности ответа",
             () -> {
                 assertThat(accountWithPartnerActual)
@@ -2448,11 +2444,16 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .isEqualTo(partner.getId());
                 assertThat(accountWithPartnerActual.getInn())
                     .isEqualTo(partner.getInn());
-                assertThat(accountWithPartnerActual.getKpp())
-                    .isNull();
                 Account actualAccount = accountWithPartnerActual.getAccount();
                 assertThat(actualAccount)
                     .isNotNull();
+                if (dbKppValue == null) {
+                    assertThat(accountWithPartnerActual.getKpp())
+                        .isNull();
+                } else {
+                    assertThat(accountWithPartnerActual.getKpp())
+                        .isEmpty();
+                }
             });
     }
 
@@ -2665,5 +2666,14 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 assertThat(actualAccount)
                     .isNotNull();
             });
+    }
+
+    static Stream<? extends Arguments> nullAndEmptyArguments() {
+        return Stream.of(
+            Arguments.of(null, StringUtils.EMPTY),
+            Arguments.of(StringUtils.EMPTY, null),
+            Arguments.of(null, null),
+            Arguments.of(StringUtils.EMPTY, StringUtils.EMPTY)
+        );
     }
 }

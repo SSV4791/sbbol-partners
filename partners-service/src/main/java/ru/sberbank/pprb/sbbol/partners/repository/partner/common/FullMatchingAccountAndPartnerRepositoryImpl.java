@@ -101,7 +101,7 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         Root<AccountEntity> root,
         String accountNumber
     ) {
-        if (Objects.nonNull(accountNumber)) {
+        if (StringUtils.isNotEmpty(accountNumber)) {
             predicates.add(builder.equal(root.get(AccountEntity_.ACCOUNT), accountNumber));
         } else {
             predicates.add(builder.or(
@@ -117,7 +117,7 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         Join<AccountEntity, PartnerEntity> partnerJoin,
         String inn
     ) {
-        if (Objects.nonNull(inn)) {
+        if (StringUtils.isNotEmpty(inn)) {
             predicates.add(builder.equal(partnerJoin.get(PartnerEntity_.INN), inn));
         } else {
             predicates.add(builder.or(
@@ -133,7 +133,7 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         Join<AccountEntity, PartnerEntity> partnerJoin,
         String kpp
     ) {
-        if (Objects.nonNull(kpp)) {
+        if (StringUtils.isNotEmpty(kpp)) {
             predicates.add(builder.equal(partnerJoin.get(PartnerEntity_.KPP), kpp));
         } else {
             predicates.add(builder.or(
@@ -178,7 +178,7 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         Join<AccountEntity, BankEntity> bankJoin,
         String bic
     ) {
-        if (Objects.nonNull(bic)) {
+        if (StringUtils.isNotEmpty(bic)) {
             predicates.add(builder.equal(bankJoin.get(BankEntity_.BIC), bic));
         } else {
             predicates.add(builder.or(
@@ -194,7 +194,7 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         Join<BankEntity, BankAccountEntity> bankAccountJoin,
         String bankAccount
     ) {
-        if (Objects.nonNull(bankAccount)) {
+        if (StringUtils.isNotEmpty(bankAccount)) {
             predicates.add(builder.equal(bankAccountJoin.get(BankAccountEntity_.ACCOUNT), bankAccount));
         } else {
             predicates.add(builder.or(
