@@ -49,10 +49,11 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
         }
 
         addDigitalIdPredicate(builder, predicates, root, request.getDigitalId());
+        addAccountPredicate(builder, predicates, root, request.getAccount());
 
         Join<AccountEntity, PartnerEntity> partnerJoin = root.join(AccountEntity_.PARTNER, JoinType.INNER);
         addPartnerInnPredicate(builder, predicates, partnerJoin, request.getInn());
-        addPartnerTypePredicate(builder, predicates, partnerJoin, PartnerType.PARTNER);
+        addPartnerTypePredicate(builder, predicates, partnerJoin);
 
         Join<AccountEntity, BankEntity> bankJoin = root.join(AccountEntity_.BANK, JoinType.INNER);
         addBankBicPredicate(builder, predicates, bankJoin, request.getBic());
@@ -83,6 +84,22 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
         predicates.add(builder.equal(root.get(AccountEntity_.DIGITAL_ID), digitalId));
     }
 
+    private void addAccountPredicate(
+        CriteriaBuilder builder,
+        List<Predicate> predicates,
+        Root<AccountEntity> root,
+        String account
+    ) {
+        if (StringUtils.isNotEmpty(account)) {
+            predicates.add(builder.equal(root.get(AccountEntity_.ACCOUNT), account));
+        } else {
+            predicates.add(builder.or(
+                builder.equal(root.get(AccountEntity_.ACCOUNT), StringUtils.EMPTY),
+                builder.isNull(root.get(AccountEntity_.ACCOUNT))
+            ));
+        }
+    }
+
     private void addPartnerInnPredicate(
         CriteriaBuilder builder,
         List<Predicate> predicates,
@@ -102,10 +119,9 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
     private void addPartnerTypePredicate(
         CriteriaBuilder builder,
         List<Predicate> predicates,
-        Join<AccountEntity, PartnerEntity> partnerJoin,
-        PartnerType partnerType
+        Join<AccountEntity, PartnerEntity> partnerJoin
     ) {
-        predicates.add(builder.equal(partnerJoin.get(PartnerEntity_.TYPE), partnerType));
+        predicates.add(builder.equal(partnerJoin.get(PartnerEntity_.TYPE), PartnerType.PARTNER));
     }
 
     private void addBankBicPredicate(

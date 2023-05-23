@@ -2229,12 +2229,21 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    @DisplayName("POST /partner/account/get-at-requisites получени счета партнера вместе с партнером")
-    void testAccountAndPartnerFilter_whenRequestIsCorrect() {
+    @DisplayName("POST /partner/account/get-at-requisites получение счета партнера вместе с партнером")
+    void testGetAtRequisites_whenRequestIsCorrect() {
         var partner =
             step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        Account account = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-
+        Account account = step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId())
+            .account(account.getAccount())
+            .getBank()
+            .bic(account.getBank().getBic())
+            .bankAccount(account.getBank().getBankAccount()));
+        step("Создание третьего счета", () -> createValidAccount(partner.getId(), partner.getDigitalId())
+            .account(account.getAccount())
+            .getBank()
+            .bic(account.getBank().getBic())
+            .bankAccount(account.getBank().getBankAccount()));
         var request = step("Подготовка тестовых данных",
             () -> new AccountAndPartnerRequest()
                 .digitalId(partner.getDigitalId())
@@ -2273,8 +2282,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    @DisplayName("POST /partner/account/get-at-requisites получени партнером")
-    void testAccountAndPartnerFilter_whenRequestIsCorrect_thenFindPartner() {
+    @DisplayName("POST /partner/account/get-at-requisites получение партнером")
+    void testGetAtRequisites_whenRequestIsCorrect_thenFindPartner() {
         var partner =
             step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
         Account account = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
@@ -2315,8 +2324,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
-    @DisplayName("POST /partner/account/get-at-requisites получени счета партнера вместе с партнером результат не найден")
-    void testAccountAndPartnerFilter_whenRequestIsCorrect_thenNotFound() {
+    @DisplayName("POST /partner/account/get-at-requisites получение счета партнера вместе с партнером результат не найден")
+    void testGetAtRequisites_whenRequestIsCorrect_thenNotFound() {
         var partner =
             step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
         Account account = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
@@ -2346,6 +2355,64 @@ class AccountControllerTest extends BaseAccountControllerTest {
         });
     }
 
+    @Test
+    @DisplayName("POST /partner/account/get-at-requisites получение счета и партнера когда отсутствует корсчет Банка")
+    void testGetAtRequisites_whenBankAccountIsNull() {
+        var creatingPartner =
+            step("Подготовка данных о партнере",
+                (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
+
+        var partner =
+            step("Создание партнера",
+                () -> PartnerControllerTest.createValidPartner(creatingPartner));
+
+        Account account =
+            step("Создание счета",
+                () -> {
+                    var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
+                    creatingAccount.getBank().setBankAccount(null);
+                    return createValidAccount(creatingAccount);
+                });
+
+        var request =
+            step("Подготовка тестовых данных",
+                () ->
+                    new AccountAndPartnerRequest()
+                        .digitalId(partner.getDigitalId())
+                        .account(account.getAccount())
+                        .bic(account.getBank().getBic())
+                        .bankAccount(null)
+                        .inn(partner.getInn())
+                        .kpp(partner.getKpp())
+                        .name(partner.getOrgName())
+            );
+
+        List<AccountWithPartnerResponse> actualAccountWithPartnerList =
+            step("Выполнение post-запроса /account/get-at-requisites",
+                () ->
+                    post(
+                        baseRoutePath + "/account/get-at-requisites",
+                        request,
+                        new TypeRef<>() {
+                        }
+                    ));
+
+        step("Проверка корректности ответа",
+            () -> {
+                assertThat(actualAccountWithPartnerList).asList()
+                    .hasSize(1);
+                var actualAccountWithPartner = actualAccountWithPartnerList.get(0);
+                assertThat(actualAccountWithPartner.getId())
+                    .isEqualTo(partner.getId());
+                assertThat(actualAccountWithPartner.getInn())
+                    .isEqualTo(partner.getInn());
+                assertThat(actualAccountWithPartner.getKpp())
+                    .isEqualTo(partner.getKpp());
+                Account actualAccount = actualAccountWithPartner.getAccount();
+                assertThat(actualAccount)
+                    .isNotNull();
+            });
+    }
 
     @Test
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса " +
@@ -2548,65 +2615,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .isNotNull();
                 assertThat(error.getCode())
                     .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
-            });
-    }
-
-    @Test
-    @DisplayName("POST /partner/account/get-at-requisites получение счета и партнера когда отсутствует корсчет Банка")
-    void testGetAtRequisites_whenBankAccountIsNull() {
-        var creatingPartner =
-            step("Подготовка данных о партнере",
-                (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
-
-        var partner =
-            step("Создание партнера",
-                () -> PartnerControllerTest.createValidPartner(creatingPartner));
-
-        Account account =
-            step("Создание счета",
-                () -> {
-                    var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
-                    creatingAccount.getBank().setBankAccount(null);
-                    return createValidAccount(creatingAccount);
-                });
-
-        var request =
-            step("Подготовка тестовых данных",
-                () ->
-                    new AccountAndPartnerRequest()
-                        .digitalId(partner.getDigitalId())
-                        .account(account.getAccount())
-                        .bic(account.getBank().getBic())
-                        .bankAccount(null)
-                        .inn(partner.getInn())
-                        .kpp(partner.getKpp())
-                        .name(partner.getOrgName())
-            );
-
-        List<AccountWithPartnerResponse> actualAccountWithPartnerList =
-            step("Выполнение post-запроса /account/get-at-requisites",
-                () ->
-                    post(
-                        baseRoutePath + "/account/get-at-requisites",
-                        request,
-                        new TypeRef<>() {
-                        }
-                    ));
-
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(actualAccountWithPartnerList).asList()
-                    .hasSize(1);
-                var actualAccountWithPartner = actualAccountWithPartnerList.get(0);
-                assertThat(actualAccountWithPartner.getId())
-                    .isEqualTo(partner.getId());
-                assertThat(actualAccountWithPartner.getInn())
-                    .isEqualTo(partner.getInn());
-                assertThat(actualAccountWithPartner.getKpp())
-                    .isEqualTo(partner.getKpp());
-                Account actualAccount = actualAccountWithPartner.getAccount();
-                assertThat(actualAccount)
-                    .isNotNull();
             });
     }
 
