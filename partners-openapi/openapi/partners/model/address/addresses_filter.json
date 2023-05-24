@@ -12,10 +12,12 @@
     },
     "unifiedIds": {
       "type": "array",
+      "x-extra-field-annotation": "@UuidFormatArrayValidation",
+      "maximum": 30,
       "items": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 40,
+        "minLength": 36,
+        "maxLength": 36,
         "x-not-empty": true
       },
       "title": "Идентификаторы партнеров/контактов"

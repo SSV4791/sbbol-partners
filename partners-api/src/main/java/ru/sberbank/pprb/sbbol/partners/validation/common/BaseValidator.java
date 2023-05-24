@@ -16,4 +16,13 @@ public class BaseValidator {
         context.buildConstraintViolationWithTemplate(message)
             .addConstraintViolation();
     }
+
+    public void buildMessage(ConstraintValidatorContext context, int i, String message) {
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(message)
+            .addBeanNode()
+            .inIterable()
+            .atIndex(i)
+            .addConstraintViolation();
+    }
 }
