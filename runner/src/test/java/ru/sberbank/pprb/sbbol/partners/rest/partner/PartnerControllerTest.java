@@ -435,10 +435,10 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 .digitalId(partner.getDigitalId())
                 .partnersFilter(PartnerFilterType.BUDGET)
                 .pagination(
-                        new Pagination()
-                            .offset(0)
-                            .count(4)
-                    );
+                    new Pagination()
+                        .offset(0)
+                        .count(4)
+                );
         });
         var partnersResponse = step("Выполнение post-запроса /partners/view, код ответа 200", () -> post(
             "/partners/view",
@@ -933,7 +933,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
     @ParameterizedTest
     @ArgumentsSource(PartnerFilterLegalFormArgumentsProvider.class)
-    void  testSavePartner_whenLegalFormIsNull(PartnersFilter filter) {
+    void testSavePartner_whenLegalFormIsNull(PartnersFilter filter) {
         post(
             baseRoutePath,
             HttpStatus.CREATED,
@@ -1153,6 +1153,48 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotEqualTo(partner.getFirstName());
     }
 
+    @Test
+    void testNegativeGetAllPartnersInvalidIds() {
+        var partnersFilter = step("Подготовка тестовых данных. Создание PartnersFilter", () -> {
+            var filter = podamFactory.manufacturePojo(PartnersFilter.class);
+            filter.setIds(List.of("", "invalid", UUID.randomUUID().toString()));
+            return filter;
+        });
+
+        var response = step("Выполнение POST-запроса /partners/view Ошибка валидации", () ->
+            post(
+                "/partners/view",
+                HttpStatus.BAD_REQUEST,
+                partnersFilter,
+                Error.class)
+        );
+
+        step("Проверка результата", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+
+            var messages = response.getDescriptions().stream()
+                .flatMap(o -> o.getMessage().stream())
+                .collect(Collectors.toList());
+
+            assertThat(messages)
+                .isNotEmpty()
+                .asList()
+                .contains(MessagesTranslator.toLocale("validation.uuid_id.format"));
+
+            var fields = response.getDescriptions().stream()
+                .map(Descriptions::getField)
+                .collect(Collectors.toList());
+
+            assertThat(fields)
+                .isNotEmpty()
+                .asList()
+                .contains("ids[0]", "ids[1]")
+                .doesNotContain("ids[2]");
+        });
+    }
 
     @Test
     void testNegativeGetAllPartners() {

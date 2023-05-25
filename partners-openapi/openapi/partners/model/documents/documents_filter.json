@@ -5,6 +5,8 @@
   "properties": {
     "unifiedIds": {
       "type": "array",
+      "x-extra-field-annotation": "@UuidFormatArrayValidation",
+      "maximum": 30,
       "items": {
         "type": "string",
         "minLength": 36,

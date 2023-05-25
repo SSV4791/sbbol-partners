@@ -12,8 +12,11 @@
     },
     "ids": {
       "type": "array",
+      "x-extra-field-annotation": "@UuidFormatArrayValidation",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 36,
+        "maxLength": 36
       },
       "maximum": 30
     },

@@ -12,6 +12,7 @@
     },
     "partnerIds": {
       "type": "array",
+      "x-extra-field-annotation": "@UuidFormatArrayValidation",
       "maximum": 30,
       "items": {
         "type": "string",
@@ -24,6 +25,7 @@
     "accountIds": {
       "title": "Идентификаторы счетов",
       "type": "array",
+      "x-extra-field-annotation": "@UuidFormatArrayValidation",
       "maximum": 30,
       "items": {
         "type": "string",
