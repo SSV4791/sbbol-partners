@@ -43,13 +43,13 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "zip_code", length = 6)
     private String zipCode;
 
-    @Column(name = "country_code")
+    @Column(name = "country_code", nullable = false)
     private String countryCode;
 
-    @Column(name = "country_iso_code")
+    @Column(name = "country_iso_code", nullable = false)
     private String countryIsoCode;
 
-    @Column(name = "country")
+    @Column(name = "country", nullable = false)
     private String country;
 
     @Column(name = "administration_unit_code")

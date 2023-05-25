@@ -1,12 +1,14 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AddressType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 
@@ -14,9 +16,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ContextConfiguration(
+    classes = {
+        AddressMapperImpl.class,
+        AddressMapperImpl_.class
+    }
+)
 class AddressMapperTest extends BaseUnitConfiguration {
 
-    private static final AddressMapper mapper = Mappers.getMapper(AddressMapper.class);
+    @Autowired
+    private AddressMapper mapper;
 
     @Test
     void testToAddress() {

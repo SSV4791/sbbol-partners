@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -9,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AddressType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.AddressMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Loggable
 @Mapper
+@DecoratedWith(AddressMapperDecorator.class)
 public interface AddressMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(address.getUuid().toString())")
@@ -57,6 +60,9 @@ public interface AddressMapper extends BaseMapper {
     @Mapping(target = "building", source = "address.building")
     @Mapping(target = "buildingBlock", source = "address.buildingBlock")
     @Mapping(target = "flat", source = "address.flat")
+    @Mapping(target = "countryCode", ignore = true)
+    @Mapping(target = "countryIsoCode", ignore = true)
+    @Mapping(target = "country", ignore = true)
     AddressEntity toAddress(AddressCreateFullModel address, String digitalId, UUID unifiedUuid);
 
     @Mapping(target = "uuid", ignore = true)
@@ -64,6 +70,9 @@ public interface AddressMapper extends BaseMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
+    @Mapping(target = "countryCode", ignore = true)
+    @Mapping(target = "countryIsoCode", ignore = true)
+    @Mapping(target = "country", ignore = true)
     AddressEntity toAddress(AddressCreate address);
 
     @Named("toAddressType")
@@ -75,10 +84,16 @@ public interface AddressMapper extends BaseMapper {
     @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
+    @Mapping(target = "countryCode", ignore = true)
+    @Mapping(target = "countryIsoCode", ignore = true)
+    @Mapping(target = "country", ignore = true)
     AddressEntity toAddress(Address address);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
+    @Mapping(target = "countryCode", ignore = true)
+    @Mapping(target = "countryIsoCode", ignore = true)
+    @Mapping(target = "country", ignore = true)
     void updateAddress(Address address, @MappingTarget() AddressEntity addressEntity);
 }

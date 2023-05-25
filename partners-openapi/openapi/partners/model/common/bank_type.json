@@ -1,0 +1,9 @@
+{
+  "type": "string",
+  "title": "Тип Банка (DEFAULT - Банк РФ; BENEFICIARY - Банк Берефициара; AGENT - Банк-посредник)",
+  "enum": [
+    "DEFAULT",
+    "BENEFICIARY",
+    "AGENT"
+  ]
+}

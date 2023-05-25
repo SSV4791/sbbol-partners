@@ -11,3 +11,6 @@ databaseChangeLog:
   - include:
       file: 1683723052713_add_account_additional.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1683723052714_change_partner.sql
+      relativeToChangelogFile: true

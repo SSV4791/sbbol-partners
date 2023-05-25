@@ -1,19 +1,22 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl_;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankAccountMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Bank;
-import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.ArrayList;
@@ -22,14 +25,27 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ContextConfiguration(
+    classes = {
+        AccountMapperImpl.class,
+        AccountMapperImpl_.class,
+        BankMapperImpl.class,
+        BankMapperImpl_.class,
+        BankAccountMapperImpl.class
+    }
+)
 class AccountMapperTest extends BaseUnitConfiguration {
 
-    private static final AccountMapper mapper = Mappers.getMapper(AccountMapper.class);
+    @Autowired
+    private AccountMapper accountMapper;
+
+    @Autowired
+    private BankMapper bankMapper;
 
     @Test
     void testToAccounts() {
         List<AccountEntity> expected = factory.manufacturePojo(ArrayList.class, AccountEntity.class);
-        var actual = mapper.toAccounts(expected);
+        var actual = accountMapper.toAccounts(expected);
         assertThat(actual)
             .isNotNull();
         assertThat(expected)
@@ -57,7 +73,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
         var expected = factory.manufacturePojo(AccountCreateFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
         var unifiedUuid = factory.manufacturePojo(UUID.class);
-        var actual = mapper.toAccount(expected, digitalId, unifiedUuid);
+        var actual = accountMapper.toAccount(expected, digitalId, unifiedUuid);
         assertThat(actual)
             .isNotNull();
         assertThat(expected.getAccount())
@@ -75,13 +91,13 @@ class AccountMapperTest extends BaseUnitConfiguration {
         assertThat(unifiedUuid)
             .isEqualTo(actual.getPartnerUuid());
         assertThat(actual.getBank().getType())
-            .isEqualTo(expected.getBank().getMediary() ? BankType.AGENT : BankType.DEFAULT);
+            .isEqualTo(bankMapper.getBankType(expected.getBank().getMediary(), expected.getBank().getType()));
     }
 
     @Test
     void testToAccount() {
         var expected = factory.manufacturePojo(AccountEntity.class);
-        var actual = mapper.toAccount(expected);
+        var actual = accountMapper.toAccount(expected);
         assertThat(actual)
             .isNotNull();
         assertThat(expected.getPartnerUuid())
@@ -113,12 +129,12 @@ class AccountMapperTest extends BaseUnitConfiguration {
     @Test
     void testToAccountCreate() {
         var expected = factory.manufacturePojo(AccountCreate.class);
-        var account = mapper.toAccount(expected);
+        var account = accountMapper.toAccount(expected);
         var bank = account.getBank();
         bank.setAccount(account);
         var bankAccount = bank.getBankAccount();
         bankAccount.setBank(bank);
-        var actual = mapper.toAccount(account, Mockito.mock(BudgetMaskService.class));
+        var actual = accountMapper.toAccount(account, Mockito.mock(BudgetMaskService.class));
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -129,78 +145,9 @@ class AccountMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    void testToBank() {
-        var expected = factory.manufacturePojo(Bank.class);
-        var actual = mapper.toBank(expected);
-        var account = new AccountEntity();
-        account.setUuid(UUID.fromString(expected.getAccountId()));
-        actual.setAccount(account);
-        var bankAccount = actual.getBankAccount();
-        bankAccount.setBank(actual);
-        assertThat(expected)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "accountId",
-                "bankAccount.bankId"
-            )
-            .isEqualTo(mapper.toBank(actual));
-    }
-
-    @Test
-    void testToBankReverse() {
-        var expected = factory.manufacturePojo(BankEntity.class);
-        var actual = mapper.toBank(expected);
-        expected.setAccount(factory.manufacturePojo(AccountEntity.class));
-        assertThat(expected)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "account",
-                "lastModifiedDate",
-                "type",
-                "swiftCode",
-                "clearingBankCode",
-                "clearingBankCodeName",
-                "clearingBankSymbolCode",
-                "clearingCountryCode",
-                "filial",
-                "bankOption",
-                "bankAccount.bank",
-                "bankAccount.lastModifiedDate"
-            )
-            .isEqualTo(mapper.toBank(actual));
-    }
-
-    @Test
-    void testToBankAccount() {
-        var expected = factory.manufacturePojo(BankAccount.class)
-            .id(UUID.randomUUID().toString());
-        var actual = mapper.toBankAccount(expected);
-        var bank = new BankEntity();
-        bank.setUuid(UUID.fromString(expected.getBankId()));
-        actual.setBank(bank);
-        assertThat(expected)
-            .usingRecursiveComparison()
-            .ignoringFields("bankUuid")
-            .isEqualTo(mapper.toBankAccount(actual));
-    }
-
-    @Test
-    void testToBankAccountReverse() {
-        var expected = factory.manufacturePojo(BankAccountEntity.class);
-        var actual = mapper.toBankAccount(expected);
-        assertThat(expected)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "bank",
-                "lastModifiedDate"
-            )
-            .isEqualTo(mapper.toBankAccount(actual));
-    }
-
-    @Test
     void testToAccountWithPartner() {
         AccountEntity expected = factory.manufacturePojo(AccountEntity.class);
-        AccountWithPartnerResponse actual = mapper.toAccountWithPartner(expected);
+        AccountWithPartnerResponse actual = accountMapper.toAccountWithPartner(expected);
         assertThat(actual.getId())
             .isEqualTo(expected.getPartner().getUuid().toString());
         assertThat(actual.getOrgName())

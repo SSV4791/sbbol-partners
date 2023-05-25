@@ -57,10 +57,10 @@ public class AccountEntity extends BaseEntity {
     @Column(name = "account", length = 20)
     private String account;
 
-    @Column(name = "currency_code")
+    @Column(name = "currency_code", nullable = false, length = 3)
     private String currencyCode;
 
-    @Column(name = "currency_iso_code")
+    @Column(name = "currency_iso_code", nullable = false, length = 3)
     private String currencyIsoCode;
 
     @Enumerated(EnumType.STRING)
