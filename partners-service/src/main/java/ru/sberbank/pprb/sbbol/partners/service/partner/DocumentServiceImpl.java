@@ -1,12 +1,14 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
@@ -16,6 +18,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 abstract class DocumentServiceImpl implements DocumentService {
@@ -82,23 +86,17 @@ abstract class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public Document updateDocument(DocumentChange document) {
-        var foundDocument = documentRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getId()))
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId(), document.getId()));
-        if (!Objects.equals(document.getVersion(), foundDocument.getVersion())) {
-            throw new OptimisticLockException(foundDocument.getVersion(), document.getVersion());
-        }
-        if (StringUtils.isNotEmpty(document.getDocumentTypeId())) {
-            var foundDocumentType =
-                documentDictionaryRepository.getByUuid(UUID.fromString(document.getDocumentTypeId()));
-            if (foundDocumentType.isEmpty()) {
-                throw new EntryNotFoundException("documentType", document.getDigitalId(), document.getId());
-            }
-        }
+        var foundDocument = findDocumentEntity(document.getDigitalId(), document.getId(), document.getVersion(), document.getDocumentTypeId());
         documentMapper.updateDocument(document, foundDocument);
-        var saveContact = documentRepository.save(foundDocument);
-        var response = documentMapper.toDocument(saveContact);
-        response.setVersion(response.getVersion() + 1);
-        return response;
+        return saveDocument(foundDocument);
+    }
+
+    @Override
+    @Transactional
+    public Document patchDocument(DocumentChange document) {
+        var foundDocument = findDocumentEntity(document.getDigitalId(), document.getId(), document.getVersion(), document.getDocumentTypeId());
+        documentMapper.patchDocument(document, foundDocument);
+        return saveDocument(foundDocument);
     }
 
     @Override
@@ -112,5 +110,48 @@ abstract class DocumentServiceImpl implements DocumentService {
             }
             documentRepository.delete(foundDocument.get());
         }
+    }
+
+    @Override
+    @Transactional
+    public void saveOrPatchDocuments(String digitalId, String partnerId, Set<DocumentChangeFullModel> documents) {
+        Optional.ofNullable(documents)
+            .ifPresent(documentList ->
+                documentList.forEach(documentChangeFullModel -> saveOrPatchDocument(digitalId, partnerId, documentChangeFullModel)));
+    }
+
+    @Override
+    @Transactional
+    public void saveOrPatchDocument(String digitalId, String partnerId, DocumentChangeFullModel documentChangeFullModel) {
+        if (StringUtils.hasText(documentChangeFullModel.getId())) {
+            var document = documentMapper.toDocument(documentChangeFullModel, digitalId, partnerId);
+            patchDocument(document);
+        } else {
+            var documentCreate = documentMapper.toDocumentCreate(documentChangeFullModel, digitalId, partnerId);
+            saveDocument(documentCreate);
+        }
+    }
+
+    private DocumentEntity findDocumentEntity(String digitalId, String documentId, Long version, String documentTypeId) {
+        var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(documentId))
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, documentId));
+        if (!Objects.equals(version, foundDocument.getVersion())) {
+            throw new OptimisticLockException(foundDocument.getVersion(), version);
+        }
+        if (StringUtils.hasText(documentTypeId)) {
+            var foundDocumentType =
+                documentDictionaryRepository.getByUuid(UUID.fromString(documentTypeId));
+            if (foundDocumentType.isEmpty()) {
+                throw new EntryNotFoundException("documentType", digitalId, documentId);
+            }
+        }
+        return foundDocument;
+    }
+
+    private Document saveDocument(DocumentEntity document) {
+        var saveContact = documentRepository.save(document);
+        var response = documentMapper.toDocument(saveContact);
+        response.setVersion(response.getVersion() + 1);
+        return response;
     }
 }

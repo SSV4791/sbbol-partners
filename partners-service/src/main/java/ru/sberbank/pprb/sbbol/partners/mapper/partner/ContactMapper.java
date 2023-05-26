@@ -1,11 +1,14 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
@@ -13,7 +16,9 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.ContactMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
@@ -32,6 +37,7 @@ import java.util.stream.Collectors;
     },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
+@DecoratedWith(ContactMapperDecorator.class)
 public interface ContactMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(contact.getUuid().toString())")
@@ -66,7 +72,6 @@ public interface ContactMapper extends BaseMapper {
                 }).collect(Collectors.toList());
         }
     }
-
 
     default List<ContactPhoneEntity> toPhone(Set<String> phones, String digitalId) {
         if (CollectionUtils.isEmpty(phones)) {
@@ -106,6 +111,9 @@ public interface ContactMapper extends BaseMapper {
     @Mapping(target = "position", source = "contact.position")
     ContactEntity toContact(ContactCreateFullModel contact, String digitalId, UUID partnerUuid);
 
+    Contact toContact(ContactChangeFullModel contact, String digitalId, String partnerId);
+
+    ContactCreate toContactCreate(ContactChangeFullModel contact, String digitalId, String partnerId);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
@@ -123,6 +131,13 @@ public interface ContactMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
     void updateContact(Contact contact, @MappingTarget() ContactEntity contactEntity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
+    void patchContact(Contact contact, @MappingTarget() ContactEntity contactEntity);
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget ContactEntity contact) {

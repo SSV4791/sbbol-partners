@@ -7,6 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactPhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,5 +38,31 @@ class ContactPhoneMapperTest extends BaseUnitConfiguration {
                 "lastModifiedDate"
             )
             .isEqualTo(mapper.toPhone(actual));
+    }
+
+    @Test
+    void mapPhoneChangeFullModelToPhone() {
+        var phoneChangeFullModel = factory.manufacturePojo(PhoneChangeFullModel.class);
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedId = factory.manufacturePojo(String.class);
+        var actualPhone = mapper.toPhone(phoneChangeFullModel, digitalId, unifiedId);
+        var expectedPhone = new Phone()
+            .id(phoneChangeFullModel.getId())
+            .digitalId(digitalId)
+            .unifiedId(unifiedId)
+            .version(phoneChangeFullModel.getVersion())
+            .phone(phoneChangeFullModel.getPhone());
+        assertThat(actualPhone)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedPhone);
+    }
+
+    @Test
+    void mapPhoneChangeFullModelToString() {
+        var phoneChangeFullModel = factory.manufacturePojo(PhoneChangeFullModel.class);
+        var actualPhone = mapper.toPhoneStr(phoneChangeFullModel);
+        assertThat(actualPhone)
+            .isEqualTo(phoneChangeFullModel.getPhone());
     }
 }

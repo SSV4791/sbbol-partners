@@ -1,12 +1,15 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Context;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
@@ -15,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.AccountMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
@@ -38,6 +42,10 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "partnerId", expression = "java(account.getPartnerUuid() == null ? null : account.getPartnerUuid().toString())")
     @Mapping(target = "budget", ignore = true)
     Account toAccount(AccountEntity account);
+
+    AccountChange toAccount(AccountChangeFullModel account, String digitalId, String partnerId);
+
+    AccountCreate toAccountCreate(AccountChangeFullModel account, String digitalId, String partnerId);
 
     @InheritConfiguration(name = "toAccount")
     Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
@@ -83,7 +91,25 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "state", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
+    @Mapping(target = "bank", ignore = true)
     void updateAccount(AccountChange account, @MappingTarget AccountEntity accountEntity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "toUUID")
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "priorityAccount", ignore = true)
+    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "search", ignore = true)
+    @Mapping(target = "partner", ignore = true)
+    @Mapping(target = "bank", ignore = true)
+    void patchAccount(AccountChange account, @MappingTarget AccountEntity accountEntity);
+
+    @Named("toUUID")
+    default UUID toUUID(String id) {
+        return mapUuid(id);
+    }
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {

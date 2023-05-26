@@ -16,9 +16,10 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
@@ -41,6 +42,7 @@ import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_CREATE;
+import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
 
 @Loggable
@@ -62,6 +64,10 @@ public class PartnerServiceImpl implements PartnerService {
     private final ContactMapper contactMapper;
     private final PartnerMapper partnerMapper;
     private final ReplicationService replicationService;
+    private final AddressService partnerAddressService;
+    private final DocumentService partnerDocumentService;
+    private final ContactService contactService;
+    private final AccountService accountService;
 
     public PartnerServiceImpl(
         AccountRepository accountRepository,
@@ -77,7 +83,11 @@ public class PartnerServiceImpl implements PartnerService {
         AddressMapper addressMapper,
         ContactMapper contactMapper,
         PartnerMapper partnerMapper,
-        ReplicationService replicationService
+        ReplicationService replicationService,
+        AddressService partnerAddressService,
+        DocumentService partnerDocumentService,
+        ContactService contactService,
+        AccountService accountService
     ) {
         this.accountRepository = accountRepository;
         this.documentRepository = documentRepository;
@@ -93,6 +103,10 @@ public class PartnerServiceImpl implements PartnerService {
         this.contactMapper = contactMapper;
         this.partnerMapper = partnerMapper;
         this.replicationService = replicationService;
+        this.partnerAddressService = partnerAddressService;
+        this.partnerDocumentService = partnerDocumentService;
+        this.contactService = contactService;
+        this.accountService = accountService;
     }
 
     @Override
@@ -138,7 +152,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     @Audit(eventType = PARTNER_FULL_MODEL_CREATE)
-    public PartnerCreateFullModelResponse savePartner(PartnerCreateFullModel partner) {
+    public PartnerFullModelResponse savePartner(PartnerCreateFullModel partner) {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savedPartner = partnerRepository.save(partnerEntity);
         var digitalId = partner.getDigitalId();
@@ -184,15 +198,11 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     @Audit(eventType = PARTNER_UPDATE)
-    public Partner updatePartner(Partner partner) {
+    public Partner patchPartner(Partner partner) {
         var digitalId = partner.getDigitalId();
-        var partnerUuid = UUID.fromString(partner.getId());
-        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
-            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partner.getId()));
-        if (!Objects.equals(partner.getVersion(), foundPartner.getVersion())) {
-            throw new OptimisticLockException(foundPartner.getVersion(), partner.getVersion());
-        }
+        var partnerId = partner.getId();
+        var partnerUuid = UUID.fromString(partnerId);
+        var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
         var accountEntities = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
@@ -204,6 +214,40 @@ public class PartnerServiceImpl implements PartnerService {
         response.setVersion(response.getVersion() + 1);
         response.setGku(getGku(response.getInn()));
         return response;
+    }
+
+    @Override
+    @Transactional
+    @Audit(eventType = PARTNER_FULL_MODEL_UPDATE)
+    public PartnerFullModelResponse patchPartner(PartnerChangeFullModel partner) {
+        var digitalId = partner.getDigitalId();
+        var partnerId = partner.getId();
+        var partnerUuid = UUID.fromString(partnerId);
+        var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
+        partnerMapper.patchPartner(partner, foundPartner);
+        PartnerEntity savedPartner = partnerRepository.save(foundPartner);
+        partnerAddressService.saveOrPatchAddresses(digitalId, partnerId, partner.getAddress());
+        partnerDocumentService.saveOrPatchDocuments(digitalId, partnerId, partner.getDocuments());
+        contactService.saveOrPatchContacts(digitalId, partnerId, partner.getContacts());
+        accountService.saveOrPatchAccounts(digitalId, partnerId, partner.getAccounts());
+        var addresses = addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid).stream()
+            .map(addressMapper::toAddress)
+            .collect(Collectors.toList());
+        var documents = documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid).stream()
+            .map(documentMapper::toDocument)
+            .collect(Collectors.toList());
+        var contacts = contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid).stream()
+            .map(contactMapper::toContact)
+            .collect(Collectors.toList());
+        var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid).stream()
+            .map(accountMapper::toAccount)
+            .collect(Collectors.toList());
+        return partnerMapper.toPartnerMullResponse(savedPartner)
+            .gku(getGku(savedPartner.getInn()))
+            .address(addresses)
+            .documents(documents)
+            .contacts(contacts)
+            .accounts(accounts);
     }
 
     @Override
@@ -248,5 +292,15 @@ public class PartnerServiceImpl implements PartnerService {
         }
         var housingInn = gkuInnDictionaryRepository.getByInn(inn);
         return housingInn != null;
+    }
+
+    private PartnerEntity findPartnerEntity(String digitalId, String partnerId, Long version) {
+        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(partnerId))
+            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
+        if (!Objects.equals(version, foundPartner.getVersion())) {
+            throw new OptimisticLockException(foundPartner.getVersion(),version);
+        }
+        return foundPartner;
     }
 }

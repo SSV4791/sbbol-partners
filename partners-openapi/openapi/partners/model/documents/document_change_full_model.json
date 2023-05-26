@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Изменение документа в рамках изменения партнера и его дочерних сущностей",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "documentTypeId": {
+      "type": "string",
+      "title": "Идентификатор типа документа",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
+    },
+    "series": {
+      "type": "string",
+      "title": "Серия документа",
+      "maxLength": 50
+    },
+    "number": {
+      "type": "string",
+      "title": "Номер документа",
+      "maxLength": 50
+    },
+    "dateIssue": {
+      "type": "string",
+      "format": "date",
+      "title": "Дата выдачи документа"
+    },
+    "divisionIssue": {
+      "type": "string",
+      "title": "Место выдачи документа",
+      "maxLength": 250
+    },
+    "divisionCode": {
+      "type": "string",
+      "title": "Код документа",
+      "maxLength": 50
+    },
+    "certifierName": {
+      "type": "string",
+      "title": "Имя удостоверяющего сотрудника",
+      "maxLength": 100
+    },
+    "positionCertifier": {
+      "type": "string",
+      "title": "Должность удостоверяющего сотрудника",
+      "maxLength": 100
+    },
+    "certifierType": {
+      "$ref": "../common/certifier_type.json"
+    }
+  },
+  "required": [
+    "documentTypeId"
+  ]
+}
+

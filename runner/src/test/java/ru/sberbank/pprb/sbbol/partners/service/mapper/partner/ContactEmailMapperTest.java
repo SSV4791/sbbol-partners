@@ -7,6 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactEmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,5 +38,31 @@ class ContactEmailMapperTest extends BaseUnitConfiguration {
                 "lastModifiedDate"
             )
             .isEqualTo(mapper.toEmail(actual));
+    }
+
+    @Test
+    void mapEmailChangeFullModelToEmail() {
+        var emailChangeFullModel = factory.manufacturePojo(EmailChangeFullModel.class);
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedId = factory.manufacturePojo(String.class);
+        var actualEmail = mapper.toEmail(emailChangeFullModel, digitalId, unifiedId);
+        var expectedEmail = new Email()
+            .id(emailChangeFullModel.getId())
+            .digitalId(digitalId)
+            .unifiedId(unifiedId)
+            .version(emailChangeFullModel.getVersion())
+            .email(emailChangeFullModel.getEmail());
+        assertThat(actualEmail)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedEmail);
+    }
+
+    @Test
+    void mapEmailChangeFullModelToString() {
+        var emailChangeFullModel = factory.manufacturePojo(EmailChangeFullModel.class);
+        var actualEmail = mapper.toEmailStr(emailChangeFullModel);
+        assertThat(actualEmail)
+            .isEqualTo(emailChangeFullModel.getEmail());
     }
 }

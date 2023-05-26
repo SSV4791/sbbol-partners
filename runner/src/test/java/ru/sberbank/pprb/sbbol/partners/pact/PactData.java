@@ -23,7 +23,7 @@ import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
@@ -172,8 +172,8 @@ public class PactData {
             .documents(Set.of(documentCreateFullModel()));
     }
 
-    public PartnerCreateFullModelResponse partnerCreateFullModelResponse() {
-        return new PartnerCreateFullModelResponse()
+    public PartnerFullModelResponse partnerCreateFullModelResponse() {
+        return new PartnerFullModelResponse()
             .id(UUID_ID)
             .digitalId(DIGITAL_ID)
             .legalForm(LegalForm.fromValue(LEGAL_FORM_LEGAL_ENTITY))

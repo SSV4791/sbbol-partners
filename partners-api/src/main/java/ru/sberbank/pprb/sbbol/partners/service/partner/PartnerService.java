@@ -2,9 +2,10 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 
@@ -38,7 +39,7 @@ public interface PartnerService {
      * @param partner данные Партнера
      * @return Партнер
      */
-    PartnerCreateFullModelResponse savePartner(PartnerCreateFullModel partner);
+    PartnerFullModelResponse savePartner(PartnerCreateFullModel partner);
 
     /**
      * Создание нового Партнера
@@ -54,7 +55,15 @@ public interface PartnerService {
      * @param partner новые данные Партнера
      * @return Партнер
      */
-    Partner updatePartner(Partner partner);
+    Partner patchPartner(Partner partner);
+
+    /**
+     * Частичное обновление Партнера со всеми дочерними сущностями
+     *
+     * @param partner данные Партнера
+     * @return Партнер
+     */
+    PartnerFullModelResponse patchPartner(PartnerChangeFullModel partner);
 
     /**
      * Удаление Партнера

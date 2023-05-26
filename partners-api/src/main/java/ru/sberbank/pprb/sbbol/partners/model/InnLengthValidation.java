@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
+import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeLengthPartnerChangeFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeLengthPartnerCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeLengthPartnerCreateFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.inn.InnAttributeLengthPartnerDtoValidator;
@@ -20,7 +21,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     validatedBy = {
         InnAttributeLengthPartnerDtoValidator.class,
         InnAttributeLengthPartnerCreateDtoValidator.class,
-        InnAttributeLengthPartnerCreateFullModelDtoValidator.class
+        InnAttributeLengthPartnerCreateFullModelDtoValidator.class,
+        InnAttributeLengthPartnerChangeFullModelDtoValidator.class
     }
 )
 public @interface InnLengthValidation {

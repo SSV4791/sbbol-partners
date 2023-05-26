@@ -7,7 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class NameAttributePartnerFullModelDtoValidator extends BaseNameAttributeValidator
+public class NameAttributePartnerCreateFullModelDtoValidator extends BaseNameAttributeValidator
     implements ConstraintValidator<PartnerNameValidation, PartnerCreateFullModel> {
 
     @Override

@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Изменение контакта в рамках изменения партнера и его дочерних сущностей",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации",
+      "maxLength": 350,
+      "x-not-empty": true
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя контакта",
+      "maxLength": 50,
+      "x-not-empty": true
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия контакта",
+      "maxLength": 50,
+      "x-not-empty": true
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество контакта",
+      "maxLength": 50,
+      "x-not-empty": true
+    },
+    "position": {
+      "type": "string",
+      "title": "Должность",
+      "maxLength": 100,
+      "x-not-empty": true
+    },
+    "phones": {
+      "type": "array",
+      "title": "Телефоны",
+      "items": {
+        "$ref": "../phone/phone_change_full_model.json"
+      }
+    },
+    "emails": {
+      "type": "array",
+      "title": "Адрес электронной почты",
+      "items": {
+        "$ref": "../email/email_change_full_model.json"
+      }
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    }
+  },
+  "required": [
+    "legalForm"
+  ]
+}

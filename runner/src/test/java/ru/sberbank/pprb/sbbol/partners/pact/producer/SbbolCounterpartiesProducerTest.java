@@ -81,7 +81,7 @@ public class SbbolCounterpartiesProducerTest {
             .thenReturn(pactData.partnerCreateFullModelResponse());
         when(partnerService.savePartner(pactData.partnerCreate()))
             .thenReturn(pactData.partner());
-        when(partnerService.updatePartner(pactData.partner()))
+        when(partnerService.patchPartner(pactData.partner()))
             .thenReturn(pactData.partner());
         when(phoneService.savePhone(pactData.phoneCreate()))
             .thenReturn(pactData.phone());

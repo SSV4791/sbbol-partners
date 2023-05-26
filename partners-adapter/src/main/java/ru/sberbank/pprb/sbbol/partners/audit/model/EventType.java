@@ -11,6 +11,7 @@ public enum EventType {
     SIGN_ACCOUNTS_CREATE("sign_accounts_create_success", "sign_accounts_create_error"),
     SIGN_ACCOUNTS_DELETE("sign_accounts_delete_success", "sign_accounts_delete_error"),
     PARTNER_FULL_MODEL_CREATE("partner_full_model_create_success", "partner_full_model_create_error"),
+    PARTNER_FULL_MODEL_UPDATE("partner_full_model_update_success", "partner_full_model_update_error"),
     PARTNER_CREATE("partner_create_success", "partner_create_error"),
     PARTNER_UPDATE("partner_update_success", "partner_update_error"),
     PARTNER_DELETE("partner_delete_success", "partner_delete_error");

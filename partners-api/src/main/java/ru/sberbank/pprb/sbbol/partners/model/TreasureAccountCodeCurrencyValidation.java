@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeTreasureCodeCurrencyAccountChangeDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeTreasureCodeCurrencyAccountChangeFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeTreasureCodeCurrencyAccountCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeTreasureCodeCurrencyAccountCreateFullModelDtoValidator;
 
@@ -24,6 +25,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         AccountAttributeTreasureCodeCurrencyAccountChangeDtoValidator.class,
         AccountAttributeTreasureCodeCurrencyAccountCreateDtoValidator.class,
         AccountAttributeTreasureCodeCurrencyAccountCreateFullModelDtoValidator.class,
+        AccountAttributeTreasureCodeCurrencyAccountChangeFullModelDtoValidator.class
     }
 )
 public @interface TreasureAccountCodeCurrencyValidation {

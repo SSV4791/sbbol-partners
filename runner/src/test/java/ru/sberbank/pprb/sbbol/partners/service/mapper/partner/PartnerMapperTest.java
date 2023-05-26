@@ -1,9 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
@@ -11,36 +11,51 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerEmailMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.StringMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.Citizenship;
+import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ContextConfiguration(
+    classes = {
+        PartnerMapperImpl.class,
+        PartnerMapperImpl_.class,
+        PartnerEmailMapperImpl.class,
+        PartnerPhoneMapperImpl.class,
+        StringMapperImpl.class
+    }
+)
 class PartnerMapperTest extends BaseUnitConfiguration {
 
+    @Autowired
     private PartnerMapper mapper;
 
-    @Mock
+    @Autowired
     private PartnerPhoneMapper partnerPhoneMapper;
 
-    @Mock
+    @Autowired
     private PartnerEmailMapper partnerEmailMapper;
-
-    @BeforeEach
-    void before() {
-        mapper = new PartnerMapperImpl(partnerEmailMapper, partnerPhoneMapper);
-    }
 
     @Test
     void mapUuid() {
@@ -216,5 +231,130 @@ class PartnerMapperTest extends BaseUnitConfiguration {
         PartnerCitizenshipType citizenshipType = PartnerMapper.toCitizenshipType(typeEnum);
         assertThat(typeEnum)
             .isEqualTo(PartnerMapper.toCitizenshipType(citizenshipType));
+    }
+
+    @Test
+    void patchPartnerWithoutMergedPhonesAndEmails() {
+        var partnerChangeFullModel = new PartnerChangeFullModel()
+            .orgName("Updated orgName")
+            .comment("Updated comment")
+            .latinName("Updated latin name");
+        var actualPartnerEntity = factory.manufacturePojo(PartnerEntity.class);
+        actualPartnerEntity.getPhones().forEach(phoneEntity -> {
+            phoneEntity.setPartner(actualPartnerEntity);
+            phoneEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+        });
+        actualPartnerEntity.getEmails().forEach(emailEntity -> {
+            emailEntity.setPartner(actualPartnerEntity);
+            emailEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+        });
+        var expectedPhones = new ArrayList<>(actualPartnerEntity.getPhones());
+        var expectedEmails = new ArrayList<>(actualPartnerEntity.getEmails());
+        mapper.patchPartner(partnerChangeFullModel, actualPartnerEntity);
+        var expectedPartnerEntity = new PartnerEntity();
+        expectedPartnerEntity.setUuid(actualPartnerEntity.getUuid());
+        expectedPartnerEntity.setVersion(actualPartnerEntity.getVersion());
+        expectedPartnerEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+        expectedPartnerEntity.setFirstName(actualPartnerEntity.getFirstName());
+        expectedPartnerEntity.setMiddleName(actualPartnerEntity.getMiddleName());
+        expectedPartnerEntity.setSecondName(actualPartnerEntity.getSecondName());
+        expectedPartnerEntity.setOrgName(partnerChangeFullModel.getOrgName());
+        expectedPartnerEntity.setInn(actualPartnerEntity.getInn());
+        expectedPartnerEntity.setKpp(actualPartnerEntity.getKpp());
+        expectedPartnerEntity.setOgrn(actualPartnerEntity.getOgrn());
+        expectedPartnerEntity.setOkpo(actualPartnerEntity.getOkpo());
+        expectedPartnerEntity.setCitizenship(actualPartnerEntity.getCitizenship());
+        expectedPartnerEntity.setComment(partnerChangeFullModel.getComment());
+        expectedPartnerEntity.setLatinName(partnerChangeFullModel.getLatinName());
+        expectedPartnerEntity.setLegalType(actualPartnerEntity.getLegalType());
+        expectedPartnerEntity.setPhones(expectedPhones);
+        expectedPartnerEntity.setEmails(expectedEmails);
+        assertThat(actualPartnerEntity)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                "uuid",
+                "createDate",
+                "gkuInnEntity",
+                "lastModifiedDate",
+                "phones.lastModifiedDate",
+                "emails.lastModifiedDate",
+                "search",
+                "type"
+            )
+            .isEqualTo(expectedPartnerEntity);
+    }
+
+    @Test
+    void patchPartnerWithMergedPhonesAndEmails() {
+        var updatedPhone = new PhoneChangeFullModel()
+            .phone(factory.manufacturePojo(String.class));
+        var updatedEmail = new EmailChangeFullModel()
+            .email(factory.manufacturePojo(String.class));
+        var partnerChangeFullModel = new PartnerChangeFullModel()
+            .phones(Set.of(updatedPhone))
+            .emails(Set.of(updatedEmail));
+        var actualPartnerEntity = factory.manufacturePojo(PartnerEntity.class);
+        actualPartnerEntity.getPhones().forEach(phoneEntity -> {
+            phoneEntity.setPartner(actualPartnerEntity);
+            phoneEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+        });
+        actualPartnerEntity.getEmails().forEach(emailEntity -> {
+            emailEntity.setPartner(actualPartnerEntity);
+            emailEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+        });
+        var expectedPhones = Stream.concat(
+            actualPartnerEntity.getPhones().stream(),
+            partnerChangeFullModel.getPhones().stream().map(phoneChangeFullModel -> {
+                var partnerPhoneEntity = new PartnerPhoneEntity();
+                partnerPhoneEntity.setPhone(phoneChangeFullModel.getPhone());
+                partnerPhoneEntity.setPartner(actualPartnerEntity);
+                partnerPhoneEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+                return partnerPhoneEntity;
+            }))
+            .collect(Collectors.toList());
+        var expectedEmails = Stream.concat(
+            actualPartnerEntity.getEmails().stream(),
+            partnerChangeFullModel.getEmails().stream().map(emailChangeFullModel -> {
+                var partnerEmailEntity = new PartnerEmailEntity();
+                partnerEmailEntity.setEmail(emailChangeFullModel.getEmail());
+                partnerEmailEntity.setPartner(actualPartnerEntity);
+                partnerEmailEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+                return  partnerEmailEntity;
+            }))
+            .collect(Collectors.toList());
+        mapper.patchPartner(partnerChangeFullModel, actualPartnerEntity);
+        var expectedPartnerEntity = new PartnerEntity();
+        expectedPartnerEntity.setUuid(actualPartnerEntity.getUuid());
+        expectedPartnerEntity.setVersion(actualPartnerEntity.getVersion());
+        expectedPartnerEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+        expectedPartnerEntity.setFirstName(actualPartnerEntity.getFirstName());
+        expectedPartnerEntity.setMiddleName(actualPartnerEntity.getMiddleName());
+        expectedPartnerEntity.setSecondName(actualPartnerEntity.getSecondName());
+        expectedPartnerEntity.setOrgName(actualPartnerEntity.getOrgName());
+        expectedPartnerEntity.setInn(actualPartnerEntity.getInn());
+        expectedPartnerEntity.setKpp(actualPartnerEntity.getKpp());
+        expectedPartnerEntity.setOgrn(actualPartnerEntity.getOgrn());
+        expectedPartnerEntity.setOkpo(actualPartnerEntity.getOkpo());
+        expectedPartnerEntity.setCitizenship(actualPartnerEntity.getCitizenship());
+        expectedPartnerEntity.setComment(actualPartnerEntity.getComment());
+        expectedPartnerEntity.setLatinName(actualPartnerEntity.getLatinName());
+        expectedPartnerEntity.setLegalType(actualPartnerEntity.getLegalType());
+        expectedPartnerEntity.setPhones(expectedPhones);
+        expectedPartnerEntity.setEmails(expectedEmails);
+        assertThat(actualPartnerEntity)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFields(
+                "uuid",
+                "createDate",
+                "gkuInnEntity",
+                "lastModifiedDate",
+                "phones.lastModifiedDate",
+                "emails.lastModifiedDate",
+                "search",
+                "type"
+            )
+            .isEqualTo(expectedPartnerEntity);
     }
 }

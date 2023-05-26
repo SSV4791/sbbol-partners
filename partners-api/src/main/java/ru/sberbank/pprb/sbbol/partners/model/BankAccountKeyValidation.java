@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.account.account.BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFullModelDtoValidator;
 
@@ -23,7 +24,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     validatedBy = {
         BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeDtoValidator.class,
         BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateDtoValidator.class,
-        BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFullModelDtoValidator.class
+        BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFullModelDtoValidator.class,
+        BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeFullModelDtoValidator.class
     }
 )
 public @interface BankAccountKeyValidation {

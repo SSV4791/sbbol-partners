@@ -299,7 +299,11 @@ public class PartnerServiceConfiguration {
         AddressMapper addressMapper,
         ContactMapper contactMapper,
         PartnerMapper partnerMapper,
-        ReplicationService replicationService
+        ReplicationService replicationService,
+        AddressService partnerAddressService,
+        DocumentService partnerDocumentService,
+        ContactService contactService,
+        AccountService accountService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
             accountRepository,
@@ -315,7 +319,11 @@ public class PartnerServiceConfiguration {
             addressMapper,
             contactMapper,
             partnerMapper,
-            replicationService
+            replicationService,
+            partnerAddressService,
+            partnerDocumentService,
+            contactService,
+            accountService
         );
     }
 

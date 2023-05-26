@@ -2,7 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl;
 
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.EventParamMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.AuditEventMapperAgent;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 
 import java.util.HashMap;
 
@@ -32,7 +32,7 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.EventPa
 
 public class PartnerFullModelCreateSuccessAuditMapperAgent implements AuditEventMapperAgent {
 
-    private final EventParamMapper<PartnerCreateFullModelResponse> mapper = partner -> {
+    private final EventParamMapper<PartnerFullModelResponse> mapper = partner -> {
         var params = new HashMap<String, String>();
         putEventParam(ID, partner.getId(), params);
         putEventParam(DIGITAL_ID, partner.getDigitalId(), params);
@@ -65,7 +65,7 @@ public class PartnerFullModelCreateSuccessAuditMapperAgent implements AuditEvent
     }
 
     @Override
-    public EventParamMapper<PartnerCreateFullModelResponse> getAuditEventMapper() {
+    public EventParamMapper<PartnerFullModelResponse> getAuditEventMapper() {
         return mapper;
     }
 }

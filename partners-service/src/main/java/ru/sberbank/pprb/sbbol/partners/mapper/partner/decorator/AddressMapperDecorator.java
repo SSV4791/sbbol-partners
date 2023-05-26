@@ -21,6 +21,10 @@ public abstract class AddressMapperDecorator implements AddressMapper {
 
     private static final String COUNTRY_RUS = "Россия Russian Federation";
 
+    @Autowired
+    @Qualifier("delegate")
+    private AddressMapper delegate;
+
     @Override
     public AddressEntity toAddress(AddressCreateFullModel address, String digitalId, UUID unifiedUuid) {
         var addressEntity = delegate.toAddress(address, digitalId, unifiedUuid);
@@ -55,10 +59,6 @@ public abstract class AddressMapperDecorator implements AddressMapper {
         addressEntity.setCountryIsoCode(normalizationCountryIsoCode(address.getCountryIsoCode()));
         addressEntity.setCountry(normalizationCountry(address.getCountry()));
     }
-
-    @Autowired
-    @Qualifier("delegate")
-    private AddressMapper delegate;
 
     protected String normalizationCountryCode(String countryCode) {
         return isNull(countryCode) ? COUNTRY_CODE_RUS : countryCode;

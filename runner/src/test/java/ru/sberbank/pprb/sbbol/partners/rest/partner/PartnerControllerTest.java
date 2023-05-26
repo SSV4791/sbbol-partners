@@ -2,39 +2,56 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.qameta.allure.Allure;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.Address;
+import ru.sberbank.pprb.sbbol.partners.model.AddressChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
+import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
+import ru.sberbank.pprb.sbbol.partners.model.Document;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
+import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
@@ -44,14 +61,17 @@ import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterLegalF
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
@@ -471,7 +491,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 baseRoutePath + "/full-model",
                 HttpStatus.CREATED,
                 partner,
-                PartnerCreateFullModelResponse.class
+                PartnerFullModelResponse.class
             );
 
             return new PartnersFilter()
@@ -1926,7 +1946,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/full-model",
             HttpStatus.CREATED,
             request,
-            PartnerCreateFullModelResponse.class
+            PartnerFullModelResponse.class
         );
         assertThat(createdPartner)
             .isNotNull();
@@ -2343,6 +2363,1135 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
             .asList()
             .contains("Поле содержит недопустимый(-е) символ(-ы): АБВ");
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление основных реквизитов")
+    @MethodSource("partnerArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changePartnerAttributes(String updatedComment, String updatedKpp) {
+        var createdFullModelPartner = step("Создание Партнера", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление партнера", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setComment(updatedComment);
+            partnerChange.setKpp(updatedKpp);
+            return partnerChange;
+        });
+        var expectedPartnerFullModelResponse = step("Подготавливаем ожидаемый ответ после обновления партнера", () -> {
+            var partnerFullModel = clonePartnerFullModelResponse(createdFullModelPartner);
+            partnerFullModel.setComment(updatedComment);
+            partnerFullModel.setKpp(updatedKpp);
+            return partnerFullModel;
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнер.", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка основных реквизитов после обновления Партнера", () -> {
+            assertThat(actualPartnerFullModelResponse)
+                .isNotNull();
+            assertThat(actualPartnerFullModelResponse)
+                .usingRecursiveComparison()
+                .ignoringFields(
+                    "version",
+                    "phones",
+                    "emails",
+                    "accounts",
+                    "documents",
+                    "address",
+                    "contacts"
+                )
+                .isEqualTo(expectedPartnerFullModelResponse);
+        });
+    }
+
+    static Stream<? extends Arguments> partnerArgumentsForUpdatingPartnerFullModel() {
+        return Stream.of(Arguments.of("Обновление комментария по партнеру", "111111111"));
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление телефонов")
+    @MethodSource("phoneArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changePhones(Set<String> initialPhones, Set<Pair<String, String>> updatedPhones) {
+        var createdFullModelPartner = step("Создание Партнера с телефонами", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setPhones(initialPhones);
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var phoneChangeFullModelList = step("Подготавливаем список телефонов для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedPhones)) {
+                return null;
+            }
+            return updatedPhones.stream()
+                .map(updatedPhone -> {
+                    if (StringUtils.isEmpty(updatedPhone.getLeft())) {
+                        return new PhoneChangeFullModel()
+                            .phone(updatedPhone.getRight());
+                    }
+                    var existedPhone = createdFullModelPartner.getPhones().stream()
+                        .filter(phone -> phone.getPhone().equals(updatedPhone.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new PhoneChangeFullModel()
+                        .id(existedPhone.getId())
+                        .version(existedPhone.getVersion())
+                        .phone(updatedPhone.getRight());
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление партнера", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setPhones(phoneChangeFullModelList);
+            return partnerChange;
+        });
+        var expectedPhones = step("Подготавливаем ожидаемый список телефонов после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialPhones) && CollectionUtils.isEmpty(updatedPhones)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialPhones)) {
+                return updatedPhones.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedPhones)) {
+                return new ArrayList<>(initialPhones);
+            }
+            return Stream.concat(
+                initialPhones.stream().map(initialPhone ->
+                    updatedPhones.stream()
+                        .filter(it -> initialPhone.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialPhone)
+                ),
+                updatedPhones.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка телефонов после обновления Партнера", () -> {
+            var actualPhones = actualPartnerFullModelResponse.getPhones().stream()
+                .map(Phone::getPhone)
+                .collect(Collectors.toList());
+            assertThat(actualPhones)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedPhones);
+        });
+    }
+
+    static Stream<? extends Arguments> phoneArgumentsForUpdatingPartnerFullModel() {
+        var initialPhones = Set.of("0079241111111", "0079242222222");
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, "0079241111122"),
+                    Pair.of(null, "0079242222233")
+                )
+            ),
+            Arguments.of(
+                initialPhones,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialPhones,
+                Set.of(
+                    Pair.of("0079241111111", "0079241111122"),
+                    Pair.of("0079242222222", "0079242222233")
+                )
+            ),
+            Arguments.of(
+                initialPhones,
+                Set.of(
+                    Pair.of("0079241111111", "0079241111122"),
+                    Pair.of(null, "0079243333333")
+                )
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление электронных адресов")
+    @MethodSource("emailArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changeEmails(Set<String> initialEmails, Set<Pair<String, String>> updatedEmails) {
+        var createdFullModelPartner = step("Создание Партнера с электронными адресами", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setEmails(initialEmails);
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var emailChangeFullModelList = step("Подготавливаем список электроных адресов для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedEmails)) {
+                return null;
+            }
+            return updatedEmails.stream()
+                .map(updatedEmail -> {
+                    if (StringUtils.isEmpty(updatedEmail.getLeft())) {
+                        return new EmailChangeFullModel()
+                            .email(updatedEmail.getRight());
+                    }
+                    var existedEmail = createdFullModelPartner.getEmails().stream()
+                        .filter(email -> email.getEmail().equals(updatedEmail.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new EmailChangeFullModel()
+                        .id(existedEmail.getId())
+                        .version(existedEmail.getVersion())
+                        .email(updatedEmail.getRight());
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление партнера", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setEmails(emailChangeFullModelList);
+            return partnerChange;
+        });
+        var expectedEmail = step("Подготавливаем ожидаемый список электронных адресов после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialEmails) && CollectionUtils.isEmpty(updatedEmails)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialEmails)) {
+                return updatedEmails.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedEmails)) {
+                return new ArrayList<>(initialEmails);
+            }
+            return Stream.concat(
+                initialEmails.stream().map(initialEmail ->
+                    updatedEmails.stream()
+                        .filter(it -> initialEmail.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialEmail)
+                ),
+                updatedEmails.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка электронных адресов после обновления Партнера", () -> {
+            var actualEmails = actualPartnerFullModelResponse.getEmails().stream()
+                .map(Email::getEmail)
+                .collect(Collectors.toList());
+            assertThat(actualEmails)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedEmail);
+        });
+    }
+
+    static Stream<? extends Arguments> emailArgumentsForUpdatingPartnerFullModel() {
+        var initialEmails = Set.of("11-11-11@mail.ru", "22-22-22@mail.ru");
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, "11-11-11@mail.ru"),
+                    Pair.of(null, "22-22-22@mail.ru")
+                )
+            ),
+            Arguments.of(
+                initialEmails,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialEmails,
+                Set.of(
+                    Pair.of("11-11-11@mail.ru", "11-11-22@mail.ru"),
+                    Pair.of("22-22-22@mail.ru", "22-22-33@mail.ru")
+                )
+            ),
+            Arguments.of(
+                initialEmails,
+                Set.of(
+                    Pair.of("11-11-11@mail.ru", "11-11-22@mail.ru"),
+                    Pair.of(null, "33-33-33@mail.ru")
+                )
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление адресов")
+    @MethodSource("addressArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changeAddresses(Set<String> initialAddresses, Set<Pair<String, String>> updatedAddresses) {
+        var createdFullModelPartner = step("Создание Партнера с адресами", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setAddress(
+                initialAddresses.stream()
+                    .map(it -> new AddressCreateFullModel()
+                        .type(AddressType.LEGAL_ADDRESS)
+                        .fullAddress(it))
+                    .collect(Collectors.toSet())
+            );
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var addressChangeFullModelList = step("Подготавливаем список адресов для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedAddresses)) {
+                return null;
+            }
+            return updatedAddresses.stream()
+                .map(updatedAddress -> {
+                    if (StringUtils.isEmpty(updatedAddress.getLeft())) {
+                        return new AddressChangeFullModel()
+                            .type(AddressType.LEGAL_ADDRESS)
+                            .fullAddress(updatedAddress.getRight());
+                    }
+                    var existedAddress = createdFullModelPartner.getAddress().stream()
+                        .filter(address -> address.getFullAddress().equals(updatedAddress.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new AddressChangeFullModel()
+                        .id(existedAddress.getId())
+                        .version(existedAddress.getVersion())
+                        .type(existedAddress.getType())
+                        .fullAddress(updatedAddress.getRight());
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление партнера", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setAddress(addressChangeFullModelList);
+            return partnerChange;
+        });
+        var expectedAddresses = step("Подготавливаем ожидаемый список адресов после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialAddresses) && CollectionUtils.isEmpty(updatedAddresses)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialAddresses)) {
+                return updatedAddresses.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedAddresses)) {
+                return new ArrayList<>(initialAddresses);
+            }
+            return Stream.concat(
+                initialAddresses.stream().map(initialAddress ->
+                    updatedAddresses.stream()
+                        .filter(it -> initialAddress.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialAddress)
+                ),
+                updatedAddresses.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c адресами.", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка адресов после обновления Партнера", () -> {
+            var actualAddresses = actualPartnerFullModelResponse.getAddress().stream()
+                .map(Address::getFullAddress)
+                .collect(Collectors.toList());
+            assertThat(actualAddresses)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedAddresses);
+        });
+    }
+
+    static Stream<? extends Arguments> addressArgumentsForUpdatingPartnerFullModel() {
+        var initialAddress1 = "full address 1";
+        var initialAddress2 = "full address 2";
+        var updatedAddress1 = "full address 3";
+        var updatedAddress2 = "full address 4";
+        var initialAddresses = Set.of(initialAddress1, initialAddress2);
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, updatedAddress1),
+                    Pair.of(null, updatedAddress2)
+                )
+            ),
+            Arguments.of(
+                initialAddresses,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialAddresses,
+                Set.of(
+                    Pair.of(initialAddress1, updatedAddress1),
+                    Pair.of(initialAddress2, updatedAddress2)
+                )
+            ),
+            Arguments.of(
+                initialAddresses,
+                Set.of(
+                    Pair.of(initialAddress1, updatedAddress1),
+                    Pair.of(null, updatedAddress2)
+                )
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление документов")
+    @MethodSource("documentArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changeDocument(Set<String> initialDocuments, Set<Pair<String, String>> updatedDocuments) {
+        var documentTypeId = "8a4d4464-64a1-4f3d-ab86-fd3be614f7a2";
+        var createdFullModelPartner = step("Создание Партнера с документами", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setDocuments(
+                initialDocuments.stream()
+                    .map(it -> new DocumentCreateFullModel()
+                        .documentTypeId(documentTypeId)
+                        .number("Номер")
+                        .series(it)
+                    )
+                    .collect(Collectors.toSet())
+            );
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var documentChangeFullModelList = step("Подготавливаем список документов для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedDocuments)) {
+                return null;
+            }
+            return updatedDocuments.stream()
+                .map(updatedDocument -> {
+                    if (StringUtils.isEmpty(updatedDocument.getLeft())) {
+                        return new DocumentChangeFullModel()
+                            .documentTypeId(documentTypeId)
+                            .series(updatedDocument.getRight());
+                    }
+                    var existedDocument = createdFullModelPartner.getDocuments().stream()
+                        .filter(document -> document.getSeries().equals(updatedDocument.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new DocumentChangeFullModel()
+                        .id(existedDocument.getId())
+                        .version(existedDocument.getVersion())
+                        .documentTypeId(documentTypeId)
+                        .series(updatedDocument.getRight());
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление документов", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setDocuments(documentChangeFullModelList);
+            return partnerChange;
+        });
+        var expectedDocuments = step("Подготавливаем ожидаемый список документов после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialDocuments) && CollectionUtils.isEmpty(updatedDocuments)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialDocuments)) {
+                return updatedDocuments.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedDocuments)) {
+                return new ArrayList<>(initialDocuments);
+            }
+            return Stream.concat(
+                initialDocuments.stream().map(initialDocument ->
+                    updatedDocuments.stream()
+                        .filter(it -> initialDocument.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialDocument)
+                ),
+                updatedDocuments.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c документами.", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка документов после обновления Партнера", () -> {
+            var actualDocuments = actualPartnerFullModelResponse.getDocuments().stream()
+                .map(Document::getSeries)
+                .collect(Collectors.toList());
+            assertThat(actualDocuments)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedDocuments);
+        });
+    }
+
+    static Stream<? extends Arguments> documentArgumentsForUpdatingPartnerFullModel() {
+        var initialDocument1 = "document 1";
+        var initialDocument2 = "document 2";
+        var updatedDocument1 = "document 3";
+        var updatedDocument2 = "document 4";
+        var initialDocuments = Set.of(initialDocument1, initialDocument2);
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, updatedDocument1),
+                    Pair.of(null, updatedDocument2)
+                )
+            ),
+            Arguments.of(
+                initialDocuments,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialDocuments,
+                Set.of(
+                    Pair.of(initialDocument1, updatedDocument1),
+                    Pair.of(initialDocument2, updatedDocument2)
+                )
+            ),
+            Arguments.of(
+                initialDocuments,
+                Set.of(
+                    Pair.of(initialDocument1, updatedDocument1),
+                    Pair.of(null, updatedDocument2)
+                )
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление контактов")
+    @MethodSource("contactArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changeContact(Set<String> initialContacts, Set<Pair<String, String>> updatedContacts) {
+        var createdFullModelPartner = step("Создание Партнера с контактами", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setContacts(
+                initialContacts.stream()
+                    .map(it -> new ContactCreateFullModel()
+                        .legalForm(LegalForm.PHYSICAL_PERSON)
+                        .firstName(it)
+                    )
+                    .collect(Collectors.toSet())
+            );
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var contactChangeFullModelList = step("Подготавливаем список контактов для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedContacts)) {
+                return null;
+            }
+            return updatedContacts.stream()
+                .map(updatedContact -> {
+                    if (StringUtils.isEmpty(updatedContact.getLeft())) {
+                        return new ContactChangeFullModel()
+                            .legalForm(LegalForm.PHYSICAL_PERSON)
+                            .firstName(updatedContact.getRight());
+                    }
+                    var existedContact = createdFullModelPartner.getContacts().stream()
+                        .filter(contact -> contact.getFirstName().equals(updatedContact.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new ContactChangeFullModel()
+                        .id(existedContact.getId())
+                        .version(existedContact.getVersion())
+                        .legalForm(LegalForm.PHYSICAL_PERSON)
+                        .firstName(updatedContact.getRight());
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление контактов", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setContacts(contactChangeFullModelList);
+            return partnerChange;
+        });
+        var expectedContacts = step("Подготавливаем ожидаемый список контактов после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialContacts) && CollectionUtils.isEmpty(updatedContacts)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialContacts)) {
+                return updatedContacts.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedContacts)) {
+                return new ArrayList<>(initialContacts);
+            }
+            return Stream.concat(
+                initialContacts.stream().map(initialContact ->
+                    updatedContacts.stream()
+                        .filter(it -> initialContact.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialContact)
+                ),
+                updatedContacts.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c контактами.", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка контактов после обновления Партнера", () -> {
+            var actualContacts = actualPartnerFullModelResponse.getContacts().stream()
+                .map(Contact::getFirstName)
+                .collect(Collectors.toList());
+            assertThat(actualContacts)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedContacts);
+        });
+    }
+
+    static Stream<? extends Arguments> contactArgumentsForUpdatingPartnerFullModel() {
+        var initialContact1 = "contact 1";
+        var initialContact2 = "contact 2";
+        var updatedContact1 = "contact 3";
+        var updatedContact2 = "contact 4";
+        var initialContacts = Set.of(initialContact1, initialContact2);
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, updatedContact1),
+                    Pair.of(null, updatedContact2)
+                )
+            ),
+            Arguments.of(
+                initialContacts,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialContacts,
+                Set.of(
+                    Pair.of(initialContact1, updatedContact1),
+                    Pair.of(initialContact2, updatedContact2)
+                )
+            ),
+            Arguments.of(
+                initialContacts,
+                Set.of(
+                    Pair.of(initialContact1, updatedContact1),
+                    Pair.of(null, updatedContact2)
+                )
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление телефонов контакта")
+    @MethodSource("contactPhoneArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changeContactPhones(Set<String> initialContactPhones, Set<Pair<String, String>> updatedContactPhones) {
+        var createdFullModelPartner = step("Создание Партнера с телефонами контакта", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setContacts(
+                Set.of(
+                    new ContactCreateFullModel()
+                        .legalForm(LegalForm.PHYSICAL_PERSON)
+                        .firstName("Контакт")
+                        .phones(initialContactPhones)
+                )
+            );
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var contactPhoneChangeFullModelList = step("Подготавливаем список телефонов контакта для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedContactPhones)) {
+                return null;
+            }
+            return updatedContactPhones.stream()
+                .map(updatedContactPhone -> {
+                    if (StringUtils.isEmpty(updatedContactPhone.getLeft())) {
+                        return new PhoneChangeFullModel()
+                            .phone(updatedContactPhone.getRight());
+                    }
+                    var existedContactPhone = createdFullModelPartner.getContacts().stream()
+                        .flatMap(contact -> contact.getPhones().stream())
+                        .filter(phone -> phone.getPhone().equals(updatedContactPhone.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new PhoneChangeFullModel()
+                        .id(existedContactPhone.getId())
+                        .version(existedContactPhone.getVersion())
+                        .phone(updatedContactPhone.getRight());
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление телефонов контакта", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            Optional.ofNullable(contactPhoneChangeFullModelList)
+                    .ifPresent(it ->
+                        Optional.ofNullable(partnerChange.getContacts())
+                            .ifPresent(contacts ->
+                                contacts.forEach(contact ->
+                                    contact.setPhones(new ArrayList<>(contactPhoneChangeFullModelList)))
+                            )
+                    );
+            return partnerChange;
+        });
+        var expectedContactPhones = step("Подготавливаем ожидаемый список телефонов контакта после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialContactPhones) && CollectionUtils.isEmpty(updatedContactPhones)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialContactPhones)) {
+                return updatedContactPhones.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedContactPhones)) {
+                return new ArrayList<>(initialContactPhones);
+            }
+            return Stream.concat(
+                initialContactPhones.stream().map(initialContactPhone ->
+                    updatedContactPhones.stream()
+                        .filter(it -> initialContactPhone.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialContactPhone)
+                ),
+                updatedContactPhones.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c телефонами контакта.", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка телефонов контакта после обновления Партнера", () -> {
+            var actualPhones = actualPartnerFullModelResponse.getContacts().stream()
+                .flatMap(contact -> contact.getPhones().stream())
+                .map(Phone::getPhone)
+                .collect(Collectors.toList());
+            assertThat(actualPhones)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedContactPhones);
+        });
+    }
+
+    static Stream<? extends Arguments> contactPhoneArgumentsForUpdatingPartnerFullModel() {
+        var initialPhone1 = "1111111111111";
+        var initialPhone2 = "2222222222222";
+        var updatedPhone1 = "1111111111122";
+        var updatedPhone2 = "2222222222233";
+        var initialPhones = Set.of(initialPhone1, initialPhone2);
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, updatedPhone1),
+                    Pair.of(null, updatedPhone2)
+                )
+            ),
+            Arguments.of(
+                initialPhones,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialPhones,
+                Set.of(
+                    Pair.of(initialPhone1, updatedPhone1),
+                    Pair.of(initialPhone2, updatedPhone2)
+                )
+            ),
+            Arguments.of(
+                initialPhones,
+                Set.of(
+                    Pair.of(initialPhone1, updatedPhone1),
+                    Pair.of(null, updatedPhone2)
+                )
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление электронных адресов контакта")
+    @MethodSource("contactEmailArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changeContactEmails(Set<String> initialContactEmails, Set<Pair<String, String>> updatedContactEmails) {
+        var createdFullModelPartner = step("Создание Партнера с электронными адресами контакта", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setContacts(
+                Set.of(
+                    new ContactCreateFullModel()
+                        .legalForm(LegalForm.PHYSICAL_PERSON)
+                        .firstName("Контакт")
+                        .emails(initialContactEmails)
+                )
+            );
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var contactEmailChangeFullModelList = step("Подготавливаем список электронных адресов контакта для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedContactEmails)) {
+                return null;
+            }
+            return updatedContactEmails.stream()
+                .map(updatedContactEmail -> {
+                    if (StringUtils.isEmpty(updatedContactEmail.getLeft())) {
+                        return new EmailChangeFullModel()
+                            .email(updatedContactEmail.getRight());
+                    }
+                    var existedContactEmail = createdFullModelPartner.getContacts().stream()
+                        .flatMap(contact -> contact.getEmails().stream())
+                        .filter(email -> email.getEmail().equals(updatedContactEmail.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new EmailChangeFullModel()
+                        .id(existedContactEmail.getId())
+                        .version(existedContactEmail.getVersion())
+                        .email(updatedContactEmail.getRight());
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление электронных адресов контакта", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            Optional.ofNullable(contactEmailChangeFullModelList)
+                .ifPresent(it ->
+                    Optional.ofNullable(partnerChange.getContacts())
+                        .ifPresent(contacts ->
+                            contacts.forEach(contact ->
+                                contact.setEmails(new ArrayList<>(contactEmailChangeFullModelList)))
+                        )
+                );
+            return partnerChange;
+        });
+        var expectedContactEmails = step("Подготавливаем ожидаемый список электронных адресов контакта после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialContactEmails) && CollectionUtils.isEmpty(updatedContactEmails)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialContactEmails)) {
+                return updatedContactEmails.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedContactEmails)) {
+                return new ArrayList<>(initialContactEmails);
+            }
+            return Stream.concat(
+                initialContactEmails.stream().map(initialContactEmail ->
+                    updatedContactEmails.stream()
+                        .filter(it -> initialContactEmail.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialContactEmail)
+                ),
+                updatedContactEmails.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c электронными адресами контакта.", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка электронные адреса контакта после обновления Партнера", () -> {
+            var actualEmails = actualPartnerFullModelResponse.getContacts().stream()
+                .flatMap(contact -> contact.getEmails().stream())
+                .map(Email::getEmail)
+                .collect(Collectors.toList());
+            assertThat(actualEmails)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedContactEmails);
+        });
+    }
+
+    static Stream<? extends Arguments> contactEmailArgumentsForUpdatingPartnerFullModel() {
+        var initiatEmail1 = "1111@mail.ru";
+        var initialEmail2 = "2222@mail.ru";
+        var updatedEmail1 = "1122@mail.ru";
+        var updatedEmail2 = "2233@mail.ru";
+        var initialEmails = Set.of(initiatEmail1, initialEmail2);
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, updatedEmail1),
+                    Pair.of(null, updatedEmail2)
+                )
+            ),
+            Arguments.of(
+                initialEmails,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialEmails,
+                Set.of(
+                    Pair.of(initiatEmail1, updatedEmail1),
+                    Pair.of(initialEmail2, updatedEmail2)
+                )
+            ),
+            Arguments.of(
+                initialEmails,
+                Set.of(
+                    Pair.of(initiatEmail1, updatedEmail1),
+                    Pair.of(null, updatedEmail2)
+                )
+            )
+        );
+    }
+
+
+    @ParameterizedTest
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление счетов")
+    @MethodSource("accountArgumentsForUpdatingPartnerFullModel")
+    void testUpdatePartnerFullModel_changeAccounts(Set<String> initialAccounts, Set<Pair<String, String>> updatedAccounts) {
+        var createdFullModelPartner = step("Создание Партнера с счетами", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setAccounts(
+                initialAccounts.stream()
+                    .map(PartnerControllerTest::createAccountCreateFullModel)
+                    .collect(Collectors.toSet())
+            );
+            return post(
+                baseRoutePath + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class
+            );
+        });
+        var accountChangeFullModelList = step("Подготавливаем список счетов для обновления", () -> {
+            if (CollectionUtils.isEmpty(updatedAccounts)) {
+                return null;
+            }
+            return updatedAccounts.stream()
+                .map(updatedAccount -> {
+                    if (StringUtils.isEmpty(updatedAccount.getLeft())) {
+                        return new AccountChangeFullModel()
+                            .account(updatedAccount.getRight())
+                            .bank(new BankChangeFullModel()
+                                    .name("Наименование Банка")
+                                    .bic("044525000")
+                                );
+                    }
+                    var existedAccount = createdFullModelPartner.getAccounts().stream()
+                        .filter(account -> account.getAccount().equals(updatedAccount.getLeft()))
+                        .findAny()
+                        .orElse(null);
+                    return new AccountChangeFullModel()
+                        .id(existedAccount.getId())
+                        .version(existedAccount.getVersion())
+                        .account(updatedAccount.getRight())
+                        .bank(new BankChangeFullModel()
+                            .name("Наименование Банка")
+                            .bic("044525000")
+                        );
+                })
+                .collect(Collectors.toSet());
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление партнера", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setAccounts(accountChangeFullModelList);
+            return partnerChange;
+        });
+        var expectedAccounts = step("Подготавливаем ожидаемый список счетов после обновления партнера", () -> {
+            if (CollectionUtils.isEmpty(initialAccounts) && CollectionUtils.isEmpty(updatedAccounts)) {
+                return Collections.emptyList();
+            }
+            if (CollectionUtils.isEmpty(initialAccounts)) {
+                return updatedAccounts.stream().map(Pair::getRight).collect(Collectors.toList());
+            }
+            if (CollectionUtils.isEmpty(updatedAccounts)) {
+                return new ArrayList<>(initialAccounts);
+            }
+            return Stream.concat(
+                initialAccounts.stream().map(initialAccount ->
+                    updatedAccounts.stream()
+                        .filter(it -> initialAccount.equals(it.getLeft()))
+                        .findFirst()
+                        .map(Pair::getRight)
+                        .orElse(initialAccount)
+                ),
+                updatedAccounts.stream()
+                    .filter(it -> StringUtils.isEmpty(it.getLeft()))
+                    .map(Pair::getRight)
+            ).collect(Collectors.toList());
+        });
+        var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c счетами.", () ->
+            patch(
+                baseRoutePath + "/full-model",
+                HttpStatus.OK,
+                partnerChangeFullModel,
+                PartnerFullModelResponse.class
+            )
+        );
+        step("Проверка счетов после обновления Партнера", () -> {
+            var actualAccounts = actualPartnerFullModelResponse.getAccounts().stream()
+                .map(Account::getAccount)
+                .collect(Collectors.toList());
+            assertThat(actualAccounts)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedAccounts);
+        });
+    }
+
+    static Stream<? extends Arguments> accountArgumentsForUpdatingPartnerFullModel() {
+        var initialAccount1 = "40702810000000000001";
+        var initialAccount2 = "40702810300000000002";
+        var updatedAccount1 = "40702810100000000011";
+        var updatedAccount2 = "40702810500000000022";
+        var initialAccounts = Set.of(initialAccount1, initialAccount2);
+        return Stream.of(
+            Arguments.of(
+                Collections.emptySet(),
+                Set.of(
+                    Pair.of(null, updatedAccount1),
+                    Pair.of(null, updatedAccount2)
+                )
+            ),
+            Arguments.of(
+                initialAccounts,
+                Collections.emptySet()
+            ),
+            Arguments.of(
+                initialAccounts,
+                Set.of(
+                    Pair.of(initialAccount1, updatedAccount1),
+                    Pair.of(initialAccount2, updatedAccount2)
+                )
+            ),
+            Arguments.of(
+                initialAccounts,
+                Set.of(
+                    Pair.of(initialAccount1, updatedAccount1),
+                    Pair.of(null, updatedAccount2)
+                )
+            )
+        );
+    }
+
+    static public AccountCreateFullModel createAccountCreateFullModel(String account) {
+        return new AccountCreateFullModel()
+            .account(account)
+            .bank(
+                new BankCreate()
+                    .name("Банк")
+                    .bic("044525000"));
+    }
+
+    private PartnerChangeFullModel mapToPartnerUpdateFullModel(PartnerFullModelResponse partner) {
+        var phones = partner.getPhones() == null ? null : partner.getPhones().stream()
+            .map(it ->
+                new PhoneChangeFullModel()
+                    .id(it.getId())
+                    .version(it.getVersion())
+                    .phone(it.getPhone())
+            )
+            .collect(Collectors.toSet());
+        var emails = partner.getEmails() == null ? null : partner.getEmails().stream()
+            .map(it ->
+                new EmailChangeFullModel()
+                    .id(it.getId())
+                    .version(it.getVersion())
+                    .email(it.getEmail())
+            )
+            .collect(Collectors.toSet());
+        var contacts = partner.getContacts() == null ? null : partner.getContacts().stream()
+            .map(contact ->
+                new ContactChangeFullModel()
+                    .id(contact.getId())
+                    .version(contact.getVersion())
+                    .legalForm(contact.getLegalForm())
+                    .firstName(contact.getFirstName())
+                )
+            .collect(Collectors.toSet());
+        return new PartnerChangeFullModel()
+            .id(partner.getId())
+            .version(partner.getVersion())
+            .digitalId(partner.getDigitalId())
+            .legalForm(partner.getLegalForm())
+            .inn(partner.getInn())
+            .orgName(partner.getOrgName())
+            .phones(phones)
+            .emails(emails)
+            .accounts(null)
+            .documents(null)
+            .address(null)
+            .contacts(contacts);
+    }
+
+    private PartnerFullModelResponse clonePartnerFullModelResponse(PartnerFullModelResponse partner) {
+        return new PartnerFullModelResponse()
+            .id(partner.getId())
+            .version(partner.getVersion())
+            .digitalId(partner.getDigitalId())
+            .legalForm(partner.getLegalForm())
+            .orgName(partner.getOrgName())
+            .firstName(partner.getFirstName())
+            .secondName(partner.getSecondName())
+            .middleName(partner.getMiddleName())
+            .inn(partner.getInn())
+            .kpp(partner.getKpp())
+            .ogrn(partner.getOgrn())
+            .okpo(partner.getOkpo())
+            .comment(partner.getComment())
+            .phones(partner.getPhones())
+            .emails(partner.getEmails())
+            .accounts(partner.getAccounts())
+            .documents(partner.getDocuments())
+            .address(partner.getAddress())
+            .contacts(partner.getContacts());
     }
 
     public static PartnerCreate getValidPartner(String digitalId, LegalForm form) {

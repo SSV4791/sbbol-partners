@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
+import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnAttributeLengthPartnerChangeFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnAttributeLengthPartnerCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnAttributeLengthPartnerCreateFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.ogrn.OgrnAttributeLengthPartnerDtoValidator;
@@ -20,7 +21,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     validatedBy = {
         OgrnAttributeLengthPartnerDtoValidator.class,
         OgrnAttributeLengthPartnerCreateDtoValidator.class,
-        OgrnAttributeLengthPartnerCreateFullModelDtoValidator.class
+        OgrnAttributeLengthPartnerCreateFullModelDtoValidator.class,
+        OgrnAttributeLengthPartnerChangeFullModelDtoValidator.class
     }
 )
 public @interface OgrnLengthValidation {

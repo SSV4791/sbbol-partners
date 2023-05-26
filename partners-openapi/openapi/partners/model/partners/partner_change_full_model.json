@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Изменение партнера и его дочерних сущностей",
+  "x-extra-class-annotation": "@InnLengthValidation @InnExistValidation @PartnerNameValidation @OgrnLengthValidation @OkpoValidataion @BalanceTreasureAccountValidation @TreasureAccountCodeCurrencyValidation @TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation @BankAccountKeyValidation",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Уникальный идентификатор партнера",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 160,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "latinName": {
+      "type": "string",
+      "title": "Латинское наименование",
+      "pattern": "[A-Za-z0-9!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 255,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "inn": {
+      "type": "string",
+      "pattern": "[0-9]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "title": "ИНН",
+      "x-extra-field-annotation": "@InnControlNumberValidation"
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП",
+      "pattern": "[0-9A-Z]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 9,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "x-extra-field-annotation": "@KppValidation"
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН",
+      "minLength": 13,
+      "maxLength": 15,
+      "x-extra-field-annotation": "@OgrnKeyValidation"
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО",
+      "pattern": "[0-9]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий пользователя",
+      "maxLength": 255,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
+    },
+    "citizenship": {
+      "$ref": "../common/citizenship.json"
+    },
+    "accounts": {
+      "type": "array",
+      "title": "Счета",
+      "items": {
+        "$ref": "../accounts/account_change_full_model.json",
+        "maxItems": 10
+      },
+      "uniqueItems": true
+    },
+    "phones": {
+      "type": "array",
+      "title": "Телефоны",
+      "items": {
+        "$ref": "../phone/phone_change_full_model.json",
+        "maxItems": 10
+      },
+      "uniqueItems": true
+    },
+    "emails": {
+      "type": "array",
+      "title": "Адреса электронной почты",
+      "items": {
+        "$ref": "../email/email_change_full_model.json",
+        "maxItems": 10
+      },
+      "uniqueItems": true
+    },
+    "contacts": {
+      "title": "Контакты",
+      "type": "array",
+      "items": {
+        "$ref": "../contact/contact_change_full_model.json",
+        "maxItems": 10
+      },
+      "uniqueItems": true
+    },
+    "address": {
+      "title": "Адрес",
+      "type": "array",
+      "items": {
+        "$ref": "../address/address_change_full_model.json",
+        "maxItems": 10
+      },
+      "uniqueItems": true
+    },
+    "documents": {
+      "title": "Документы",
+      "type": "array",
+      "items": {
+        "$ref": "../documents/document_change_full_model.json",
+        "maxItems": 10
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "id",
+    "digitalId",
+    "version",
+    "legalForm"
+  ]
+}
+

@@ -14,7 +14,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.AccountCreateErrorAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.AccountCreateSuccessAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.AccountUpdateErrorAuditMapperAgent;
@@ -33,6 +32,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccou
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccountsCreateSuccessAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccountsDeleteErrorAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccountsDeleteSuccessAuditMapperAgent;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 
 import java.util.ArrayList;
 import java.util.stream.Stream;
@@ -278,7 +278,7 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
     @Test
     void partnerFullModelCreateSuccessAgentMappingTest() {
         var partner =
-            Allure.step("Создание объекта для маппинга", () -> factory.manufacturePojo(PartnerCreateFullModelResponse.class));
+            Allure.step("Создание объекта для маппинга", () -> factory.manufacturePojo(PartnerFullModelResponse.class));
         var params =
             Allure.step("Получение параметров события", () -> {
                 var agent = new PartnerFullModelCreateSuccessAuditMapperAgent();

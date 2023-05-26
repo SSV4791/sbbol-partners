@@ -1,8 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
+import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerChangeFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerCreateFullModelDtoValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -20,7 +21,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     validatedBy = {
         NameAttributePartnerDtoValidator.class,
         NameAttributePartnerCreateDtoValidator.class,
-        NameAttributePartnerFullModelDtoValidator.class
+        NameAttributePartnerCreateFullModelDtoValidator.class,
+        NameAttributePartnerChangeFullModelDtoValidator.class
     }
 )
 public @interface PartnerNameValidation {
