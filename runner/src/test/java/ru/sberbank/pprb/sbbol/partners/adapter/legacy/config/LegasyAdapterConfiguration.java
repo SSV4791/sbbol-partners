@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.adapter.legacy.config;
 import org.mockito.ArgumentMatchers;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockReset;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
@@ -115,7 +118,23 @@ public class LegasyAdapterConfiguration extends PodamConfiguration {
     }
 
     @Bean
-    public LegacySbbolAdapter legacySbbolAdapter(RestTemplate restTemplate) {
-        return new LegacySbbolAdapterImpl(restTemplate);
+    public RetryTemplate sbbolLegacyRetryTemplate(
+        @Value("${sbbol.retry.max_attempts:3}") Integer maxAttempts,
+        @Value("${sbbol.retry.interval:5000}") Long retryTimeInterval
+    ) {
+        return RetryTemplate.builder()
+            .notRetryOn(HttpClientErrorException.BadRequest.class)
+            .traversingCauses()
+            .maxAttempts(maxAttempts)
+            .fixedBackoff(retryTimeInterval)
+            .build();
+    }
+
+    @Bean
+    public LegacySbbolAdapter legacySbbolAdapter(
+        RestTemplate restTemplate,
+        RetryTemplate sbbolLegacyRetryTemplate
+    ) {
+        return new LegacySbbolAdapterImpl(restTemplate, sbbolLegacyRetryTemplate);
     }
 }

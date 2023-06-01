@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
@@ -41,10 +42,11 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
 
     private final RestTemplate restTemplate;
     private final HttpHeaders httpHeaders;
+    private final RetryTemplate retryTemplate;
 
-
-    public LegacySbbolAdapterImpl(RestTemplate restTemplate) {
+    public LegacySbbolAdapterImpl(RestTemplate restTemplate, RetryTemplate retryTemplate) {
         this.restTemplate = restTemplate;
+        this.retryTemplate = retryTemplate;
         this.httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -239,12 +241,14 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     @Override
     public CounterpartyCheckRequisitesResult checkRequisites(CounterpartyCheckRequisites request) {
         try {
-            ResponseEntity<CounterpartyCheckRequisitesResult> responseEntity = restTemplate.exchange(
-                CHECK_REQUISITES,
-                HttpMethod.POST,
-                new HttpEntity<>(request, httpHeaders),
-                new ParameterizedTypeReference<>() {
-                });
+            ResponseEntity<CounterpartyCheckRequisitesResult> responseEntity = retryTemplate.execute(context ->
+                restTemplate.exchange(
+                    CHECK_REQUISITES,
+                    HttpMethod.POST,
+                    new HttpEntity<>(request, httpHeaders),
+                    new ParameterizedTypeReference<>() {}
+                )
+            );
             return responseEntity.getBody();
         } catch (HttpClientErrorException e) {
             throw new SbbolException(e.getStatusCode(), e.getMessage(), e);

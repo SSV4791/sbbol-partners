@@ -59,6 +59,8 @@ data:
     # Sbbol connect
     sbbol.url={% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.host }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='host') | first }}{% endif %}:{% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.istio_mesh_port | default('80') }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}/ss-rest/api
     sbbol.time_out={{ os_project.sbbol.time_out | default('10000') }}
+    sbbol.retry.max_attempts={{  os_project.sbbol.retry.max_attempts | default('3') }}
+    sbbol.retry.interval={{  os_project.sbbol.retry.interval | default('5000') }}
 
     # Fraud
     fraud.enabled={{ os_project.fraud.enabled | default('true') }}
