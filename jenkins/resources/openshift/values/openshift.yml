@@ -51,6 +51,11 @@ os_project:
       mtls:
         port: 5443
 
+  sbbol:
+    retry:
+      max_attempts: 3
+      interval: 5000
+
   audit:
     enabled: false
     time_out: 5000
