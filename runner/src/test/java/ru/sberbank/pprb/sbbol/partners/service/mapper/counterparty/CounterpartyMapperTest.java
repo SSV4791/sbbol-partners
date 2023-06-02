@@ -33,6 +33,20 @@ class CounterpartyMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
+    void toCounterpartyCheckRequisites_thenTaxNumberIsEmpty() {
+        var searchRequest = factory.manufacturePojo(CounterpartySearchRequest.class);
+        searchRequest.setTaxNumber("");
+        CounterpartyCheckRequisites response = mapper.toCounterpartyCheckRequisites(searchRequest);
+        assertThat(searchRequest.getAccountNumber()).isEqualTo(response.getAccountNumber());
+        assertThat(searchRequest.getBankAccount()).isEqualTo(response.getBankAccount());
+        assertThat(searchRequest.getBankBic()).isEqualTo(response.getBankBic());
+        assertThat(searchRequest.getDigitalId()).isEqualTo(response.getDigitalId());
+        assertThat(searchRequest.getKpp()).isEqualTo(response.getKpp());
+        assertThat(searchRequest.getName()).isEqualTo(response.getName());
+        assertThat(response.getTaxNumber()).isNull();
+    }
+
+    @Test
     void toCounterpartyTest() {
         var partner = factory.manufacturePojo(PartnerEntity.class);
         var account = factory.manufacturePojo(AccountEntity.class);
