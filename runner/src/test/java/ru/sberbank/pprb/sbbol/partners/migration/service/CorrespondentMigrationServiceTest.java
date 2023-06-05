@@ -16,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,7 +102,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
         assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
         generatedCorrespondent.setVersion(1);
-        generatedCorrespondent.setReplicationGuid(RandomStringUtils.randomAlphanumeric(10));
+        generatedCorrespondent.setReplicationGuid(UUID.randomUUID().toString());
         response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {});
         correspondentData = response.getResult().getCorrespondents().get(0);
         assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
@@ -121,7 +122,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
         assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
         generatedCorrespondent.setVersion(1);
-        generatedCorrespondent.setReplicationGuid(RandomStringUtils.randomAlphanumeric(10));
+        generatedCorrespondent.setReplicationGuid(UUID.randomUUID().toString());
         generatedCorrespondent.setPprbGuid(correspondentData.getPprbGuid());
         response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
         });
@@ -166,7 +167,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
             correspondent.setAccount(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setBic(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setDescription(RandomStringUtils.randomAlphanumeric(8));
-            correspondent.setReplicationGuid(randomReplicationGuid);
+            correspondent.setReplicationGuid(UUID.randomUUID().toString());
             correspondent.setCorrPhoneNumber(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setCorrEmail(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setBankAccount(RandomStringUtils.randomAlphanumeric(8));
