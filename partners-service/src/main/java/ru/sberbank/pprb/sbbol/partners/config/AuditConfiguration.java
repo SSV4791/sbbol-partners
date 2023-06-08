@@ -6,6 +6,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.AuditAspect;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.AuditEventMapperAgent;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.PartnerFullModelUpdateErrorAuditMapperAgent;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.PartnerFullModelUpdateSuccessAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.service.audit.AuditService;
 import ru.sberbank.pprb.sbbol.partners.service.audit.AuditServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.AuditEventMapperAgentRegistry;
@@ -92,6 +94,16 @@ public class AuditConfiguration {
     @Bean
     AuditEventMapperAgent partnerFullModelCreateErrorAgent() {
         return new PartnerFullModelCreateErrorAuditMapperAgent();
+    }
+
+    @Bean
+    AuditEventMapperAgent partnerFullModelUpdateSuccessAgent() {
+        return new PartnerFullModelUpdateSuccessAuditMapperAgent();
+    }
+
+    @Bean
+    AuditEventMapperAgent partnerFullModelUpdateErrorAgent() {
+        return new PartnerFullModelUpdateErrorAuditMapperAgent();
     }
 
     @Bean

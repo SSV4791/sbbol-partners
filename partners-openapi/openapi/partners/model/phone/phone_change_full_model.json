@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Изменение телефона в рамках изменения партнера и его дочерних сущностей",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор телефона",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Номер телефона",
+      "minLength": 13,
+      "maxLength": 13,
+      "pattern": "\\d{13}",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
+    }
+  },
+  "required": [
+    "phone"
+  ]
+}

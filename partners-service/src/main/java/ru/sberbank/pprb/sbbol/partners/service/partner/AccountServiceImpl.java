@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
@@ -19,6 +20,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
@@ -32,6 +34,8 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -123,26 +127,18 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Audit(eventType = ACCOUNT_UPDATE)
     public Account updateAccount(AccountChange account) {
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getId()))
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, account.getDigitalId(), account.getId()));
-        if (!Objects.equals(account.getVersion(), foundAccount.getVersion())) {
-            throw new OptimisticLockException(foundAccount.getVersion(), account.getVersion());
-        }
+        var foundAccount = findAccountEntity(account.getDigitalId(), account.getId(), account.getVersion());
         accountMapper.updateAccount(account, foundAccount);
-        if (AccountStateType.SIGNED == foundAccount.getState()) {
-            throw new AccountAlreadySignedException(account.getAccount());
-        }
-        try {
-            var savedAccount = accountRepository.save(foundAccount);
-            var response = accountMapper.toAccount(savedAccount, budgetMaskService);
-            response.setVersion(response.getVersion() + 1);
-            replicationService.updateCounterparty(response);
-            return response;
-        } catch (DataIntegrityViolationException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            throw new EntrySaveException(DOCUMENT_NAME, e);
-        }
+        return saveAccount(foundAccount);
+    }
+
+    @Override
+    @Transactional
+    @Audit(eventType = ACCOUNT_UPDATE)
+    public Account patchAccount(AccountChange account) {
+        var foundAccount = findAccountEntity(account.getDigitalId(), account.getId(), account.getVersion());
+        accountMapper.patchAccount(account, foundAccount);
+        return saveAccount(foundAccount);
     }
 
     @Override
@@ -236,5 +232,51 @@ public class AccountServiceImpl implements AccountService {
             throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());
         }
         return accountMapper.toAccountWithPartner(accounts.get(0));
+    }
+
+    @Override
+    @Transactional
+    public void saveOrPatchAccounts(String digitalId, String partnerId, Set<AccountChangeFullModel> accounts) {
+        Optional.ofNullable(accounts)
+            .ifPresent(addressList ->
+                addressList.forEach(accountChangeFullModel -> saveOrPatchAccount(digitalId, partnerId, accountChangeFullModel)));
+    }
+
+    @Override
+    @Transactional
+    public void saveOrPatchAccount(String digitalId, String partnerId, AccountChangeFullModel accountChangeFullModel) {
+        if (StringUtils.hasText(accountChangeFullModel.getId())) {
+            var account = accountMapper.toAccount(accountChangeFullModel, digitalId, partnerId);
+            patchAccount(account);
+        } else {
+            var accountCreate = accountMapper.toAccountCreate(accountChangeFullModel, digitalId, partnerId);
+            saveAccount(accountCreate);
+        }
+    }
+
+    private AccountEntity findAccountEntity(String digitalId, String accountId, Long version) {
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountId))
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
+        if (!Objects.equals(version, foundAccount.getVersion())) {
+            throw new OptimisticLockException(foundAccount.getVersion(), version);
+        }
+        return foundAccount;
+    }
+
+    private Account saveAccount(AccountEntity account) {
+        if (AccountStateType.SIGNED == account.getState()) {
+            throw new AccountAlreadySignedException(account.getAccount());
+        }
+        try {
+            var savedAccount = accountRepository.save(account);
+            var response = accountMapper.toAccount(savedAccount, budgetMaskService);
+            response.setVersion(response.getVersion() + 1);
+            replicationService.updateCounterparty(response);
+            return response;
+        } catch (DataIntegrityViolationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw new EntrySaveException(DOCUMENT_NAME, e);
+        }
     }
 }

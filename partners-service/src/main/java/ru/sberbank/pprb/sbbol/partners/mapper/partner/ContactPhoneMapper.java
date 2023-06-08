@@ -6,6 +6,9 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactPhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
+import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
+
+import java.util.Optional;
 
 @Loggable
 @Mapper
@@ -20,4 +23,10 @@ public interface ContactPhoneMapper extends BaseMapper {
     @Mapping(target = "contact", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     ContactPhoneEntity toPhone(Phone phone);
+
+    Phone toPhone(PhoneChangeFullModel phone, String digitalId, String unifiedId);
+
+    default String toPhoneStr(PhoneChangeFullModel phone) {
+        return Optional.ofNullable(phone).map(PhoneChangeFullModel::getPhone).orElse(null);
+    }
 }

@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeKeyAccountChangeDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeKeyAccountChangeFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeKeyAccountCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.account.account.AccountAttributeKeyAccountCreateFullModelDtoValidator;
 
@@ -24,6 +25,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         AccountAttributeKeyAccountChangeDtoValidator.class,
         AccountAttributeKeyAccountCreateDtoValidator.class,
         AccountAttributeKeyAccountCreateFullModelDtoValidator.class,
+        AccountAttributeKeyAccountChangeFullModelDtoValidator.class,
     }
 )
 public @interface AccountKeyValidation {

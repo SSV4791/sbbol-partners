@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Изменение банка в рамках изменения партнера и его дочерних сущностей",
+  "x-extra-class-annotation": "@BankAccountValidation",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "Идентификатор",
+      "minLength": 36,
+      "maxLength": 36,
+      "x-not-empty": true
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "bic": {
+      "type": "string",
+      "title": "БИК",
+      "pattern": "[0-9]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "minLength": 9,
+      "maxLength": 9,
+      "x-length-message": "{validation.account.bank.bic.length}"
+    },
+    "name": {
+      "type": "string",
+      "title": "Наименование",
+      "maxLength": 160,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "x-not-empty": true
+    },
+    "mediary": {
+      "deprecated": true,
+      "type": "boolean",
+      "title": "Является транзитным банком",
+      "default": false
+    },
+    "bankAccount": {
+      "$ref": "bank_account_change_full_model.json",
+      "title": "Корреспондентский счёт"
+    },
+    "type": {
+      "$ref": "../common/bank_type.json"
+    },
+    "swift_code": {
+      "type": "string",
+      "title": "SWIFT-код Банка",
+      "maxLength": 8
+    },
+    "clearing_country_code": {
+      "type": "string",
+      "title": "Клиринговый код страны Банка",
+      "maxLength": 2
+    },
+    "clearing_bank_code": {
+      "type": "string",
+      "title": "Клиринговый код Банка",
+      "maxLength": 31
+    },
+    "clearing_bank_symbol_code": {
+      "type": "string",
+      "title": "Символьный клиринговый код Банка",
+      "maxLength": 2
+    },
+    "clearing_bank_code_name": {
+      "type": "string",
+      "title": "Наименование клирингового кода Банка",
+      "maxLength": 140
+    },
+    "filial": {
+      "type": "string",
+      "title": "Филиал Банка",
+      "maxLength": 70
+    },
+    "bank_option": {
+      "type": "string",
+      "title": "Опция Банка",
+      "maxLength": 1
+    }
+  },
+  "required": [
+    "name",
+    "bic"
+  ]
+}

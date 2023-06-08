@@ -8,9 +8,10 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValid;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
@@ -50,12 +51,17 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<PartnerCreateFullModelResponse> createFullModel(PartnerCreateFullModel partnerCreateFullModel) {
+    public ResponseEntity<PartnerFullModelResponse> createFullModel(PartnerCreateFullModel partnerCreateFullModel) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partnerService.savePartner(partnerCreateFullModel));
     }
 
     @Override
     public ResponseEntity<Partner> update(Partner partner) {
-        return ResponseEntity.ok(partnerService.updatePartner(partner));
+        return ResponseEntity.ok(partnerService.patchPartner(partner));
+    }
+
+    @Override
+    public ResponseEntity<PartnerFullModelResponse> patchFullModel(PartnerChangeFullModel partnerChangeFullModel) {
+        return ResponseEntity.status(HttpStatus.OK).body(partnerService.patchPartner(partnerChangeFullModel));
     }
 }

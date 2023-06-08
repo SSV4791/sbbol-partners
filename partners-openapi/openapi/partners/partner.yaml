@@ -174,7 +174,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'model/partners/partner_create_full_model_response.json'
+                $ref: 'model/partners/partner_full_model_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: 'model/common/error.json'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+    patch:
+      tags:
+        - Partners
+      description: Обновление партнера
+      operationId: patch-full-model
+      requestBody:
+        description: Партнеры
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'model/partners/partner_change_full_model.json'
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/partners/partner_full_model_response.json'
         404:
           description: Not Found
         400:

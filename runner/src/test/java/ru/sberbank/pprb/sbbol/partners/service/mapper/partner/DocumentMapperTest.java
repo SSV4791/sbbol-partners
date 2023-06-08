@@ -1,16 +1,18 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.DocumentCertifierType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.LegalFormMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 
@@ -19,17 +21,17 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ContextConfiguration(
+    classes = {
+        DocumentMapperImpl.class,
+        DocumentTypeMapperImpl.class,
+        LegalFormMapperImpl.class
+    }
+)
 class DocumentMapperTest extends BaseUnitConfiguration {
 
+    @Autowired
     private DocumentMapper mapper;
-
-    @Mock
-    private DocumentTypeMapper documentTypeMapper;
-
-    @BeforeEach
-    void before() {
-        mapper = new DocumentMapperImpl(documentTypeMapper);
-    }
 
     @Test
     void testToDocuments() {
@@ -91,5 +93,55 @@ class DocumentMapperTest extends BaseUnitConfiguration {
         DocumentCertifierType documentType = DocumentMapper.toCertifierType(typeEnum);
         assertThat(typeEnum)
             .isEqualTo(DocumentMapper.toCertifierType(documentType));
+    }
+
+    @Test
+    void mapDocumentChangeFullModelToDocumentChange() {
+        var documentChangeFullModel = factory.manufacturePojo(DocumentChangeFullModel.class);
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedId = factory.manufacturePojo(String.class);
+        var actualDocumentChange = mapper.toDocument(documentChangeFullModel, digitalId, unifiedId);
+        var expectedDocumentChange = new DocumentChange()
+            .id(documentChangeFullModel.getId())
+            .digitalId(digitalId)
+            .unifiedId(unifiedId)
+            .version(documentChangeFullModel.getVersion())
+            .divisionCode(documentChangeFullModel.getDivisionCode())
+            .divisionIssue(documentChangeFullModel.getDivisionIssue())
+            .certifierName(documentChangeFullModel.getCertifierName())
+            .certifierType(documentChangeFullModel.getCertifierType())
+            .number(documentChangeFullModel.getNumber())
+            .series(documentChangeFullModel.getSeries())
+            .positionCertifier(documentChangeFullModel.getPositionCertifier())
+            .documentTypeId(documentChangeFullModel.getDocumentTypeId())
+            .dateIssue(documentChangeFullModel.getDateIssue());
+        assertThat(actualDocumentChange)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedDocumentChange);
+    }
+
+    @Test
+    void mapDocumentChangeFullModelToDocumentCreate() {
+        var documentChangeFullModel = factory.manufacturePojo(DocumentChangeFullModel.class);
+        var digitalId = factory.manufacturePojo(String.class);
+        var unifiedId = factory.manufacturePojo(String.class);
+        var actualDocumentCreate = mapper.toDocumentCreate(documentChangeFullModel, digitalId, unifiedId);
+        var expectedDocumentCreate = new DocumentCreate()
+            .digitalId(digitalId)
+            .unifiedId(unifiedId)
+            .divisionCode(documentChangeFullModel.getDivisionCode())
+            .divisionIssue(documentChangeFullModel.getDivisionIssue())
+            .certifierName(documentChangeFullModel.getCertifierName())
+            .certifierType(documentChangeFullModel.getCertifierType())
+            .number(documentChangeFullModel.getNumber())
+            .series(documentChangeFullModel.getSeries())
+            .positionCertifier(documentChangeFullModel.getPositionCertifier())
+            .documentTypeId(documentChangeFullModel.getDocumentTypeId())
+            .dateIssue(documentChangeFullModel.getDateIssue());
+        assertThat(actualDocumentCreate)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedDocumentCreate);
     }
 }

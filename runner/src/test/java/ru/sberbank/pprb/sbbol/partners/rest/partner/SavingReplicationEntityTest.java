@@ -9,7 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
 import ru.sberbank.pprb.sbbol.partners.legacy.exception.SbbolException;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.ReplicationEntity;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType;
@@ -114,7 +114,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             baseRoutePath + "/full-model",
             HttpStatus.CREATED,
             request,
-            PartnerCreateFullModelResponse.class
+            PartnerFullModelResponse.class
         );
         var createdAccounts = createdPartner.getAccounts();
         for (var account : createdAccounts) {

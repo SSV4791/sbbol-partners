@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.model;
 
+import ru.sberbank.pprb.sbbol.partners.validation.partner.okpo.OkpoLengthPartnerChangeFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.okpo.OkpoLengthPartnerCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.okpo.OkpoLengthPartnerCreateFullModelDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.okpo.OkpoLengthPartnerDtoValidator;
@@ -20,7 +21,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     validatedBy = {
         OkpoLengthPartnerDtoValidator.class,
         OkpoLengthPartnerCreateDtoValidator.class,
-        OkpoLengthPartnerCreateFullModelDtoValidator.class
+        OkpoLengthPartnerCreateFullModelDtoValidator.class,
+        OkpoLengthPartnerChangeFullModelDtoValidator.class
     }
 )
 public @interface OkpoValidataion {

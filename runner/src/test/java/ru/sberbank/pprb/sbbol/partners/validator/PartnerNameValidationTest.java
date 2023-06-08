@@ -10,7 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerDtoValidator;
-import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerFullModelDtoValidator;
+import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerCreateFullModelDtoValidator;
 
 import javax.validation.ConstraintValidatorContext;
 
@@ -163,7 +163,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.PHYSICAL_PERSON);
 
         var validator =
-            spy(new NameAttributePartnerFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator());
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -176,7 +176,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.PHYSICAL_PERSON);
 
         var validator =
-            spy(new NameAttributePartnerFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator());
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -190,7 +190,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.PHYSICAL_PERSON);
 
         var validator =
-            spy(new NameAttributePartnerFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator());
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -203,7 +203,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.LEGAL_ENTITY);
 
         var validator =
-            spy(new NameAttributePartnerFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator());
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -216,7 +216,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.ENTREPRENEUR);
 
         var validator =
-            spy(new NameAttributePartnerFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator());
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));

@@ -221,6 +221,18 @@ public abstract class AbstractIntegrationTest {
             .as(response);
     }
 
+    public static <T, BODY> T patch(String url, HttpStatus responseHttpStatus, BODY body, Class<T> response) {
+        return given()
+            .spec(requestSpec)
+            .body(body)
+            .when()
+            .patch(url)
+            .then()
+            .spec(specResponseHandler(responseHttpStatus))
+            .extract()
+            .as(response);
+    }
+
     public static Response delete(String url, HttpStatus responseHttpStatus, Object... params) {
         return given()
             .spec(requestSpec)

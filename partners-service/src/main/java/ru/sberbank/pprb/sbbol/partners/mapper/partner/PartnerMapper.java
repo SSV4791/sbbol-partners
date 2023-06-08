@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.AfterMapping;
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,12 +18,14 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerCitizenshipType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.StringMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.PartnerMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Citizenship;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +48,7 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
     },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
+@DecoratedWith(PartnerMapperDecorator.class)
 public interface PartnerMapper extends BaseMapper {
 
     @Mapping(target = "gku", ignore = true)
@@ -163,6 +167,20 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "gkuInnEntity", ignore = true)
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);
 
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "orgName", source = "orgName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "firstName", source = "firstName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "secondName", source = "secondName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "middleName", source = "middleName", qualifiedByName = "toTrimmed")
+    @Mapping(target = "legalType", source = "legalForm", qualifiedByName = "toLegalType")
+    @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "createDate", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "search", ignore = true)
+    @Mapping(target = "gkuInnEntity", ignore = true)
+    void patchPartner(PartnerChangeFullModel partner, @MappingTarget() PartnerEntity partnerEntity);
+
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
         var searchSubString =
@@ -204,7 +222,7 @@ public interface PartnerMapper extends BaseMapper {
     @Mapping(target = "documents", ignore = true)
     @Mapping(target = "address", ignore = true)
     @Mapping(target = "contacts", ignore = true)
-    PartnerCreateFullModelResponse toPartnerMullResponse(PartnerEntity partner);
+    PartnerFullModelResponse toPartnerMullResponse(PartnerEntity partner);
 
     @NotNull
     @Override

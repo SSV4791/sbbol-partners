@@ -1,10 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
@@ -13,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 
@@ -68,6 +71,10 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "positionCertifier", source = "document.positionCertifier")
     DocumentEntity toDocument(DocumentCreateFullModel document, String digitalId, UUID unifiedUuid);
 
+    DocumentChange toDocument(DocumentChangeFullModel document, String digitalId, String unifiedId);
+
+    DocumentCreate toDocumentCreate(DocumentChangeFullModel document, String digitalId, String unifiedId);
+
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
     @Mapping(target = "version", ignore = true)
@@ -90,4 +97,17 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void updateDocument(DocumentChange document, @MappingTarget DocumentEntity documentEntity);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "toUUID")
+    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "toUUID")
+    @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
+    void patchDocument(DocumentChange document, @MappingTarget DocumentEntity documentEntity);
+
+    @Named("toUUID")
+    default UUID toUUID(String id) {
+        return mapUuid(id);
+    }
 }

@@ -1,8 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
@@ -36,4 +38,11 @@ public interface BankAccountMapper extends BaseMapper {
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "account", source = "bankAccount")
     void updateBankAccount(BankAccount bankAccount, @MappingTarget BankAccountEntity bankAccountEntity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "uuid", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "bank", ignore = true)
+    @Mapping(target = "account", source = "bankAccount")
+    void patchBankAccount(BankAccount bankAccount, @MappingTarget BankAccountEntity bankAccountEntity);
 }

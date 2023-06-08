@@ -1,11 +1,14 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
+import ru.sberbank.pprb.sbbol.partners.model.ContactChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
@@ -17,6 +20,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Loggable
@@ -89,16 +94,17 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public Contact updateContact(Contact contact) {
-        var foundContact = contactRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getId()))
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, contact.getDigitalId(), contact.getId()));
-        if (!Objects.equals(contact.getVersion(), foundContact.getVersion())) {
-            throw new OptimisticLockException(foundContact.getVersion(), contact.getVersion());
-        }
+        var foundContact = findContactEntity(contact.getDigitalId(), contact.getId(), contact.getVersion());
         contactMapper.updateContact(contact, foundContact);
-        var saveContact = contactRepository.save(foundContact);
-        var response = contactMapper.toContact(saveContact);
-        response.setVersion(response.getVersion() + 1);
-        return response;
+        return saveContact(foundContact);
+    }
+
+    @Override
+    @Transactional
+    public Contact patchContact(Contact contact) {
+        var foundContact = findContactEntity(contact.getDigitalId(), contact.getId(), contact.getVersion());
+        contactMapper.patchContact(contact, foundContact);
+        return saveContact(foundContact);
     }
 
     @Override
@@ -112,5 +118,41 @@ public class ContactServiceImpl implements ContactService {
             addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
             documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
         }
+    }
+
+    @Override
+    @Transactional
+    public void saveOrPatchContacts(String digitalId, String partnerId, Set<ContactChangeFullModel> contacts) {
+        Optional.ofNullable(contacts)
+            .ifPresent(contactList ->
+                contactList.forEach(contactChangeFullModel -> saveOrPatchContact(digitalId, partnerId, contactChangeFullModel)));
+    }
+
+    @Override
+    @Transactional
+    public void saveOrPatchContact(String digitalId, String partnerId, ContactChangeFullModel contactChangeFullModel) {
+        if (StringUtils.hasText(contactChangeFullModel.getId())) {
+            var contact = contactMapper.toContact(contactChangeFullModel, digitalId, partnerId);
+            patchContact(contact);
+        } else {
+            var contactCreate = contactMapper.toContactCreate(contactChangeFullModel, digitalId, partnerId);
+            saveContact(contactCreate);
+        }
+    }
+
+    private ContactEntity findContactEntity(String digitalId, String contactId, Long version) {
+        var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(contactId))
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactId));
+        if (!Objects.equals(version, foundContact.getVersion())) {
+            throw new OptimisticLockException(foundContact.getVersion(), version);
+        }
+        return foundContact;
+    }
+
+    private Contact saveContact(ContactEntity contact) {
+        var saveContact = contactRepository.save(contact);
+        var response = contactMapper.toContact(saveContact);
+        response.setVersion(response.getVersion() + 1);
+        return response;
     }
 }
