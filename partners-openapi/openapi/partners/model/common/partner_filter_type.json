@@ -1,11 +1,13 @@
 {
-  "title": "Фильтр по видам партнеров и правовой формы ЮЛ",
+  "title": "Фильтр для отображения организаций с фильтром по типам счетов",
   "type": "string",
   "enum": [
     "LEGAL_ENTITY",
     "ENTREPRENEUR",
     "PHYSICAL_PERSON",
     "GKU",
-    "BUDGET"
+    "BUDGET",
+    "CUR_ACCOUNT",
+    "RUB_ACCOUNT"
   ]
 }

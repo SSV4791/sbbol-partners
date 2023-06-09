@@ -34,7 +34,8 @@
     },
     "partnersFilter": {
       "deprecated": true,
-      "description": "Будут исключены типы LEGAL_ENTITY, ENTREPRENEUR, PHYSICAL_PERSON",
+      "deprecationMessage": "Будут исключены типы LEGAL_ENTITY, ENTREPRENEUR, PHYSICAL_PERSON",
+      "description": "Фильтр для отображения организаций с фильтром по типам счетов",
       "$ref": "../common/partner_filter_type.json"
     },
     "accountSignType": {
