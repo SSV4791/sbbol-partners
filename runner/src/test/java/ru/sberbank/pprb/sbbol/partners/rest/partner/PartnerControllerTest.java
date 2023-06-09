@@ -29,6 +29,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
+import ru.sberbank.pprb.sbbol.partners.model.BankType;
 import ru.sberbank.pprb.sbbol.partners.model.CertifierType;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactChangeFullModel;
@@ -89,10 +90,13 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_N
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
+import static ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType.CUR_ACCOUNT;
+import static ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType.RUB_ACCOUNT;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.createValidBudgetAccountWith40101Balance;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRenter;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -115,6 +119,108 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         if (gkuInnEntity2 != null) {
             innDictionaryRepository.delete(gkuInnEntity2);
         }
+    }
+
+    @Test
+    void testPartnersWithViewAccountCurrFilter() {
+        var digitalId = step("Подготовка тестовых данных. DigitalId", () -> randomAlphabetic(10));
+        var partner = step("Создание партнера", () -> post(
+            baseRoutePath,
+            HttpStatus.CREATED,
+            getValidLegalEntityPartner(digitalId),
+            Partner.class
+        ));
+
+        var filter = step("Подготовка тестовых данных. PartnersFilter", () ->
+            new PartnersFilter()
+                .digitalId(digitalId)
+                .partnersFilter(CUR_ACCOUNT)
+                .pagination(
+                    new Pagination()
+                        .offset(0)
+                        .count(10)
+                )
+        );
+
+        var response = step("Выполнение запроса. У партнера нет счетов, должен вернуться пустой список партнеров", () -> post(
+            "/partners/view",
+            HttpStatus.OK,
+            filter,
+            PartnersResponse.class
+        ));
+
+        step("Проверка результата", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getPartners())
+                .asList()
+                .isEmpty();
+        });
+
+        step("Подготовка тестовых данных. Создание счета. (BankType DEFAULT)", () ->
+            createValidAccount(partner.getId(), digitalId));
+
+        var response1 = step("Выполнение запроса. У клиента есть счет, но только рублевый(BankType DEFAULT), должен вернуться пустой список", () ->
+             post(
+                "/partners/view",
+                HttpStatus.OK,
+                filter,
+                PartnersResponse.class
+            ));
+
+        step("Проверка результата", () -> {
+        assertThat(response1)
+            .isNotNull();
+        assertThat(response1.getPartners())
+            .asList()
+            .isEmpty();
+        });
+
+        step("Подготовка тестовых данных. Устанавливаем фильтр на партнеров с рублевыми счетами (BankType DEFAULT)",
+            () -> filter.partnersFilter(RUB_ACCOUNT));
+
+        var response2 = step("Выполнение запроса. У партнера есть рублевый счет, должен вернуться список с 1 партнером", () ->
+            post(
+                "/partners/view",
+                HttpStatus.OK,
+                filter,
+                PartnersResponse.class
+            ));
+
+        step("Проверка результата", () -> {
+            assertThat(response2)
+                .isNotNull();
+            assertThat(response2.getPartners())
+                .asList()
+                .isNotEmpty()
+                .hasSize(1);
+        });
+
+        step("Подготовка тестовых данных. Создание счета. BankType BENEFICIARY", () -> {
+            var validAccount = getValidAccount(partner.getId(), digitalId);
+            validAccount.getBank().type(BankType.BENEFICIARY);
+            createValidAccount(validAccount);
+        });
+
+        step("Подготовка тестовых данных. Устанавливаем фильтр на партнеров с валютными счетами",
+            () -> filter.partnersFilter(CUR_ACCOUNT));
+
+        var response3 = step("Выполнение запроса. У партнера есть валютный счет, должен вернуться список с 1 партнером", () ->
+            post(
+                "/partners/view",
+                HttpStatus.OK,
+                filter,
+                PartnersResponse.class
+            ));
+
+        step("Проверка результата", () -> {
+            assertThat(response3)
+                .isNotNull();
+            assertThat(response3.getPartners())
+                .asList()
+                .isNotEmpty()
+                .hasSize(1);
+        });
     }
 
     @Test
@@ -3071,13 +3177,13 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partnerChangeFullModel = step("Подготавливаем запрос на обновление телефонов контакта", () -> {
             var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
             Optional.ofNullable(contactPhoneChangeFullModelList)
-                    .ifPresent(it ->
-                        Optional.ofNullable(partnerChange.getContacts())
-                            .ifPresent(contacts ->
-                                contacts.forEach(contact ->
-                                    contact.setPhones(new ArrayList<>(contactPhoneChangeFullModelList)))
-                            )
-                    );
+                .ifPresent(it ->
+                    Optional.ofNullable(partnerChange.getContacts())
+                        .ifPresent(contacts ->
+                            contacts.forEach(contact ->
+                                contact.setPhones(new ArrayList<>(contactPhoneChangeFullModelList)))
+                        )
+                );
             return partnerChange;
         });
         var expectedContactPhones = step("Подготавливаем ожидаемый список телефонов контакта после обновления партнера", () -> {
@@ -3320,9 +3426,9 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                         return new AccountChangeFullModel()
                             .account(updatedAccount.getRight())
                             .bank(new BankChangeFullModel()
-                                    .name("Наименование Банка")
-                                    .bic("044525000")
-                                );
+                                .name("Наименование Банка")
+                                .bic("044525000")
+                            );
                     }
                     var existedAccount = createdFullModelPartner.getAccounts().stream()
                         .filter(account -> account.getAccount().equals(updatedAccount.getLeft()))
@@ -3454,7 +3560,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                     .version(contact.getVersion())
                     .legalForm(contact.getLegalForm())
                     .firstName(contact.getFirstName())
-                )
+            )
             .collect(Collectors.toSet());
         return new PartnerChangeFullModel()
             .id(partner.getId())
