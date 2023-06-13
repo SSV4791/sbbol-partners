@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners phone number
-  version: 1.0.9
+  version: 1.1.0
   description: OpenAPI Specification for Partner phone number
 
 servers:
