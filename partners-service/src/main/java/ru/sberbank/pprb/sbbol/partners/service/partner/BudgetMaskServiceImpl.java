@@ -6,7 +6,6 @@ import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
-import ru.sberbank.pprb.sbbol.partners.exception.BadRequestException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
@@ -61,8 +60,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         return !isTaxAccountReceiver && (isGisGmpReceiver || isOfkReceiver);
     }
 
-    @Override
-    public boolean isBicGisGmp(String bic) {
+    private boolean isBicGisGmp(String bic) {
         if (!StringUtils.hasText(bic)) {
             return false;
         }
@@ -70,8 +68,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         return StringUtils.hasText(bic) && checkMask(bic, masks);
     }
 
-    @Override
-    public boolean isAccountGisGmp(String account) {
+    private boolean isAccountGisGmp(String account) {
         if (!StringUtils.hasText(account)) {
             return false;
         }
@@ -79,9 +76,8 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         return checkMask(account, masks);
     }
 
-    @Override
-    public boolean isOfkReceiver(String accountNumber, String bankAccount) {
-        if (StringUtils.hasText(accountNumber) && StringUtils.hasText(bankAccount)) {
+    private boolean isOfkReceiver(String accountNumber, String bankAccount) {
+        if (!StringUtils.hasText(accountNumber) || !StringUtils.hasText(bankAccount)) {
             return false;
         }
         var accountMasks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.BUDGET_ACCOUNT);
@@ -89,8 +85,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         return checkMask(accountNumber, accountMasks) && checkMask(bankAccount, corrAccountMasks);
     }
 
-    @Override
-    public boolean isTaxAccountReceiver(String bankAccount) {
+    private boolean isTaxAccountReceiver(String bankAccount) {
         if (!StringUtils.hasText(bankAccount)) {
             return false;
         }
@@ -115,7 +110,9 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
                 maskFormatter.setMask(mask.getMask());
                 maskFormatter.valueToString(param);
                 return true;
-            } catch (ParseException ignored) {}
+            } catch (ParseException ignored) {
+                //Игнорируем ошибку, чтоб идти дальше по процессу.
+            }
         }
         return false;
     }
