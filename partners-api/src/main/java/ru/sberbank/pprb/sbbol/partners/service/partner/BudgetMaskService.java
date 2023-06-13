@@ -25,37 +25,4 @@ public interface BudgetMaskService {
      * @return true - при совпадении масок, иначе - false
      */
     boolean isBudget(String account, String bic, String bankAccount);
-
-    /**
-     * Подходит ли БИК под требования ГИС ГМП
-     *
-     * @param bic БИК
-     * @return true - при совпадении масок, иначе - false
-     */
-    boolean isBicGisGmp(String bic);
-
-    /**
-     * Подходит ли счёт под требования ГИС ГМП
-     *
-     * @param account номер счёта
-     * @return true - при совпадении масок, иначе - false
-     */
-    boolean isAccountGisGmp(String account);
-
-    /**
-     * Проверяет является ли счёт ОФК
-     *
-     * @param accountNumber номер счёта
-     * @param bankAccount   корр счёт банка
-     * @return true - при совпадении масок, иначе - false
-     */
-    boolean isOfkReceiver(String accountNumber, String bankAccount);
-
-    /**
-     * Подходит ли счёт под маски счетов организации УФК
-     *
-     * @param bankAccount корр счёт банка
-     * @return true - при совпадении масок, иначе - false
-     */
-    boolean isTaxAccountReceiver(String bankAccount);
 }
