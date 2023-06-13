@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
@@ -15,6 +14,9 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRe
 import javax.swing.text.MaskFormatter;
 import java.text.ParseException;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.util.StringUtils.hasText;
 
 @Loggable
 public class BudgetMaskServiceImpl implements BudgetMaskService {
@@ -61,15 +63,15 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     }
 
     private boolean isBicGisGmp(String bic) {
-        if (!StringUtils.hasText(bic)) {
+        if (isBlank(bic)) {
             return false;
         }
         var masks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.BIC);
-        return StringUtils.hasText(bic) && checkMask(bic, masks);
+        return hasText(bic) && checkMask(bic, masks);
     }
 
     private boolean isAccountGisGmp(String account) {
-        if (!StringUtils.hasText(account)) {
+        if (isBlank(account)) {
             return false;
         }
         var masks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.GIS_GMP_ACCOUNT);
@@ -77,7 +79,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     }
 
     private boolean isOfkReceiver(String accountNumber, String bankAccount) {
-        if (!StringUtils.hasText(accountNumber) || !StringUtils.hasText(bankAccount)) {
+        if (isBlank(accountNumber) || isBlank(bankAccount)) {
             return false;
         }
         var accountMasks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.BUDGET_ACCOUNT);
@@ -86,7 +88,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     }
 
     private boolean isTaxAccountReceiver(String bankAccount) {
-        if (!StringUtils.hasText(bankAccount)) {
+        if (isBlank(bankAccount)) {
             return false;
         }
         var masks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.TAX_ACCOUNT_RECEIVER);
@@ -101,7 +103,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
      * @return true если счёт или бик попадает под одну из масок
      */
     private boolean checkMask(String param, List<BudgetMaskEntity> masks) {
-        if (!StringUtils.hasText(param) || CollectionUtils.isEmpty(masks)) {
+        if (isBlank(param) || CollectionUtils.isEmpty(masks)) {
             return false;
         }
         MaskFormatter maskFormatter = new MaskFormatter();
