@@ -130,11 +130,6 @@
       "title": "Признак ЖКУ",
       "default": false
     },
-    "budget": {
-      "type": "boolean",
-      "title": "Признак бюджетности",
-      "default": false
-    },
     "citizenship": {
       "$ref": "../common/citizenship.json"
     }

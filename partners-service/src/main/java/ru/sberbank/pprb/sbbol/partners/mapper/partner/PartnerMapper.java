@@ -214,7 +214,6 @@ public interface PartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "gku", ignore = true)
-    @Mapping(target = "budget", ignore = true)
     @Mapping(target = "id", expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
