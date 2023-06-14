@@ -9,7 +9,6 @@ import java.util.HashMap;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.EventParamNames.ACCOUNTS;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.EventParamNames.ADDRESS;
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.EventParamNames.BUDGET;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.EventParamNames.CITIZENSHIP;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.EventParamNames.COMMENT;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.EventParamNames.CONTACTS;
@@ -55,7 +54,6 @@ public class PartnerFullModelUpdateSuccessAuditMapperAgent implements AuditEvent
         putEventParam(EMAILS, partner.getEmails(), params);
         putEventParam(COMMENT, partner.getComment(), params);
         putEventParam(GKU, partner.getGku(), params);
-        putEventParam(BUDGET, partner.getBudget(), params);
         putEventParam(CITIZENSHIP, partner.getCitizenship(), params);
         return params;
     };
