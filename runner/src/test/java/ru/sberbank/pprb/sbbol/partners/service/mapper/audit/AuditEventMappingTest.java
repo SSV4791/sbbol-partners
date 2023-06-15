@@ -310,7 +310,6 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
                     partner.getContacts().toString(),
                     partner.getAddress().toString(),
                     partner.getGku().toString(),
-                    partner.getBudget().toString(),
                     partner.getDocuments().toString()
                 );
         });
