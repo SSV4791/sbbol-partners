@@ -159,6 +159,8 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "inn", source = "partner.inn")
     @Mapping(target = "kpp", source = "partner.kpp")
     @Mapping(target = "comment", source = "partner.comment")
+    @Mapping(target = "version", source = "partner.version")
+    @Mapping(target = "gku", ignore = true)
     AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto);
 
     default List<AccountWithPartnerResponse> toAccountsWithPartner(PartnerEntity partner) {

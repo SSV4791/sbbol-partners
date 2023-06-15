@@ -17,6 +17,7 @@ dependencies {
     implementation(platform(liveLibs.spring.boot.dependencies))
     implementation(liveLibs.antifraud.api)
     implementation(liveLibs.bundles.micrometer)
+    implementation(liveLibs.ehcache.net.core)
     implementation(liveLibs.hibernate.jcache)
     implementation(liveLibs.javax.servlet.api)
     implementation(liveLibs.mapstruct.core)
@@ -25,9 +26,9 @@ dependencies {
     implementation(liveLibs.sbp.jpa.model.support)
     implementation(liveLibs.spring.boot.starter.aop)
     implementation(liveLibs.spring.boot.starter.data.jpa)
+    implementation(liveLibs.spring.context.support)
 
     compileOnly(liveLibs.hibernate.jpamodelgen)
-    runtimeOnly(liveLibs.ehcache.org.core)
 }
 
 val componentName = "${project.properties["metaComponentName"]}"

@@ -27,10 +27,10 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
+import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.List;
 import java.util.Objects;
@@ -55,7 +55,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final ContactRepository contactRepository;
     private final AddressRepository addressRepository;
     private final PartnerRepository partnerRepository;
-    private final GkuInnDictionaryRepository gkuInnDictionaryRepository;
+    private final GkuInnCacheableStorage gkuInnCacheableStorage;
     private final BudgetMaskService budgetMaskService;
     private final FraudServiceManager fraudServiceManager;
     private final AccountMapper accountMapper;
@@ -75,7 +75,7 @@ public class PartnerServiceImpl implements PartnerService {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        GkuInnDictionaryRepository gkuInnDictionaryRepository,
+        GkuInnCacheableStorage gkuInnCacheableStorage,
         BudgetMaskService budgetMaskService,
         FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
@@ -94,7 +94,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.contactRepository = contactRepository;
         this.addressRepository = addressRepository;
         this.partnerRepository = partnerRepository;
-        this.gkuInnDictionaryRepository = gkuInnDictionaryRepository;
+        this.gkuInnCacheableStorage = gkuInnCacheableStorage;
         this.budgetMaskService = budgetMaskService;
         this.fraudServiceManager = fraudServiceManager;
         this.accountMapper = accountMapper;
@@ -116,7 +116,7 @@ public class PartnerServiceImpl implements PartnerService {
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = partnerMapper.toPartner(partner);
-        response.setGku(getGku(response.getInn()));
+        response.setGku(isGkuInn(response.getInn()));
         return response;
     }
 
@@ -144,7 +144,7 @@ public class PartnerServiceImpl implements PartnerService {
             return partnersResponse;
         }
         for (Partner partner : partners) {
-            partner.setGku(getGku(partner.getInn()));
+            partner.setGku(isGkuInn(partner.getInn()));
         }
         return partnersResponse.partners(partners);
     }
@@ -177,7 +177,7 @@ public class PartnerServiceImpl implements PartnerService {
             replicationService.createCounterparty(accounts);
         }
         return partnerMapper.toPartnerMullResponse(savedPartner)
-            .gku(getGku(savedPartner.getInn()))
+            .gku(isGkuInn(savedPartner.getInn()))
             .accounts(accounts)
             .address(addresses)
             .documents(documents)
@@ -191,7 +191,7 @@ public class PartnerServiceImpl implements PartnerService {
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
         var response = partnerMapper.toPartner(savePartner);
-        response.setGku(getGku(response.getInn()));
+        response.setGku(isGkuInn(response.getInn()));
         return response;
     }
 
@@ -212,7 +212,7 @@ public class PartnerServiceImpl implements PartnerService {
         }
         var response = partnerMapper.toPartner(savePartner);
         response.setVersion(response.getVersion() + 1);
-        response.setGku(getGku(response.getInn()));
+        response.setGku(isGkuInn(response.getInn()));
         return response;
     }
 
@@ -243,7 +243,7 @@ public class PartnerServiceImpl implements PartnerService {
             .map(accountMapper::toAccount)
             .collect(Collectors.toList());
         return partnerMapper.toPartnerMullResponse(savedPartner)
-            .gku(getGku(savedPartner.getInn()))
+            .gku(isGkuInn(savedPartner.getInn()))
             .address(addresses)
             .documents(documents)
             .contacts(contacts)
@@ -280,20 +280,6 @@ public class PartnerServiceImpl implements PartnerService {
         }
     }
 
-    /**
-     * Получение признака ЖКУ
-     *
-     * @param inn ИНН
-     * @return признак принадлежит инн ЖКУ true - да, false - нет
-     */
-    private boolean getGku(String inn) {
-        if (inn == null) {
-            return false;
-        }
-        var housingInn = gkuInnDictionaryRepository.getByInn(inn);
-        return housingInn != null;
-    }
-
     private PartnerEntity findPartnerEntity(String digitalId, String partnerId, Long version) {
         PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(partnerId))
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
@@ -302,5 +288,9 @@ public class PartnerServiceImpl implements PartnerService {
             throw new OptimisticLockException(foundPartner.getVersion(),version);
         }
         return foundPartner;
+    }
+
+    private boolean isGkuInn(String inn) {
+        return gkuInnCacheableStorage.isGkuInn(inn);
     }
 }

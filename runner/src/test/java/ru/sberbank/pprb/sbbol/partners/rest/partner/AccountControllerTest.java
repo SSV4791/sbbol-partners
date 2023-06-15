@@ -5,14 +5,18 @@ import io.restassured.common.mapper.TypeRef;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -27,7 +31,9 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.partners.storage.CacheNames;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,7 +58,22 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class AccountControllerTest extends BaseAccountControllerTest {
 
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
+    private GkuInnDictionaryRepository innDictionaryRepository;
+
     private static final String KPP_WITHOUT_ACCOUNT = "618243879";
+
+    private GkuInnEntity gkuInnEntity;
+
+    @AfterEach
+    void after() {
+        if (gkuInnEntity != null) {
+            innDictionaryRepository.delete(gkuInnEntity);
+        }
+    }
 
     @Test
     @DisplayName("POST /partner/accounts/view аттрибут ЖКУ = true")
@@ -2233,6 +2254,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testGetAtRequisites_whenRequestIsCorrect() {
         var partner =
             step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
         Account account = step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
         step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId())
             .account(account.getAccount())
@@ -2253,6 +2275,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .inn(partner.getInn())
                 .kpp(partner.getKpp())
                 .name(partner.getOrgName()));
+        step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
         List<AccountWithPartnerResponse> accountsWithPartner =
             step("Выполнение post-запроса /partner/account/get-at-requisites",
                 () -> post(
@@ -2267,6 +2290,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(accountsWithPartner)
                 .size().isEqualTo(1);
             AccountWithPartnerResponse accountWithPartnerActual = accountsWithPartner.get(0);
+            assertThat(accountWithPartnerActual.getGku())
+                .isTrue();
+            assertThat(accountWithPartnerActual.getVersion())
+                .isNotNull();
             assertThat(accountWithPartnerActual.getId())
                 .isEqualTo(partner.getId());
             assertThat(accountWithPartnerActual.getInn())
@@ -2287,7 +2314,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
         var partner =
             step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
         Account account = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-
         var request = step("Подготовка тестовых данных",
             () -> new AccountAndPartnerRequest()
                 .digitalId(partner.getDigitalId())
@@ -2317,6 +2343,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isEqualTo(partner.getInn());
             assertThat(accountWithPartnerActual.getKpp())
                 .isEqualTo(partner.getKpp());
+            assertThat(accountWithPartnerActual.getGku())
+                .isFalse();
+            assertThat(accountWithPartnerActual.getVersion())
+                .isNotNull();
             Account actualAccount = accountWithPartnerActual.getAccount();
             assertThat(actualAccount)
                 .isNull();
@@ -2421,11 +2451,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
         var partner =
             step("Создание партнера",
                 (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-
+        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
         Account account =
             step("Создание счета",
                 () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-
         var request =
             step("Подготовка тестовых данных",
                 () ->
@@ -2438,7 +2467,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                         .kpp(partner.getKpp())
                         .name(partner.getOrgName())
             );
-
+        step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
         AccountWithPartnerResponse accountWithPartnerActual =
             step("Выполнение post-запроса /partner/account/get-at-all-requisites",
                 () ->
@@ -2448,7 +2477,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
                         new TypeRef<>() {
                         }
                     ));
-
         step("Проверка корректности ответа",
             () -> {
                 assertThat(accountWithPartnerActual)
@@ -2459,6 +2487,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .isEqualTo(partner.getInn());
                 assertThat(accountWithPartnerActual.getKpp())
                     .isEqualTo(partner.getKpp());
+                assertThat(accountWithPartnerActual.getGku())
+                    .isTrue();
+                assertThat(accountWithPartnerActual.getVersion())
+                    .isNotNull();
                 Account actualAccount = accountWithPartnerActual.getAccount();
                 assertThat(actualAccount)
                     .isNotNull();
@@ -2467,9 +2499,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
 
     @ParameterizedTest
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса. " +
-        "КПП имеет значение null или empty")
+        "КПП не определен у контрагента и не задан в запросе")
     @MethodSource("nullAndEmptyArguments")
-    void testGetAtAllRequisites_whenKppIsNullOrEmpty_thenFindPartner(String dbKppValue, String requestKppValue) {
+    void testGetAtAllRequisites_whenKppIsNull_thenFindPartner(String dbKppValue, String requestKppValue) {
         var creatingPartner =
             step("Подготовка данных о партнере",
                 () -> {
@@ -2511,6 +2543,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .isEqualTo(partner.getId());
                 assertThat(accountWithPartnerActual.getInn())
                     .isEqualTo(partner.getInn());
+                assertThat(accountWithPartnerActual.getGku())
+                    .isFalse();
+                assertThat(accountWithPartnerActual.getVersion())
+                    .isNotNull();
                 Account actualAccount = accountWithPartnerActual.getAccount();
                 assertThat(actualAccount)
                     .isNotNull();
@@ -2674,6 +2710,15 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 assertThat(actualAccount)
                     .isNotNull();
             });
+    }
+
+    private GkuInnEntity saveGkuInn(String inn) {
+        if (!org.springframework.util.StringUtils.hasText(inn)) {
+            return null;
+        }
+        gkuInnEntity = new GkuInnEntity();
+        gkuInnEntity.setInn(inn);
+        return innDictionaryRepository.save(gkuInnEntity);
     }
 
     static Stream<? extends Arguments> nullAndEmptyArguments() {

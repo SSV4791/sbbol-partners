@@ -40,8 +40,11 @@ data:
     management.metrics.export.prometheus.enabled=true
 
     # Service Cache
-    service.legacy.default.cache.time={{ service.legacy.default.cache.time | default('300')}}
-    service.legacy.max.entries.local.heap={{ service.legacy.max.entries.local.heap | default('1000')}}
+    service.legacy.cache.time={{ os_project.service.legacy.cache.time | default('300')}}
+    service.legacy.cache.size={{ os_project.service.legacy.cache.size | default('1000')}}
+    service.gku_inn_dictionary.cache.time={{ os_project.service.gku_inn_dictionary.cache.time | default('3600')}}
+    service.gku_inn_dictionary.cache.size={{ os_project.service.gku_inn_dictionary.cache.size | default('10000')}}
+    service.budget_mask_dictionary.cache.size={{ os_project.service.budget_mask_dictionary.cache.size | default('10000')}}
 
     # AutoProc params
     migrate.gku.batch_size={{ migrate.gku.batch_size | default('10000')}}

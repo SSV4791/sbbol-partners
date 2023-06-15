@@ -22,8 +22,10 @@ public interface BankMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")
     @Mapping(target = "accountId", expression = "java(bank.getAccount().getUuid() == null ? null : bank.getAccount().getUuid().toString())")
+    @Mapping(target = "mediary", source = "intermediary")
     Bank toBank(BankEntity bank);
 
+    @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -33,16 +35,19 @@ public interface BankMapper extends BaseMapper {
     Bank toBank(BankChangeFullModel bankChangeFullModel);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
+    @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     BankEntity toBank(Bank bank);
 
+    @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "bankAccount", ignore = true)
     void updateBank(Bank bank, @MappingTarget BankEntity bankEntity);
 
+    @Mapping(target = "intermediary", source = "mediary")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "account", ignore = true)
