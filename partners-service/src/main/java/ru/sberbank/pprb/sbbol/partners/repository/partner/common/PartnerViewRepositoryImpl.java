@@ -14,7 +14,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BudgetMaskType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
@@ -38,7 +37,6 @@ import javax.persistence.criteria.Subquery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -157,8 +155,6 @@ public class PartnerViewRepositoryImpl
         switch (partnerFilter) {
             case GKU -> addGkuPredicate(builder, predicates, root);
             case BUDGET -> addBudgetPredicate(builder, criteria, predicates, root);
-            case CUR_ACCOUNT -> addCurrencyAccountPredicate(builder, criteria, predicates, root);
-            case RUB_ACCOUNT -> addRoubleAccountPredicate(builder, criteria, predicates, root);
             case ENTREPRENEUR -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), ENTREPRENEUR));
             case PHYSICAL_PERSON -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), PHYSICAL_PERSON));
             case LEGAL_ENTITY -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LEGAL_ENTITY));
@@ -168,46 +164,6 @@ public class PartnerViewRepositoryImpl
     private void addGkuPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root) {
         Join<PartnerEntity, GkuInnEntity> join = root.join(PartnerEntity_.GKU_INN_ENTITY, JoinType.INNER);
         predicates.add(builder.equal(root.get(PartnerEntity_.INN), join.get(GkuInnEntity_.INN)));
-    }
-
-    private void addCurrencyAccountPredicate(
-        CriteriaBuilder builder,
-        CriteriaQuery<PartnerEntity> criteria,
-        List<Predicate> predicates,
-        Root<PartnerEntity> root
-    ) {
-        Subquery<Integer> subQuery = criteria.subquery(Integer.class);
-        Root<AccountEntity> accountRoot = subQuery.from(AccountEntity.class);
-        Join<AccountEntity, BankEntity> bankJoin = accountRoot.join(AccountEntity_.BANK, JoinType.INNER);
-        subQuery
-            .select(builder.literal(1))
-            .where(
-                builder.and(
-                    builder.equal(root.get(PartnerEntity_.UUID), accountRoot.get(AccountEntity_.PARTNER_UUID)),
-                    builder.notEqual(bankJoin.get(BankEntity_.TYPE), BankType.DEFAULT)
-                )
-            );
-        predicates.add(builder.exists(subQuery));
-    }
-
-    private void addRoubleAccountPredicate(
-        CriteriaBuilder builder,
-        CriteriaQuery<PartnerEntity> criteria,
-        List<Predicate> predicates,
-        Root<PartnerEntity> root
-    ) {
-        Subquery<Integer> subQuery = criteria.subquery(Integer.class);
-        Root<AccountEntity> accountRoot = subQuery.from(AccountEntity.class);
-        Join<AccountEntity, BankEntity> bankJoin = accountRoot.join(AccountEntity_.BANK, JoinType.INNER);
-        subQuery
-            .select(builder.literal(1))
-            .where(
-                builder.and(
-                    builder.equal(root.get(PartnerEntity_.UUID), accountRoot.get(AccountEntity_.PARTNER_UUID)),
-                    builder.equal(bankJoin.get(BankEntity_.TYPE), BankType.DEFAULT)
-                )
-            );
-        predicates.add(builder.exists(subQuery));
     }
 
     private void addBudgetPredicate(

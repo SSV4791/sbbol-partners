@@ -50,44 +50,6 @@
     "bankAccount": {
       "$ref": "bank_account.json",
       "title": "Корреспондентский счёт"
-    },
-    "type": {
-      "$ref": "../common/bank_type.json"
-    },
-    "swift_code": {
-      "type": "string",
-      "title": "SWIFT-код Банка",
-      "maxLength": 8
-    },
-    "clearing_country_code": {
-      "type": "string",
-      "title": "Клиринговый код страны Банка",
-      "maxLength": 2
-    },
-    "clearing_bank_code": {
-      "type": "string",
-      "title": "Клиринговый код Банка",
-      "maxLength": 31
-    },
-    "clearing_bank_symbol_code": {
-      "type": "string",
-      "title": "Символьный клиринговый код Банка",
-      "maxLength": 2
-    },
-    "clearing_bank_code_name": {
-      "type": "string",
-      "title": "Наименование клирингового кода Банка",
-      "maxLength": 140
-    },
-    "filial": {
-      "type": "string",
-      "title": "Филиал Банка",
-      "maxLength": 70
-    },
-    "bank_option": {
-      "type": "string",
-      "title": "Опция Банка",
-      "maxLength": 1
     }
   },
   "required": [

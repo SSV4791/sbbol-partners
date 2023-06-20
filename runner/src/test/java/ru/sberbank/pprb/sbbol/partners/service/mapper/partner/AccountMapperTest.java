@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl_;
@@ -99,8 +98,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isEqualTo(actual.getDigitalId());
         assertThat(unifiedUuid)
             .isEqualTo(actual.getPartnerUuid());
-        assertThat(actual.getBank().getType())
-            .isEqualTo(bankMapper.getBankType(expected.getBank().getMediary(), expected.getBank().getType()));
     }
 
     @Test
@@ -131,8 +128,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isEqualTo(actual.getBank().getBic());
         assertThat(expected.getBank().getBankAccount().getAccount())
             .isEqualTo(actual.getBank().getBankAccount().getBankAccount());
-        assertThat(actual.getBank().getMediary())
-            .isEqualTo(expected.getBank().getType() == BankType.AGENT);
     }
 
     @Test
@@ -187,8 +182,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .isEqualTo(actual.getAccount().getBank().getBic());
         assertThat(expected.getBank().getBankAccount().getAccount())
             .isEqualTo(actual.getAccount().getBank().getBankAccount().getBankAccount());
-        assertThat(actual.getAccount().getBank().getMediary())
-            .isEqualTo(expected.getBank().getType() == BankType.AGENT);
     }
 
     @Test
@@ -203,26 +196,16 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .digitalId(digitalId)
             .partnerId(partnerId)
             .account(accountChangeFullModel.getAccount())
-            .comment(accountChangeFullModel.getComment())
-            .currencyCode(accountChangeFullModel.getCurrencyCode())
-            .currencyIsoCode(accountChangeFullModel.getCurrencyIsoCode());
+            .comment(accountChangeFullModel.getComment());
         Optional.ofNullable(accountChangeFullModel.getBank())
                 .ifPresent(bank -> {
                     expectedAccountChange.setBank(new Bank()
                         .id(bank.getId())
                         .version(bank.getVersion())
                         .accountId(accountChangeFullModel.getId())
-                        .bankOption(bank.getBankOption())
                         .bic(bank.getBic())
-                        .clearingBankCode(bank.getClearingBankCode())
-                        .clearingBankCodeName(bank.getClearingBankCodeName())
-                        .clearingCountryCode(bank.getClearingCountryCode())
-                        .clearingBankSymbolCode(bank.getClearingBankSymbolCode())
-                        .filial(bank.getFilial())
                         .mediary(bank.getMediary())
                         .name(bank.getName())
-                        .swiftCode(bank.getSwiftCode())
-                        .type(bank.getType())
                         .bankAccount(
                             Optional.ofNullable(bank.getBankAccount())
                                 .map(bankAccount -> new BankAccount()
@@ -251,23 +234,13 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .digitalId(digitalId)
             .partnerId(partnerId)
             .account(accountChangeFullModel.getAccount())
-            .comment(accountChangeFullModel.getComment())
-            .currencyCode(accountChangeFullModel.getCurrencyCode())
-            .currencyIsoCode(accountChangeFullModel.getCurrencyIsoCode());
+            .comment(accountChangeFullModel.getComment());
         Optional.ofNullable(accountChangeFullModel.getBank())
             .ifPresent(bank -> {
                 expectedAccountCreate.setBank(new BankCreate()
-                    .bankOption(bank.getBankOption())
                     .bic(bank.getBic())
-                    .clearingBankCode(bank.getClearingBankCode())
-                    .clearingBankCodeName(bank.getClearingBankCodeName())
-                    .clearingCountryCode(bank.getClearingCountryCode())
-                    .clearingBankSymbolCode(bank.getClearingBankSymbolCode())
-                    .filial(bank.getFilial())
                     .mediary(bank.getMediary())
                     .name(bank.getName())
-                    .swiftCode(bank.getSwiftCode())
-                    .type(bank.getType())
                     .bankAccount(
                         Optional.ofNullable(bank.getBankAccount())
                             .map(bankAccount -> new BankAccountCreate()
@@ -292,8 +265,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
         expectedAccountEntity.setUuid(UUID.fromString(accountChange.getId()));
         expectedAccountEntity.setPartnerUuid(UUID.fromString(accountChange.getPartnerId()));
         expectedAccountEntity.setAccount(accountChange.getAccount());
-        expectedAccountEntity.setCurrencyCode(accountChange.getCurrencyCode());
-        expectedAccountEntity.setCurrencyIsoCode(accountChange.getCurrencyIsoCode());
         expectedAccountEntity.setComment(accountChange.getComment());
         expectedAccountEntity.setDigitalId(accountChange.getDigitalId());
         expectedAccountEntity.setVersion(accountChange.getVersion());
@@ -302,16 +273,8 @@ class AccountMapperTest extends BaseUnitConfiguration {
                     var bankEntity = new BankEntity();
                     bankEntity.setUuid(UUID.fromString(bank.getId()));
                     bankEntity.setVersion(bank.getVersion());
-                    bankEntity.setType(bankMapper.getBankType(bank.getMediary(), bank.getType()));
                     bankEntity.setBic(bank.getBic());
-                    bankEntity.setBankOption(bank.getBankOption());
-                    bankEntity.setClearingBankCode(bank.getClearingBankCode());
-                    bankEntity.setClearingBankCodeName(bank.getClearingBankCodeName());
-                    bankEntity.setClearingBankSymbolCode(bank.getClearingBankSymbolCode());
-                    bankEntity.setClearingCountryCode(bank.getClearingCountryCode());
-                    bankEntity.setFilial(bank.getFilial());
                     bankEntity.setName(bank.getName());
-                    bankEntity.setSwiftCode(bank.getSwiftCode());
                     bankEntity.setAccount(expectedAccountEntity);
                     Optional.ofNullable(bank.getBankAccount())
                             .ifPresent(bankAccount -> {
@@ -363,8 +326,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
         expectedAccountEntity.setPartnerUuid(actualAccountEntity.getPartnerUuid());
         expectedAccountEntity.setPartner(actualAccountEntity.getPartner());
         expectedAccountEntity.setAccount(actualAccountEntity.getAccount());
-        expectedAccountEntity.setCurrencyCode(actualAccountEntity.getCurrencyCode());
-        expectedAccountEntity.setCurrencyIsoCode(actualAccountEntity.getCurrencyIsoCode());
         expectedAccountEntity.setComment(accountChange.getComment());
         expectedAccountEntity.setDigitalId(actualAccountEntity.getDigitalId());
         expectedAccountEntity.setVersion(accountChange.getVersion());
