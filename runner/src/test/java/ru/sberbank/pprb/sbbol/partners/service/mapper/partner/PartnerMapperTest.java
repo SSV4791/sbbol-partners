@@ -237,8 +237,7 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     void patchPartnerWithoutMergedPhonesAndEmails() {
         var partnerChangeFullModel = new PartnerChangeFullModel()
             .orgName("Updated orgName")
-            .comment("Updated comment")
-            .latinName("Updated latin name");
+            .comment("Updated comment");
         var actualPartnerEntity = factory.manufacturePojo(PartnerEntity.class);
         actualPartnerEntity.getPhones().forEach(phoneEntity -> {
             phoneEntity.setPartner(actualPartnerEntity);
@@ -265,7 +264,6 @@ class PartnerMapperTest extends BaseUnitConfiguration {
         expectedPartnerEntity.setOkpo(actualPartnerEntity.getOkpo());
         expectedPartnerEntity.setCitizenship(actualPartnerEntity.getCitizenship());
         expectedPartnerEntity.setComment(partnerChangeFullModel.getComment());
-        expectedPartnerEntity.setLatinName(partnerChangeFullModel.getLatinName());
         expectedPartnerEntity.setLegalType(actualPartnerEntity.getLegalType());
         expectedPartnerEntity.setPhones(expectedPhones);
         expectedPartnerEntity.setEmails(expectedEmails);
@@ -338,7 +336,6 @@ class PartnerMapperTest extends BaseUnitConfiguration {
         expectedPartnerEntity.setOkpo(actualPartnerEntity.getOkpo());
         expectedPartnerEntity.setCitizenship(actualPartnerEntity.getCitizenship());
         expectedPartnerEntity.setComment(actualPartnerEntity.getComment());
-        expectedPartnerEntity.setLatinName(actualPartnerEntity.getLatinName());
         expectedPartnerEntity.setLegalType(actualPartnerEntity.getLegalType());
         expectedPartnerEntity.setPhones(expectedPhones);
         expectedPartnerEntity.setEmails(expectedEmails);

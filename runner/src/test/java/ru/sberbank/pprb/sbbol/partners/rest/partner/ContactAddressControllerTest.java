@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.Allure;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -364,7 +365,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .building("1")
-            .buildingBlock("2")
+            .buildingBlock(RandomStringUtils.randomAlphabetic(300))
             .city("3")
             .flat("4")
             .location("5")
@@ -372,9 +373,6 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             .regionCode("7")
             .street("8")
             .type(AddressType.LEGAL_ADDRESS)
-            .countryIsoCode("RU")
-            .countryCode("RUS")
-            .country("Россия")
             .zipCode("9");
     }
 

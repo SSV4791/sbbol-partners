@@ -1,21 +1,15 @@
 package ru.sberbank.pprb.sbbol.partners.migration.mapper;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapper;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapperImpl;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapperImpl_;
-import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.decorator.MigrationPartnerMapperDecorator;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 
 import java.util.UUID;
 
@@ -60,7 +54,6 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
         assertThat(migrationAccountEntity.getDigitalId()).isEqualTo(DIGITAL_ID);
         assertThat(migrationAccountEntity.getBank().getBic()).isEqualTo(migrationCorrespondentCandidate.getBic());
         assertThat(migrationAccountEntity.getBank().getName()).isEqualTo(migrationCorrespondentCandidate.getBankName());
-        assertThat(migrationAccountEntity.getBank().getType()).isEqualTo(BankType.DEFAULT);
         assertThat(migrationAccountEntity.getBank().getBankAccount().getAccount()).isEqualTo(migrationCorrespondentCandidate.getBankAccount());
         assertThat(migrationAccountEntity.getBank().getAccount()).isNotNull();
         assertThat(migrationAccountEntity.getBank().getBankAccount().getBank()).isNotNull();

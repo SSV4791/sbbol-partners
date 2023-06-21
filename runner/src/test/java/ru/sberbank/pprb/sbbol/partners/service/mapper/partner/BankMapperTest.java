@@ -82,16 +82,8 @@ class BankMapperTest extends BaseUnitConfiguration {
         bankMapper.updateBank(bank, actualBankEntity);
         var expectedBankEntity = new BankEntity();
         expectedBankEntity.setVersion(bank.getVersion());
-        expectedBankEntity.setBankOption(bank.getBankOption());
         expectedBankEntity.setBic(bank.getBic());
-        expectedBankEntity.setClearingBankCode(bank.getClearingBankCode());
-        expectedBankEntity.setClearingBankCodeName(bank.getClearingBankCodeName());
-        expectedBankEntity.setClearingBankSymbolCode(bank.getClearingBankSymbolCode());
-        expectedBankEntity.setClearingCountryCode(bank.getClearingCountryCode());
-        expectedBankEntity.setFilial(bank.getFilial());
         expectedBankEntity.setName(bank.getName());
-        expectedBankEntity.setSwiftCode(bank.getSwiftCode());
-        expectedBankEntity.setType(bankMapper.getBankType(bank.getMediary(), bank.getType()));
         Optional.ofNullable(bank.getBankAccount())
             .ifPresent(bankAccount -> {
                 var bankAccountEntity = new BankAccountEntity();
@@ -128,16 +120,8 @@ class BankMapperTest extends BaseUnitConfiguration {
         bankMapper.patchBank(bank, actualBankEntity);
         var expectedBankEntity = new BankEntity();
         expectedBankEntity.setVersion(actualBankEntity.getVersion());
-        expectedBankEntity.setBankOption(actualBankEntity.getBankOption());
         expectedBankEntity.setBic(actualBankEntity.getBic());
-        expectedBankEntity.setClearingBankCode(actualBankEntity.getClearingBankCode());
-        expectedBankEntity.setClearingBankCodeName(actualBankEntity.getClearingBankCodeName());
-        expectedBankEntity.setClearingBankSymbolCode(actualBankEntity.getClearingBankSymbolCode());
-        expectedBankEntity.setClearingCountryCode(actualBankEntity.getClearingCountryCode());
-        expectedBankEntity.setFilial(actualBankEntity.getFilial());
         expectedBankEntity.setName(bank.getName());
-        expectedBankEntity.setSwiftCode(actualBankEntity.getSwiftCode());
-        expectedBankEntity.setType(actualBankEntity.getType());
         expectedBankEntity.setBankAccount(actualBankEntity.getBankAccount());
         assertThat(actualBankEntity)
             .usingRecursiveComparison()
@@ -165,17 +149,9 @@ class BankMapperTest extends BaseUnitConfiguration {
         var expectedBank = new Bank()
             .id(bankChangeFullModel.getId())
             .version(bankChangeFullModel.getVersion())
-            .bankOption(bankChangeFullModel.getBankOption())
             .bic(bankChangeFullModel.getBic())
             .name(bankChangeFullModel.getName())
-            .clearingBankCode(bankChangeFullModel.getClearingBankCode())
-            .clearingBankCodeName(bankChangeFullModel.getClearingBankCodeName())
-            .clearingBankSymbolCode(bankChangeFullModel.getClearingBankSymbolCode())
-            .clearingCountryCode(bankChangeFullModel.getClearingCountryCode())
-            .filial(bankChangeFullModel.getFilial())
-            .mediary(bankChangeFullModel.getMediary())
-            .swiftCode(bankChangeFullModel.getSwiftCode())
-            .type(bankChangeFullModel.getType());
+            .mediary(bankChangeFullModel.getMediary());
         Optional.ofNullable(bankChangeFullModel.getBankAccount())
                 .ifPresent(bankAccountChangeFullModel -> {
                     var bankAccount = new BankAccount()

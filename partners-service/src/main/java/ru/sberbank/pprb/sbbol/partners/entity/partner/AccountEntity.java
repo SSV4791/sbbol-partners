@@ -57,12 +57,6 @@ public class AccountEntity extends BaseEntity {
     @Column(name = "account", length = 20)
     private String account;
 
-    @Column(name = "currency_code", nullable = false, length = 3)
-    private String currencyCode;
-
-    @Column(name = "currency_iso_code", nullable = false, length = 3)
-    private String currencyIsoCode;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "state", length = 10)
     private AccountStateType state;
@@ -163,22 +157,6 @@ public class AccountEntity extends BaseEntity {
 
     public void setPartner(PartnerEntity partner) {
         this.partner = partner;
-    }
-
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
-
-    public String getCurrencyIsoCode() {
-        return currencyIsoCode;
-    }
-
-    public void setCurrencyIsoCode(String currencyIsoCode) {
-        this.currencyIsoCode = currencyIsoCode;
     }
 
     @Override
