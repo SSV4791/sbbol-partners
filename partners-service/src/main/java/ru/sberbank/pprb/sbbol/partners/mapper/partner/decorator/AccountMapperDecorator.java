@@ -5,25 +5,57 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
+import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
+import java.util.List;
 import java.util.Optional;
 
 public abstract class AccountMapperDecorator implements AccountMapper {
-
-    private static final String CURRENCY_ISO_CODE_RUR = "RUB";
-
-    private static final String CURRENCY_CODE_RUR = "643";
 
     @Autowired
     @Qualifier("delegate")
     private AccountMapper delegate;
 
     @Autowired
+    private GkuInnCacheableStorage gkuInnCacheableStorage;
+
+    @Autowired
     private BankMapper bankMapper;
+
+    @Override
+    public AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto) {
+        var accountWithPartnerResponse = delegate.toAccountWithPartner(accountDto);
+        accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
+        return accountWithPartnerResponse;
+    }
+
+    public AccountWithPartnerResponse toAccountWithPartner(PartnerEntity partner) {
+        var accountWithPartnerResponse = delegate.toAccountWithPartner(partner);
+        accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
+        return accountWithPartnerResponse;
+    }
+
+    @Override
+    public List<AccountWithPartnerResponse> toAccountsWithPartner(PartnerEntity partner) {
+        var accountWithPartnerResponseList = delegate.toAccountsWithPartner(partner);
+        accountWithPartnerResponseList.forEach(accountWithPartnerResponse ->
+            accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn())));
+        return accountWithPartnerResponseList;
+    }
+
+    @Override
+    public List<AccountWithPartnerResponse> toAccountsWithPartner(List<AccountEntity> accounts) {
+        var accountWithPartnerResponseList = delegate.toAccountsWithPartner(accounts);
+        accountWithPartnerResponseList.forEach(accountWithPartnerResponse ->
+            accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn())));
+        return accountWithPartnerResponseList;
+    }
 
     @Override
     public AccountChange toAccount(AccountChangeFullModel accountChangeFullModel, String digitalId, String partnerId) {
@@ -55,5 +87,9 @@ public abstract class AccountMapperDecorator implements AccountMapper {
             bankMapper.patchBank(account.getBank(), accountEntity.getBank());
         }
         delegate.mapBidirectional(accountEntity);
+    }
+
+    private boolean isGkuInn(String inn) {
+        return gkuInnCacheableStorage.isGkuInn(inn);
     }
 }

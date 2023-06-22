@@ -9,7 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.BudgetMaskMapper;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskFilter;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
+import ru.sberbank.pprb.sbbol.partners.storage.BudgetMaskCacheableStorage;
 
 import javax.swing.text.MaskFormatter;
 import java.text.ParseException;
@@ -21,21 +21,22 @@ import static org.springframework.util.StringUtils.hasText;
 @Loggable
 public class BudgetMaskServiceImpl implements BudgetMaskService {
 
-    private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;
+    private final BudgetMaskCacheableStorage budgetMaskCacheableStorage;
+
     private final BudgetMaskMapper budgetMaskMapper;
 
     public BudgetMaskServiceImpl(
-        BudgetMaskDictionaryRepository budgetMaskDictionaryRepository,
+        BudgetMaskCacheableStorage budgetMaskCacheableStorage,
         BudgetMaskMapper budgetMaskMapper
     ) {
-        this.budgetMaskDictionaryRepository = budgetMaskDictionaryRepository;
+        this.budgetMaskCacheableStorage = budgetMaskCacheableStorage;
         this.budgetMaskMapper = budgetMaskMapper;
     }
 
     @Override
     @Transactional(readOnly = true)
     public BudgetMasksResponse getBudgetMasks(BudgetMaskFilter filter) {
-        var response = budgetMaskDictionaryRepository.findByFilter(filter);
+        var response = budgetMaskCacheableStorage.findByFilter(filter);
         BudgetMasksResponse budgetMasksResponse = new BudgetMasksResponse();
         for (var budgetMaskEntity : response) {
             budgetMasksResponse.addMasksItem(budgetMaskMapper.toBudgetMask(budgetMaskEntity));
@@ -66,7 +67,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         if (isBlank(bic)) {
             return false;
         }
-        var masks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.BIC);
+        var masks = budgetMaskCacheableStorage.findAllByType(BudgetMaskType.BIC);
         return hasText(bic) && checkMask(bic, masks);
     }
 
@@ -74,7 +75,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         if (isBlank(account)) {
             return false;
         }
-        var masks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.GIS_GMP_ACCOUNT);
+        var masks = budgetMaskCacheableStorage.findAllByType(BudgetMaskType.GIS_GMP_ACCOUNT);
         return checkMask(account, masks);
     }
 
@@ -82,8 +83,8 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         if (isBlank(accountNumber) || isBlank(bankAccount)) {
             return false;
         }
-        var accountMasks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.BUDGET_ACCOUNT);
-        var corrAccountMasks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.BUDGET_CORR_ACCOUNT);
+        var accountMasks = budgetMaskCacheableStorage.findAllByType(BudgetMaskType.BUDGET_ACCOUNT);
+        var corrAccountMasks = budgetMaskCacheableStorage.findAllByType(BudgetMaskType.BUDGET_CORR_ACCOUNT);
         return checkMask(accountNumber, accountMasks) && checkMask(bankAccount, corrAccountMasks);
     }
 
@@ -91,7 +92,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
         if (isBlank(bankAccount)) {
             return false;
         }
-        var masks = budgetMaskDictionaryRepository.findAllByType(BudgetMaskType.TAX_ACCOUNT_RECEIVER);
+        var masks = budgetMaskCacheableStorage.findAllByType(BudgetMaskType.TAX_ACCOUNT_RECEIVER);
         return checkMask(bankAccount, masks);
     }
 

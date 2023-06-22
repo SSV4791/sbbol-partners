@@ -84,6 +84,7 @@ class BankMapperTest extends BaseUnitConfiguration {
         expectedBankEntity.setVersion(bank.getVersion());
         expectedBankEntity.setBic(bank.getBic());
         expectedBankEntity.setName(bank.getName());
+        expectedBankEntity.setIntermediary(bank.getMediary());
         Optional.ofNullable(bank.getBankAccount())
             .ifPresent(bankAccount -> {
                 var bankAccountEntity = new BankAccountEntity();
@@ -123,6 +124,7 @@ class BankMapperTest extends BaseUnitConfiguration {
         expectedBankEntity.setBic(actualBankEntity.getBic());
         expectedBankEntity.setName(bank.getName());
         expectedBankEntity.setBankAccount(actualBankEntity.getBankAccount());
+        expectedBankEntity.setIntermediary(bank.getMediary());
         assertThat(actualBankEntity)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()

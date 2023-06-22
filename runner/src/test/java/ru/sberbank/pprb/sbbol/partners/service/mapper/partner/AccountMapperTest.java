@@ -1,22 +1,26 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankAccountMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
@@ -24,14 +28,19 @@ import ru.sberbank.pprb.sbbol.partners.model.Bank;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
+import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ContextConfiguration(
     classes = {
@@ -47,8 +56,13 @@ class AccountMapperTest extends BaseUnitConfiguration {
     @Autowired
     private AccountMapper accountMapper;
 
-    @Autowired
-    private BankMapper bankMapper;
+    @MockBean
+    private GkuInnCacheableStorage gkuInnCacheableStorage;
+
+    @BeforeEach
+    void initEach() {
+        when(gkuInnCacheableStorage.isGkuInn(any())).thenReturn(false);
+    }
 
     @Test
     void testToAccounts() {
@@ -150,38 +164,79 @@ class AccountMapperTest extends BaseUnitConfiguration {
 
     @Test
     void testToAccountWithPartner() {
-        AccountEntity expected = factory.manufacturePojo(AccountEntity.class);
-        AccountWithPartnerResponse actual = accountMapper.toAccountWithPartner(expected);
-        assertThat(actual.getId())
-            .isEqualTo(expected.getPartner().getUuid().toString());
-        assertThat(actual.getOrgName())
-            .isEqualTo(expected.getPartner().getOrgName());
-        assertThat(actual.getFirstName())
-            .isEqualTo(expected.getPartner().getFirstName());
-        assertThat(actual.getSecondName())
-            .isEqualTo(expected.getPartner().getSecondName());
-        assertThat(actual.getMiddleName())
-            .isEqualTo(expected.getPartner().getMiddleName());
-        assertThat(actual.getInn())
-            .isEqualTo(expected.getPartner().getInn());
-        assertThat(actual.getKpp())
-            .isEqualTo(expected.getPartner().getKpp());
-        assertThat(actual.getComment())
-            .isEqualTo(expected.getPartner().getComment());
-        assertThat(actual.getAccount().getPartnerId() )
-            .hasToString(expected.getPartnerUuid().toString());
-        assertThat(actual.getAccount().getId())
-            .hasToString(expected.getUuid().toString());
-        assertThat(actual.getAccount().getDigitalId())
-            .isEqualTo(expected.getDigitalId() );
-        assertThat(actual.getAccount().getAccount())
-            .isEqualTo(expected.getAccount() );
-        assertThat(actual.getAccount().getBank().getName())
-            .isEqualTo(expected.getBank().getName() );
-        assertThat(expected.getBank().getBic())
-            .isEqualTo(actual.getAccount().getBank().getBic());
-        assertThat(expected.getBank().getBankAccount().getAccount())
-            .isEqualTo(actual.getAccount().getBank().getBankAccount().getBankAccount());
+        var accountEntity = factory.manufacturePojo(AccountEntity.class);
+        var expectedAccountWithPartnerResponse = getExpectedAccountWithPartnerResponse(accountEntity);
+        var actualAccountWithPartnerResponse = accountMapper.toAccountWithPartner(accountEntity);
+        assertThat(actualAccountWithPartnerResponse)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedAccountWithPartnerResponse);
+    }
+
+    @Test
+    void testToAccountsWithPartner() {
+        var accountEntity1 = factory.manufacturePojo(AccountEntity.class);
+        var accountEntity2 = factory.manufacturePojo(AccountEntity.class);
+        var accountEntity3 = factory.manufacturePojo(AccountEntity.class);
+        var accountEntities = List.of(accountEntity1, accountEntity2, accountEntity3);
+        var expectedAccountWithPartnerResponse = accountEntities.stream()
+            .map(this::getExpectedAccountWithPartnerResponse)
+            .collect(Collectors.toList());
+        var  actualAccountWithPartnerResponse = accountMapper.toAccountsWithPartner(accountEntities);
+        assertThat(actualAccountWithPartnerResponse)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .isEqualTo(expectedAccountWithPartnerResponse);
+    }
+
+    private AccountWithPartnerResponse getExpectedAccountWithPartnerResponse(AccountEntity accountEntity) {
+        return new AccountWithPartnerResponse()
+            .id(accountEntity.getPartner().getUuid().toString())
+            .digitalId(accountEntity.getPartner().getDigitalId())
+            .version(accountEntity.getPartner().getVersion())
+            .legalForm(PartnerMapper.toLegalType(accountEntity.getPartner().getLegalType()))
+            .inn(accountEntity.getPartner().getInn())
+            .kpp(accountEntity.getPartner().getKpp())
+            .firstName(accountEntity.getPartner().getFirstName())
+            .middleName(accountEntity.getPartner().getMiddleName())
+            .secondName(accountEntity.getPartner().getSecondName())
+            .orgName(accountEntity.getPartner().getOrgName())
+            .comment(accountEntity.getPartner().getComment())
+            .gku(false)
+            .account(
+                new Account()
+                    .id(accountEntity.getUuid().toString())
+                    .digitalId(accountEntity.getDigitalId())
+                    .version(accountEntity.getVersion())
+                    .partnerId(accountEntity.getPartnerUuid().toString())
+                    .account(accountEntity.getAccount())
+                    .priorityAccount(accountEntity.getPriorityAccount())
+                    .state(mapSignType(accountEntity.getState()))
+                    .comment(accountEntity.getComment())
+                    .bank(
+                        new Bank()
+                            .id(accountEntity.getBank().getUuid().toString())
+                            .version(accountEntity.getBank().getVersion())
+                            .accountId(accountEntity.getBank().getAccount().getUuid().toString())
+                            .name(accountEntity.getBank().getName())
+                            .bic(accountEntity.getBank().getBic())
+                            .mediary(accountEntity.getBank().getIntermediary())
+                            .bankAccount(
+                                new BankAccount()
+                                    .id(accountEntity.getBank().getBankAccount().getUuid().toString())
+                                    .version(accountEntity.getBank().getBankAccount().getVersion())
+                                    .bankId(accountEntity.getBank().getBankAccount().getBank().getUuid().toString())
+                                    .bankAccount(accountEntity.getBank().getBankAccount().getAccount())
+                            )
+                    )
+            );
+    }
+
+    private SignType mapSignType(AccountStateType accountStateType) {
+        return switch (accountStateType) {
+            case SIGNED -> SignType.SIGNED;
+            case NOT_SIGNED -> SignType.NOT_SIGNED;
+        };
     }
 
     @Test
@@ -275,6 +330,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                     bankEntity.setVersion(bank.getVersion());
                     bankEntity.setBic(bank.getBic());
                     bankEntity.setName(bank.getName());
+                    bankEntity.setIntermediary(bank.getMediary());
                     bankEntity.setAccount(expectedAccountEntity);
                     Optional.ofNullable(bank.getBankAccount())
                             .ifPresent(bankAccount -> {
