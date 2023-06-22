@@ -188,7 +188,8 @@ paths:
         403:
           description: Forbidden
 
-    patch:
+  /partner/full-model/patch:
+    post:
       tags:
         - Partners
       description: Обновление партнера
