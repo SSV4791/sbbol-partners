@@ -98,8 +98,11 @@ import static ru.sberbank.pprb.sbbol.partners.rest.renter.RenterUtils.getValidRe
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 public class PartnerControllerTest extends AbstractIntegrationTest {
 
-    public static final String baseRoutePath = "/partner";
-    public static final String baseRoutePathForGet = "/partners/{digitalId}/{id}";
+    public static final String BASE_ROUTE_PATH = "/partner";
+
+    public static final String PARTNER_GETTING_URL = "/partners/{digitalId}/{id}";
+
+    public static final String FULL_MODEL_PARTNER_PATCH_URL = BASE_ROUTE_PATH + "/full-model/patch";
 
     @Autowired
     private GkuInnDictionaryRepository innDictionaryRepository;
@@ -121,7 +124,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testCreatePartnerWithoutDigitalId() {
         var partner = getValidLegalEntityPartner("");
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -155,7 +158,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .emails(null)
             .comment(null);
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -163,7 +166,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -189,7 +192,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .emails(null)
             .comment(null);
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -197,7 +200,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -224,7 +227,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .emails(null)
             .comment(null);
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -232,7 +235,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -248,7 +251,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidLegalEntityPartner(randomAlphabetic(10))
             .legalForm(null);
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -272,7 +275,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetPartner() {
         var partner = getValidLegalEntityPartner();
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -281,7 +284,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var actualPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -298,7 +301,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetOnePartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -307,7 +310,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -357,7 +360,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var digitalId = randomAlphabetic(10);
         var innForPartner = getValidInnNumber(LegalForm.LEGAL_ENTITY);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId)
                 .inn(innForPartner),
@@ -367,7 +370,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId)
                 .inn(innForPartner),
@@ -404,7 +407,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetSearchBudgetPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -414,7 +417,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createValidBudgetAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -488,7 +491,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             partner.setAccounts(Set.of(account));
 
             var createdPartner = post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partner,
                 PartnerFullModelResponse.class
@@ -521,7 +524,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetSearchGKUPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -533,7 +536,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         gkuInnEntity1.setInn(createdPartner1.getInn());
         innDictionaryRepository.save(gkuInnEntity1);
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -570,7 +573,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetSearchOrgNamePartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -579,7 +582,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -617,7 +620,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var createPartner = getValidLegalEntityPartner(digitalId);
         createPartner.setOrgName(orgName);
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             createPartner,
             Partner.class
@@ -650,7 +653,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetSearchFIOPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidPhysicalPersonPartner(digitalId),
             Partner.class
@@ -659,7 +662,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -697,7 +700,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partnerCreate = getValidLegalEntityPartner(digitalId);
         partnerCreate.setOrgName(partnerCreate.getOrgName().toLowerCase());
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partnerCreate,
             Partner.class
@@ -707,7 +710,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
         partnerCreate.setOrgName(partnerCreate.getOrgName().toUpperCase());
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partnerCreate,
             Partner.class
@@ -743,7 +746,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetSearchLegalPersonPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -752,7 +755,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
 
             getValidPhysicalPersonPartner(digitalId),
@@ -785,7 +788,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetSearchPhysicalPersonPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -794,7 +797,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidPhysicalPersonPartner(digitalId),
             Partner.class
@@ -826,7 +829,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetSearchEntrepreneurPersonPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -835,7 +838,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidEntrepreneurPartner(digitalId),
             Partner.class
@@ -868,7 +871,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetPartnersNotSignedAccount() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -878,7 +881,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createValidAccount(createdPartner1.getId(), createdPartner1.getDigitalId());
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidEntrepreneurPartner(digitalId),
             Partner.class
@@ -911,7 +914,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetPartnersSignedAccount() throws JsonProcessingException {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -922,7 +925,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createValidAccountsSign(createdPartner1.getDigitalId(), validAccount.getId(), validAccount.getVersion(), getBase64FraudMetaData());
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidEntrepreneurPartner(digitalId),
             Partner.class
@@ -955,19 +958,19 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     @ArgumentsSource(PartnerFilterLegalFormArgumentsProvider.class)
     void testSavePartner_whenLegalFormIsNull(PartnersFilter filter) {
         post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidPartner(filter.getDigitalId(), LegalForm.LEGAL_ENTITY),
             Partner.class
         );
         post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidPartner(filter.getDigitalId(), LegalForm.ENTREPRENEUR),
             Partner.class
         );
         post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidPartner(filter.getDigitalId(), LegalForm.PHYSICAL_PERSON),
             Partner.class
@@ -1039,7 +1042,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         partner.setPhones(newPhones);
         partner.setEmails(newEmails);
         var newUpdatePartner = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             updatePartner(partner),
             Partner.class
@@ -1079,7 +1082,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         partner.setEmails(newEmails1);
         partner.setVersion(newUpdatePartner.getVersion() + 1);
         var newUpdatePartner1 = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             updatePartner(partner),
             Error.class
@@ -1120,7 +1123,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         partner.setPhones(newPhones);
         partner.setEmails(newEmails);
         var newUpdatePartner = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             updatePartner(partner),
             Partner.class
@@ -1160,7 +1163,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         partner.setEmails(newEmails1);
         partner.setVersion(partner.getVersion() + 1);
         var newUpdatePartner1 = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             updatePartner(partner),
             Partner.class
@@ -1220,7 +1223,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testNegativeGetAllPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -1229,7 +1232,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -1238,7 +1241,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner3 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -1297,7 +1300,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetAllPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -1306,7 +1309,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -1315,7 +1318,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
 
         var createdPartner3 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -1349,7 +1352,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testGetPartnersWithoutRenters() {
         var digitalId = randomAlphabetic(10);
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class
@@ -1407,7 +1410,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createValidPartner(partner);
         partner.setKpp(null);
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -1425,7 +1428,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createValidPartner(partner);
         partner.setInn(null);
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -1441,7 +1444,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidLegalEntityPartner();
         createValidPartner(partner);
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -1469,7 +1472,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1488,7 +1491,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -1503,7 +1506,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testUpdatePartner() {
         var partner = getValidLegalEntityPartner();
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -1513,7 +1516,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createdPartner.setPhones(null);
         createdPartner.setEmails(null);
         var newUpdatePartner = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             createdPartner,
             Partner.class
@@ -1534,7 +1537,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createValidPartner(partner);
         var errorUpdatePartner = createdPartner1.kpp(newKpp);
         var error = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             errorUpdatePartner,
             Error.class
@@ -1551,7 +1554,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         Long version = partner.getVersion() + 1;
         partner.setVersion(version);
         var partnerError = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             updatePartner(partner),
             Error.class
@@ -1567,13 +1570,13 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void positiveTestUpdatePartnerVersion() {
         var partner = createValidPartner();
         var updatePartner = put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             updatePartner(partner),
             Partner.class
         );
         var checkPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             updatePartner.getDigitalId(),
@@ -1635,7 +1638,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     @Test
     void testDeprecatedDeletePartner() throws JsonProcessingException {
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(),
             Partner.class
@@ -1643,7 +1646,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(createdPartner)
             .isNotNull();
         var actualPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1662,7 +1665,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         ).getBody();
 
         var searchPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.NOT_FOUND,
             Error.class,
             createdPartner.getDigitalId(),
@@ -1679,7 +1682,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testCreatePartnerWithContacts() {
         var partnerCreate = getValidLegalEntityPartner();
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partnerCreate,
             Partner.class
@@ -1714,7 +1717,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testUpdatePartnerContacts_updateExistContacts() {
         var partnerCreate = getValidLegalEntityPartner();
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partnerCreate,
             Partner.class
@@ -1734,13 +1737,13 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .isNotNull();
         updateEmail.setEmail("12345@mail.ru");
         put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             createdPartner,
             Partner.class
         );
         var updatedPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1778,7 +1781,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void testUpdatePartnerContacts_addNewContacts() {
         var partnerCreate = getValidLegalEntityPartner();
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partnerCreate,
             Partner.class
@@ -1792,13 +1795,13 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createdPartner.getPhones().add(new Phone().phone("0071234567890"));
         createdPartner.getEmails().add(new Email().email("007@mail.ru"));
         put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             createdPartner,
             Partner.class
         );
         var updatedPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1838,7 +1841,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         partnerCreate.getPhones().add("0071234567890");
         partnerCreate.getEmails().add("123@mail.ru");
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partnerCreate,
             Partner.class
@@ -1854,13 +1857,13 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createdPartner.setPhones(phones);
         createdPartner.setEmails(emails);
         put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             createdPartner,
             Partner.class
         );
         var updatedPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1900,7 +1903,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         partnerCreate.getPhones().add("0071234567890");
         partnerCreate.getEmails().add("123@mail.ru");
         var createdPartner = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partnerCreate,
             Partner.class
@@ -1914,13 +1917,13 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         createdPartner.setPhones(Collections.emptySet());
         createdPartner.setEmails(Collections.emptySet());
         put(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.OK,
             createdPartner,
             Partner.class
         );
         var updatedPartner = get(
-            baseRoutePathForGet,
+            PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
@@ -1943,7 +1946,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     void savePartnerFullModel() {
         var request = getValidFullModelLegalEntityPartner();
         var createdPartner = post(
-            baseRoutePath + "/full-model",
+            BASE_ROUTE_PATH + "/full-model",
             HttpStatus.CREATED,
             request,
             PartnerFullModelResponse.class
@@ -1961,7 +1964,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             accountCreateFullModel
         ));
         var error = post(
-            baseRoutePath + "/full-model",
+            BASE_ROUTE_PATH + "/full-model",
             HttpStatus.BAD_REQUEST,
             request,
             Error.class
@@ -1987,7 +1990,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             accountCreateFullModel
         ));
         var error = post(
-            baseRoutePath + "/full-model",
+            BASE_ROUTE_PATH + "/full-model",
             HttpStatus.BAD_REQUEST,
             request,
             Error.class
@@ -2007,7 +2010,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidFullModelLegalEntityPartner();
         partner.setOrgName("");
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -2023,7 +2026,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidFullModelLegalEntityPartner();
         partner.setOrgName("[Наименование Ёё \\] §±`~><");
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -2041,7 +2044,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath + "/full-model")
+            .post(BASE_ROUTE_PATH + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2057,7 +2060,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner1)
             .when()
-            .post(baseRoutePath + "/full-model")
+            .post(BASE_ROUTE_PATH + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2074,7 +2077,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner2)
             .when()
-            .post(baseRoutePath + "/full-model")
+            .post(BASE_ROUTE_PATH + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2090,7 +2093,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidPhysicalPersonPartner();
         partner.setFirstName("[Имя Ёё] \\ §±`~><");
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -2106,7 +2109,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidPhysicalPersonPartner();
         partner.setComment("[Коммент Ёё §±]");
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -2122,7 +2125,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2141,7 +2144,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath + "/full-model")
+            .post(BASE_ROUTE_PATH + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2157,7 +2160,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath + "/full-model")
+            .post(BASE_ROUTE_PATH + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2173,7 +2176,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidLegalEntityPartner();
         partner.setKpp("1234567890");
         var error = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -2184,7 +2187,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
         partner.setKpp("[АБВ1234]");
         var error1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -2196,7 +2199,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
         partner.setKpp("003456789");
         var error2 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.BAD_REQUEST,
             partner,
             Error.class
@@ -2211,7 +2214,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var partner = getValidLegalEntityPartner();
         partner.setKpp(null);
         var response = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -2223,7 +2226,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
         partner.setKpp("0");
         var response1 = post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -2242,7 +2245,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2261,7 +2264,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2283,7 +2286,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath + "/full-model")
+            .post(BASE_ROUTE_PATH + "/full-model")
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2304,7 +2307,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2322,7 +2325,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2337,7 +2340,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner1)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2355,7 +2358,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(baseRoutePath)
+            .post(BASE_ROUTE_PATH)
             .then()
             .spec(createBadRequestResponseSpec)
             .extract()
@@ -2372,7 +2375,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         var createdFullModelPartner = step("Создание Партнера", () -> {
             var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -2391,8 +2394,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             return partnerFullModel;
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнер.", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -2428,7 +2431,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
             partnerCreateFullModel.setPhones(initialPhones);
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -2484,8 +2487,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -2541,7 +2544,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
             partnerCreateFullModel.setEmails(initialEmails);
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -2597,8 +2600,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -2660,7 +2663,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                     .collect(Collectors.toSet())
             );
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -2718,8 +2721,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c адресами.", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -2788,7 +2791,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                     .collect(Collectors.toSet())
             );
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -2846,8 +2849,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c документами.", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -2914,7 +2917,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                     .collect(Collectors.toSet())
             );
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -2972,8 +2975,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c контактами.", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -3040,7 +3043,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 )
             );
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -3104,8 +3107,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c телефонами контакта.", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -3173,7 +3176,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 )
             );
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -3237,8 +3240,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c электронными адресами контакта.", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -3304,7 +3307,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                     .collect(Collectors.toSet())
             );
             return post(
-                baseRoutePath + "/full-model",
+                BASE_ROUTE_PATH + "/full-model",
                 HttpStatus.CREATED,
                 partnerCreateFullModel,
                 PartnerFullModelResponse.class
@@ -3368,8 +3371,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             ).collect(Collectors.toList());
         });
         var actualPartnerFullModelResponse = step("Выполняем запрос на обновление Партнера c счетами.", () ->
-            patch(
-                baseRoutePath + "/full-model",
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
                 HttpStatus.OK,
                 partnerChangeFullModel,
                 PartnerFullModelResponse.class
@@ -3627,7 +3630,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
     protected static Partner createValidPartner() {
         return post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(),
             Partner.class
@@ -3636,7 +3639,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
     protected static Partner createValidPartner(PartnerCreate partner) {
         return post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
@@ -3645,7 +3648,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
 
     protected static Partner createValidPartner(String digitalId) {
         return Allure.step("Создание валидного контрагента", () -> post(
-            baseRoutePath,
+            BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
             Partner.class));
@@ -3658,7 +3661,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         partner.setOkpo("1234123123123213123123123123");
         partner.setEmails(Set.of
             ("@@@@@@@@@@@@"));
-        return post(baseRoutePath, HttpStatus.BAD_REQUEST, partner, Error.class);
+        return post(BASE_ROUTE_PATH, HttpStatus.BAD_REQUEST, partner, Error.class);
     }
 
     public static Partner updatePartner(Partner partner) {
