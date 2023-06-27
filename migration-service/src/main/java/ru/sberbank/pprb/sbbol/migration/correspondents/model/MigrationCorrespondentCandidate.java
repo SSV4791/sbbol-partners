@@ -1,11 +1,16 @@
 package ru.sberbank.pprb.sbbol.migration.correspondents.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * Контрагент-кандидат для миграции
  */
 public class MigrationCorrespondentCandidate implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * Наименование
      */

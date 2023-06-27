@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMapper;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
+import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentResponse;
+import ru.sberbank.pprb.sbbol.migration.exception.MigrationException;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
@@ -47,7 +49,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
 
     @Override
     @Transactional
-    public List<MigratedCorrespondentData> migrate(String digitalId, List<MigrationCorrespondentCandidate> correspondents) {
+    public MigrationCorrespondentResponse migrate(String digitalId, List<MigrationCorrespondentCandidate> correspondents) {
         var migratedCorrespondentData = new ArrayList<MigratedCorrespondentData>(correspondents.size());
         LOGGER.debug("Начало миграции контрагентов для организации c digitalId: {}. Количество кандидатов: {}", digitalId, correspondents.size());
         AccountEntity savedAccount;
@@ -56,11 +58,11 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                 savedAccount = saveOrUpdate(digitalId, correspondent, true);
             } catch (Exception ex) {
                 LOGGER.error(
-                    "В процессе миграции контрагента с sbbolReplicationGuid: {}, произошла ошибка. Причина: {}",
+                    "В процессе миграции контрагента с sbbolReplicationGuid: {}",
                     correspondent.getReplicationGuid(),
                     ex.getCause()
                 );
-                throw ex;
+                throw new MigrationException(ex);
             }
             String pprbGuid = null;
             if (savedAccount.getUuid() != null) {
@@ -75,7 +77,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             );
         }
         LOGGER.debug("Для организации c digitalId: {}, мигрировано {} контрагентов", digitalId, migratedCorrespondentData.size());
-        return migratedCorrespondentData;
+        return new MigrationCorrespondentResponse(migratedCorrespondentData);
     }
 
     @Override
