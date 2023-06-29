@@ -134,7 +134,7 @@ documentation:
       build -x test
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
-  version_init: 02.005.00_0000
+  version_init: 02.007.00_0000
   repository: maven-distr-dev
   artifact_id: CI02792425
   group_id: CI00908578
@@ -152,8 +152,8 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: '2.4'
-    commit_or_tag: '02.004.01_0002_i-2.4'
-    release_key: DCBBRAIN-4121
+    commit_or_tag: '02.006.00_0001_i-2.4'
+    release_key: DCBBRAIN-4501
     reverse_and_publish: false
     type: release
   jobs:
