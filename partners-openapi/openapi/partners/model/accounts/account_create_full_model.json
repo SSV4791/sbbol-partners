@@ -9,18 +9,6 @@
       "title": "Счёт",
       "maxLength": 20
     },
-    "currency_iso_code": {
-      "type": "string",
-      "title": "ISO-код валюты счета",
-      "minLength": 3,
-      "maxLength": 3
-    },
-    "currency_code": {
-      "type": "string",
-      "title": "Код валюты счета",
-      "minLength": 3,
-      "maxLength": 3
-    },
     "bank": {
       "title": "Банк",
       "$ref": "../bank/bank_create.json"

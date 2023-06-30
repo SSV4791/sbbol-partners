@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest.post;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.baseRoutePath;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.BASE_ROUTE_PATH;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidPartner;
 
 public class PartnerFilterIdsArgumentsProvider implements ArgumentsProvider {
@@ -28,7 +28,7 @@ public class PartnerFilterIdsArgumentsProvider implements ArgumentsProvider {
         List<String> ids = new ArrayList<>(partnersSize);
         for (int i = 0; i < partnersSize; i++) {
             Partner partner = post(
-                baseRoutePath,
+                    BASE_ROUTE_PATH,
                 HttpStatus.CREATED,
                 getValidPartner(digitalId, LegalForm.LEGAL_ENTITY),
                 Partner.class

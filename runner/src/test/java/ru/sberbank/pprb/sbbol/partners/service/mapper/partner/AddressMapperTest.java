@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AddressType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
@@ -20,8 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration(
     classes = {
-        AddressMapperImpl.class,
-        AddressMapperImpl_.class
+        AddressMapperImpl.class
     }
 )
 class AddressMapperTest extends BaseUnitConfiguration {
@@ -76,9 +74,6 @@ class AddressMapperTest extends BaseUnitConfiguration {
             .version(addressChangeFullModel.getVersion())
             .digitalId(digitalId)
             .unifiedId(unifiedId)
-            .fullAddress(addressChangeFullModel.getFullAddress())
-            .administrationUnit(addressChangeFullModel.getAdministrationUnit())
-            .administrationUnitCode(addressChangeFullModel.getAdministrationUnitCode())
             .area(addressChangeFullModel.getArea())
             .building(addressChangeFullModel.getBuilding())
             .buildingBlock(addressChangeFullModel.getBuildingBlock())
@@ -89,10 +84,7 @@ class AddressMapperTest extends BaseUnitConfiguration {
             .regionCode(addressChangeFullModel.getRegionCode())
             .street(addressChangeFullModel.getStreet())
             .type(addressChangeFullModel.getType())
-            .zipCode(addressChangeFullModel.getZipCode())
-            .country(addressChangeFullModel.getCountry())
-            .countryCode(addressChangeFullModel.getCountryCode())
-            .countryIsoCode(addressChangeFullModel.getCountryIsoCode());
+            .zipCode(addressChangeFullModel.getZipCode());
         assertThat(actualAddress)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -108,9 +100,6 @@ class AddressMapperTest extends BaseUnitConfiguration {
         var expectedAddressCreate = new AddressCreate()
             .digitalId(digitalId)
             .unifiedId(unifiedId)
-            .fullAddress(addressChangeFullModel.getFullAddress())
-            .administrationUnit(addressChangeFullModel.getAdministrationUnit())
-            .administrationUnitCode(addressChangeFullModel.getAdministrationUnitCode())
             .area(addressChangeFullModel.getArea())
             .building(addressChangeFullModel.getBuilding())
             .buildingBlock(addressChangeFullModel.getBuildingBlock())
@@ -121,10 +110,7 @@ class AddressMapperTest extends BaseUnitConfiguration {
             .regionCode(addressChangeFullModel.getRegionCode())
             .street(addressChangeFullModel.getStreet())
             .type(addressChangeFullModel.getType())
-            .zipCode(addressChangeFullModel.getZipCode())
-            .country(addressChangeFullModel.getCountry())
-            .countryCode(addressChangeFullModel.getCountryCode())
-            .countryIsoCode(addressChangeFullModel.getCountryIsoCode());
+            .zipCode(addressChangeFullModel.getZipCode());
         assertThat(actualAddressCreate)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()

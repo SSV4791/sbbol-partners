@@ -23,38 +23,6 @@
       "title": "Индекс",
       "maxLength": 6
     },
-    "country_iso_code": {
-      "type": "string",
-      "title": "ISO-код страны",
-      "minLength": 2,
-      "maxLength": 3
-    },
-    "country_code": {
-      "type": "string",
-      "title": "Код страны",
-      "minLength": 3,
-      "maxLength": 3
-    },
-    "country": {
-      "type": "string",
-      "title": "Наименование страны",
-      "maxLength": 80
-    },
-    "administration_unit_code": {
-      "type": "string",
-      "title": "Код административной единицы",
-      "maxLength": 10
-    },
-    "administration_unit": {
-      "type": "string",
-      "title": "Наименование административной единицы",
-      "maxLength": 70
-    },
-    "full_address": {
-      "type": "string",
-      "title": "Полная строка адреса",
-      "maxLength": 1024
-    },
     "region": {
       "type": "string",
       "title": "Район",
@@ -93,7 +61,7 @@
     "buildingBlock": {
       "type": "string",
       "title": "Строение",
-      "maxLength": 20
+      "maxLength": 300
     },
     "flat": {
       "type": "string",

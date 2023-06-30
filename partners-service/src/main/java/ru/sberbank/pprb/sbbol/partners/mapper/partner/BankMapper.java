@@ -6,11 +6,9 @@ import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.BankType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.BankMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Bank;
@@ -24,14 +22,10 @@ public interface BankMapper extends BaseMapper {
 
     @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")
     @Mapping(target = "accountId", expression = "java(bank.getAccount().getUuid() == null ? null : bank.getAccount().getUuid().toString())")
-    @Mapping(target = "mediary", source = "type", qualifiedByName = "getMediaryByBankType")
+    @Mapping(target = "mediary", source = "intermediary")
     Bank toBank(BankEntity bank);
 
-    @Named("getMediaryByBankType")
-    default boolean getMediaryByBankType(BankType bankType) {
-        return bankType == BankType.AGENT;
-    }
-
+    @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -41,16 +35,19 @@ public interface BankMapper extends BaseMapper {
     Bank toBank(BankChangeFullModel bankChangeFullModel);
 
     @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
+    @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     BankEntity toBank(Bank bank);
 
+    @Mapping(target = "intermediary", source = "mediary")
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "bankAccount", ignore = true)
     void updateBank(Bank bank, @MappingTarget BankEntity bankEntity);
 
+    @Mapping(target = "intermediary", source = "mediary")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "account", ignore = true)
@@ -65,8 +62,4 @@ public interface BankMapper extends BaseMapper {
             bankAccount.setBank(bank);
         }
     }
-
-    default BankType getBankType(Boolean mediary, ru.sberbank.pprb.sbbol.partners.model.BankType bankType) {
-        return BankType.DEFAULT;
-    };
 }

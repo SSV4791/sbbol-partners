@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import ru.sberbank.pprb.sbbol.migration.exception.MigrationException;
 import ru.sberbank.pprb.sbbol.migration.gku.mapper.MigrationGkuMapper;
 import ru.sberbank.pprb.sbbol.migration.gku.model.MigrationGkuCandidate;
 import ru.sberbank.pprb.sbbol.migration.gku.repository.MigrationGkuRepository;
@@ -59,7 +60,7 @@ public class GkuMigrationServiceImpl implements GkuMigrationService {
             migrationGkuRepository.saveAll(entities);
         } catch (Exception ex) {
             LOGGER.error("В процессе миграции справочника ЖКУ произошла ошибка. Причина: {}", ex.getLocalizedMessage());
-            throw ex;
+            throw new MigrationException(ex);
         }
         LOGGER.info("Окончание миграции справочника ЖКУ количество записей: {}", entities.size());
     }

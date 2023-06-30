@@ -32,12 +32,10 @@ import ru.sberbank.pprb.sbbol.partners.replication.resolver.ReplicationRaceCondi
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
@@ -76,6 +74,8 @@ import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.impl.ReplicationServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.storage.BudgetMaskCacheableStorage;
+import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
@@ -169,10 +169,10 @@ public class PartnerServiceConfiguration {
 
     @Bean
     BudgetMaskService budgetMaskService(
-        BudgetMaskDictionaryRepository budgetMaskDictionaryRepository,
+        BudgetMaskCacheableStorage budgetMaskCacheableStorage,
         BudgetMaskMapper budgetMaskMapper
     ) {
-        return new BudgetMaskServiceImpl(budgetMaskDictionaryRepository, budgetMaskMapper);
+        return new BudgetMaskServiceImpl(budgetMaskCacheableStorage, budgetMaskMapper);
     }
 
     @Bean
@@ -291,7 +291,7 @@ public class PartnerServiceConfiguration {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        GkuInnDictionaryRepository gkuInnDictionaryRepository,
+        GkuInnCacheableStorage gkuInnCacheableStorage,
         BudgetMaskService budgetMaskService,
         FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
@@ -311,7 +311,7 @@ public class PartnerServiceConfiguration {
             contactRepository,
             addressRepository,
             partnerRepository,
-            gkuInnDictionaryRepository,
+            gkuInnCacheableStorage,
             budgetMaskService,
             fraudServiceManager,
             accountMapper,
