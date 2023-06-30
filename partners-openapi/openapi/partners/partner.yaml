@@ -26,10 +26,10 @@ paths:
           required: true
           schema:
             type: string
-          description: Идентефикатор партнера
+          description: Идентификатор партнера
       responses:
         200:
-          description: Успешинй ответ
+          description: Успешный ответ
           content:
             application/json:
               schema:
@@ -68,7 +68,7 @@ paths:
             items:
               type: string
               maxItems: 200
-          description: Идентефикатор партнера
+          description: Идентификатор партнера
         - name: Fraud-Meta-Data
           in: header
           required: true

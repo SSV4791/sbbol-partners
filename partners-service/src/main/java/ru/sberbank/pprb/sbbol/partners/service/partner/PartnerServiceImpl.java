@@ -211,7 +211,6 @@ public class PartnerServiceImpl implements PartnerService {
             replicationService.updateCounterparty(accounts);
         }
         var response = partnerMapper.toPartner(savePartner);
-        response.setVersion(response.getVersion() + 1);
         response.setGku(isGkuInn(response.getInn()));
         return response;
     }
