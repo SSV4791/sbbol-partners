@@ -61,7 +61,6 @@ public class PactData {
     public static final String BANK_ACCOUNT = "30101810400000000225";
     public static final String BIC = "044525225";
     public static final String BANK_NAME = "ПАО СБЕРБАНК";
-    public static final Boolean MEDIARY = true;
     public static final Boolean PRIORITY_ACCOUNT = true;
     public static final String SIGN_STATE = SignType.SIGNED.toString();
     public static final String POSITION = "SOME POSITION";
@@ -324,7 +323,6 @@ public class PactData {
             .version(VERSION)
             .bic(BIC)
             .name(BANK_NAME)
-            .mediary(MEDIARY)
             .bankAccount(bankAccount());
     }
 
@@ -332,7 +330,6 @@ public class PactData {
         return new BankCreate()
             .bic(BIC)
             .name(BANK_NAME)
-            .mediary(MEDIARY)
             .bankAccount(bankAccountCreate());
     }
 

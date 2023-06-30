@@ -34,12 +34,6 @@
       "x-pattern-message": "{validation.partner.illegal_symbols}",
       "x-not-empty": true
     },
-    "mediary": {
-      "deprecated": true,
-      "type": "boolean",
-      "title": "Является транзитным банком",
-      "default": false
-    },
     "bankAccount": {
       "$ref": "bank_account_change_full_model.json",
       "title": "Корреспондентский счёт"
