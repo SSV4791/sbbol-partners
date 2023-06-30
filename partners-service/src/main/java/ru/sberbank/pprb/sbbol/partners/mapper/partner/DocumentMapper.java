@@ -28,14 +28,15 @@ import java.util.stream.Collectors;
 @Loggable
 @Mapper(
     uses = {
+        BaseMapper.class,
         DocumentTypeMapper.class
     },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
-public interface DocumentMapper extends BaseMapper {
+public interface DocumentMapper {
 
-    @Mapping(target = "id", expression = "java(document.getUuid() == null ? null : document.getUuid().toString())")
-    @Mapping(target = "unifiedId", expression = "java(document.getUnifiedUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid", qualifiedByName = "mapUuid")
     @Mapping(target = "documentType", source = "type")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     Document toDocument(DocumentEntity document);
@@ -61,7 +62,7 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "certifierType", source = "document.certifierType", qualifiedByName = "toCertifierType")
-    @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
+    @Mapping(target = "typeUuid", source = "document.documentTypeId", qualifiedByName = "mapUuid")
     @Mapping(target = "series", source = "document.series")
     @Mapping(target = "number", source = "document.number")
     @Mapping(target = "dateIssue", source = "document.dateIssue")
@@ -76,12 +77,12 @@ public interface DocumentMapper extends BaseMapper {
     DocumentCreate toDocumentCreate(DocumentChangeFullModel document, String digitalId, String unifiedId);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
-    @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
+    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "mapUuid")
     DocumentEntity toDocument(DocumentCreate document);
 
     @Named("toCertifierType")
@@ -92,8 +93,8 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(document.getUnifiedId()))")
-    @Mapping(target = "typeUuid", expression = "java(mapUuid(document.getDocumentTypeId()))")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "mapUuid")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void updateDocument(DocumentChange document, @MappingTarget DocumentEntity documentEntity);
 
@@ -101,13 +102,8 @@ public interface DocumentMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "toUUID")
-    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "toUUID")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "mapUuid")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void patchDocument(DocumentChange document, @MappingTarget DocumentEntity documentEntity);
-
-    @Named("toUUID")
-    default UUID toUUID(String id) {
-        return mapUuid(id);
-    }
 }

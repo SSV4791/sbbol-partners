@@ -37,11 +37,13 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
 @Mapper(
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
+        BaseMapper.class,
         PartnerEmailMapper.class,
         PartnerPhoneMapper.class,
         StringMapper.class
@@ -49,10 +51,10 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 @DecoratedWith(PartnerMapperDecorator.class)
-public interface PartnerMapper extends BaseMapper {
+public interface PartnerMapper {
 
     @Mapping(target = "gku", ignore = true)
-    @Mapping(target = "id", expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     Partner toPartner(PartnerEntity partner);
@@ -136,7 +138,7 @@ public interface PartnerMapper extends BaseMapper {
 
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(partner.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "orgName", source = "orgName", qualifiedByName = "toTrimmed")
     @Mapping(target = "firstName", source = "firstName", qualifiedByName = "toTrimmed")
     @Mapping(target = "secondName", source = "secondName", qualifiedByName = "toTrimmed")
@@ -214,7 +216,7 @@ public interface PartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "gku", ignore = true)
-    @Mapping(target = "id", expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "accounts", ignore = true)
@@ -224,7 +226,6 @@ public interface PartnerMapper extends BaseMapper {
     PartnerFullModelResponse toPartnerMullResponse(PartnerEntity partner);
 
     @NotNull
-    @Override
     default String saveSearchString(String... search) {
         return Stream.of(search)
             .filter(Objects::nonNull)

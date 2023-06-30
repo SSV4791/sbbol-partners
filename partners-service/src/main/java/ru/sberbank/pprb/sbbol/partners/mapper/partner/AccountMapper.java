@@ -8,7 +8,6 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
@@ -30,16 +29,21 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
+
 @Loggable
-@Mapper(uses = {BankMapper.class})
+@Mapper(uses = {
+    BaseMapper.class,
+    BankMapper.class
+})
 @DecoratedWith(AccountMapperDecorator.class)
-public interface AccountMapper extends BaseMapper {
+public interface AccountMapper {
 
     @InheritConfiguration
     List<Account> toAccounts(List<AccountEntity> accounts);
 
-    @Mapping(target = "id", expression = "java(account.getUuid() == null ? null : account.getUuid().toString())")
-    @Mapping(target = "partnerId", expression = "java(account.getPartnerUuid() == null ? null : account.getPartnerUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "partnerId", source = "partnerUuid", qualifiedByName = "mapUuid")
     @Mapping(target = "budget", ignore = true)
     Account toAccount(AccountEntity account);
 
@@ -64,7 +68,7 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "account", source = "account.account")
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "state", constant = "NOT_SIGNED")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
@@ -73,9 +77,9 @@ public interface AccountMapper extends BaseMapper {
     AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "state", constant = "NOT_SIGNED")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
@@ -84,7 +88,7 @@ public interface AccountMapper extends BaseMapper {
     AccountEntity toAccount(AccountCreate account);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(account.getPartnerId()))")
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
@@ -96,7 +100,7 @@ public interface AccountMapper extends BaseMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "toUUID")
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
@@ -105,11 +109,6 @@ public interface AccountMapper extends BaseMapper {
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "bank", ignore = true)
     void patchAccount(AccountChange account, @MappingTarget AccountEntity accountEntity);
-
-    @Named("toUUID")
-    default UUID toUUID(String id) {
-        return mapUuid(id);
-    }
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
@@ -167,8 +166,7 @@ public interface AccountMapper extends BaseMapper {
         return List.of(toAccountWithPartner(partner));
     }
 
-    @Mapping(target = "id",
-        expression = "java(partner.getUuid() == null ? null : partner.getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "legalForm", source = "legalType")
     @Mapping(target = "account", ignore = true)
     AccountWithPartnerResponse toAccountWithPartner(PartnerEntity partner);

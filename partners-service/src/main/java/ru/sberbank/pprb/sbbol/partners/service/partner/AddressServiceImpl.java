@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
+
 abstract class AddressServiceImpl implements AddressService {
 
     public static final String DOCUMENT_NAME = "contact_address";
@@ -93,7 +95,7 @@ abstract class AddressServiceImpl implements AddressService {
     @Transactional
     public void deleteAddresses(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var uuid = addressMapper.mapUuid(id);
+            var uuid = mapUuid(id);
             var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, uuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
             addressRepository.delete(foundAddress);

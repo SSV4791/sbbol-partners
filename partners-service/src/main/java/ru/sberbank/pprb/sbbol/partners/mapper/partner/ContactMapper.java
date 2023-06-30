@@ -32,16 +32,17 @@ import java.util.stream.Collectors;
 @Loggable
 @Mapper(
     uses = {
+        BaseMapper.class,
         ContactEmailMapper.class,
         ContactPhoneMapper.class
     },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 @DecoratedWith(ContactMapperDecorator.class)
-public interface ContactMapper extends BaseMapper {
+public interface ContactMapper {
 
-    @Mapping(target = "id", expression = "java(contact.getUuid().toString())")
-    @Mapping(target = "partnerId", expression = "java(contact.getPartnerUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "partnerId", source = "partnerUuid", qualifiedByName = "mapUuid")
     @Mapping(target = "legalForm", source = "type", qualifiedByName = "toLegalType")
     Contact toContact(ContactEntity contact);
 
@@ -53,7 +54,7 @@ public interface ContactMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
     @Mapping(target = "emails", expression = "java(toEmail(contact.getEmails(), contact.getDigitalId()))")
     @Mapping(target = "phones", expression = "java(toPhone(contact.getPhones(), contact.getDigitalId()))")
     @Mapping(target = "type", source = "legalForm", qualifiedByName = "toLegalType")
@@ -115,8 +116,8 @@ public interface ContactMapper extends BaseMapper {
 
     ContactCreate toContactCreate(ContactChangeFullModel contact, String digitalId, String partnerId);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(contact.getId()))")
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
     @Mapping(target = "type", source = "legalForm", qualifiedByName = "toLegalType")
     @Mapping(target = "lastModifiedDate", ignore = true)
     ContactEntity toContact(Contact contact);
@@ -129,14 +130,14 @@ public interface ContactMapper extends BaseMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
     void updateContact(Contact contact, @MappingTarget() ContactEntity contactEntity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(contact.getPartnerId()))")
+    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
     void patchContact(Contact contact, @MappingTarget() ContactEntity contactEntity);
 
     @AfterMapping

@@ -12,7 +12,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 
 public class PartnerCreateArgumentsProvider implements ArgumentsProvider {
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
         return Stream.of(
             Arguments.of(
                 getValidPartner(randomAlphabetic(10), LegalForm.LEGAL_ENTITY)

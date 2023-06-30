@@ -9,24 +9,24 @@ import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 
 @Loggable
-@Mapper
-public interface PartnerEmailMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface PartnerEmailMapper {
 
-    @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
-    @Mapping(target = "unifiedId",
-        expression = "java(email.getPartner().getUuid() == null ? null : email.getPartner().getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedId", source = "partner.uuid", qualifiedByName = "mapUuid")
     Email toEmail(PartnerEmailEntity email);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "partner", ignore = true)
     PartnerEmailEntity toEmail(Email email);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "digitalId", ignore = true)
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerEmailEntity toEmail(EmailChangeFullModel email);
 
-    @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
     EmailChangeFullModel toEmailChangeFullModel(PartnerEmailEntity email);
 }

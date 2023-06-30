@@ -30,8 +30,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
+
 @Mapper(
     componentModel = "spring",
+    uses = {
+        BaseMapper.class,
+    },
     imports = {
         LegalType.class,
         AccountMapper.class,
@@ -41,7 +46,7 @@ import java.util.stream.Stream;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
 @DecoratedWith(MigrationPartnerMapperDecorator.class)
-public interface MigrationPartnerMapper extends BaseMapper {
+public interface MigrationPartnerMapper {
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "type", constant = "PARTNER")
@@ -199,9 +204,9 @@ public interface MigrationPartnerMapper extends BaseMapper {
     @Mapping(target = "account", source = "account.account")
     @Mapping(target = "bic", source = "account.bank.bic")
     @Mapping(target = "description", source = "partner.comment")
-    @Mapping(target = "pprbGuid", source = "account.uuid")
+    @Mapping(target = "pprbGuid", source = "account.uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "bankAccount", source = "account.bank.bankAccount.account")
-    @Mapping(target = "replicationGuid", source = "account.uuid")
+    @Mapping(target = "replicationGuid", source = "account.uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "signed", expression = "java(toSigned(account.getState()))")
     @Mapping(target = "version", source = "account.version")
     @Mapping(target = "bankName", source = "account.bank.name")

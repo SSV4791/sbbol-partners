@@ -11,16 +11,15 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 import java.util.Optional;
 
 @Loggable
-@Mapper
-public interface ContactEmailMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface ContactEmailMapper {
 
-    @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
-    @Mapping(target = "unifiedId",
-        expression = "java(email.getContact().getUuid() == null ? null : email.getContact().getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedId", source = "contact.uuid", qualifiedByName = "mapUuid")
     Email toEmail(ContactEmailEntity email);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "contact", ignore = true)
     ContactEmailEntity toEmail(Email email);
 

@@ -10,27 +10,26 @@ import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 
 @Loggable
-@Mapper
-public interface EmailMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface EmailMapper {
 
-    @Mapping(target = "id", expression = "java(email.getUuid() == null ? null : email.getUuid().toString())")
-    @Mapping(target = "unifiedId",
-        expression = "java(email.getUnifiedUuid() == null ? null : email.getUnifiedUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid", qualifiedByName = "mapUuid")
     Email toEmail(EmailEntity email);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     EmailEntity toEmail(EmailCreate email);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(email.getId()))")
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     EmailEntity toEmail(Email email);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(email.getUnifiedId()))")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updateEmail(Email email, @MappingTarget() EmailEntity foundEmail);
 }

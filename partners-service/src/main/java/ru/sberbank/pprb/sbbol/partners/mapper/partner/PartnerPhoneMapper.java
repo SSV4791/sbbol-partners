@@ -9,24 +9,24 @@ import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 
 @Loggable
-@Mapper
-public interface PartnerPhoneMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface PartnerPhoneMapper {
 
-    @Mapping(target = "id", expression = "java(phone.getUuid() == null ? null : phone.getUuid().toString())")
-    @Mapping(target = "unifiedId",
-        expression = "java(phone.getPartner().getUuid() == null ? null : phone.getPartner().getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedId", source = "partner.uuid", qualifiedByName = "mapUuid")
     Phone toPhone(PartnerPhoneEntity phone);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(phone.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerPhoneEntity toPhone(Phone phone);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(phone.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "digitalId", ignore = true)
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerPhoneEntity toPhone(PhoneChangeFullModel phone);
 
-    @Mapping(target = "id", expression = "java(phone.getUuid() == null ? null : phone.getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
     PhoneChangeFullModel toPhoneChangeFullModel(PartnerPhoneEntity phone);
 }

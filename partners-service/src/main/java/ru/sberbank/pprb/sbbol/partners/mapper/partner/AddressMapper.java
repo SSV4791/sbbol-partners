@@ -23,11 +23,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Loggable
-@Mapper
-public interface AddressMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface AddressMapper {
 
-    @Mapping(target = "id", expression = "java(address.getUuid().toString())")
-    @Mapping(target = "unifiedId", expression = "java(address.getUnifiedUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid", qualifiedByName = "mapUuid")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     Address toAddress(AddressEntity address);
 
@@ -37,15 +37,6 @@ public interface AddressMapper extends BaseMapper {
     }
 
     default List<AddressEntity> toAddress(Set<AddressCreateFullModel> addresses, String digitalId, UUID unifiedUuid) {
-        if (CollectionUtils.isEmpty(addresses)) {
-            return Collections.emptyList();
-        }
-        return addresses.stream()
-            .map(value -> toAddress(value, digitalId, unifiedUuid))
-            .collect(Collectors.toList());
-    }
-
-    default List<AddressEntity> toAddressFromAddressChangeFullModel(Set<AddressChangeFullModel> addresses, String digitalId, UUID unifiedUuid) {
         if (CollectionUtils.isEmpty(addresses)) {
             return Collections.emptyList();
         }
@@ -71,7 +62,7 @@ public interface AddressMapper extends BaseMapper {
     @Mapping(target = "flat", source = "address.flat")
     AddressEntity toAddress(AddressCreateFullModel address, String digitalId, UUID unifiedUuid);
 
-    @Mapping(target = "uuid", expression = "java(address.getId() == null ? null : mapUuid(address.getId()))")
+    @Mapping(target = "uuid", source = "address.id", qualifiedByName = "mapUuid")
     @Mapping(target = "version", source = "address.version")
     @Mapping(target = "unifiedUuid", source = "unifiedUuid")
     @Mapping(target = "digitalId", source = "digitalId")
@@ -89,7 +80,7 @@ public interface AddressMapper extends BaseMapper {
     AddressEntity toAddress(AddressChangeFullModel address, String digitalId, UUID unifiedUuid);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
@@ -101,20 +92,20 @@ public interface AddressMapper extends BaseMapper {
     }
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", expression = "java(mapUuid(address.getId()))")
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     AddressEntity toAddress(Address address);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     void updateAddress(Address address, @MappingTarget() AddressEntity addressEntity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", expression = "java(mapUuid(address.getUnifiedId()))")
+    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
     void patchAddress(Address address, @MappingTarget() AddressEntity addressEntity);
 
     Address toAddress(AddressChangeFullModel address, String digitalId, String unifiedId);

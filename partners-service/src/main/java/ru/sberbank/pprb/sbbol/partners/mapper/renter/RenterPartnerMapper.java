@@ -44,13 +44,16 @@ import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.SERVICEPASSP
 @Mapper(
     componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    uses = {
+        BaseMapper.class,
+    },
     imports = {
         CollectionUtils.class
     }
 )
-public interface RenterPartnerMapper extends BaseMapper {
+public interface RenterPartnerMapper {
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(renter.getUuid()))")
+    @Mapping(target = "uuid", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "type", constant = "RENTER")
     @Mapping(target = "orgName", source = "legalName")
     @Mapping(target = "secondName", source = "lastName")
@@ -105,7 +108,7 @@ public interface RenterPartnerMapper extends BaseMapper {
     }
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partnerUuid", expression = "java(mapUuid(renter.getUuid()))")
+    @Mapping(target = "partnerUuid", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "comment", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "createDate", ignore = true)
@@ -165,6 +168,7 @@ public interface RenterPartnerMapper extends BaseMapper {
     @Mapping(target = "flat", source = "address.flat")
     AddressEntity toAddress(RenterAddress address, UUID partnerUuid, String digitalId);
 
+    @Mapping(target = "uuid", source = "partnerUuid", qualifiedByName = "mapUuid")
     @Mapping(target = "digitalId", source = "renter.digitalId")
     @Mapping(target = "series", source = "renter.dulSerie")
     @Mapping(target = "number", source = "renter.dulNumber")
@@ -197,7 +201,7 @@ public interface RenterPartnerMapper extends BaseMapper {
         };
     }
 
-    @Mapping(target = "uuid", expression = "java(partner.getUuid().toString())")
+    @Mapping(target = "uuid", source = "partner.uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "digitalId", source = "partner.digitalId")
     @Mapping(target = "type", source = "partner.legalType")
     @Mapping(target = "lastName", source = "partner.secondName")
@@ -377,6 +381,7 @@ public interface RenterPartnerMapper extends BaseMapper {
         };
     }
 
+    @Mapping(target = "uuid", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "legalType", source = "type", qualifiedByName = "toLegalType")
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "version", ignore = true)

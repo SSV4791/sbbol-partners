@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
+
 abstract class EmailServiceImpl implements EmailService {
 
     public static final String DOCUMENT_NAME = "email";
@@ -81,7 +83,7 @@ abstract class EmailServiceImpl implements EmailService {
     @Transactional
     public void deleteEmails(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var uuid = emailMapper.mapUuid(id);
+            var uuid = mapUuid(id);
             var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundEmail.isEmpty()) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);

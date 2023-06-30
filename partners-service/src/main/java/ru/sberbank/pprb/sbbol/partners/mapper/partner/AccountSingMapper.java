@@ -15,12 +15,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Loggable
-@Mapper
-public interface AccountSingMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface AccountSingMapper {
 
     @Named("toSignAccount")
-    @Mapping(target = "entityId", expression = "java(sign.getEntityUuid().toString())")
-    @Mapping(target = "accountId", expression = "java(sign.getAccountUuid().toString())")
+    @Mapping(target = "entityId", source = "entityUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "accountId", source = "accountUuid", qualifiedByName = "mapUuid")
     @Mapping(target = "digest", source = "digest")
     @Mapping(target = "sign", source = "sign")
     @Mapping(target = "externalDataFileId", source = "externalDataFileId")
@@ -33,8 +33,8 @@ public interface AccountSingMapper extends BaseMapper {
     @Mapping(target = "accountSignDetail", source = "sign", qualifiedByName = "toSignAccount")
     AccountSignInfo toSignAccount(SignEntity sign, String digitalId);
 
-    @Mapping(target = "entityUuid", expression = "java(mapUuid(sing.getEntityId()))")
-    @Mapping(target = "accountUuid", expression = "java(mapUuid(sing.getAccountId()))")
+    @Mapping(target = "entityUuid", source = "sing.entityId", qualifiedByName = "mapUuid")
+    @Mapping(target = "accountUuid", source = "sing.accountId", qualifiedByName = "mapUuid")
     @Mapping(target = "partnerUuid", source = "partnerUuid")
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "uuid", ignore = true)

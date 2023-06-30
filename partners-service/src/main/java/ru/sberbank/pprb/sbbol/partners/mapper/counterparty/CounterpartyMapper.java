@@ -16,12 +16,17 @@ import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisites;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
+
 @Loggable
 @Mapper(
     componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+    uses = {
+        BaseMapper.class
+    }
 )
-public interface CounterpartyMapper extends BaseMapper {
+public interface CounterpartyMapper {
 
     @Mapping(target = "taxNumber", source = "taxNumber", qualifiedByName = "toTaxNumber")
     CounterpartyCheckRequisites toCounterpartyCheckRequisites(CounterpartySearchRequest request);
@@ -31,7 +36,7 @@ public interface CounterpartyMapper extends BaseMapper {
     @Mapping(target = "settlementType", ignore = true)
     @Mapping(target = "counterpartyPhone", ignore = true)
     @Mapping(target = "counterpartyEmail", ignore = true)
-    @Mapping(target = "pprbGuid", expression = "java(account.getUuid().toString())")
+    @Mapping(target = "pprbGuid", source = "account.uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "name", source = "partner", qualifiedByName = "toName")
     @Mapping(target = "taxNumber", source = "partner.inn")
     @Mapping(target = "kpp", source = "partner.kpp")

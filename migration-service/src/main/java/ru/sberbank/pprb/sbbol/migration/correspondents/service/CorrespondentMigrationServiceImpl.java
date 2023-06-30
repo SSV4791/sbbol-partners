@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
+
 @Service
 @AutoJsonRpcServiceImpl
 public class CorrespondentMigrationServiceImpl implements CorrespondentMigrationService {
@@ -126,7 +129,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             }
         }
         var search =
-            migrationPartnerMapper.prepareSearchString(correspondent.getInn(), correspondent.getKpp(), correspondent.getName());
+            prepareSearchString(correspondent.getInn(), correspondent.getKpp(), correspondent.getName());
         AccountEntity savedAccount;
         var searchPartner = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
         if (searchPartner == null) {
@@ -138,7 +141,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             var bic = correspondent.getBic();
             var account = correspondent.getAccount();
             var bankAccount = correspondent.getBankAccount();
-            var searchAccount = migrationPartnerMapper.saveSearchString(searchPartner.getUuid().toString(), account, bic, bankAccount);
+            var searchAccount = saveSearchString(searchPartner.getUuid().toString(), account, bic, bankAccount);
             var foundAccount =
                 accountRepository.findByDigitalIdAndSearch(digitalId, searchAccount);
             if (foundAccount == null) {

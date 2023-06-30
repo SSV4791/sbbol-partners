@@ -44,6 +44,7 @@ import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_DELE
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -258,7 +259,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     private void deletePartners(String digitalId, Set<String> ids, FraudMetaData fraudMetaData) {
         for (String partnerId : ids) {
-            var partnerUuid = partnerMapper.mapUuid(partnerId);
+            var partnerUuid = mapUuid(partnerId);
             PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
                 .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerUuid));
@@ -284,7 +285,7 @@ public class PartnerServiceImpl implements PartnerService {
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
         if (!Objects.equals(version, foundPartner.getVersion())) {
-            throw new OptimisticLockException(foundPartner.getVersion(),version);
+            throw new OptimisticLockException(foundPartner.getVersion(), version);
         }
         return foundPartner;
     }

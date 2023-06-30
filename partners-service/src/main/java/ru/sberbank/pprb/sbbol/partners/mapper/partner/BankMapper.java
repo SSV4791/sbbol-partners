@@ -16,12 +16,12 @@ import ru.sberbank.pprb.sbbol.partners.model.BankChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 
 @Loggable
-@Mapper(uses = {BankAccountMapper.class})
+@Mapper(uses = {BaseMapper.class, BankAccountMapper.class})
 @DecoratedWith(BankMapperDecorator.class)
-public interface BankMapper extends BaseMapper {
+public interface BankMapper {
 
-    @Mapping(target = "id", expression = "java(bank.getUuid() == null ? null : bank.getUuid().toString())")
-    @Mapping(target = "accountId", expression = "java(bank.getAccount().getUuid() == null ? null : bank.getAccount().getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "accountId", source = "account.uuid", qualifiedByName = "mapUuid")
     Bank toBank(BankEntity bank);
 
     @Mapping(target = "account", ignore = true)
@@ -32,7 +32,7 @@ public interface BankMapper extends BaseMapper {
 
     Bank toBank(BankChangeFullModel bankChangeFullModel);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(bank.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     BankEntity toBank(Bank bank);
