@@ -45,8 +45,7 @@ class BankMapperTest extends BaseUnitConfiguration {
             .usingRecursiveComparison()
             .ignoringFields(
                 "accountId",
-                "bankAccount.bankId",
-                "mediary"
+                "bankAccount.bankId"
             )
             .isEqualTo(bankMapper.toBank(actual));
     }
@@ -84,7 +83,6 @@ class BankMapperTest extends BaseUnitConfiguration {
         expectedBankEntity.setVersion(bank.getVersion());
         expectedBankEntity.setBic(bank.getBic());
         expectedBankEntity.setName(bank.getName());
-        expectedBankEntity.setIntermediary(bank.getMediary());
         Optional.ofNullable(bank.getBankAccount())
             .ifPresent(bankAccount -> {
                 var bankAccountEntity = new BankAccountEntity();
@@ -124,7 +122,6 @@ class BankMapperTest extends BaseUnitConfiguration {
         expectedBankEntity.setBic(actualBankEntity.getBic());
         expectedBankEntity.setName(bank.getName());
         expectedBankEntity.setBankAccount(actualBankEntity.getBankAccount());
-        expectedBankEntity.setIntermediary(bank.getMediary());
         assertThat(actualBankEntity)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -152,17 +149,16 @@ class BankMapperTest extends BaseUnitConfiguration {
             .id(bankChangeFullModel.getId())
             .version(bankChangeFullModel.getVersion())
             .bic(bankChangeFullModel.getBic())
-            .name(bankChangeFullModel.getName())
-            .mediary(bankChangeFullModel.getMediary());
+            .name(bankChangeFullModel.getName());
         Optional.ofNullable(bankChangeFullModel.getBankAccount())
-                .ifPresent(bankAccountChangeFullModel -> {
-                    var bankAccount = new BankAccount()
-                        .id(bankAccountChangeFullModel.getId())
-                        .version(bankAccountChangeFullModel.getVersion())
-                        .bankId(bankChangeFullModel.getId())
-                        .bankAccount(bankAccountChangeFullModel.getBankAccount());
-                    expectedBank.setBankAccount(bankAccount);
-                });
+            .ifPresent(bankAccountChangeFullModel -> {
+                var bankAccount = new BankAccount()
+                    .id(bankAccountChangeFullModel.getId())
+                    .version(bankAccountChangeFullModel.getVersion())
+                    .bankId(bankChangeFullModel.getId())
+                    .bankAccount(bankAccountChangeFullModel.getBankAccount());
+                expectedBank.setBankAccount(bankAccount);
+            });
         assertThat(actualBank)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()

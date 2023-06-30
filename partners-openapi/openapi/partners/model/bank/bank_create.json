@@ -22,12 +22,6 @@
       "x-pattern-message": "{validation.partner.illegal_symbols}",
       "x-not-empty": true
     },
-    "mediary": {
-      "deprecated": true,
-      "type": "boolean",
-      "title": "Является транзитным банком",
-      "default": false
-    },
     "bankAccount": {
       "title": "Корреспондентский счёт",
       "$ref": "bank_account_create.json"

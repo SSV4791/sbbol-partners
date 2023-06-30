@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
@@ -17,10 +17,10 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankAccountMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl_;
-import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
-import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
@@ -156,8 +156,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
-                "budget",
-                "bank.mediary"
+                "budget"
             )
             .isEqualTo(actual);
     }
@@ -182,7 +181,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
         var expectedAccountWithPartnerResponse = accountEntities.stream()
             .map(this::getExpectedAccountWithPartnerResponse)
             .collect(Collectors.toList());
-        var  actualAccountWithPartnerResponse = accountMapper.toAccountsWithPartner(accountEntities);
+        var actualAccountWithPartnerResponse = accountMapper.toAccountsWithPartner(accountEntities);
         assertThat(actualAccountWithPartnerResponse)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -220,7 +219,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
                             .accountId(accountEntity.getBank().getAccount().getUuid().toString())
                             .name(accountEntity.getBank().getName())
                             .bic(accountEntity.getBank().getBic())
-                            .mediary(accountEntity.getBank().getIntermediary())
                             .bankAccount(
                                 new BankAccount()
                                     .id(accountEntity.getBank().getBankAccount().getUuid().toString())
@@ -253,26 +251,25 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .account(accountChangeFullModel.getAccount())
             .comment(accountChangeFullModel.getComment());
         Optional.ofNullable(accountChangeFullModel.getBank())
-                .ifPresent(bank -> {
-                    expectedAccountChange.setBank(new Bank()
-                        .id(bank.getId())
-                        .version(bank.getVersion())
-                        .accountId(accountChangeFullModel.getId())
-                        .bic(bank.getBic())
-                        .mediary(bank.getMediary())
-                        .name(bank.getName())
-                        .bankAccount(
-                            Optional.ofNullable(bank.getBankAccount())
-                                .map(bankAccount -> new BankAccount()
-                                        .id(bankAccount.getId())
-                                        .version(bankAccount.getVersion())
-                                        .bankId(bank.getId())
-                                        .bankAccount(bankAccount.getBankAccount())
-                                    )
-                                .orElse(null)
-                        )
-                    );
-                });
+            .ifPresent(bank -> {
+                expectedAccountChange.setBank(new Bank()
+                    .id(bank.getId())
+                    .version(bank.getVersion())
+                    .accountId(accountChangeFullModel.getId())
+                    .bic(bank.getBic())
+                    .name(bank.getName())
+                    .bankAccount(
+                        Optional.ofNullable(bank.getBankAccount())
+                            .map(bankAccount -> new BankAccount()
+                                .id(bankAccount.getId())
+                                .version(bankAccount.getVersion())
+                                .bankId(bank.getId())
+                                .bankAccount(bankAccount.getBankAccount())
+                            )
+                            .orElse(null)
+                    )
+                );
+            });
         assertThat(actualAccountChange)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -294,7 +291,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .ifPresent(bank -> {
                 expectedAccountCreate.setBank(new BankCreate()
                     .bic(bank.getBic())
-                    .mediary(bank.getMediary())
                     .name(bank.getName())
                     .bankAccount(
                         Optional.ofNullable(bank.getBankAccount())
@@ -324,25 +320,24 @@ class AccountMapperTest extends BaseUnitConfiguration {
         expectedAccountEntity.setDigitalId(accountChange.getDigitalId());
         expectedAccountEntity.setVersion(accountChange.getVersion());
         Optional.ofNullable(accountChange.getBank())
-                .ifPresent(bank -> {
-                    var bankEntity = new BankEntity();
-                    bankEntity.setUuid(UUID.fromString(bank.getId()));
-                    bankEntity.setVersion(bank.getVersion());
-                    bankEntity.setBic(bank.getBic());
-                    bankEntity.setName(bank.getName());
-                    bankEntity.setIntermediary(bank.getMediary());
-                    bankEntity.setAccount(expectedAccountEntity);
-                    Optional.ofNullable(bank.getBankAccount())
-                            .ifPresent(bankAccount -> {
-                                var bankAccountEntity = new BankAccountEntity();
-                                bankAccountEntity.setUuid(UUID.fromString(bankAccount.getId()));
-                                bankAccountEntity.setVersion(bankAccount.getVersion());
-                                bankAccountEntity.setAccount(bankAccount.getBankAccount());
-                                bankAccountEntity.setBank(bankEntity);
-                                bankEntity.setBankAccount(bankAccountEntity);
-                            });
-                    expectedAccountEntity.setBank(bankEntity);
-                });
+            .ifPresent(bank -> {
+                var bankEntity = new BankEntity();
+                bankEntity.setUuid(UUID.fromString(bank.getId()));
+                bankEntity.setVersion(bank.getVersion());
+                bankEntity.setBic(bank.getBic());
+                bankEntity.setName(bank.getName());
+                bankEntity.setAccount(expectedAccountEntity);
+                Optional.ofNullable(bank.getBankAccount())
+                    .ifPresent(bankAccount -> {
+                        var bankAccountEntity = new BankAccountEntity();
+                        bankAccountEntity.setUuid(UUID.fromString(bankAccount.getId()));
+                        bankAccountEntity.setVersion(bankAccount.getVersion());
+                        bankAccountEntity.setAccount(bankAccount.getBankAccount());
+                        bankAccountEntity.setBank(bankEntity);
+                        bankEntity.setBankAccount(bankAccountEntity);
+                    });
+                expectedAccountEntity.setBank(bankEntity);
+            });
         assertThat(actualAccountEntity)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
