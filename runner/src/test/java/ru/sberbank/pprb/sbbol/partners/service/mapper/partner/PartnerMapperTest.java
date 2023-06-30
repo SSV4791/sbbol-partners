@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerPhoneMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.StringMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.Citizenship;
 import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
@@ -61,7 +62,7 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     void mapUuid() {
         var expected = UUID.randomUUID();
         var value = "[[[" + expected + "]]]";
-        var actual = mapper.mapUuid(value);
+        var actual = BaseMapper.mapUuid(value);
         assertThat(expected)
             .isEqualTo(actual);
     }
@@ -103,14 +104,14 @@ class PartnerMapperTest extends BaseUnitConfiguration {
 
         assertThat(actual.getEmails())
             .isNotNull();
-        for(var email: actual.getEmails()) {
+        for (var email : actual.getEmails()) {
             assertThat(expected.getEmails())
                 .contains(email.getEmail());
         }
 
         assertThat(actual.getPhones())
             .isNotNull();
-        for(var phone: actual.getPhones()) {
+        for (var phone : actual.getPhones()) {
             assertThat(expected.getPhones())
                 .contains(phone.getPhone());
         }
@@ -144,14 +145,14 @@ class PartnerMapperTest extends BaseUnitConfiguration {
 
         assertThat(actual.getPhones())
             .isNotNull();
-        for(var phoneEntity: expected.getPhones()) {
+        for (var phoneEntity : expected.getPhones()) {
             assertThat(actual.getPhones())
                 .contains(partnerPhoneMapper.toPhone(phoneEntity));
         }
 
         assertThat(actual.getEmails())
             .isNotNull();
-        for(var email: expected.getEmails()) {
+        for (var email : expected.getEmails()) {
             assertThat(actual.getEmails())
                 .contains(partnerEmailMapper.toEmail(email));
         }
@@ -302,24 +303,24 @@ class PartnerMapperTest extends BaseUnitConfiguration {
             emailEntity.setDigitalId(actualPartnerEntity.getDigitalId());
         });
         var expectedPhones = Stream.concat(
-            actualPartnerEntity.getPhones().stream(),
-            partnerChangeFullModel.getPhones().stream().map(phoneChangeFullModel -> {
-                var partnerPhoneEntity = new PartnerPhoneEntity();
-                partnerPhoneEntity.setPhone(phoneChangeFullModel.getPhone());
-                partnerPhoneEntity.setPartner(actualPartnerEntity);
-                partnerPhoneEntity.setDigitalId(actualPartnerEntity.getDigitalId());
-                return partnerPhoneEntity;
-            }))
+                actualPartnerEntity.getPhones().stream(),
+                partnerChangeFullModel.getPhones().stream().map(phoneChangeFullModel -> {
+                    var partnerPhoneEntity = new PartnerPhoneEntity();
+                    partnerPhoneEntity.setPhone(phoneChangeFullModel.getPhone());
+                    partnerPhoneEntity.setPartner(actualPartnerEntity);
+                    partnerPhoneEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+                    return partnerPhoneEntity;
+                }))
             .collect(Collectors.toList());
         var expectedEmails = Stream.concat(
-            actualPartnerEntity.getEmails().stream(),
-            partnerChangeFullModel.getEmails().stream().map(emailChangeFullModel -> {
-                var partnerEmailEntity = new PartnerEmailEntity();
-                partnerEmailEntity.setEmail(emailChangeFullModel.getEmail());
-                partnerEmailEntity.setPartner(actualPartnerEntity);
-                partnerEmailEntity.setDigitalId(actualPartnerEntity.getDigitalId());
-                return  partnerEmailEntity;
-            }))
+                actualPartnerEntity.getEmails().stream(),
+                partnerChangeFullModel.getEmails().stream().map(emailChangeFullModel -> {
+                    var partnerEmailEntity = new PartnerEmailEntity();
+                    partnerEmailEntity.setEmail(emailChangeFullModel.getEmail());
+                    partnerEmailEntity.setPartner(actualPartnerEntity);
+                    partnerEmailEntity.setDigitalId(actualPartnerEntity.getDigitalId());
+                    return partnerEmailEntity;
+                }))
             .collect(Collectors.toList());
         mapper.patchPartner(partnerChangeFullModel, actualPartnerEntity);
         var expectedPartnerEntity = new PartnerEntity();

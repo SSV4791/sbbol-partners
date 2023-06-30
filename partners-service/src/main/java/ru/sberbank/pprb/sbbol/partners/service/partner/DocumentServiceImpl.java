@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
+
 abstract class DocumentServiceImpl implements DocumentService {
 
     public static final String DOCUMENT_NAME = "document";
@@ -103,7 +105,7 @@ abstract class DocumentServiceImpl implements DocumentService {
     @Transactional
     public void deleteDocuments(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var uuid = documentMapper.mapUuid(id);
+            var uuid = mapUuid(id);
             var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundDocument.isEmpty()) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);

@@ -11,7 +11,6 @@ import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyEve
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyMessageHeader;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartySendToAnalyzeRq;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.FraudChannelIndicator;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
@@ -19,8 +18,9 @@ import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import java.time.LocalDateTime;
 
 import static java.util.Objects.isNull;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
-public interface BaseFraudMetaDataMapper extends BaseMapper {
+public interface BaseFraudMetaDataMapper {
 
     String EVENT_TYPE_SIGN_COUNTERPARTY_ACCOUNT = "EDIT_PAYEE";
 
@@ -38,6 +38,7 @@ public interface BaseFraudMetaDataMapper extends BaseMapper {
     @Mapping(target = "channelIndicator", source = "channelIndicator", qualifiedByName = "toChannelIndicator")
     @Mapping(target = "clientDefinedChannelIndicator", expression = "java(toClientDefinedChannelIndicator())")
     @Mapping(target = "eventData", source = "eventData", qualifiedByName = "toEventData")
+    @Mapping(target = "clientDefinedAttributeList", ignore = true)
     CounterPartySendToAnalyzeRq mapToCounterPartySendToAnalyzeRq(FraudMetaData metaData);
 
     @Mapping(target = "counterpartyId", expression = "java(partner.getUuid().toString())")
@@ -51,6 +52,31 @@ public interface BaseFraudMetaDataMapper extends BaseMapper {
     @Mapping(target = "vspNumber", source = "clientData.vspNumber")
     @Mapping(target = "dboOperationName", expression = "java(getDboOperationName())")
     @Mapping(target = "privateIpAddress", source = "deviceRequest.ipAddress")
+    @Mapping(target = "userComment", ignore = true)
+    @Mapping(target = "receiverBicSwift", ignore = true)
+    @Mapping(target = "receiverAccount", ignore = true)
+    @Mapping(target = "firstSignTime", ignore = true)
+    @Mapping(target = "firstSignIpAddress", ignore = true)
+    @Mapping(target = "firstSignLogin", ignore = true)
+    @Mapping(target = "firstSignCryptoprofile", ignore = true)
+    @Mapping(target = "firstSignCryptoprofileType", ignore = true)
+    @Mapping(target = "firstSignChannel", ignore = true)
+    @Mapping(target = "firstSignType", ignore = true)
+    @Mapping(target = "firstSignImsi", ignore = true)
+    @Mapping(target = "firstSignCertId", ignore = true)
+    @Mapping(target = "firstSignPhone", ignore = true)
+    @Mapping(target = "firstSignEmail", ignore = true)
+    @Mapping(target = "firstSignSource", ignore = true)
+    @Mapping(target = "firstSignToken", ignore = true)
+    @Mapping(target = "senderIpAddress", ignore = true)
+    @Mapping(target = "senderLogin", ignore = true)
+    @Mapping(target = "senderPhone", ignore = true)
+    @Mapping(target = "senderEmail", ignore = true)
+    @Mapping(target = "senderSource", ignore = true)
+    @Mapping(target = "sbbolGuid", ignore = true)
+    @Mapping(target = "reestrId", ignore = true)
+    @Mapping(target = "reestrRowCount", ignore = true)
+    @Mapping(target = "reestrRowNumber", ignore = true)
     CounterPartyClientDefinedAttributes toCounterPartyClientDefinedAttributes(FraudMetaData metaData, @Context PartnerEntity partner);
 
     @Named("toMessageHeader")

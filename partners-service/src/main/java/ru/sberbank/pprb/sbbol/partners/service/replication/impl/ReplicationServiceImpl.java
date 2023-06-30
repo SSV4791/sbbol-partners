@@ -25,6 +25,7 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import java.util.List;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_COUNTERPARTY;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_SIGN;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.DELETING_COUNTERPARTY;
@@ -96,8 +97,8 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     @Override
     public void createCounterparty(Account account) {
-        var partnerUuid = toUUID(account.getPartnerId());
-        var accountUuid = toUUID(account.getId());
+        var partnerUuid = mapUuid(account.getPartnerId());
+        var accountUuid = mapUuid(account.getId());
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .orElseThrow(() -> new EntryNotFoundException(PARTNER_ENTRY, partnerUuid));
@@ -123,8 +124,8 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     @Override
     public void updateCounterparty(Account account) {
-        var partnerUuid = toUUID(account.getPartnerId());
-        var accountUuid = toUUID(account.getId());
+        var partnerUuid = mapUuid(account.getPartnerId());
+        var accountUuid = mapUuid(account.getId());
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .orElseThrow(() -> new EntryNotFoundException(PARTNER_ENTRY, partnerUuid));
@@ -195,36 +196,32 @@ public class ReplicationServiceImpl implements ReplicationService {
         }
     }
 
-    private UUID toUUID (String id) {
-        return counterpartyMapper.mapUuid(id);
-    }
-
     private void handleCreatingCounterparty(String digitalId, Counterparty counterparty) {
         LOG.debug("Сохраняем в очередь реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
         saveReplicationEntityToMessageQueue(
             digitalId,
-            toUUID(counterparty.getPprbGuid()),
+            mapUuid(counterparty.getPprbGuid()),
             CREATING_COUNTERPARTY,
             counterparty
         );
         LOG.debug("Отправляем реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
         legacySbbolAdapter.create(digitalId, counterparty);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", toUUID(counterparty.getPprbGuid()));
-        raceConditionResolver.resolve(CREATING_COUNTERPARTY, toUUID(counterparty.getPprbGuid()), digitalId);
+        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
+        raceConditionResolver.resolve(CREATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
     }
 
     private void handleUpdatingCounterparty(String digitalId, Counterparty counterparty) {
         LOG.debug("Сохраняем в очередь реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
         saveReplicationEntityToMessageQueue(
             digitalId,
-            toUUID(counterparty.getPprbGuid()),
+            mapUuid(counterparty.getPprbGuid()),
             UPDATING_COUNTERPARTY,
             counterparty
         );
         LOG.debug("Отправляем реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
         legacySbbolAdapter.update(digitalId, counterparty);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", toUUID(counterparty.getPprbGuid()));
-        raceConditionResolver.resolve(UPDATING_COUNTERPARTY, toUUID(counterparty.getPprbGuid()), digitalId);
+        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
+        raceConditionResolver.resolve(UPDATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
 
     }
 
@@ -232,14 +229,14 @@ public class ReplicationServiceImpl implements ReplicationService {
         LOG.debug("Сохраняем в очередь реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
         saveReplicationEntityToMessageQueue(
             digitalId,
-            toUUID(counterpartyId),
+            mapUuid(counterpartyId),
             DELETING_COUNTERPARTY,
             counterpartyId
         );
         LOG.debug("Отправляем реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
         legacySbbolAdapter.delete(digitalId, counterpartyId);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", toUUID(counterpartyId));
-        raceConditionResolver.resolve(DELETING_COUNTERPARTY, toUUID(counterpartyId), digitalId);
+        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", mapUuid(counterpartyId));
+        raceConditionResolver.resolve(DELETING_COUNTERPARTY, mapUuid(counterpartyId), digitalId);
     }
 
     private void handleCreatingSign(String digitalId, String digitalUserId, CounterpartySignData signData) {
@@ -258,18 +255,18 @@ public class ReplicationServiceImpl implements ReplicationService {
         raceConditionResolver.resolve(CREATING_SIGN, counterpartyId, digitalId);
     }
 
-    private void  handleDeletingSign(String digitalId, String counterpartyId) {
+    private void handleDeletingSign(String digitalId, String counterpartyId) {
         LOG.debug("Сохраняем в очередь реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
         saveReplicationEntityToMessageQueue(
             digitalId,
-            toUUID(counterpartyId),
+            mapUuid(counterpartyId),
             DELETING_SIGN,
             counterpartyId
         );
         LOG.debug("Отправляем реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
         legacySbbolAdapter.removeSign(digitalId, counterpartyId);
         LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
-        raceConditionResolver.resolve(DELETING_SIGN, toUUID(counterpartyId), digitalId);
+        raceConditionResolver.resolve(DELETING_SIGN, mapUuid(counterpartyId), digitalId);
     }
 
     private <T> void saveReplicationEntityToMessageQueue(

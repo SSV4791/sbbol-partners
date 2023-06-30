@@ -8,8 +8,8 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 
 @Loggable
-@Mapper
-public interface LegalFormMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface LegalFormMapper {
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)

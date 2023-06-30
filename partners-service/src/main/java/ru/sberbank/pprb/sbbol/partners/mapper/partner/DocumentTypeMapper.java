@@ -13,19 +13,20 @@ import java.util.List;
 @Loggable
 @Mapper(
     uses = {
+        BaseMapper.class,
         LegalFormMapper.class
     },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
-public interface DocumentTypeMapper extends BaseMapper {
+public interface DocumentTypeMapper {
 
-    @Mapping(target = "id", expression = "java(documentType.getUuid() == null ? null :documentType.getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "documentType", source = "systemName")
     DocumentType toDocumentType(DocumentTypeEntity documentType);
 
     List<DocumentType> toDocumentType(List<DocumentTypeEntity> documentType);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(documentType.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "systemName", source = "documentType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)

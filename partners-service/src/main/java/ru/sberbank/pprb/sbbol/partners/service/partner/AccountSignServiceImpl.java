@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_DELETE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 
 @Loggable
 public class AccountSignServiceImpl implements AccountSignService {
@@ -91,7 +92,7 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Audit(eventType = SIGN_ACCOUNTS_DELETE)
     public void deleteAccountsSign(String digitalId, List<String> accountIds) {
         for (String accountId : accountIds) {
-            var accountUuid = accountSingMapper.mapUuid(accountId);
+            var accountUuid = mapUuid(accountId);
             var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountUuid);
             // Сделанно в рамках поддержания миграции чтоб не создавать пустушку для мигрированных подписанных счетов
             if (sign.isPresent()) {

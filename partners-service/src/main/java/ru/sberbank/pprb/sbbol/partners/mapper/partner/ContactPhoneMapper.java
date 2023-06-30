@@ -11,15 +11,14 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 import java.util.Optional;
 
 @Loggable
-@Mapper
-public interface ContactPhoneMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface ContactPhoneMapper {
 
-    @Mapping(target = "id", expression = "java(phone.getUuid() == null ? null : phone.getUuid().toString())")
-    @Mapping(target = "unifiedId",
-        expression = "java(phone.getContact().getUuid() == null ? null : phone.getContact().getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedId", source = "contact.uuid", qualifiedByName = "mapUuid")
     Phone toPhone(ContactPhoneEntity phone);
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(phone.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "contact", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     ContactPhoneEntity toPhone(Phone phone);

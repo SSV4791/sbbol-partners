@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner.common;
 
 import org.jetbrains.annotations.NotNull;
+import org.mapstruct.Mapper;
+import org.mapstruct.Named;
 import org.springframework.util.StringUtils;
 
 import java.util.Locale;
@@ -12,9 +14,11 @@ import java.util.stream.Stream;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
+@Mapper
 public interface BaseMapper {
 
-    default UUID mapUuid(final String id) {
+    @Named("mapUuid")
+    static UUID mapUuid(final String id) {
         if (StringUtils.hasText(id)) {
             var value = id.replaceAll("[\\[\\]]", "");
             return UUID.fromString(value);
@@ -22,12 +26,13 @@ public interface BaseMapper {
         return null;
     }
 
-    default String mapUuid(final UUID uuid) {
+    @Named("mapUuid")
+    static String mapUuid(final UUID uuid) {
         return uuid == null ? null : uuid.toString();
     }
 
     @NotNull
-    default String saveSearchString(String... search) {
+    static String saveSearchString(String... search) {
         return Stream.of(
                 search
             )
@@ -38,7 +43,7 @@ public interface BaseMapper {
     }
 
     @NotNull
-    default String prepareSearchString(String... search) {
+    static String prepareSearchString(String... search) {
         return Stream.of(
                 search
             )

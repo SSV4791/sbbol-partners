@@ -251,7 +251,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .account(accountChangeFullModel.getAccount())
             .comment(accountChangeFullModel.getComment());
         Optional.ofNullable(accountChangeFullModel.getBank())
-            .ifPresent(bank -> {
+            .ifPresent(bank ->
                 expectedAccountChange.setBank(new Bank()
                     .id(bank.getId())
                     .version(bank.getVersion())
@@ -268,8 +268,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                             )
                             .orElse(null)
                     )
-                );
-            });
+                ));
         assertThat(actualAccountChange)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -288,7 +287,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .account(accountChangeFullModel.getAccount())
             .comment(accountChangeFullModel.getComment());
         Optional.ofNullable(accountChangeFullModel.getBank())
-            .ifPresent(bank -> {
+            .ifPresent(bank ->
                 expectedAccountCreate.setBank(new BankCreate()
                     .bic(bank.getBic())
                     .name(bank.getName())
@@ -299,8 +298,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                             )
                             .orElse(null)
                     )
-                );
-            });
+                ));
         assertThat(actualAccountCreate)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()

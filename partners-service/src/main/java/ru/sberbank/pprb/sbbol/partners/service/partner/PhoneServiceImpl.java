@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
+
 abstract class PhoneServiceImpl implements PhoneService {
 
     public static final String DOCUMENT_NAME = "phone";
@@ -81,7 +83,7 @@ abstract class PhoneServiceImpl implements PhoneService {
     @Transactional
     public void deletePhones(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var uuid = phoneMapper.mapUuid(id);
+            var uuid = mapUuid(id);
             var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, uuid);
             if (foundPhone.isEmpty()) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);

@@ -14,6 +14,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
+
 public abstract class MigrationPartnerMapperDecorator implements MigrationPartnerMapper {
 
     public static final int ENTREPRENEUR_INN_LENGTH = 12;

@@ -11,10 +11,10 @@ import ru.sberbank.pprb.sbbol.partners.model.BudgetMask;
 import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskForm;
 
 @Loggable
-@Mapper
-public interface BudgetMaskMapper extends BaseMapper {
+@Mapper(uses = {BaseMapper.class})
+public interface BudgetMaskMapper {
 
-    @Mapping(target = "id", expression = "java(budgetMask.getUuid().toString())")
+    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
     @Mapping(target = "maskType", source = "type", qualifiedByName = "toBudgetMaskType")
     BudgetMask toBudgetMask(BudgetMaskEntity budgetMask);
 
@@ -23,7 +23,7 @@ public interface BudgetMaskMapper extends BaseMapper {
         return budgetMaskType != null ? BudgetMaskForm.valueOf(budgetMaskType.name()) : null;
     }
 
-    @Mapping(target = "uuid", expression = "java(mapUuid(budgetMask.getId()))")
+    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
     @Mapping(target = "type", source = "maskType", qualifiedByName = "toBudgetMaskType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)

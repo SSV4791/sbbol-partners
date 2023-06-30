@@ -42,6 +42,8 @@ import java.util.stream.Collectors;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_UPDATE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
 public class AccountServiceImpl implements AccountService {
@@ -146,7 +148,7 @@ public class AccountServiceImpl implements AccountService {
     @Audit(eventType = ACCOUNTS_DELETE)
     public void deleteAccounts(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var uuid = accountMapper.mapUuid(id);
+            var uuid = mapUuid(id);
             var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
             try {
@@ -154,7 +156,7 @@ public class AccountServiceImpl implements AccountService {
                 var accountSignEntity =
                     accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccount.getUuid());
                 accountSignEntity.ifPresent(accountSignRepository::delete);
-                replicationService.deleteCounterparty(digitalId, uuid.toString());
+                replicationService.deleteCounterparty(digitalId, id);
             } catch (RuntimeException e) {
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
@@ -183,7 +185,7 @@ public class AccountServiceImpl implements AccountService {
         List<AccountEntity> accounts = accountRepository.findByRequest(request);
         if (CollectionUtils.isEmpty(accounts)) {
             var search =
-                accountMapper.prepareSearchString(request.getInn(), request.getKpp(), request.getName());
+                prepareSearchString(request.getInn(), request.getKpp(), request.getName());
             PartnerEntity partner = partnerRepository.findByDigitalIdAndSearchAndType(request.getDigitalId(), search, PartnerType.PARTNER);
             if (Objects.isNull(partner)) {
                 throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
@@ -210,7 +212,7 @@ public class AccountServiceImpl implements AccountService {
             .filter(value -> {
                 PartnerEntity partner = value.getPartner();
                 String fio =
-                    accountMapper.prepareSearchString(partner.getSecondName(), partner.getFirstName(), partner.getMiddleName());
+                    prepareSearchString(partner.getSecondName(), partner.getFirstName(), partner.getMiddleName());
                 return Objects.equals(partner.getOrgName(), request.getName()) ||
                     Objects.equals(fio, request.getName());
             })

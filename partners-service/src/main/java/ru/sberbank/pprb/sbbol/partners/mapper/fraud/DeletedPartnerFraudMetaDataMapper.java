@@ -33,11 +33,17 @@ import static java.util.Objects.nonNull;
 public interface DeletedPartnerFraudMetaDataMapper extends BaseFraudMetaDataMapper {
 
     @InheritConfiguration
-    @Mapping(target = "clientDefinedAttributeList", expression = "java(toCounterPartyClientDefinedAttributesForDeletedPartner(metaData, partner))")
+    @Mapping(
+        target = "clientDefinedAttributeList",
+        expression = "java(toCounterPartyClientDefinedAttributesForDeletedPartner(metaData, partner))"
+    )
     CounterPartySendToAnalyzeRq mapToCounterPartySendToAnalyzeRq(FraudMetaData metaData, @Context PartnerEntity partner);
 
     @Named("toCounterPartyClientDefinedAttributesForDeletedPartner")
-    default CounterPartyClientDefinedAttributes toCounterPartyClientDefinedAttributesForDeletedPartner(FraudMetaData metaData, PartnerEntity partner) {
+    default CounterPartyClientDefinedAttributes toCounterPartyClientDefinedAttributesForDeletedPartner(
+        FraudMetaData metaData,
+        PartnerEntity partner
+    ) {
         var counterPartyClientDefinedAttributes = toCounterPartyClientDefinedAttributes(metaData, partner);
         if (counterPartyClientDefinedAttributes == null) {
             return null;

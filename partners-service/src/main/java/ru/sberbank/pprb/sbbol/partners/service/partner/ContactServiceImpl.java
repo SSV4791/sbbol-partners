@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
+
 @Loggable
 public class ContactServiceImpl implements ContactService {
 
@@ -111,7 +113,7 @@ public class ContactServiceImpl implements ContactService {
     @Transactional
     public void deleteContacts(String digitalId, List<String> ids) {
         for (String id : ids) {
-            var contactUuid = contactMapper.mapUuid(id);
+            var contactUuid = mapUuid(id);
             var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactUuid)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactUuid));
             contactRepository.delete(foundContact);

@@ -9,7 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
@@ -26,22 +25,19 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
 
 public class AccountViewRepositoryImpl
     extends BaseRepository<AccountEntity, AccountsFilter> implements AccountViewRepository {
 
     private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;
-    private final AccountMapper accountMapper;
 
     public AccountViewRepositoryImpl(
         EntityManager entityManager,
-        BudgetMaskDictionaryRepository budgetMaskDictionaryRepository,
-        AccountMapper accountMapper
+        BudgetMaskDictionaryRepository budgetMaskDictionaryRepository
     ) {
         super(entityManager, AccountEntity.class);
         this.budgetMaskDictionaryRepository = budgetMaskDictionaryRepository;
-        this.accountMapper = accountMapper;
-
     }
 
     @Override
@@ -94,7 +90,7 @@ public class AccountViewRepositoryImpl
     private void addSearchPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
         var filterSearch = filter.getSearch();
         if (filterSearch != null && StringUtils.hasText(filterSearch.getSearch())) {
-            var searchPattern = accountMapper.saveSearchString(filterSearch.getSearch())
+            var searchPattern = saveSearchString(filterSearch.getSearch())
                 .toLowerCase(Locale.getDefault());
             predicates.add(
                 builder.like(

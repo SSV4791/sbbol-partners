@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.qameta.allure.Allure;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +55,7 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterIdsArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterLegalFormArgumentsProvider;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
@@ -145,105 +145,34 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(description.getMessage()).size().isEqualTo(2);
     }
 
-    @Test
-    void testCreateEmptyLegalEntityPartner() {
-        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
-            .firstName(null)
-            .secondName(null)
-            .middleName(null)
-            .kpp(null)
-            .ogrn(null)
-            .okpo(null)
-            .phones(null)
-            .emails(null)
-            .comment(null);
-        var createdPartner = post(
+    @ParameterizedTest
+    @ArgumentsSource(PartnerCreateArgumentsProvider.class)
+    @DisplayName("POST /partner Создание партнера")
+    void testCreatePartner(PartnerCreate partner) {
+        assertThat(partner)
+            .isNotNull();
+        var createdPartner = step("Подготовка тестовых данных", () -> post(
             BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             partner,
             Partner.class
-        );
+        ));
         assertThat(createdPartner)
             .isNotNull();
-        var actualPartner = get(
+        var actualPartner = step("Выполнение post-запроса /partner, код ответа 200", () -> get(
             PARTNER_GETTING_URL,
             HttpStatus.OK,
             Partner.class,
             createdPartner.getDigitalId(),
             createdPartner.getId()
-        );
-        assertThat(actualPartner)
-            .isNotNull()
-            .isEqualTo(createdPartner);
-    }
-
-    @Test
-    void testCreateEmptyEntrepreneurPartner() {
-        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
-            .legalForm(LegalForm.ENTREPRENEUR)
-            .firstName(null)
-            .secondName(null)
-            .middleName(null)
-            .inn(getValidInnNumber(LegalForm.ENTREPRENEUR))
-            .kpp(null)
-            .ogrn(null)
-            .okpo(null)
-            .phones(null)
-            .emails(null)
-            .comment(null);
-        var createdPartner = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.CREATED,
-            partner,
-            Partner.class
-        );
-        assertThat(createdPartner)
-            .isNotNull();
-        var actualPartner = get(
-            PARTNER_GETTING_URL,
-            HttpStatus.OK,
-            Partner.class,
-            createdPartner.getDigitalId(),
-            createdPartner.getId()
-        );
-        assertThat(actualPartner)
-            .isNotNull()
-            .isEqualTo(createdPartner);
-    }
-
-    @Test
-    void testCreateEmptyPhysicalPersonPartner() {
-        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
-            .legalForm(LegalForm.PHYSICAL_PERSON)
-            .orgName(null)
-            .firstName(randomAlphabetic(10))
-            .secondName(randomAlphabetic(10))
-            .middleName(null)
-            .inn(null)
-            .kpp(null)
-            .ogrn(null)
-            .okpo(null)
-            .phones(null)
-            .emails(null)
-            .comment(null);
-        var createdPartner = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.CREATED,
-            partner,
-            Partner.class
-        );
-        assertThat(createdPartner)
-            .isNotNull();
-        var actualPartner = get(
-            PARTNER_GETTING_URL,
-            HttpStatus.OK,
-            Partner.class,
-            createdPartner.getDigitalId(),
-            createdPartner.getId()
-        );
-        assertThat(actualPartner)
-            .isNotNull()
-            .isEqualTo(createdPartner);
+        ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualPartner)
+                .isNotNull();
+            assertThat(actualPartner)
+                .isNotNull()
+                .isEqualTo(createdPartner);
+        });
     }
 
     @Test
@@ -269,32 +198,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(description).isNotNull();
         assertThat(description.getMessage()).contains("Поле обязательно для заполнения");
         assertThat(description.getMessage()).size().isEqualTo(1);
-    }
-
-    @Test
-    void testGetPartner() {
-        var partner = getValidLegalEntityPartner();
-        var createdPartner = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.CREATED,
-            partner,
-            Partner.class
-        );
-        assertThat(createdPartner)
-            .isNotNull();
-
-        var actualPartner = get(
-            PARTNER_GETTING_URL,
-            HttpStatus.OK,
-            Partner.class,
-            createdPartner.getDigitalId(),
-            createdPartner.getId()
-        );
-        assertThat(actualPartner)
-            .isNotNull();
-        assertThat(actualPartner)
-            .isNotNull()
-            .isEqualTo(createdPartner);
     }
 
     @Test
@@ -3498,32 +3401,24 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     public static PartnerCreate getValidPartner(String digitalId, LegalForm form) {
+        var partner = new PartnerCreate()
+            .digitalId(digitalId)
+            .legalForm(form)
+            .inn(getValidInnNumber(form))
+            .kpp("123456789")
+            .ogrn(getValidOgrnNumber(form))
+            .okpo(getValidOkpoNumber(form))
+            .phones(new HashSet<>(List.of("0079241111111")))
+            .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
+            .comment("555555");
         if (form == LegalForm.LEGAL_ENTITY || form == LegalForm.ENTREPRENEUR) {
-            return new PartnerCreate()
-                .digitalId(digitalId)
-                .legalForm(form)
-                .orgName(randomAlphabetic(10))
-                .inn(getValidInnNumber(form))
-                .kpp("123456789")
-                .ogrn(getValidOgrnNumber(form))
-                .okpo(getValidOkpoNumber(form))
-                .phones(new HashSet<>(List.of("0079241111111")))
-                .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
-                .comment("555555");
+            return partner
+                .orgName(randomAlphabetic(10));
         } else {
-            return new PartnerCreate()
-                .digitalId(digitalId)
-                .legalForm(form)
+            return partner
                 .firstName(randomAlphabetic(10))
                 .secondName(randomAlphabetic(10))
-                .middleName(randomAlphabetic(10))
-                .inn(getValidInnNumber(form))
-                .kpp("123456789")
-                .ogrn(getValidOgrnNumber(form))
-                .okpo(getValidOkpoNumber(form))
-                .phones(new HashSet<>(List.of("0079241111111")))
-                .emails(new HashSet<>(List.of("a.a.a@sberbank.ru")))
-                .comment("555555");
+                .middleName(randomAlphabetic(10));
         }
     }
 
@@ -3647,7 +3542,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     protected static Partner createValidPartner(String digitalId) {
-        return Allure.step("Создание валидного контрагента", () -> post(
+        return step("Создание валидного контрагента", () -> post(
             BASE_ROUTE_PATH,
             HttpStatus.CREATED,
             getValidLegalEntityPartner(digitalId),
