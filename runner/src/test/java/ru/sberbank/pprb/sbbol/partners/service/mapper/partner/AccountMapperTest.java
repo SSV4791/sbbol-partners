@@ -349,6 +349,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "partner",
                 "bank.uuid",
                 "bank.lastModifiedDate",
+                "bank.intermediary",
                 "bank.account.uuid",
                 "bank.account.partner",
                 "bank.account.createDate",

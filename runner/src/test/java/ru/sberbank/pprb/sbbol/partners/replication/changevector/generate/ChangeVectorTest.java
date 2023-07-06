@@ -12,6 +12,8 @@ import com.sbt.pprb.integration.changevector.snapshot.ChangeVectorImpl;
 import com.sbt.pprb.integration.changevector.snapshot.CreateEventImpl;
 import com.sbt.pprb.integration.hibernate.changes.serialization.meta.HibernateMetadataSource;
 import com.sbt.pprb.integration.hibernate.changes.transform.Normalizer;
+import com.sbt.pprb.integration.hibernate.standin.annotations.Replication;
+import com.sbt.pprb.integration.hibernate.standin.annotations.Standin;
 import com.sbt.pprb.integration.replication.clientlocks.model.ClientLock;
 import com.sbt.pprb.integration.replication.clientlocks.model.ClientLockEvent;
 import com.sbt.pprb.integration.replication.clientlocks.model.ConfirmationEntity;
@@ -29,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.ReflectionUtils;
 import ru.dcbqa.allureee.annotations.layers.UnitTestLayer;
 import ru.sberbank.pprb.sbbol.partners.config.HibernatePluginCleanerInitializer;
 import ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration;
@@ -37,6 +40,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.metamodel.EntityType;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -142,6 +146,9 @@ class ChangeVectorTest {
         return idField;
     }
 
+    /**
+     * @see {@link com.sbt.pprb.integration.hibernate.changes.processors.CreateEventProcessor#modelToStore}
+     */
     private void fillEvent(Object entity, EntityPersister persister, Normalizer normalizer, CreateEventImplementor<?> createEvent) {
         Type[] types = persister.getPropertyTypes();
         String[] propertyNames = persister.getPropertyNames();
@@ -151,6 +158,9 @@ class ChangeVectorTest {
                 continue;
             }
             if (isVersion(persister, name)) {
+                continue;
+            }
+            if (isStandinReplicationDisabled(entity.getClass(), name)) {
                 continue;
             }
             Type type = types[i];
@@ -191,4 +201,31 @@ class ChangeVectorTest {
         String versionPropertyName = persister.getPropertyNames()[versionProperty];
         return propertyName.equals(versionPropertyName);
     }
+
+    /**
+     * Вернуть true, если поле выключено из репликации в стендин.
+     * <p>
+     * Standin-плагин (sbp-hibernate-standin) не записывает в вектора изменений поля,
+     * отмеченные аннотацией {@code @Standin(replication = Replication.DISABLED)},
+     * поэтому такие поля не должны попадать и в вектора изменений, которые создает
+     * текущий тестовый класс.
+     *
+     * @param entityClass класс @Entity-объекта
+     * @param name        имя поля
+     * @return true, если поле не должно попасть в вектор изменений
+     */
+    private boolean isStandinReplicationDisabled(Class<?> entityClass, String name) {
+        Field field = ReflectionUtils.findField(entityClass, name);
+        if (field != null) {
+            Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
+            for (Annotation annotation : declaredAnnotations) {
+                if (annotation instanceof Standin) {
+                    Standin standin = (Standin) annotation;
+                    return standin.replication() == Replication.DISABLED;
+                }
+            }
+        }
+        return false;
+    }
+
 }
