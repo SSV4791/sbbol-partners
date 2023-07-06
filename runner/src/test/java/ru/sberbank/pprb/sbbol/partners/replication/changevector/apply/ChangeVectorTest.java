@@ -63,4 +63,5 @@ class ChangeVectorTest {
                 .forEach(resolver::resolve);
         }
     }
+
 }
