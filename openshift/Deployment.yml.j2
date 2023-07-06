@@ -57,6 +57,7 @@ spec:
 {% endfor %}
 {% endif %}
       labels:
+        secman: application-pod
         app: {{ os_project.name }}-{{ suffix_app_label }}
         version: {{ version | default('v1') }}
 {% if secman.openshift.enabled is not defined or secman.openshift.enabled | bool %}
@@ -98,6 +99,11 @@ spec:
                   fieldPath: metadata.name
             - name: RUN_DEBUG
               value: 'false'
+            - name: JAVA_TOOL_OPTIONS     #автоматическое прокидывание JVM параметров (без явного указания в entrypoint.sh)
+              value: >-
+                -Dlogging.config=/deployments/config/logback/logback.xml
+                -Dspring.config.location=file:/deployments/config/application.properties,file:/deployments/credentials/main_db/secret.properties,file:/deployments/credentials/si_db/secret.properties,file:/deployments/config/app_journal/appJournal.properties
+                {{ os_project.app.javaToolOptions | default('') }}
           ports:
             - containerPort: 8080
               name: http

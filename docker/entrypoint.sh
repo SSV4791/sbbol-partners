@@ -46,10 +46,7 @@ then
   export DEBUG_CONFIG="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000"
 fi
 
-export LOGGING_CONFIG="-Dlogging.config=/deployments/config/logback/logback.xml"
-export CONFIG_LOCATIONS="-Dspring.config.location=file:/deployments/config/application.properties,file:/deployments/credentials/main_db/secret.properties,file:/deployments/credentials/si_db/secret.properties,file:/deployments/config/app_journal/appJournal.properties"
-
 # Запуск приложения
 env $custom_envs sh -c '
-exec java $DEBUG_CONFIG $CONFIG_LOCATIONS $LOGGING_CONFIG -jar partners.jar
+exec java $DEBUG_CONFIG -jar partners.jar
 '
