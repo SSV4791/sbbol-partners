@@ -151,7 +151,7 @@ release:
     parallel_build: true
     params_branch: master
     params_folder: develop
-    istio_tag: '2.4'
+    istio_tag: 'test_2.5'
     commit_or_tag: '02.006.00_0001_i-2.4'
     release_key: DCBBRAIN-4501
     reverse_and_publish: false
