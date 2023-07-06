@@ -14,6 +14,10 @@ os_project:
   host: "https://api.dev-gen2.sigma.sbrf.ru:6443"
   project: ci02281165-edevgen2-efs-kib-sbbol-dev-test6
   name: sbbol-partners
+  app:
+    javaToolOptions: >-
+      -XX:MaxRAMPercentage=25
+      -XX:InitialRAMPercentage=1.5625
   istio:
     ingress:
       mtls:
