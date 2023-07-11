@@ -10,7 +10,7 @@
     "count": {
       "type": "integer",
       "title": "Количество возвращаемых записей",
-      "maximum": 200
+      "maximum": 300
     },
     "hasNextPage": {
       "type": "boolean",
