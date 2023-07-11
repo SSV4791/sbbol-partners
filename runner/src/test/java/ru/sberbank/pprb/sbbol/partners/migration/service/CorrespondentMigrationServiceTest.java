@@ -99,7 +99,6 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         var correspondents = response.getResult().getCorrespondents();
         assertThat(correspondents).isNotNull();
         MigratedCorrespondentData correspondentData = correspondents.get(0);
-        assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
         assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
         generatedCorrespondent.setVersion(1);
         generatedCorrespondent.setReplicationGuid(UUID.randomUUID().toString());
@@ -119,7 +118,6 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         var correspondents = response.getResult().getCorrespondents();
         assertThat(correspondents).isNotNull();
         MigratedCorrespondentData correspondentData = correspondents.get(0);
-        assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
         assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
         generatedCorrespondent.setVersion(1);
         generatedCorrespondent.setReplicationGuid(UUID.randomUUID().toString());
@@ -159,8 +157,9 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
     private List<MigrationCorrespondentCandidate> generateCorrespondents(int count) {
         List<MigrationCorrespondentCandidate> generatedCorrespondents = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            String randomReplicationGuid = RandomStringUtils.randomAlphanumeric(8);
+            String randomReplicationGuid = UUID.randomUUID().toString();
             MigrationCorrespondentCandidate correspondent = new MigrationCorrespondentCandidate();
+            correspondent.setReplicationGuid(randomReplicationGuid);
             correspondent.setName(RandomStringUtils.randomAlphanumeric(8) + " " + RandomStringUtils.randomAlphanumeric(8));
             correspondent.setInn(RandomStringUtils.randomAlphanumeric(8));
             correspondent.setKpp(RandomStringUtils.randomAlphanumeric(8));

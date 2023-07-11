@@ -21,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentTypeMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.EmailMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.partner.IdsHistoryMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterMapper;
@@ -38,6 +39,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.IdsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
@@ -45,6 +47,8 @@ import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.DeletedPartnerFraudServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.FraudServiceManagerImpl;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.SignedAccountFraudServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.impl.IdsHistoryServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
@@ -138,7 +142,8 @@ public class PartnerServiceConfiguration {
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
-        ReplicationService replicationService
+        ReplicationService replicationService,
+        IdsHistoryService idsHistoryService
     ) {
         return new AccountServiceImpl(
             accountRepository,
@@ -146,7 +151,8 @@ public class PartnerServiceConfiguration {
             accountSignRepository,
             budgetMaskService,
             accountMapper,
-            replicationService
+            replicationService,
+            idsHistoryService
         );
     }
 
@@ -303,7 +309,8 @@ public class PartnerServiceConfiguration {
         AddressService partnerAddressService,
         DocumentService partnerDocumentService,
         ContactService contactService,
-        AccountService accountService
+        AccountService accountService,
+        IdsHistoryService idsHistoryService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
             accountRepository,
@@ -323,7 +330,8 @@ public class PartnerServiceConfiguration {
             partnerAddressService,
             partnerDocumentService,
             contactService,
-            accountService
+            accountService,
+            idsHistoryService
         );
     }
 
@@ -385,5 +393,10 @@ public class PartnerServiceConfiguration {
             mapperRegistry,
             replicationRepository
         );
+    }
+
+    @Bean
+    IdsHistoryService idsHistoryService(IdsHistoryRepository idsHistoryRepository, IdsHistoryMapper idsHistoryMapper) {
+        return new IdsHistoryServiceImpl(idsHistoryRepository, idsHistoryMapper);
     }
 }

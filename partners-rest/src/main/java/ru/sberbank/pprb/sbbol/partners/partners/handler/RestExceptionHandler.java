@@ -26,6 +26,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudModelValidationException;
+import ru.sberbank.pprb.sbbol.partners.exception.IdsHistoryException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
@@ -186,6 +187,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus.BAD_REQUEST,
             CRITICAL,
             FRAUD_MODEL_VALIDATION_EXCEPTION.getValue(),
+            ex.getMessage(),
+            Collections.emptyMap(),
+            httpRequest.getRequestURL()
+        );
+    }
+
+    @ExceptionHandler(IdsHistoryException.class)
+    protected ResponseEntity<Object> handleFraudModelValidationException(
+        IdsHistoryException ex,
+        HttpServletRequest httpRequest
+    ) {
+        LOG.error("Ошибка выполнения операции с таблицей ids_history", ex);
+        return buildResponsesEntity(
+            HttpStatus.BAD_REQUEST,
+            CRITICAL,
+            EXCEPTION.getValue(),
             ex.getMessage(),
             Collections.emptyMap(),
             httpRequest.getRequestURL()

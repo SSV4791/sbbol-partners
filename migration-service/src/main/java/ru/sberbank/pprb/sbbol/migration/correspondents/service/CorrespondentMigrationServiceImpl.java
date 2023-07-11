@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +38,20 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
+    private final IdsHistoryService idsHistoryService;
 
     public CorrespondentMigrationServiceImpl(
         MigrationPartnerMapper migrationPartnerMapper,
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
-        AccountSignRepository accountSignRepository
+        AccountSignRepository accountSignRepository,
+        IdsHistoryService idsHistoryService
     ) {
         this.migrationPartnerMapper = migrationPartnerMapper;
         this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
+        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
@@ -104,6 +108,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         if (foundAccount.isPresent()) {
             var accountEntity = foundAccount.get();
             accountRepository.delete(accountEntity);
+            idsHistoryService.delete(digitalId, accountEntity.getUuid());
             var accountSignEntity =
                 accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountEntity.getUuid());
             accountSignEntity.ifPresent(accountSignRepository::delete);
@@ -156,6 +161,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             migrationPartnerMapper.updatePartnerEntity(digitalId, correspondent, searchPartner);
             partnerRepository.save(searchPartner);
         }
+        idsHistoryService.add(digitalId, UUID.fromString(correspondent.getReplicationGuid()), savedAccount.getUuid());
         return savedAccount;
     }
 

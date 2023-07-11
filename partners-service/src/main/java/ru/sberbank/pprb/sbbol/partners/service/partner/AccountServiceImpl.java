@@ -30,6 +30,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -56,6 +57,7 @@ public class AccountServiceImpl implements AccountService {
     private final BudgetMaskService budgetMaskService;
     private final AccountMapper accountMapper;
     private final ReplicationService replicationService;
+    private final IdsHistoryService idsHistoryService;
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
@@ -63,7 +65,8 @@ public class AccountServiceImpl implements AccountService {
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
-        ReplicationService replicationService
+        ReplicationService replicationService,
+        IdsHistoryService idsHistoryService
     ) {
         this.accountRepository = accountRepository;
         this.partnerRepository = partnerRepository;
@@ -71,6 +74,7 @@ public class AccountServiceImpl implements AccountService {
         this.budgetMaskService = budgetMaskService;
         this.accountMapper = accountMapper;
         this.replicationService = replicationService;
+        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
@@ -117,6 +121,8 @@ public class AccountServiceImpl implements AccountService {
             var savedAccount = accountRepository.save(accountEntity);
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             replicationService.createCounterparty(response);
+            var savedAccountUuid = savedAccount.getUuid();
+            idsHistoryService.add(savedAccount.getDigitalId(), savedAccountUuid, savedAccountUuid);
             return response;
         } catch (DataIntegrityViolationException e) {
             throw e;
@@ -153,10 +159,12 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
             try {
                 accountRepository.delete(foundAccount);
+                var foundAccountUuid = foundAccount.getUuid();
                 var accountSignEntity =
-                    accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccount.getUuid());
+                    accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccountUuid);
                 accountSignEntity.ifPresent(accountSignRepository::delete);
                 replicationService.deleteCounterparty(digitalId, id);
+                idsHistoryService.delete(digitalId, foundAccountUuid);
             } catch (RuntimeException e) {
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
