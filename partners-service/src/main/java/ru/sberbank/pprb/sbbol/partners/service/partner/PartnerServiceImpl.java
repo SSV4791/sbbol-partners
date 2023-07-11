@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BaseEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -29,6 +30,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
@@ -69,6 +71,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final DocumentService partnerDocumentService;
     private final ContactService contactService;
     private final AccountService accountService;
+    private final IdsHistoryService idsHistoryService;
 
     public PartnerServiceImpl(
         AccountRepository accountRepository,
@@ -88,7 +91,8 @@ public class PartnerServiceImpl implements PartnerService {
         AddressService partnerAddressService,
         DocumentService partnerDocumentService,
         ContactService contactService,
-        AccountService accountService
+        AccountService accountService,
+        IdsHistoryService idsHistoryService
     ) {
         this.accountRepository = accountRepository;
         this.documentRepository = documentRepository;
@@ -108,6 +112,7 @@ public class PartnerServiceImpl implements PartnerService {
         this.partnerDocumentService = partnerDocumentService;
         this.contactService = contactService;
         this.accountService = accountService;
+        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
@@ -159,7 +164,12 @@ public class PartnerServiceImpl implements PartnerService {
         var digitalId = partner.getDigitalId();
         var partnerUuid = savedPartner.getUuid();
         var accounts = accountMapper.toAccounts(partner.getAccounts(), digitalId, partnerUuid).stream()
-            .map(accountRepository::save)
+            .map(account -> {
+                var savedAccount = accountRepository.save(account);
+                var accountUuid = savedAccount.getUuid();
+                idsHistoryService.add(digitalId, accountUuid, accountUuid);
+                return savedAccount;
+            })
             .map(value -> accountMapper.toAccount(value, budgetMaskService))
             .collect(Collectors.toList());
         var addresses = addressMapper.toAddress(partner.getAddress(), digitalId, partnerUuid).stream()
@@ -276,6 +286,10 @@ public class PartnerServiceImpl implements PartnerService {
             if (!CollectionUtils.isEmpty(accounts)) {
                 accountRepository.deleteAll(accounts);
                 replicationService.deleteCounterparties(accounts);
+                var accountIds = accounts.stream()
+                    .map(BaseEntity::getUuid)
+                    .collect(Collectors.toList());
+                idsHistoryService.delete(digitalId, accountIds);
             }
         }
     }
