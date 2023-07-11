@@ -130,16 +130,23 @@ public abstract class AbstractIntegrationTest {
     }
 
     public static <T> T get(String url, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
-        return get(url, null, responseHttpStatus, response, params);
+        return get(url, null, responseHttpStatus, response, null, params);
     }
 
-    public static <T> T get(String url, Header header, HttpStatus responseHttpStatus, Class<T> response, Object... params) {
+    public static <T> T get(String url, HttpStatus responseHttpStatus, Class<T> response, Map<String, ?> queryParams, Object... params) {
+        return get(url, null, responseHttpStatus, response, queryParams, params);
+    }
+
+    public static <T> T get(String url, Header header, HttpStatus responseHttpStatus, Class<T> response, Map<String, ?> queryParams, Object... params) {
         var specification = given()
             .spec(requestSpec)
             .when();
         if (header != null) {
             specification
                 .header(header);
+        }
+        if (queryParams != null) {
+            specification.queryParams(queryParams);
         }
         return specification.get(url, params)
             .then()

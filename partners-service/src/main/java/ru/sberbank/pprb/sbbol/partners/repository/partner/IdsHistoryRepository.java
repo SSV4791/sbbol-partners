@@ -22,8 +22,16 @@ public interface IdsHistoryRepository extends CrudRepository<IdsHistoryEntity, U
     /**
      *
      * @param digitalId идентификатор личного кабинета
+     * @param externalIds список внешних идентификаторов сущностей
+     * @return список сущностей
+     */
+    List<IdsHistoryEntity> findByDigitalIdAndExternalIdIn(String digitalId, List<UUID> externalIds);
+
+    /**
+     *
+     * @param digitalId идентификатор личного кабинета
      * @param pprbEntityId идентификатор сущности в ППРБ
-     * @return история id
+     * @return список сущностей
      */
     List<IdsHistoryEntity> findByDigitalIdAndPprbEntityId(String digitalId, UUID pprbEntityId);
 
