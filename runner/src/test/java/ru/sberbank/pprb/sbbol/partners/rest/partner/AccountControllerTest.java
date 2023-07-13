@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -25,6 +26,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLink;
+import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -33,12 +36,14 @@ import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.storage.CacheNames;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,16 +67,24 @@ class AccountControllerTest extends BaseAccountControllerTest {
     private CacheManager cacheManager;
 
     @Autowired
+    private IdsHistoryService idsHistoryService;
+
+    @Autowired
     private GkuInnDictionaryRepository innDictionaryRepository;
 
     private static final String KPP_WITHOUT_ACCOUNT = "618243879";
 
     private GkuInnEntity gkuInnEntity;
 
+    private IdsHistoryEntity idsHistoryEntity;
+
     @AfterEach
     void after() {
         if (gkuInnEntity != null) {
             innDictionaryRepository.delete(gkuInnEntity);
+        }
+        if (idsHistoryEntity != null) {
+            idsHistoryService.delete(idsHistoryEntity.getDigitalId(), idsHistoryEntity.getPprbEntityId());
         }
     }
 
@@ -2710,6 +2723,91 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 assertThat(actualAccount)
                     .isNotNull();
             });
+    }
+
+    @Test
+    @DisplayName("GET /partner/accounts/get-accountIds-by-externalIds/{digitalId} внутреннего идентификатора счета по внешнему идентификатору")
+    void testGetAccountIdsByExternalIds() {
+        step("Подготовка тестовых данных о связи внешнего и внутреннего идентификатора", () -> {
+            idsHistoryEntity = podamFactory.manufacturePojo(IdsHistoryEntity.class);
+            idsHistoryService.add(idsHistoryEntity.getDigitalId(), idsHistoryEntity.getExternalId(), idsHistoryEntity.getPprbEntityId());
+        });
+        var externalIds =
+            step("Подготовка тестовых данных - создание externalIds", () ->
+                List.of(
+                    idsHistoryEntity.getExternalId().toString(),
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString()
+                ));
+        var expectedResponse =
+            step("Подготовка ожидаемого ответа", () -> {
+                return new ExternalInternalIdLinksResponse()
+                    .idLinks(externalIds.stream()
+                        .map(externalId ->
+                            new ExternalInternalIdLink()
+                                .externalId(externalId)
+                                .internalId(
+                                    externalId.equals(idsHistoryEntity.getExternalId().toString())
+                                        ? idsHistoryEntity.getPprbEntityId().toString()
+                                        : null
+                                )
+                        )
+                        .collect(Collectors.toList()));
+            });
+        var actualResponse =
+            step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds",
+                () -> get(
+                    baseRoutePath + "/accounts/get-accountIds-by-externalIds" + "/{digitalId}",
+                    HttpStatus.OK,
+                    ExternalInternalIdLinksResponse.class,
+                    Map.of("externalIds", externalIds),
+                    idsHistoryEntity.getDigitalId()
+                ));
+        step("Проверка корректности ответа",
+            () ->
+                assertThat(actualResponse)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expectedResponse));
+    }
+
+    @Test
+    @DisplayName("GET /partner/accounts/get-accountIds-by-externalIds/{digitalId} внутреннего идентификатора счета по внешнему идентификатору. Невалидный запрос")
+    void testGetAccountIdsByExternalIds_whenInvalidRequest() {
+        step("Подготовка тестовых данных о связи внешнего и внутреннего идентификатора", () -> {
+            idsHistoryEntity = podamFactory.manufacturePojo(IdsHistoryEntity.class);
+            idsHistoryService.add(idsHistoryEntity.getDigitalId(), idsHistoryEntity.getExternalId(), idsHistoryEntity.getPprbEntityId());
+        });
+        var externalIds =
+            step("Подготовка тестовых данных - создание externalIds", () ->
+                List.of(
+                    idsHistoryEntity.getExternalId().toString(),
+                    RandomStringUtils.randomAlphabetic(10),
+                    UUID.randomUUID().toString()
+                ));
+        var expectedResponse =
+            step("Подготовка ожидаемого ответа", () -> {
+                return new ExternalInternalIdLinksResponse()
+                    .idLinks(externalIds.stream()
+                        .map(externalId ->
+                            new ExternalInternalIdLink()
+                                .externalId(externalId)
+                                .internalId(
+                                    externalId.equals(idsHistoryEntity.getExternalId().toString())
+                                        ? idsHistoryEntity.getPprbEntityId().toString()
+                                        : null
+                                )
+                        )
+                        .collect(Collectors.toList()));
+            });
+        var actualResponse =
+            step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds",
+                () -> get(
+                    baseRoutePath + "/accounts/get-accountIds-by-externalIds" + "/{digitalId}",
+                    HttpStatus.BAD_REQUEST,
+                    Error.class,
+                    Map.of("externalIds", externalIds),
+                    idsHistoryEntity.getDigitalId()
+                ));
     }
 
     private GkuInnEntity saveGkuInn(String inn) {

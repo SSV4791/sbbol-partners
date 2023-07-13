@@ -274,3 +274,41 @@ paths:
             application/json:
               schema:
                 $ref: 'model/common/error.json'
+
+  /partner/accounts/get-accountIds-by-externalIds/{digitalId}:
+    get:
+      tags:
+        - Partner Accounts
+      description: Получение идентификатора счёта в ППРБ по его внешнему идентификатору
+      operationId: getAccountIdsByExternalIds
+      parameters:
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Идентификатор личного кабинета
+        - name: externalIds
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 200
+          description: Внешний идентификатор счета
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/accounts/external_internal_id_links_response.json'
+        404:
+          description: Not Found
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: 'model/common/error.json'

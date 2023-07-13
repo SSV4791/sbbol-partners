@@ -13,6 +13,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
+import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 
 import java.util.List;
@@ -23,8 +25,11 @@ public class AccountController implements PartnerAccountsApi {
 
     private final AccountService accountService;
 
-    public AccountController(AccountService accountService) {
+    private final IdsHistoryService idsHistoryService;
+
+    public AccountController(AccountService accountService, IdsHistoryService idsHistoryService) {
         this.accountService = accountService;
+        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
@@ -41,6 +46,11 @@ public class AccountController implements PartnerAccountsApi {
     public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
         accountService.deleteAccounts(digitalId, ids);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<ExternalInternalIdLinksResponse> getAccountIdsByExternalIds(String digitalId, List<String> externalIds) {
+        return ResponseEntity.ok(idsHistoryService.getInternalIds(digitalId, externalIds));
     }
 
     @Override

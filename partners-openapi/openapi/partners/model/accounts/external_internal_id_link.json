@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Объект связи внешнего и внутреннего идентификатора",
+  "properties": {
+    "externalId": {
+      "type": "string",
+      "title": "Внешний идентификатор",
+      "minLength": 36,
+      "maxLength": 36
+    },
+    "internalId": {
+      "type": "string",
+      "title": "Внутренний идентификатор",
+      "minLength": 36,
+      "maxLength": 36
+    }
+  }
+}
+
