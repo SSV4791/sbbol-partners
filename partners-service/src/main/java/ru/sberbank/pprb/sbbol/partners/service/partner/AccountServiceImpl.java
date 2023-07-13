@@ -163,7 +163,7 @@ public class AccountServiceImpl implements AccountService {
                 var accountSignEntity =
                     accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccountUuid);
                 accountSignEntity.ifPresent(accountSignRepository::delete);
-                replicationService.deleteCounterparty(digitalId, id);
+                replicationService.deleteCounterparty(digitalId, foundAccountUuid.toString());
                 idsHistoryService.delete(digitalId, foundAccountUuid);
             } catch (RuntimeException e) {
                 throw new EntrySaveException(DOCUMENT_NAME, e);
