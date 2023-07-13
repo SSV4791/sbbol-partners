@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.replication.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
@@ -32,6 +33,7 @@ import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.Replicati
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.DELETING_SIGN;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.UPDATING_COUNTERPARTY;
 
+@Loggable
 public class ReplicationServiceImpl implements ReplicationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReplicationServiceImpl.class);
