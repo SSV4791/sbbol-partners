@@ -5,6 +5,7 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Context;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.InheritConfiguration;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -35,7 +36,9 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.s
 @Mapper(uses = {
     BaseMapper.class,
     BankMapper.class
-})
+},
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR
+)
 @DecoratedWith(AccountMapperDecorator.class)
 public interface AccountMapper {
 
