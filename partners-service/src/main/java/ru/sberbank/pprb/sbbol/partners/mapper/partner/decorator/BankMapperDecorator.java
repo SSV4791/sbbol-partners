@@ -29,6 +29,8 @@ public abstract class BankMapperDecorator implements BankMapper {
                 bankEntity.setBankAccount(new BankAccountEntity());
             }
             bankAccountMapper.updateBankAccount(bank.getBankAccount(), bankEntity.getBankAccount());
+            var bankAccountEntity = bankEntity.getBankAccount();
+            bankAccountEntity.setBank(bankEntity);
         }
     }
 

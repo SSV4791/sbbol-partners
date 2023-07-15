@@ -29,6 +29,18 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     protected static final String BUDGET_40101_ACCOUNT_VALID = "40101810822805200005";
     protected static final String BUDGET_CORR_ACCOUNT_VALID = "40102810300000000001";
 
+    public static AccountCreate getValidAccountWithEmptyBankAccount(String partnerUuid, String digitalId) {
+        return new AccountCreate()
+            .partnerId(partnerUuid)
+            .digitalId(digitalId)
+            .account(getValidAccountNumber(getBic()))
+            .comment("Это тестовый комментарий")
+            .bank(new BankCreate()
+                .bic(getBic())
+                .name(randomAlphabetic(10))
+            );
+    }
+
     public static AccountCreate getValidAccount(String partnerUuid, String digitalId) {
         return new AccountCreate()
             .partnerId(partnerUuid)
@@ -45,10 +57,19 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     }
 
     public static Account createValidAccount(String partnerUuid, String digitalId) {
-        return Allure.step("Создание счета " + getValidAccount(partnerUuid, digitalId).getAccount(), () -> post(
+        return Allure.step("Создание счета ", () -> post(
             baseRoutePath + "/account",
             HttpStatus.CREATED,
             getValidAccount(partnerUuid, digitalId),
+            Account.class
+        ));
+    }
+
+    public static Account createValidAccountWithEmptyBankAccount(String partnerUuid, String digitalId) {
+        return Allure.step("Создание счета " , () -> post(
+            baseRoutePath + "/account",
+            HttpStatus.CREATED,
+            getValidAccountWithEmptyBankAccount(partnerUuid, digitalId),
             Account.class
         ));
     }

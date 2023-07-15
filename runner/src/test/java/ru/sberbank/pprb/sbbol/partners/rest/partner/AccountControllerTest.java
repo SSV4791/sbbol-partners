@@ -1433,6 +1433,29 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("PUT /partner/accounts редактирование счета")
+    void testUpdateAccount_whenBankAccountIsEmpty() {
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccountWithEmptyBankAccount(partner.getId(), partner.getDigitalId());
+        });
+        var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
+            baseRoutePath + "/account",
+            HttpStatus.OK,
+            updateAccount(account),
+            Account.class
+        ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(updateAccount)
+                .isNotNull();
+            assertThat(updateAccount.getComment())
+                .isNotEqualTo(account.getComment());
+            assertThat(updateAccount.getComment())
+                .isNotNull();
+        });
+    }
+
+    @Test
     @DisplayName("PUT /partner/account редактирование счета когда банк равен null")
     void testUpdateAccount_whenBankIsNull_thenBadRequest() {
         var account = step("Подготовка тестовых данных", () -> {
