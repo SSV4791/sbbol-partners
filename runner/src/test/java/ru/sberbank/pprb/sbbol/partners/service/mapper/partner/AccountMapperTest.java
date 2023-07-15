@@ -30,6 +30,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.ArrayList;
@@ -58,6 +59,9 @@ class AccountMapperTest extends BaseUnitConfiguration {
 
     @MockBean
     private GkuInnCacheableStorage gkuInnCacheableStorage;
+
+    @MockBean
+    private BudgetMaskService budgetMaskService;
 
     @BeforeEach
     void initEach() {

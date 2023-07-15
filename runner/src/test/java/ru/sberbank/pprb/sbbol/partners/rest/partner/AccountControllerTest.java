@@ -2345,6 +2345,57 @@ class AccountControllerTest extends BaseAccountControllerTest {
     }
 
     @Test
+    @DisplayName("POST /partner/account/get-at-requisites получение бюджетного счета партнера вместе с партнером")
+    void testGetAtRequisites_whenBudgetAccount() {
+        var partner =
+            step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
+        Account account = step("Создание бюджетного счета", () -> createValidBudgetAccount(partner.getId(), partner.getDigitalId()));
+        var request = step("Подготовка тестовых данных",
+            () -> new AccountAndPartnerRequest()
+                .digitalId(partner.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic())
+                .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                .inn(partner.getInn())
+                .kpp(partner.getKpp())
+                .name(partner.getOrgName()));
+        step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
+        List<AccountWithPartnerResponse> accountsWithPartner =
+            step("Выполнение post-запроса /partner/account/get-at-requisites",
+                () -> post(
+                    baseRoutePath + "/account/get-at-requisites",
+                    request,
+                    new TypeRef<>() {
+                    }
+                ));
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountsWithPartner)
+                .isNotNull();
+            assertThat(accountsWithPartner)
+                .size().isEqualTo(1);
+            AccountWithPartnerResponse accountWithPartnerActual = accountsWithPartner.get(0);
+            assertThat(accountWithPartnerActual.getGku())
+                .isTrue();
+            assertThat(accountWithPartnerActual.getVersion())
+                .isNotNull();
+            assertThat(accountWithPartnerActual.getId())
+                .isEqualTo(partner.getId());
+            assertThat(accountWithPartnerActual.getInn())
+                .isEqualTo(partner.getInn());
+            assertThat(accountWithPartnerActual.getKpp())
+                .isEqualTo(partner.getKpp());
+            Account actualAccount = accountWithPartnerActual.getAccount();
+            assertThat(actualAccount)
+                .isNotNull();
+            assertThat(actualAccount.getAccount())
+                .isEqualTo(account.getAccount());
+            assertThat(actualAccount.getBudget())
+                .isTrue();
+        });
+    }
+
+    @Test
     @DisplayName("POST /partner/account/get-at-requisites получение партнером")
     void testGetAtRequisites_whenRequestIsCorrect_thenFindPartner() {
         var partner =
@@ -2530,6 +2581,61 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 Account actualAccount = accountWithPartnerActual.getAccount();
                 assertThat(actualAccount)
                     .isNotNull();
+            });
+    }
+
+    @Test
+    @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса " +
+        "когда бюджетный счет")
+    void testGetAtAllRequisites_whenBudgetAccount() {
+        var partner =
+            step("Создание партнера",
+                (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
+        Account account =
+            step("Создание счета",
+                () -> createValidBudgetAccount(partner.getId(), partner.getDigitalId()));
+        var request =
+            step("Подготовка тестовых данных",
+                () ->
+                    new AccountAndPartnerRequest()
+                        .digitalId(partner.getDigitalId())
+                        .account(account.getAccount())
+                        .bic(account.getBank().getBic())
+                        .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                        .inn(partner.getInn())
+                        .kpp(partner.getKpp())
+                        .name(partner.getOrgName())
+            );
+        step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
+        AccountWithPartnerResponse accountWithPartnerActual =
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
+                () ->
+                    post(
+                        baseRoutePath + "/account/get-at-all-requisites",
+                        request,
+                        new TypeRef<>() {
+                        }
+                    ));
+        step("Проверка корректности ответа",
+            () -> {
+                assertThat(accountWithPartnerActual)
+                    .isNotNull();
+                assertThat(accountWithPartnerActual.getId())
+                    .isEqualTo(partner.getId());
+                assertThat(accountWithPartnerActual.getInn())
+                    .isEqualTo(partner.getInn());
+                assertThat(accountWithPartnerActual.getKpp())
+                    .isEqualTo(partner.getKpp());
+                assertThat(accountWithPartnerActual.getGku())
+                    .isTrue();
+                assertThat(accountWithPartnerActual.getVersion())
+                    .isNotNull();
+                Account actualAccount = accountWithPartnerActual.getAccount();
+                assertThat(actualAccount)
+                    .isNotNull();
+                assertThat(actualAccount.getBudget())
+                    .isTrue();
             });
     }
 

@@ -8,9 +8,11 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapper;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
+import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.List;
@@ -28,10 +30,14 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     @Autowired
     private BankMapper bankMapper;
 
+    @Autowired
+    private BudgetMaskService budgetMaskService;
+
     @Override
     public AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto) {
         var accountWithPartnerResponse = delegate.toAccountWithPartner(accountDto);
         accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
+        setBudgetMarker(accountWithPartnerResponse.getAccount());
         return accountWithPartnerResponse;
     }
 
@@ -52,8 +58,10 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     @Override
     public List<AccountWithPartnerResponse> toAccountsWithPartner(List<AccountEntity> accounts) {
         var accountWithPartnerResponseList = delegate.toAccountsWithPartner(accounts);
-        accountWithPartnerResponseList.forEach(accountWithPartnerResponse ->
-            accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn())));
+        accountWithPartnerResponseList.forEach(accountWithPartnerResponse -> {
+            accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
+            setBudgetMarker(accountWithPartnerResponse.getAccount());
+        });
         return accountWithPartnerResponseList;
     }
 
@@ -91,5 +99,24 @@ public abstract class AccountMapperDecorator implements AccountMapper {
 
     private boolean isGkuInn(String inn) {
         return gkuInnCacheableStorage.isGkuInn(inn);
+    }
+
+    private boolean isBudget(Account account) {
+        if (account !=  null) {
+            var bank = account.getBank();
+            if (bank != null) {
+                var bankAccount = bank.getBankAccount();
+                if (bankAccount != null) {
+                    return budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getBankAccount());
+                }
+            }
+        }
+        return false;
+    }
+
+    private void setBudgetMarker(Account account) {
+        if (account != null) {
+            account.setBudget(isBudget(account));
+        }
     }
 }

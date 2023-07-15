@@ -238,7 +238,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         return account;
     }
 
-    public static void createValidBudgetAccount(String partnerUuid, String digitalId) {
+    public static Account createValidBudgetAccount(String partnerUuid, String digitalId) {
         var createAccount = post(
             baseRoutePath + "/account",
             HttpStatus.CREATED,
@@ -247,6 +247,7 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
         );
         assertThat(createAccount)
             .isNotNull();
+        return createAccount;
     }
 
     public static void createValidBudgetAccountWith40101Balance(String partnerUuid, String digitalId) {
