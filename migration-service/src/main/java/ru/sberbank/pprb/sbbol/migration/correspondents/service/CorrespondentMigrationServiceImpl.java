@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.migration.correspondents.service;
 
 import com.googlecode.jsonrpc4j.spring.AutoJsonRpcServiceImpl;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
 
@@ -63,6 +63,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         for (MigrationCorrespondentCandidate correspondent : correspondents) {
             try {
                 savedAccount = saveOrUpdate(digitalId, correspondent, true);
+                idsHistoryService.add(digitalId, UUID.fromString(correspondent.getReplicationGuid()), savedAccount.getUuid());
             } catch (Exception ex) {
                 LOGGER.error(
                     "В процессе миграции контрагента с sbbolReplicationGuid: {}",
@@ -100,7 +101,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
 
     @Override
     public void delete(String digitalId, String pprbGuid) {
-        if (StringUtils.isEmpty(pprbGuid)) {
+        if (isEmpty(pprbGuid)) {
             return;
         }
         var uuid = UUID.fromString(pprbGuid);
@@ -113,7 +114,6 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                 accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountEntity.getUuid());
             accountSignEntity.ifPresent(accountSignRepository::delete);
         }
-
     }
 
     private AccountEntity saveOrUpdate(String digitalId, MigrationCorrespondentCandidate correspondent, boolean migration) {
@@ -161,7 +161,6 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             migrationPartnerMapper.updatePartnerEntity(digitalId, correspondent, searchPartner);
             partnerRepository.save(searchPartner);
         }
-        idsHistoryService.add(digitalId, UUID.fromString(correspondent.getReplicationGuid()), savedAccount.getUuid());
         return savedAccount;
     }
 

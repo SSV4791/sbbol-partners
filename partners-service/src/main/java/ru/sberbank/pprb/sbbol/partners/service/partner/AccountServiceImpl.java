@@ -121,8 +121,6 @@ public class AccountServiceImpl implements AccountService {
             var savedAccount = accountRepository.save(accountEntity);
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             replicationService.createCounterparty(response);
-            var savedAccountUuid = savedAccount.getUuid();
-            idsHistoryService.add(savedAccount.getDigitalId(), savedAccountUuid, savedAccountUuid);
             return response;
         } catch (DataIntegrityViolationException e) {
             throw e;
