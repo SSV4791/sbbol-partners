@@ -39,7 +39,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.IdsHistoryRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
@@ -396,7 +396,7 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
-    IdsHistoryService idsHistoryService(IdsHistoryRepository idsHistoryRepository, IdsHistoryMapper idsHistoryMapper) {
+    IdsHistoryService idsHistoryService(GuidsHistoryRepository idsHistoryRepository, IdsHistoryMapper idsHistoryMapper) {
         return new IdsHistoryServiceImpl(idsHistoryRepository, idsHistoryMapper);
     }
 }
