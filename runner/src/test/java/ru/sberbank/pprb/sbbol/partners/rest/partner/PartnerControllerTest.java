@@ -134,8 +134,10 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         List<Descriptions> descriptions = error.getDescriptions();
-        assertThat(descriptions).isNotNull();
-        assertThat(descriptions).size().isEqualTo(1);
+        assertThat(descriptions)
+            .isNotNull()
+            .size()
+            .isEqualTo(1);
         Descriptions description = descriptions.stream()
             .filter(value -> value.getField().equals("digitalId"))
             .findFirst().orElse(null);
@@ -190,8 +192,10 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error.getCode())
             .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
         List<Descriptions> descriptions = error.getDescriptions();
-        assertThat(descriptions).isNotNull();
-        assertThat(descriptions).size().isEqualTo(1);
+        assertThat(descriptions)
+            .isNotNull()
+            .size()
+            .isEqualTo(1);
         Descriptions description = descriptions.stream()
             .filter(value -> value.getField().equals("legalForm"))
             .findFirst().orElse(null);
@@ -887,8 +891,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         List<Partner> partners = response.getPartners();
-        assertThat(partners.size())
-            .isEqualTo(filter.getLegalForms().size());
+        assertThat(partners)
+            .hasSameSizeAs(filter.getLegalForms());
         for (Partner partner : partners) {
             assertThat(filter.getLegalForms())
                 .contains(partner.getLegalForm());
@@ -907,8 +911,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(response)
             .isNotNull();
         List<Partner> partners = response.getPartners();
-        assertThat(partners.size())
-            .isEqualTo(filter.getIds().size());
+        assertThat(partners)
+            .hasSameSizeAs(filter.getIds());
         for (Partner partner : partners) {
             assertThat(filter.getIds())
                 .contains(partner.getId());
@@ -1245,8 +1249,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        assertThat(response.getPartners().size())
-            .isEqualTo(2);
+        assertThat(response.getPartners())
+            .hasSize(2);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
@@ -1283,8 +1287,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        assertThat(response.getPartners().size())
-            .isEqualTo(1);
+        assertThat(response.getPartners())
+            .hasSize(1);
         assertThat(response.getPartners().get(0).getDigitalId())
             .isEqualTo(digitalId);
         assertThat(response.getPartners().get(0).getId())
@@ -1627,10 +1631,10 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(createdPartner)
             .isNotNull();
-        assertThat(createdPartner.getPhones().size() > 0)
-            .isTrue();
-        assertThat(createdPartner.getEmails().size() > 0)
-            .isTrue();
+        assertThat(createdPartner.getPhones())
+            .isNotEmpty();
+        assertThat(createdPartner.getEmails())
+            .isNotEmpty();
         var updatePhone = createdPartner.getPhones().stream().findFirst().orElse(null);
         assertThat(updatePhone)
             .isNotNull();
@@ -3523,7 +3527,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             );
     }
 
-    protected static Partner createValidPartner() {
+    public static Partner createValidPartner() {
         return post(
             BASE_ROUTE_PATH,
             HttpStatus.CREATED,

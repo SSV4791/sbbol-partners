@@ -9,6 +9,7 @@ import uk.co.jemos.podam.api.AttributeMetadata;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
+import uk.co.jemos.podam.api.RandomDataProviderStrategyImpl;
 import uk.co.jemos.podam.typeManufacturers.AbstractTypeManufacturer;
 import uk.co.jemos.podam.typeManufacturers.BooleanTypeManufacturerImpl;
 import uk.co.jemos.podam.typeManufacturers.IntTypeManufacturerImpl;
@@ -41,11 +42,13 @@ public class PodamConfiguration {
     @Bean
     PodamFactory podamFactory() {
         var factory = new PodamFactoryImpl();
-        factory.getStrategy()
+        RandomDataProviderStrategyImpl strategy = (RandomDataProviderStrategyImpl) factory.getStrategy();
+        strategy
             .addOrReplaceTypeManufacturer(BigDecimal.class, new BigDecimalManufacturerImpl())
             .addOrReplaceTypeManufacturer(String.class, new StringManufacturerImpl())
             .addOrReplaceTypeManufacturer(Boolean.class, new BooleanManufacturerImpl())
             .addOrReplaceTypeManufacturer(Integer.class, new IntManufacturerImpl());
+        strategy.setMaxDepth(2);
         return factory;
     }
 
@@ -72,6 +75,7 @@ public class PodamConfiguration {
                     "partnerAccountId",
                     "accountId",
                     "bankId",
+                    "replicationGuid",
                     "documentTypeId" -> UUID.randomUUID().toString();
                 case "phone" -> randomNumeric(PHONE_LENGTH);
                 case "inn" -> getValidInnNumber(LegalForm.LEGAL_ENTITY);

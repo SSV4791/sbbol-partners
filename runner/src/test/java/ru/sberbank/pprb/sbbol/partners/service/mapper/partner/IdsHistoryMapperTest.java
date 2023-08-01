@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,33 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(
     classes = IdsHistoryMapperImpl.class
 )
-public class IdsHistoryMapperTest extends BaseUnitConfiguration {
+class IdsHistoryMapperTest extends BaseUnitConfiguration {
 
     @Autowired
     private IdsHistoryMapper mapper;
-
-    @Test
-    void accountToIdsHistoryEntityTest() {
-        var digitalId = step("Подготовка тестовых данных. Создание digitalId", () -> RandomStringUtils.random(10));
-        var externalId = step("Подготовка тестовых данных. Создание externalId", UUID::randomUUID);
-        var pprbId = step("Подготовка тестовых данных. Создание pprbId", UUID::randomUUID);
-        var expected = step("Подготовка тестовых данных. Создание IdsHistoryEntity", () -> {
-            var idsHistoryEntity = new IdsHistoryEntity();
-            idsHistoryEntity.setDigitalId(digitalId);
-            idsHistoryEntity.setExternalId(externalId);
-            idsHistoryEntity.setPprbEntityId(pprbId);
-            return idsHistoryEntity;
-        });
-        var actual = step("Выполнение маппинга", () -> mapper.toIdsHistoryEntity(digitalId, externalId, pprbId));
-
-        step("Проверка результата", () ->
-            assertThat(actual)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .ignoringFields("uuid", "lastModifiedDate")
-                .isEqualTo(expected)
-        );
-    }
 
     @Test
     void toAccountIdsByExternalIdsResponse() {
@@ -66,7 +42,7 @@ public class IdsHistoryMapperTest extends BaseUnitConfiguration {
                 .addIdLinksItem(
                     new ExternalInternalIdLink()
                         .externalId(externalIds.get(0))
-                        .internalId(idsHistoryEntities.get(0).getPprbEntityId().toString())
+                        .internalId(idsHistoryEntities.get(0).getAccount().getUuid().toString())
                 )
                 .addIdLinksItem(
                     new ExternalInternalIdLink()

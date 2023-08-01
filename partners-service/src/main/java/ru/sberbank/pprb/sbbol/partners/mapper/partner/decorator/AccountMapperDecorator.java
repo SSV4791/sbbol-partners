@@ -5,18 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class AccountMapperDecorator implements AccountMapper {
 
@@ -86,7 +90,7 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     }
 
     @Override
-   public void patchAccount(AccountChange account, AccountEntity accountEntity) {
+    public void patchAccount(AccountChange account, AccountEntity accountEntity) {
         delegate.patchAccount(account, accountEntity);
         if (account.getBank() != null) {
             if (accountEntity.getBank() == null) {
@@ -97,12 +101,32 @@ public abstract class AccountMapperDecorator implements AccountMapper {
         delegate.mapBidirectional(accountEntity);
     }
 
+    public AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid) {
+        var accountEntity = delegate.toAccount(account, digitalId, partnerUuid);
+        createIdLink(accountEntity, account.getExternalId());
+        return accountEntity;
+    }
+
+    public AccountEntity toAccount(AccountCreate account) {
+        var accountEntity = delegate.toAccount(account);
+        createIdLink(accountEntity, account.getExternalId());
+        return accountEntity;
+    }
+
+    private void createIdLink(AccountEntity account, UUID externalId) {
+        var idHistoryEntity = new IdsHistoryEntity();
+        idHistoryEntity.setExternalId(externalId);
+        idHistoryEntity.setDigitalId(account.getDigitalId());
+        idHistoryEntity.setAccount(account);
+        account.setIdLinks(List.of(idHistoryEntity));
+    }
+
     private boolean isGkuInn(String inn) {
         return gkuInnCacheableStorage.isGkuInn(inn);
     }
 
     private boolean isBudget(Account account) {
-        if (account !=  null) {
+        if (account != null) {
             var bank = account.getBank();
             if (bank != null) {
                 var bankAccount = bank.getBankAccount();

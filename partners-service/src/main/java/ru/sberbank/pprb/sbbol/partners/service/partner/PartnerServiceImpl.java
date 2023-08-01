@@ -1,10 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.BaseEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -30,17 +28,16 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
-import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_CREATE;
@@ -71,7 +68,6 @@ public class PartnerServiceImpl implements PartnerService {
     private final DocumentService partnerDocumentService;
     private final ContactService contactService;
     private final AccountService accountService;
-    private final IdsHistoryService idsHistoryService;
 
     public PartnerServiceImpl(
         AccountRepository accountRepository,
@@ -91,8 +87,7 @@ public class PartnerServiceImpl implements PartnerService {
         AddressService partnerAddressService,
         DocumentService partnerDocumentService,
         ContactService contactService,
-        AccountService accountService,
-        IdsHistoryService idsHistoryService
+        AccountService accountService
     ) {
         this.accountRepository = accountRepository;
         this.documentRepository = documentRepository;
@@ -112,13 +107,12 @@ public class PartnerServiceImpl implements PartnerService {
         this.partnerDocumentService = partnerDocumentService;
         this.contactService = contactService;
         this.accountService = accountService;
-        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Partner getPartner(String digitalId, String id) {
-        PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+        PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, mapUuid(id))
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = partnerMapper.toPartner(partner);
@@ -146,7 +140,7 @@ public class PartnerServiceImpl implements PartnerService {
             partnersResponse.getPartners().remove(size - 1);
         }
         var partners = partnersResponse.getPartners();
-        if (CollectionUtils.isEmpty(partners)) {
+        if (isEmpty(partners)) {
             return partnersResponse;
         }
         for (Partner partner : partners) {
@@ -179,7 +173,7 @@ public class PartnerServiceImpl implements PartnerService {
             .map(contactRepository::save)
             .map(contactMapper::toContact)
             .collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(accounts)) {
+        if (!isEmpty(accounts)) {
             replicationService.createCounterparty(accounts);
         }
         return partnerMapper.toPartnerMullResponse(savedPartner)
@@ -207,12 +201,11 @@ public class PartnerServiceImpl implements PartnerService {
     public Partner patchPartner(Partner partner) {
         var digitalId = partner.getDigitalId();
         var partnerId = partner.getId();
-        var partnerUuid = UUID.fromString(partnerId);
         var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
-        var accountEntities = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
-        if (!CollectionUtils.isEmpty(accountEntities)) {
+        var accountEntities = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, mapUuid(partnerId));
+        if (!isEmpty(accountEntities)) {
             var accounts = accountMapper.toAccounts(accountEntities);
             replicationService.updateCounterparty(accounts);
         }
@@ -227,7 +220,7 @@ public class PartnerServiceImpl implements PartnerService {
     public PartnerFullModelResponse patchPartner(PartnerChangeFullModel partner) {
         var digitalId = partner.getDigitalId();
         var partnerId = partner.getId();
-        var partnerUuid = UUID.fromString(partnerId);
+        var partnerUuid = mapUuid(partnerId);
         var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
         partnerMapper.patchPartner(partner, foundPartner);
         PartnerEntity savedPartner = partnerRepository.save(foundPartner);
@@ -278,19 +271,15 @@ public class PartnerServiceImpl implements PartnerService {
             contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid));
             documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
             var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
-            if (!CollectionUtils.isEmpty(accounts)) {
+            if (!isEmpty(accounts)) {
                 accountRepository.deleteAll(accounts);
                 replicationService.deleteCounterparties(accounts);
-                var accountIds = accounts.stream()
-                    .map(BaseEntity::getUuid)
-                    .collect(Collectors.toList());
-                idsHistoryService.delete(digitalId, accountIds);
             }
         }
     }
 
     private PartnerEntity findPartnerEntity(String digitalId, String partnerId, Long version) {
-        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(partnerId))
+        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, mapUuid(partnerId))
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
         if (!Objects.equals(version, foundPartner.getVersion())) {

@@ -75,7 +75,7 @@ class MigrationPartnerMapperTest extends BaseUnitConfiguration {
 
     @Test
     void toMigrationAccountEntityWithoutInnerEntitiesTest() {
-        var partnerUuid = factory.manufacturePojo(UUID.class);
+        var partnerUuid = UUID.randomUUID();
         var migrationCorrespondentCandidate = factory.manufacturePojo(MigrationCorrespondentCandidate.class);
         migrationCorrespondentCandidate.setAccount(null);
         migrationCorrespondentCandidate.setBankName(null);

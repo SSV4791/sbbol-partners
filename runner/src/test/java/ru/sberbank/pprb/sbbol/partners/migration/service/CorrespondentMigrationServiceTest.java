@@ -14,7 +14,10 @@ import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateCorrespondentRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateReplicationGuidRequest;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +55,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         assertThat(response.getResult()).isNotNull();
         List<MigratedCorrespondentData> correspondentsData = response.getResult().getCorrespondents();
         assertThat(CollectionUtils.isEmpty(correspondentsData)).isFalse();
-        assertThat(correspondentsData.size()).isEqualTo(GENERATE_COUNTERPARTIES_COUNT);
+        assertThat(correspondentsData).hasSize(GENERATE_COUNTERPARTIES_COUNT);
         correspondentsData.forEach(data -> {
             assertThat(data.getPprbGuid()).isNotNull();
             assertThat(data.getSbbolReplicationGuid()).isNotNull();
@@ -84,7 +87,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         assertThat(response.getResult()).isNotNull();
         List<MigratedCorrespondentData> correspondentsData = response.getResult().getCorrespondents();
         assertThat(CollectionUtils.isEmpty(correspondentsData)).isFalse();
-        assertThat(correspondentsData.size()).isEqualTo(GENERATE_COUNTERPARTIES_COUNT);
+        assertThat(correspondentsData).hasSize(GENERATE_COUNTERPARTIES_COUNT);
         correspondentsData.forEach(data -> {
             assertThat(data.getPprbGuid()).isNotNull();
             assertThat(data.getSbbolReplicationGuid()).isNotNull();
@@ -132,7 +135,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         assertThat(response.getId()).isEqualTo(JSON_RPC_REQUEST_ID);
         assertThat(response.getJsonrpc()).isEqualTo(JSON_RPC_VERSION);
         assertThat(CollectionUtils.isEmpty(correspondents)).isFalse();
-        assertThat(correspondents.size()).isEqualTo(1);
+        assertThat(correspondents).hasSize(1);
         correspondents.forEach(data -> {
             assertThat(data.getPprbGuid()).isEqualTo(correspondentData.getPprbGuid());
             assertThat(data.getSbbolReplicationGuid()).isNotNull();
@@ -145,11 +148,13 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
     void migrateInvalidCorrespondentTest() {
         MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondentWithLongInn();
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));
-        postWithInternalServerErrorExpected(URI_REMOTE_SERVICE, request);
+        assertDoesNotThrow(() -> postWithInternalServerErrorExpected(URI_REMOTE_SERVICE, request));
     }
 
     @Test
     void migrateReplicationGuidTest() {
+        Partner partner = PartnerControllerTest.createValidPartner();
+        var account = BaseAccountControllerTest.createValidAccount(partner.getId(), partner.getDigitalId());
         assertDoesNotThrow(() -> post(
             URI_REMOTE_SERVICE,
             new JsonRpcRequest<>(
@@ -157,9 +162,9 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
                 JSON_RPC_VERSION,
                 "migrateReplicationGuid",
                 new MigrateReplicationGuidRequest(
-                    DIGITAL_ID,
+                    account.getDigitalId(),
                     List.of(
-                        new MigrationReplicationGuidCandidate(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                        new MigrationReplicationGuidCandidate(UUID.randomUUID().toString(), account.getId())
                     ))
             ),
             new TypeRef<>() {

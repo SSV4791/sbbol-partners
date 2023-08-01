@@ -26,7 +26,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudModelValidationException;
-import ru.sberbank.pprb.sbbol.partners.exception.BadRequestIdsHistoryException;
+import ru.sberbank.pprb.sbbol.partners.exception.IllegalArgumentIdsHistoryException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.exception.PartnerMigrationException;
@@ -64,6 +64,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
 
+    private static final String CHECK_VALIDATION_MESSAGE = "error.message.check.validation";
+
     @ExceptionHandler({
         DataIntegrityViolationException.class
     })
@@ -76,7 +78,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus.BAD_REQUEST,
             BUSINESS,
             MODEL_DUPLICATE_EXCEPTION.getValue(),
-            MessagesTranslator.toLocale("error.message.check.validation"),
+            MessagesTranslator.toLocale(CHECK_VALIDATION_MESSAGE),
             Collections.emptyMap(),
             httpRequest.getRequestURL()
         );
@@ -193,15 +195,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(BadRequestIdsHistoryException.class)
+    @ExceptionHandler(IllegalArgumentIdsHistoryException.class)
     protected ResponseEntity<Object> handleFraudModelValidationException(
-        BadRequestIdsHistoryException ex,
+        IllegalArgumentIdsHistoryException ex,
         HttpServletRequest httpRequest
     ) {
         LOG.error("Ошибка выполнения операции с таблицей ids_history", ex);
         return buildResponsesEntity(
-            HttpStatus.BAD_REQUEST,
-            BUSINESS,
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            CRITICAL,
             EXCEPTION.getValue(),
             ex.getMessage(),
             Collections.emptyMap(),
@@ -306,7 +308,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus.BAD_REQUEST,
             BUSINESS,
             MODEL_VALIDATION_EXCEPTION.getValue(),
-            MessagesTranslator.toLocale("error.message.check.validation"),
+            MessagesTranslator.toLocale(CHECK_VALIDATION_MESSAGE),
             errors,
             ((ServletWebRequest) request).getRequest().getRequestURL()
         );

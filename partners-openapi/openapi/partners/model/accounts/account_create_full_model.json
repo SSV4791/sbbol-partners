@@ -4,6 +4,12 @@
   "title": "Счёт партнера",
   "x-extra-class-annotation": "@AccountKeyValidation @AccountRubCodeCurrencyValidation",
   "properties": {
+    "externalId": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Внешний идентификатор",
+      "x-not-empty": true
+    },
     "account": {
       "type": "string",
       "title": "Счёт",
