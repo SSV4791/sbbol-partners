@@ -3,8 +3,8 @@ package ru.sberbank.pprb.sbbol.partners.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.IdsHistoryRepository;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.GuidsHistoryEntity;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class IdsHistoryServiceTest extends AbstractIntegrationTest {
     private IdsHistoryService idsHistoryService;
 
     @Autowired
-    private IdsHistoryRepository repository;
+    private GuidsHistoryRepository repository;
 
     @Test
     void addTest() {
@@ -27,13 +27,13 @@ public class IdsHistoryServiceTest extends AbstractIntegrationTest {
         var externalId = step("Подготовка тестовых данных. Создание externalId", UUID::randomUUID);
         var pprbId = step("Подготовка тестовых данных. Создание pprbId", UUID::randomUUID);
         var expected = step("Подготовка объекта для сравнения", () -> {
-            var expectedIdHistory = new IdsHistoryEntity();
+            var expectedIdHistory = new GuidsHistoryEntity();
             expectedIdHistory.setDigitalId(digitalId);
             expectedIdHistory.setExternalId(externalId);
             expectedIdHistory.setPprbEntityId(pprbId);
             return expectedIdHistory;
         });
-        step("Выполнение запроса. Сохранение сущности", () -> idsHistoryService.add(digitalId, externalId, pprbId));
+        step("Выполнение запроса. Сохранение сущности", () -> idsHistoryService.create(digitalId, externalId, pprbId));
 
         var ids = step("Получение сохраненной сущности из БД",
             () -> repository.findByDigitalIdAndPprbEntityId(digitalId, pprbId));
@@ -58,7 +58,7 @@ public class IdsHistoryServiceTest extends AbstractIntegrationTest {
         var externalId = step("Подготовка тестовых данных. Создание externalId", UUID::randomUUID);
         var pprbId = step("Подготовка тестовых данных. Создание pprbId", UUID::randomUUID);
 
-        step("Выполнение запроса. Сохранение сущности", () -> idsHistoryService.add(digitalId, externalId, pprbId));
+        step("Выполнение запроса. Сохранение сущности", () -> idsHistoryService.create(digitalId, externalId, pprbId));
         step("Удаление сущности", () -> idsHistoryService.delete(digitalId, pprbId));
 
         var idsAfterDelete = step("Получение сохраненной сущности из БД",
@@ -79,8 +79,8 @@ public class IdsHistoryServiceTest extends AbstractIntegrationTest {
         var pprbId = step("Подготовка тестовых данных. Создание pprbId", UUID::randomUUID);
         var pprbId2 = step("Подготовка тестовых данных. Создание pprbId2", UUID::randomUUID);
 
-        step("Выполнение запроса. Сохранение сущности", () -> idsHistoryService.add(digitalId, externalId, pprbId));
-        step("Выполнение запроса. Сохранение сущности2", () -> idsHistoryService.add(digitalId, externalId2, pprbId2));
+        step("Выполнение запроса. Сохранение сущности", () -> idsHistoryService.create(digitalId, externalId, pprbId));
+        step("Выполнение запроса. Сохранение сущности2", () -> idsHistoryService.create(digitalId, externalId2, pprbId2));
         step("Удаление сущности", () -> idsHistoryService.delete(digitalId, List.of(pprbId, pprbId2)));
 
         var idsAfterDelete = step("Получение сохраненной сущности из БД",

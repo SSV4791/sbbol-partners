@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMa
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentResponse;
+import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationReplicationGuidCandidate;
 import ru.sberbank.pprb.sbbol.migration.exception.MigrationException;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
 
@@ -63,7 +65,8 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         for (MigrationCorrespondentCandidate correspondent : correspondents) {
             try {
                 savedAccount = saveOrUpdate(digitalId, correspondent, true);
-                idsHistoryService.add(digitalId, UUID.fromString(correspondent.getReplicationGuid()), savedAccount.getUuid());
+                UUID replicationGuid = mapUuid(correspondent.getReplicationGuid());
+                idsHistoryService.create(digitalId, replicationGuid, savedAccount.getUuid());
             } catch (Exception ex) {
                 LOGGER.error(
                     "В процессе миграции контрагента с sbbolReplicationGuid: {}",
@@ -115,6 +118,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
             accountSignEntity.ifPresent(accountSignRepository::delete);
         }
     }
+
 
     private AccountEntity saveOrUpdate(String digitalId, MigrationCorrespondentCandidate correspondent, boolean migration) {
         var pprbGuid = correspondent.getPprbGuid();
@@ -170,6 +174,16 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         }
         if (AccountStateType.SIGNED == foundAccount.getState()) {
             throw new AccountAlreadySignedException(foundAccount.getAccount());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void migrateReplicationGuid(String digitalId, List<MigrationReplicationGuidCandidate> candidates) {
+        for (MigrationReplicationGuidCandidate candidate : candidates) {
+            idsHistoryService.create(
+                digitalId, mapUuid(candidate.getReplicationGuid()), mapUuid(candidate.getPprbGuid())
+            );
         }
     }
 }

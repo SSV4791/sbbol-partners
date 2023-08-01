@@ -5,7 +5,7 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.exception.BadRequestIdsHistoryException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.IdsHistoryMapper;
 import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.IdsHistoryRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 
 import java.util.List;
@@ -23,12 +23,12 @@ public class IdsHistoryServiceImpl implements IdsHistoryService {
     private static final String IDS_HISTORY_EXCEPTION_MESSAGE_BAD_FORMAT_UUID = "Не верный формат UUID. ";
     private static final String DIGITAL_ID = "digitalId: ";
     private static final String EXTERNAL_ID = "externalId: ";
-    private static final String PPRB_ID = "pprbId: ";
+    private static final String PPRB_UUID = "pprbUuid: ";
 
-    private final IdsHistoryRepository repository;
+    private final GuidsHistoryRepository repository;
     private final IdsHistoryMapper mapper;
 
-    public IdsHistoryServiceImpl(IdsHistoryRepository repository, IdsHistoryMapper mapper) {
+    public IdsHistoryServiceImpl(GuidsHistoryRepository repository, IdsHistoryMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -63,42 +63,42 @@ public class IdsHistoryServiceImpl implements IdsHistoryService {
     }
 
     @Override
-    public void add(String digitalId, UUID externalId, UUID pprbId) {
-        if (isBlank(digitalId) || isNull(externalId) || isNull(pprbId)) {
+    public void create(String digitalId, UUID externalUuid, UUID pprbUuid) {
+        if (isBlank(digitalId) || isNull(externalUuid) || isNull(pprbUuid)) {
             throw new BadRequestIdsHistoryException(
-                StringUtils.join(IDS_HISTORY_EXCEPTION_MESSAGE_EMPTY_PARAMS, DIGITAL_ID, digitalId, EXTERNAL_ID, externalId, PPRB_ID, pprbId)
+                StringUtils.join(IDS_HISTORY_EXCEPTION_MESSAGE_EMPTY_PARAMS, DIGITAL_ID, digitalId, EXTERNAL_ID, externalUuid, PPRB_UUID, pprbUuid)
             );
         }
         var foundEntity =
-            repository.findByDigitalIdAndExternalId(digitalId, externalId);
+            repository.findByDigitalIdAndExternalId(digitalId, externalUuid);
         if (foundEntity.isEmpty()) {
-            repository.save(mapper.toIdsHistoryEntity(digitalId, externalId, pprbId));
+            repository.save(mapper.toIdsHistoryEntity(digitalId, externalUuid, pprbUuid));
         }
     }
 
     @Override
-    public void delete(String digitalId, UUID pprbId) {
-        if (isBlank(digitalId) || isNull(pprbId)) {
+    public void delete(String digitalId, UUID pprbUuid) {
+        if (isBlank(digitalId) || isNull(pprbUuid)) {
             throw new BadRequestIdsHistoryException(
-                StringUtils.join(IDS_HISTORY_EXCEPTION_MESSAGE_EMPTY_PARAMS, DIGITAL_ID, digitalId, PPRB_ID, pprbId)
+                StringUtils.join(IDS_HISTORY_EXCEPTION_MESSAGE_EMPTY_PARAMS, DIGITAL_ID, digitalId, PPRB_UUID, pprbUuid)
             );
         }
-        var idsHistoryEntities =
-            repository.findByDigitalIdAndPprbEntityId(digitalId, pprbId);
-        if (!isEmpty(idsHistoryEntities)) {
-            repository.deleteAll(idsHistoryEntities);
+        var uuidsHistoryEntities =
+            repository.findByDigitalIdAndPprbEntityId(digitalId, pprbUuid);
+        if (!isEmpty(uuidsHistoryEntities)) {
+            repository.deleteAll(uuidsHistoryEntities);
         }
     }
 
     @Override
-    public void delete(String digitalId, List<UUID> pprbIds) {
-        if (isBlank(digitalId) || isEmpty(pprbIds)) {
+    public void delete(String digitalId, List<UUID> pprbUuids) {
+        if (isBlank(digitalId) || isEmpty(pprbUuids)) {
             throw new BadRequestIdsHistoryException(
-                StringUtils.join(IDS_HISTORY_EXCEPTION_MESSAGE_EMPTY_PARAMS, DIGITAL_ID, digitalId, PPRB_ID, pprbIds)
+                StringUtils.join(IDS_HISTORY_EXCEPTION_MESSAGE_EMPTY_PARAMS, DIGITAL_ID, digitalId, PPRB_UUID, pprbUuids)
             );
         }
-        for (var pprbId : pprbIds) {
-            delete(digitalId, pprbId);
+        for (var pprbUuid : pprbUuids) {
+            delete(digitalId, pprbUuid);
         }
 
     }

@@ -8,10 +8,12 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigratedCorrespondentData;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentResponse;
+import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationReplicationGuidCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcRequest;
 import ru.sberbank.pprb.sbbol.partners.migration.model.JsonRpcResponse;
 import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateCorrespondentRequest;
+import ru.sberbank.pprb.sbbol.partners.migration.model.MigrateReplicationGuidRequest;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
 class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
@@ -102,7 +105,8 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
         generatedCorrespondent.setVersion(1);
         generatedCorrespondent.setReplicationGuid(UUID.randomUUID().toString());
-        response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {});
+        response = post(URI_REMOTE_SERVICE, request, new TypeRef<>() {
+        });
         correspondentData = response.getResult().getCorrespondents().get(0);
         assertThat(correspondentData.getVersion()).isEqualTo(generatedCorrespondent.getVersion());
         assertThat(correspondentData.getSbbolReplicationGuid()).isEqualTo(generatedCorrespondent.getReplicationGuid());
@@ -142,6 +146,25 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
         MigrationCorrespondentCandidate generatedCorrespondent = generateCorrespondentWithLongInn();
         request.setParams(new MigrateCorrespondentRequest(DIGITAL_ID, List.of(generatedCorrespondent)));
         postWithInternalServerErrorExpected(URI_REMOTE_SERVICE, request);
+    }
+
+    @Test
+    void migrateReplicationGuidTest() {
+        assertDoesNotThrow(() -> post(
+            URI_REMOTE_SERVICE,
+            new JsonRpcRequest<>(
+                JSON_RPC_REQUEST_ID,
+                JSON_RPC_VERSION,
+                "migrateReplicationGuid",
+                new MigrateReplicationGuidRequest(
+                    DIGITAL_ID,
+                    List.of(
+                        new MigrationReplicationGuidCandidate(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                    ))
+            ),
+            new TypeRef<>() {
+            })
+        );
     }
 
     private MigrationCorrespondentCandidate generateCorrespondentWithLongInn() {

@@ -9,8 +9,9 @@ import java.util.UUID;
 public interface IdsHistoryService {
 
     /**
-     * Добавление сущности историй id
-     * @param digitalId идентификатор личного кабинета
+     * Получение сущности историй id
+     *
+     * @param digitalId   идентификатор личного кабинета
      * @param externalIds список внешних идентификатор
      * @return Список внутренних идентификаторов
      */
@@ -19,23 +20,26 @@ public interface IdsHistoryService {
 
     /**
      * Добавление сущности историй id
-     * @param digitalId идентификатор личного кабинета
-     * @param externalId вешний идентификатор(передать pprbId, если сущность создана в ППРБ)
-     * @param pprbId ППРБ идентификатор сущности
+     *
+     * @param digitalId  идентификатор личного кабинета
+     * @param externalUuid вешний идентификатор(передать pprbUuid, если сущность создана в ППРБ)
+     * @param pprbUuid     ППРБ идентификатор сущности
      */
-    void add(String digitalId, UUID externalId, UUID pprbId);
+    void create(String digitalId, UUID externalUuid, UUID pprbUuid);
 
     /**
      * Удаление истории id
+     *
      * @param digitalId идентификатор личного кабинета
-     * @param pprbId ППРБ идентификатор сущности
+     * @param pprbUuid    ППРБ идентификатор сущности
      */
-    void delete(String digitalId, UUID pprbId);
+    void delete(String digitalId, UUID pprbUuid);
 
     /**
      * Удаление историй id
+     *
      * @param digitalId идентификатор личного кабинета
-     * @param pprbIds список ППРБ идентификаторов сущностей
+     * @param pprbUuids   список ППРБ идентификаторов сущностей
      */
-    void delete(String digitalId, List<UUID> pprbIds);
+    void delete(String digitalId, List<UUID> pprbUuids);
 }

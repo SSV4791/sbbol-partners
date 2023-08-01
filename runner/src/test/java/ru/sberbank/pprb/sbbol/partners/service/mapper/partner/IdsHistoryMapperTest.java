@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.GuidsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.IdsHistoryMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.IdsHistoryMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLink;
@@ -31,7 +31,7 @@ public class IdsHistoryMapperTest extends BaseUnitConfiguration {
         var externalId = step("Подготовка тестовых данных. Создание externalId", UUID::randomUUID);
         var pprbId = step("Подготовка тестовых данных. Создание pprbId", UUID::randomUUID);
         var expected = step("Подготовка тестовых данных. Создание IdsHistoryEntity", () -> {
-            var idsHistoryEntity = new IdsHistoryEntity();
+            var idsHistoryEntity = new GuidsHistoryEntity();
             idsHistoryEntity.setDigitalId(digitalId);
             idsHistoryEntity.setExternalId(externalId);
             idsHistoryEntity.setPprbEntityId(pprbId);
@@ -56,9 +56,9 @@ public class IdsHistoryMapperTest extends BaseUnitConfiguration {
                 UUID.randomUUID().toString()
                 ));
         var idsHistoryEntities = step("Подготовка тестовых данных. Создание idsHistoryEntities", () -> {
-            var idsHistoryEntity1 = factory.manufacturePojo(IdsHistoryEntity.class);
+            var idsHistoryEntity1 = factory.manufacturePojo(GuidsHistoryEntity.class);
             idsHistoryEntity1.setExternalId(UUID.fromString(externalIds.get(0)));
-            var idsHistoryEntity2 = factory.manufacturePojo(IdsHistoryEntity.class);
+            var idsHistoryEntity2 = factory.manufacturePojo(GuidsHistoryEntity.class);
             return List.of(idsHistoryEntity1, idsHistoryEntity2);
         });
         var expected = step("Подготовка тестовых данных. Создание IdsHistoryEntity", () ->
