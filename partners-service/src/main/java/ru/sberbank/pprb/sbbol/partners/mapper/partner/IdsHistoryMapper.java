@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.GuidsHistoryEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLink;
 import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
@@ -28,9 +28,9 @@ public interface IdsHistoryMapper {
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "externalId", source = "externalId")
     @Mapping(target = "pprbEntityId", source = "pprbId")
-    GuidsHistoryEntity toIdsHistoryEntity(String digitalId, UUID externalId, UUID pprbId);
+    IdsHistoryEntity toIdsHistoryEntity(String digitalId, UUID externalId, UUID pprbId);
 
-    default ExternalInternalIdLinksResponse toAccountIdsByExternalIdsResponse(List<String> externalIds, List<GuidsHistoryEntity> idsHistoryEntities) {
+    default ExternalInternalIdLinksResponse toAccountIdsByExternalIdsResponse(List<String> externalIds, List<IdsHistoryEntity> idsHistoryEntities) {
         if (isEmpty(externalIds)) {
             return null;
         }

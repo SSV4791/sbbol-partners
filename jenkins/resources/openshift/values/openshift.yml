@@ -12,7 +12,7 @@ os_project:
     - port: 8080
   health_check: false
   host: "https://api.dev-gen2.sigma.sbrf.ru:6443"
-  project: ci02281165-edevgen2-efs-kib-sbbol-dev-test6
+  project: ci02281165-edevgen2-efs-kib-sbbol-dev-test31  #istio2
   name: sbbol-partners
   app:
     javaToolOptions: >-
@@ -109,8 +109,8 @@ project_suffix: "{{ (os_project.project | hash('md5'))[:6] }}"
 suffix_istio_label: "{{ project_suffix }}"
 suffix_app_label: "{{ project_suffix }}"
 
+registry_area_app: docker-internal.registry-ci.delta.sbrf.ru
 registry_ott: registry.sigma.sbrf.ru/pprb/ci00641491/ci01125613_ott
-registry_istio_proxy: registry.sigma.sbrf.ru/registry_redhat_io/openshift-service-mesh
 
 canary_suffix: main
 

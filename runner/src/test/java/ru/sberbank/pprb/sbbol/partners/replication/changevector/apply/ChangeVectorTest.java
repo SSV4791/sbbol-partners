@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
+import static java.nio.file.Files.list;
+
 @UnitTestLayer
 @ActiveProfiles("cv")
 @Import(DataSourceConfiguration.class)
@@ -40,7 +42,7 @@ class ChangeVectorTest {
         HibernateMetadataSource metadataSource = new HibernateMetadataSource(sessionFactory);
         Serializer<ChangeVector> serializer = new ChangeVectorSerializer(metadataSource);
 
-        Files.list(Paths.get("../vectors")).forEach(v -> {
+        list(Paths.get("../vectors")).forEach(v -> {
             String vector;
             try {
                 vector = Files.readString(v.toAbsolutePath());

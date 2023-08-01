@@ -3,7 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.GuidsHistoryEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 
@@ -27,7 +27,7 @@ public class IdsHistoryServiceTest extends AbstractIntegrationTest {
         var externalId = step("Подготовка тестовых данных. Создание externalId", UUID::randomUUID);
         var pprbId = step("Подготовка тестовых данных. Создание pprbId", UUID::randomUUID);
         var expected = step("Подготовка объекта для сравнения", () -> {
-            var expectedIdHistory = new GuidsHistoryEntity();
+            var expectedIdHistory = new IdsHistoryEntity();
             expectedIdHistory.setDigitalId(digitalId);
             expectedIdHistory.setExternalId(externalId);
             expectedIdHistory.setPprbEntityId(pprbId);
