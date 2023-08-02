@@ -16,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class AccountMapperDecorator implements AccountMapper {
@@ -105,10 +106,8 @@ public abstract class AccountMapperDecorator implements AccountMapper {
         if (account !=  null) {
             var bank = account.getBank();
             if (bank != null) {
-                var bankAccount = bank.getBankAccount();
-                if (bankAccount != null) {
-                    return budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getBankAccount());
-                }
+                var bankAccount = Objects.nonNull(bank.getBankAccount()) ? bank.getBankAccount().getBankAccount() : null;
+                return budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount);
             }
         }
         return false;
