@@ -18,6 +18,7 @@ credentials:
   registry_delta:
     tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
     approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
+  docs_publisher: CAB-SA-DVO05789-docs_publisher
 
 project_name: sbbol-partners
 
@@ -39,6 +40,18 @@ documentation:
       -Dgradle.wrapperUser=${env.TOKEN_NAME}
       -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
       build -x test
+
+test_ift:
+  cpu: 2
+  memory: '8g'
+  command: >-
+    ./gradlew
+    -PtokenName=${env.TOKEN_NAME}
+    -PtokenPassword=${env.TOKEN_PASSWORD}
+    -Dgradle.wrapperUser=${env.TOKEN_NAME}
+    -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
+    -Dtest-layer=ift
+    test --info
 
 pr_check:
   openshift:
@@ -189,6 +202,8 @@ release:
     type: release
   jobs:
     test_release:
+      wait: false
+    vector_release:
       wait: false
   build_gradle:
     cpu: 2
