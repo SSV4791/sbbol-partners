@@ -18,6 +18,7 @@ credentials:
   registry_delta:
     tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
     approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
+  docs_publisher: CAB-SA-DVO05789-docs_publisher
 
 project_name: sbbol-partners
 
