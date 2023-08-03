@@ -27,9 +27,6 @@ data:
     server.tomcat.uri-encoding=UTF-8
     server.max-http-header-size=40000
 
-    management.metrics.tags.application={{ os_project.name }}
-    management.metrics.export.prometheus.enabled=true
-
     management.endpoints.enabled-by-default=true
     management.endpoints.web.exposure.include=health,prometheus
     management.endpoints.web.base-path={{ context_prefix }}actuator

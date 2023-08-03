@@ -15,7 +15,7 @@ import java.util.UUID;
     }
 )
 @Entity
-public class GuidsHistoryEntity extends BaseEntity {
+public class IdsHistoryEntity extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1;
@@ -58,6 +58,3 @@ public class GuidsHistoryEntity extends BaseEntity {
         return getDigitalId();
     }
 }
-
-
-

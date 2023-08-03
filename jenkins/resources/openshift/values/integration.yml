@@ -3,12 +3,12 @@ int:
   sbbol:
     rest_in:
       latest:
-        name: sbbol-rest-in
-        host: sbbol-dev-rest-in-ci02281165.apps.dev-gen2.sigma.sbrf.ru
-        port: 443
-        ott: false
-        mtls: true
-        protocol: HTTP
+        - name: sbbol-rest-in
+          host: sbbol-dev-rest-in-ci02281165-green.apps.dev-terra000007-edm.ocp.sigma.sbrf.ru
+          port: 443
+          ott: false
+          mtls: true
+          protocol: HTTPS
 
   pprb:
     db_main:
@@ -110,12 +110,14 @@ int:
     prometheus_https:
       v1_0:
         - name: prometheus-https
+          ci: ci0098765432
           host: appmon-service.apps.dev-gen.sigma.sbrf.ru
           port: '443'
           istio_mesh_port: '80'
           protocol: TLS
           mtls: true
           ott: false
+          health_path: /01.00/health/info
 
     #kafka?
     appjournal:
@@ -148,15 +150,16 @@ int:
         - name: audit-ott
           host: demo.sigma.audit-http-proxy.apps.dev-gen.sigma.sbrf.ru
           ip: 10.36.252.102
-          port: 443
-          istio_mesh_port: 80
-          protocol: HTTP
+          port: '443'
+          istio_mesh_port: '80'
+          protocol: TLS
           mtls: true
           ott: true
 
     CI02745214_digitalapi:
       v1_0:
         name: pprb-digital-api
+        ci: ci02745214
         host: ingress-ci02745214-digitalapi-ott.apps.dev-gen2.sigma.sbrf.ru
         ip: 10.36.252.127
         port: '443'
@@ -164,7 +167,7 @@ int:
         mtls: true
         protocol: TLS
         url: https://ingress-ci02745214-digitalapi-ott.apps.dev-gen2.sigma.sbrf.ru
-
+        health_path: /v1/health/info
     CI03045533_antifraud_aggregator:
       v1_0:
         name: antifraud-aggregator
@@ -175,6 +178,34 @@ int:
         mtls: true
         rotocol: HTTPS
         url: https://ingress-ci02281165-antifraud-ott.apps.dev-terra000006-idm.ocp.delta.sbrf.ru
+
+    tsa:
+      kafka:
+        v1_0:
+          - name: kafka-k2-pprb-tsa-1
+            host: tvldq-pprb01745.delta.sbrf.ru
+            ip: 10.49.213.63
+            port: 9093
+            egress_port: 3501
+            ott: false
+            mtls: false
+            protocol: TCP
+          - name: kafka-k2-pprb-tsa-2
+            host: tvldq-pprb01744.delta.sbrf.ru
+            ip: 10.49.213.226
+            port: 9093
+            egress_port: 3502
+            ott: false
+            mtls: false
+            protocol: TCP
+          - name: kafka-k2-pprb-tsa-3
+            host: tvldq-pprb01746.delta.sbrf.ru
+            ip: 10.49.213.90
+            port: 9093
+            egress_port: 3503
+            ott: false
+            mtls: false
+            protocol: TCP
 
   ott:
     v2_0:
@@ -199,11 +230,13 @@ int:
   dynatrace:
     latest:
       servers:
-        - host: tkles-mvp000199.vm.esrt.cloud.sbrf.ru
+        - name: dynatrace1
+          host: tkles-mvp000199.vm.esrt.cloud.sbrf.ru
           ip: 10.53.90.60
           port: 9999
           egress_port: 9999
-        - host: tkles-mvp000228.vm.esrt.cloud.sbrf.ru
+        - name: dynatrace2
+          host: tkles-mvp000228.vm.esrt.cloud.sbrf.ru
           ip: 10.53.90.149
           port: 9999
           egress_port: 9999

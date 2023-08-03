@@ -1,19 +1,44 @@
 docker:
   images:
-    java: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
-    postgres: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/postgres:13-alpine
-    docs: registry.sigma.sbrf.ru/ci00149046/ci00405008_sbbolufs/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
+    java: docker-internal.registry-ci.delta.sbrf.ru/ci02281165/ci03069386/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
+    postgres: docker-internal.registry-ci.delta.sbrf.ru/ci02281165/ci03069386/postgres:13-alpine
+    docs: docker-internal.registry-ci.delta.sbrf.ru/ci02281165/ci03069386/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
 
 credentials:
-  sonar: SA-SDVO0000346-sonar-token
-  nexus: SA-SDVO0000346-nexus
-  nexus_token: CAB-SA-DVO0000028-nexus
-  checkmarx: SA-SDVO0000346-checkmarx
-  openshift_token: SA-SDVO0000346-openshift
-  jenkins: SA-SDVO0000346-jenkins
-  registry_delta: CAB-SA-DVO0000028-registry
+  sonar: CAB-SA-DVO05789-sonar
+  jenkins: CAB-SA-DVO05789-jenkins
+  openshift_token: CAB-SA-DVO05789-openshift_token
+  service:
+    tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
+    approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
+  nexus_token:
+    tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
+    approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
+  checkmarx: CAB-SA-DVO05789-checkmarx
+  registry_delta:
+    tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
+    approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
 
 project_name: sbbol-partners
+
+liquibase:
+  changelog:
+    path: runner/src/main/resources/db/changelog/changelog.yaml
+  defaults_file:
+    path: jenkins/resources/liquibase/liquibase.properties
+  command_type: update
+
+documentation:
+  build:
+    workdir: ''
+    outputdir: docs/build/docs
+    command: >-
+      ./gradlew
+      -PtokenName=${env.TOKEN_NAME}
+      -PtokenPassword=${env.TOKEN_PASSWORD}
+      -Dgradle.wrapperUser=${env.TOKEN_NAME}
+      -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
+      build -x test
 
 pr_check:
   openshift:
@@ -33,7 +58,7 @@ pr_check:
         - 'src/main/java/ru/sberbank/pprb/sbbol/partners/entity'
         - 'src/test/java/ru/sberbank/pprb/sbbol/partners/replication/changevector'
     compare:
-      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.005.00_0007/CI02792425-D-02.005.00_0007-distrib.zip'
+      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.007.00_0017/CI02792425-D-02.007.00_0017-distrib.zip'
     workdir: vectors
     cpu: 2
     memory: '4g'
@@ -52,6 +77,22 @@ pr_check:
         - 'buildSrc/'
         - 'jenkins'
         - 'runner/src/main/resources/db/changelog'
+  deploy:
+    match:
+      files:
+        - 'buildSrc/'
+        - 'docker/'
+        - 'jenkins/'
+        - 'openshift/'
+      regex:
+        - '.*\.kts'
+        - '.*\.properties'
+    cpu: 2
+    memory: '8g'
+    jenkins_job: 'OAFSIEKO/SBBOL/EFS/DEV/OpenShift/Deploy/sbbol-ufs/deploy-partners-DEV'
+    label: 'prcheck'
+    branch: 'release/3.2'
+    istio_tag: 'test_2.5'
   build_gradle:
     match:
       files:
@@ -71,6 +112,9 @@ pr_check:
         - 'build.gradle.kts'
         - 'gradle.properties'
         - 'settings.gradle.kts'
+      regex:
+        - '.*\.kts'
+        - '.*\.properties'
     cpu: 1
     memory: '2g'
     command: >-
@@ -96,6 +140,9 @@ pr_check:
         - 'settings.gradle.kts'
         - 'jenkins/settings.yml'
         - 'jenkins/test.groovy'
+      regex:
+        - '.*\.kts'
+        - '.*\.properties'
     cpu: 2
     memory: '8g'
     command: >-
@@ -110,31 +157,15 @@ pr_check:
       -Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}
       -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}
       -Dtest-layer=unit,api,configuration,cdcConsumer
+      -Dpactbroker.url=${env.PACT_BROKER_URL}
       -Dallure.jobrunId=${launch.jobRunId}
       -Dbuild.link=${env.BUILD_URL}
       -Dbuild.type=prCheck
       qaReporterUpload sonarCoverage --info
 
-liquibase:
-  changelog:
-    path: runner/src/main/resources/db/changelog/changelog.yaml
-  defaults_file:
-    path: jenkins/resources/liquibase/liquibase.properties
-  command_type: update
-documentation:
-  build:
-    workdir: ''
-    outputdir: docs/build/docs
-    command: >-
-      ./gradlew
-      -PtokenName=${env.TOKEN_NAME}
-      -PtokenPassword=${env.TOKEN_PASSWORD}
-      -Dgradle.wrapperUser=${env.TOKEN_NAME}
-      -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
-      build -x test
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
-  version_init: 02.007.00_0000
+  version_init: 02.008.00_0000
   repository: maven-distr-dev
   artifact_id: CI02792425
   group_id: CI00908578
@@ -152,8 +183,8 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: 'test_2.5'
-    commit_or_tag: '02.006.00_0001_i-2.4'
-    release_key: DCBBRAIN-4501
+    commit_or_tag: '02.007.00_0017_i-test_2.5'
+    release_key: DCBBRAIN-4502
     reverse_and_publish: false
     type: release
   jobs:

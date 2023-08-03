@@ -13,7 +13,7 @@ import org.testcontainers.containers.PostgreSQLContainerProvider;
  */
 public class ExternalRegistryPostgreSQLContainerProvider extends PostgreSQLContainerProvider {
 
-    private static final String CONTAINER_NAME = "ci00149046/ci00405008_sbbolufs/postgres";
+    private static final String CONTAINER_NAME = "ci02281165/ci03069386/postgres";
 
     private static final String NAME = "pg";
 

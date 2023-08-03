@@ -28,11 +28,9 @@ val coverageExclusions = listOf(
 )
 
 sonarqube {
-    val sonarToken = project.properties["sonarToken"] as String?
     properties {
         property("sonar.projectKey", "ru.sberbank.pprb.sbbol.partners:partners")
         property("sonar.host.url", "https://sbt-sonarqube.sigma.sbrf.ru")
-        property("sonar.login", "$sonarToken")
         property("sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/coverage/jacoco/jacocoTestReport.xml")
         property("sonar.coverage.exclusions", coverageExclusions)
         property(
