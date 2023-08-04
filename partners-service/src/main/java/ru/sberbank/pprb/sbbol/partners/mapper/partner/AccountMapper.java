@@ -117,26 +117,21 @@ public interface AccountMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var searchSubString = saveSearchString(
-            account.getPartnerUuid().toString(),
-            account.getAccount()
-        );
+        var partnerUUID = account.getPartnerUuid().toString();
+        var accountNumber = account.getAccount();
+        String bic = null;
+        String corAccount = null;
         var bank = account.getBank();
         if (bank != null) {
             bank.setAccount(account);
-            searchSubString = saveSearchString(
-                searchSubString,
-                bank.getBic()
-            );
+            bic = bank.getBic();
             var bankAccount = bank.getBankAccount();
             if (bankAccount != null) {
-                searchSubString = saveSearchString(
-                    searchSubString,
-                    bankAccount.getAccount()
-                );
+                corAccount = bankAccount.getAccount();
             }
         }
-        account.setSearch(searchSubString);
+        var search = prepareSearchField(partnerUUID, accountNumber, bic, corAccount);
+        account.setSearch(search);
     }
 
     @AfterMapping
@@ -175,4 +170,13 @@ public interface AccountMapper {
     @Mapping(target = "legalForm", source = "legalType")
     @Mapping(target = "account", ignore = true)
     AccountWithPartnerResponse toAccountWithPartner(PartnerEntity partner);
+
+    default String prepareSearchField(
+        String partnerUUID,
+        String account,
+        String bic,
+        String corAccount
+    ) {
+        return saveSearchString(partnerUUID, account, bic, corAccount);
+    }
 }

@@ -186,7 +186,7 @@ public interface PartnerMapper {
     @AfterMapping
     default void mapBidirectional(@MappingTarget PartnerEntity partner) {
         var searchSubString =
-            prepareSearchString(
+            prepareSearchField(
                 partner.getInn(),
                 partner.getKpp(),
                 partner.getOrgName(),
@@ -233,5 +233,9 @@ public interface PartnerMapper {
             .map(it -> it.replaceAll("\\\\", "\\\\\\\\"))
             .collect(Collectors.joining(EMPTY))
             .toLowerCase(Locale.ROOT);
+    }
+
+    default String prepareSearchField(String inn, String kpp, String orgName, String secondName, String firstName, String middleName) {
+        return prepareSearchString(inn, kpp, orgName, firstName, secondName, firstName, middleName);
     }
 }
