@@ -5,6 +5,7 @@ import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
+import ru.sberbank.pprb.sbbol.partners.exception.ModelDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -33,7 +34,9 @@ import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -153,6 +156,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     @Audit(eventType = PARTNER_FULL_MODEL_CREATE)
     public PartnerFullModelResponse savePartner(PartnerCreateFullModel partner) {
+        checkPartnerDuplicate(partner);
         var partnerEntity = partnerMapper.toPartner(partner);
         var savedPartner = partnerRepository.save(partnerEntity);
         var digitalId = partner.getDigitalId();
@@ -188,6 +192,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     @Audit(eventType = PARTNER_CREATE)
     public Partner savePartner(PartnerCreate partner) {
+        checkPartnerDuplicate(partner);
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
         var response = partnerMapper.toPartner(savePartner);
@@ -199,6 +204,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Transactional
     @Audit(eventType = PARTNER_UPDATE)
     public Partner patchPartner(Partner partner) {
+        checkPartnerDuplicate(partner);
         var digitalId = partner.getDigitalId();
         var partnerId = partner.getId();
         var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
@@ -222,6 +228,7 @@ public class PartnerServiceImpl implements PartnerService {
         var partnerId = partner.getId();
         var partnerUuid = mapUuid(partnerId);
         var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
+        checkPartnerDuplicate(partner, foundPartner);
         partnerMapper.patchPartner(partner, foundPartner);
         PartnerEntity savedPartner = partnerRepository.save(foundPartner);
         partnerAddressService.saveOrPatchAddresses(digitalId, partnerId, partner.getAddress());
@@ -290,5 +297,96 @@ public class PartnerServiceImpl implements PartnerService {
 
     private boolean isGkuInn(String inn) {
         return gkuInnCacheableStorage.isGkuInn(inn);
+    }
+
+    private void checkPartnerDuplicate(PartnerCreateFullModel partner) {
+        checkPartnerDuplicate(
+            partner.getDigitalId(),
+            partner.getInn(),
+            partner.getKpp(),
+            partner.getOrgName(),
+            partner.getSecondName(),
+            partner.getFirstName(),
+            partner.getMiddleName()
+        );
+    }
+
+    private void checkPartnerDuplicate(PartnerCreate partner) {
+        checkPartnerDuplicate(
+            partner.getDigitalId(),
+            partner.getInn(),
+            partner.getKpp(),
+            partner.getOrgName(),
+            partner.getSecondName(),
+            partner.getFirstName(),
+            partner.getMiddleName()
+        );
+    }
+
+    private void checkPartnerDuplicate(Partner partner) {
+        checkPartnerDuplicate(
+            UUID.fromString(partner.getId()),
+            partner.getDigitalId(),
+            partner.getInn(),
+            partner.getKpp(),
+            partner.getOrgName(),
+            partner.getSecondName(),
+            partner.getFirstName(),
+            partner.getMiddleName()
+        );
+    }
+
+    private void checkPartnerDuplicate(PartnerChangeFullModel partner, PartnerEntity partnerEntity) {
+        var inn = Optional.ofNullable(partner.getInn())
+            .orElse(partnerEntity.getInn());
+        var kpp = Optional.ofNullable(partner.getKpp())
+            .orElse(partnerEntity.getKpp());
+        var orgName = Optional.ofNullable(partner.getOrgName())
+            .orElse(partnerEntity.getOgrn());
+        var secondName = Optional.ofNullable(partner.getSecondName())
+            .orElse(partnerEntity.getSecondName());
+        var firstName = Optional.ofNullable(partner.getFirstName())
+            .orElse(partnerEntity.getFirstName());
+        var middleName = Optional.ofNullable(partner.getMiddleName())
+            .orElse(partnerEntity.getMiddleName());
+        checkPartnerDuplicate(
+            UUID.fromString(partner.getId()),
+            partner.getDigitalId(),
+            inn,
+            kpp,
+            orgName,
+            secondName,
+            firstName,
+            middleName
+        );
+    }
+
+    private void checkPartnerDuplicate(
+        String digitalId,
+        String inn,
+        String kpp,
+        String orgName,
+        String secondName,
+        String firstName,
+        String middleName
+    ) {
+        checkPartnerDuplicate(null, digitalId, inn, kpp, orgName, secondName, firstName, middleName);
+    }
+
+    private void checkPartnerDuplicate(
+        UUID uuid,
+        String digitalId,
+        String inn,
+        String kpp,
+        String orgName,
+        String secondName,
+        String firstName,
+        String middleName
+    ) {
+        var search = partnerMapper.prepareSearchField(inn, kpp, orgName, secondName, firstName, middleName);
+        var partnerEntity = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
+        if (nonNull(partnerEntity) && !partnerEntity.getUuid().equals(uuid)) {
+            throw new ModelDuplicateException(DOCUMENT_NAME);
+        }
     }
 }

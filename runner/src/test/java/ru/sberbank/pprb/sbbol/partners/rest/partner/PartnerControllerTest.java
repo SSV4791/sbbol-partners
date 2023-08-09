@@ -2145,6 +2145,34 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testSaveFullModelPartner_whenDuplicatePartner() {
+        var partner = getValidFullModelLegalEntityPartner();
+        given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(BASE_ROUTE_PATH + "/full-model")
+            .then()
+            .spec(createResponseSpec);
+        var actualError = given()
+            .spec(requestSpec)
+            .body(partner)
+            .when()
+            .post(BASE_ROUTE_PATH + "/full-model")
+            .then()
+            .spec(createBadRequestResponseSpec)
+            .extract()
+            .as(Error.class);
+        var expectedError = new Error()
+            .code(MODEL_DUPLICATE_EXCEPTION.getValue())
+            .message(MessagesTranslator.toLocale("error.message.check.validation"))
+            .type(BUSINESS)
+            .descriptions(Collections.emptyList());
+        assertThat(actualError)
+            .isEqualTo(expectedError);
+    }
+
+    @Test
     void testSavePartner_whenInvalidOgrnLength() {
         var partner = getValidLegalEntityPartner();
         partner.setOgrn("11");

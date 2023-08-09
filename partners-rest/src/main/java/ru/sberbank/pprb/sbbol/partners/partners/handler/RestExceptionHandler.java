@@ -22,6 +22,7 @@ import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
+import ru.sberbank.pprb.sbbol.partners.exception.ModelDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
@@ -127,7 +128,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         AccountPriorityOneMoreException.class,
         AccountAlreadySignedException.class,
         OptimisticLockException.class,
-        CheckValidationException.class
+        CheckValidationException.class,
+        ModelDuplicateException.class
     })
     protected ResponseEntity<Object> handleBusinessException(
         BaseException ex,

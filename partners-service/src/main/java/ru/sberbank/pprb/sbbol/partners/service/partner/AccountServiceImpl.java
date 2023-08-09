@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
+import ru.sberbank.pprb.sbbol.partners.exception.ModelDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -38,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_CREATE;
@@ -108,6 +110,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Audit(eventType = ACCOUNT_CREATE)
     public Account saveAccount(AccountCreate account) {
+        checkAccountDuplicate(account);
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, mapUuid(account.getPartnerId()));
         if (foundPartner.isEmpty()) {
@@ -130,6 +133,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Audit(eventType = ACCOUNT_UPDATE)
     public Account updateAccount(AccountChange account) {
+        checkAccountDuplicate(account);
         var foundAccount = findAccountEntity(account.getDigitalId(), account.getId(), account.getVersion());
         accountMapper.updateAccount(account, foundAccount);
         return saveAccount(foundAccount);
@@ -140,6 +144,7 @@ public class AccountServiceImpl implements AccountService {
     @Audit(eventType = ACCOUNT_UPDATE)
     public Account patchAccount(AccountChange account) {
         var foundAccount = findAccountEntity(account.getDigitalId(), account.getId(), account.getVersion());
+        checkAccountDuplicate(account, foundAccount);
         accountMapper.patchAccount(account, foundAccount);
         return saveAccount(foundAccount);
     }
@@ -267,12 +272,12 @@ public class AccountServiceImpl implements AccountService {
         return foundAccount;
     }
 
-    private Account saveAccount(AccountEntity account) {
-        if (AccountStateType.SIGNED == account.getState()) {
-            throw new AccountAlreadySignedException(account.getAccount());
+    private Account saveAccount(AccountEntity accountEntity) {
+        if (AccountStateType.SIGNED == accountEntity.getState()) {
+            throw new AccountAlreadySignedException(accountEntity.getAccount());
         }
         try {
-            var savedAccount = accountRepository.save(account);
+            var savedAccount = accountRepository.save(accountEntity);
             var response = accountMapper.toAccount(savedAccount, budgetMaskService);
             response.setVersion(response.getVersion() + 1);
             replicationService.updateCounterparty(response);
@@ -281,6 +286,94 @@ public class AccountServiceImpl implements AccountService {
             throw e;
         } catch (RuntimeException e) {
             throw new EntrySaveException(DOCUMENT_NAME, e);
+        }
+    }
+
+    private void checkAccountDuplicate(AccountCreate account) {
+        String bic = null;
+        String corAccount = null;
+        var bank = account.getBank();
+        if (nonNull(bank)) {
+            bic = bank.getBic();
+            var bankAccount = bank.getBankAccount();
+            if (nonNull(bankAccount)) {
+                corAccount = bankAccount.getBankAccount();
+            }
+        }
+        checkAccountDuplicate(
+            null,
+            account.getDigitalId(),
+            account.getPartnerId(),
+            account.getAccount(),
+            bic,
+            corAccount
+        );
+    }
+
+    private void checkAccountDuplicate(AccountChange account) {
+        String bic = null;
+        String corAccount = null;
+        var bank = account.getBank();
+        if (nonNull(bank)) {
+            bic = bank.getBic();
+            var bankAccount = bank.getBankAccount();
+            if (nonNull(bankAccount)) {
+                corAccount = bankAccount.getBankAccount();
+            }
+        }
+        checkAccountDuplicate(
+            account.getId(),
+            account.getDigitalId(),
+            account.getPartnerId(),
+            account.getAccount(),
+            bic,
+            corAccount
+        );
+    }
+
+    private void checkAccountDuplicate(AccountChange account, AccountEntity accountEntity) {
+        String bic = null;
+        String corAccount = null;
+        var bank = account.getBank();
+        if (nonNull(bank)) {
+            bic = bank.getBic();
+            var bankAccount = bank.getBankAccount();
+            if (nonNull(bankAccount)) {
+                corAccount = bankAccount.getBankAccount();
+            }
+        }
+        if (isNull(bic) || isNull(corAccount)) {
+            var bankEntity = accountEntity.getBank();
+            if (nonNull(bankEntity)) {
+                bic = Optional.ofNullable(bic).orElse(bankEntity.getBic());
+                var bankAccountEntity = bankEntity.getBankAccount();
+                if (nonNull(bankAccountEntity)) {
+                    corAccount = Optional.ofNullable(corAccount).orElse(bankAccountEntity.getAccount());
+                }
+            }
+        }
+        checkAccountDuplicate(
+            account.getId(),
+            account.getDigitalId(),
+            account.getPartnerId(),
+            account.getAccount(),
+            bic,
+            corAccount
+        );
+    }
+
+    private void checkAccountDuplicate(
+        String accountUuid,
+        String digitalId,
+        String partnerUuid,
+        String account,
+        String bic,
+        String corAccount
+    ) {
+        var search = accountMapper.prepareSearchField(partnerUuid, account, bic, corAccount);
+        var accountEntity = accountRepository.findByDigitalIdAndSearch(digitalId, search);
+        if (nonNull(accountEntity) && !accountEntity.getUuid().equals(accountUuid)) {
+            throw new ModelDuplicateException(DOCUMENT_NAME);
         }
     }
 }
