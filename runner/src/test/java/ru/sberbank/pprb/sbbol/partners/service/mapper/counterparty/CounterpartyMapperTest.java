@@ -7,6 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;

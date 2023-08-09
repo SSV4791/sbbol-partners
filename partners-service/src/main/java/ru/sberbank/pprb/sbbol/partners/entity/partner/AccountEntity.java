@@ -14,11 +14,13 @@ import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -72,6 +74,9 @@ public class AccountEntity extends BaseEntity {
 
     @Column(name = "search", length = 500)
     private String search;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IdsHistoryEntity> idLinks;
 
     public Boolean getPriorityAccount() {
         if (priorityAccount == null) {
@@ -157,6 +162,14 @@ public class AccountEntity extends BaseEntity {
 
     public void setPartner(PartnerEntity partner) {
         this.partner = partner;
+    }
+
+    public List<IdsHistoryEntity> getIdLinks() {
+        return idLinks;
+    }
+
+    public void setIdLinks(List<IdsHistoryEntity> idLinks) {
+        this.idLinks = idLinks;
     }
 
     @Override

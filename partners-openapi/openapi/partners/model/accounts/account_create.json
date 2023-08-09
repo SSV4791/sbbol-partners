@@ -11,6 +11,12 @@
       "maxLength": 36,
       "x-not-empty": true
     },
+    "externalId": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Внешний идентификатор",
+      "x-not-empty": true
+    },
     "digitalId": {
       "type": "string",
       "title": "Идентификатор личного кабинета клиента",

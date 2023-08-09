@@ -37,9 +37,9 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.FlatRenterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.renter.RenterRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
@@ -142,8 +142,7 @@ public class PartnerServiceConfiguration {
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
-        ReplicationService replicationService,
-        IdsHistoryService idsHistoryService
+        ReplicationService replicationService
     ) {
         return new AccountServiceImpl(
             accountRepository,
@@ -151,8 +150,7 @@ public class PartnerServiceConfiguration {
             accountSignRepository,
             budgetMaskService,
             accountMapper,
-            replicationService,
-            idsHistoryService
+            replicationService
         );
     }
 
@@ -309,8 +307,7 @@ public class PartnerServiceConfiguration {
         AddressService partnerAddressService,
         DocumentService partnerDocumentService,
         ContactService contactService,
-        AccountService accountService,
-        IdsHistoryService idsHistoryService
+        AccountService accountService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
             accountRepository,
@@ -330,8 +327,7 @@ public class PartnerServiceConfiguration {
             partnerAddressService,
             partnerDocumentService,
             contactService,
-            accountService,
-            idsHistoryService
+            accountService
         );
     }
 

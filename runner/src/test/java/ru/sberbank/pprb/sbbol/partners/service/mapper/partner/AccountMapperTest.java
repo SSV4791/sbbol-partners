@@ -160,7 +160,8 @@ class AccountMapperTest extends BaseUnitConfiguration {
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
-                "budget"
+                "budget",
+                "externalId"
             )
             .isEqualTo(actual);
     }
@@ -351,6 +352,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "search",
                 "state",
                 "partner",
+                "idLinks",
                 "bank.uuid",
                 "bank.lastModifiedDate",
                 "bank.intermediary",
@@ -361,6 +363,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "bank.account.search",
                 "bank.account.priorityAccount",
                 "bank.account.state",
+                "bank.account.idLinks",
                 "bank.bankAccount.uuid",
                 "bank.bankAccount.lastModifiedDate"
 
@@ -405,8 +408,8 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "bank.account.priorityAccount",
                 "bank.account.state",
                 "bank.bankAccount.uuid",
-                "bank.bankAccount.lastModifiedDate"
-
+                "bank.bankAccount.lastModifiedDate",
+                "idLinks"
             )
             .isEqualTo(expectedAccountEntity);
     }

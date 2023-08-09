@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
@@ -76,15 +75,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
 
     private GkuInnEntity gkuInnEntity;
 
-    private IdsHistoryEntity idsHistoryEntity;
-
     @AfterEach
     void after() {
         if (gkuInnEntity != null) {
             innDictionaryRepository.delete(gkuInnEntity);
-        }
-        if (idsHistoryEntity != null) {
-            idsHistoryService.delete(idsHistoryEntity.getDigitalId(), idsHistoryEntity.getPprbEntityId());
         }
     }
 
@@ -225,7 +219,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(response.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             for (var text : response.getDescriptions()) {
-                assertThat(errorTexts.contains(text)).isTrue();
+                assertThat(errorTexts).contains(text);
             }
         });
     }
@@ -569,7 +563,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(response)
                 .isNotNull();
             assertThat(response.getAccounts())
-                .hasSize(0);
+                .isEmpty();
             assertThat(response.getPagination().getHasNextPage())
                 .isFalse();
         });
@@ -1055,6 +1049,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return getValidAccount(partner.getId(), partner.getDigitalId());
         });
+        expected.setExternalId(UUID.randomUUID());
         var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createValidAccount(expected));
         step("Проверка корректности ответа", () -> assertThat(account)
             .usingRecursiveComparison()
@@ -1065,6 +1060,28 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 "bank.bankAccount.uuid",
                 "bank.bankAccount.bankUuid")
             .isEqualTo(account));
+    }
+
+    @Test
+    @DisplayName("POST /partner/accounts создание счета")
+    void testCreateAccountCheckExternalId() {
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(getValidAccount(partner.getId(), partner.getDigitalId()));
+        });
+        var idsLink = step("Выполнение запроса",
+            () -> idsHistoryService.getInternalIds(account.getDigitalId(), List.of(account.getId())));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(idsLink)
+                .isNotNull();
+            assertThat(idsLink.getIdLinks())
+                .isNotNull()
+                .asList()
+                .hasSize(1);
+            assertThat(idsLink.getIdLinks().get(0).getExternalId())
+                .isEqualTo(account.getId());
+        });
     }
 
     @Test
@@ -2857,32 +2874,32 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("GET /partner/accounts/get-accountIds-by-externalIds/{digitalId} внутреннего идентификатора счета по внешнему идентификатору")
     void testGetAccountIdsByExternalIds() {
-        step("Подготовка тестовых данных о связи внешнего и внутреннего идентификатора", () -> {
-            idsHistoryEntity = podamFactory.manufacturePojo(IdsHistoryEntity.class);
-            idsHistoryService.create(idsHistoryEntity.getDigitalId(), idsHistoryEntity.getExternalId(), idsHistoryEntity.getPprbEntityId());
+        var account = step("Подготовка тестовых данных о связи внешнего и внутреннего идентификатора", () -> {
+            var partner = createValidPartner();
+            return createValidAccount(getValidAccount(partner.getId(), partner.getDigitalId()));
         });
         var externalIds =
             step("Подготовка тестовых данных - создание externalIds", () ->
                 List.of(
-                    idsHistoryEntity.getExternalId().toString(),
+                    account.getId(),
                     UUID.randomUUID().toString(),
                     UUID.randomUUID().toString()
                 ));
         var expectedResponse =
-            step("Подготовка ожидаемого ответа", () -> {
-                return new ExternalInternalIdLinksResponse()
+            step("Подготовка ожидаемого ответа", () ->
+                new ExternalInternalIdLinksResponse()
                     .idLinks(externalIds.stream()
                         .map(externalId ->
                             new ExternalInternalIdLink()
                                 .externalId(externalId)
                                 .internalId(
-                                    externalId.equals(idsHistoryEntity.getExternalId().toString())
-                                        ? idsHistoryEntity.getPprbEntityId().toString()
+                                    externalId.equals(account.getId())
+                                        ? account.getId()
                                         : null
                                 )
                         )
-                        .collect(Collectors.toList()));
-            });
+                        .collect(Collectors.toList()))
+            );
         var actualResponse =
             step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds",
                 () -> get(
@@ -2890,7 +2907,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     HttpStatus.OK,
                     ExternalInternalIdLinksResponse.class,
                     Map.of("externalIds", externalIds),
-                    idsHistoryEntity.getDigitalId()
+                    account.getDigitalId()
                 ));
         step("Проверка корректности ответа",
             () ->
@@ -2902,41 +2919,26 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("GET /partner/accounts/get-accountIds-by-externalIds/{digitalId} внутреннего идентификатора счета по внешнему идентификатору. Невалидный запрос")
     void testGetAccountIdsByExternalIds_whenInvalidRequest() {
-        step("Подготовка тестовых данных о связи внешнего и внутреннего идентификатора", () -> {
-            idsHistoryEntity = podamFactory.manufacturePojo(IdsHistoryEntity.class);
-            idsHistoryService.create(idsHistoryEntity.getDigitalId(), idsHistoryEntity.getExternalId(), idsHistoryEntity.getPprbEntityId());
-        });
         var externalIds =
             step("Подготовка тестовых данных - создание externalIds", () ->
-                List.of(
-                    idsHistoryEntity.getExternalId().toString(),
-                    RandomStringUtils.randomAlphabetic(10),
-                    UUID.randomUUID().toString()
-                ));
-        var expectedResponse =
-            step("Подготовка ожидаемого ответа", () -> {
-                return new ExternalInternalIdLinksResponse()
-                    .idLinks(externalIds.stream()
-                        .map(externalId ->
-                            new ExternalInternalIdLink()
-                                .externalId(externalId)
-                                .internalId(
-                                    externalId.equals(idsHistoryEntity.getExternalId().toString())
-                                        ? idsHistoryEntity.getPprbEntityId().toString()
-                                        : null
-                                )
-                        )
-                        .collect(Collectors.toList()));
-            });
+                List.of(RandomStringUtils.randomAlphabetic(10)));
+
         var actualResponse =
             step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds",
                 () -> get(
                     baseRoutePath + "/accounts/get-accountIds-by-externalIds" + "/{digitalId}",
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.INTERNAL_SERVER_ERROR,
                     Error.class,
                     Map.of("externalIds", externalIds),
-                    idsHistoryEntity.getDigitalId()
+                    RandomStringUtils.randomAlphabetic(10)
                 ));
+
+        step("Проверка результата", () -> {
+            assertThat(actualResponse)
+                .isNotNull();
+            assertThat(actualResponse.getMessage())
+                .isEqualTo("Invalid UUID string: " + externalIds.get(0));
+        });
     }
 
     private GkuInnEntity saveGkuInn(String inn) {

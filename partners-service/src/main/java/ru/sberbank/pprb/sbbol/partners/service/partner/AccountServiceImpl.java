@@ -30,16 +30,15 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_UPDATE;
@@ -57,7 +56,6 @@ public class AccountServiceImpl implements AccountService {
     private final BudgetMaskService budgetMaskService;
     private final AccountMapper accountMapper;
     private final ReplicationService replicationService;
-    private final IdsHistoryService idsHistoryService;
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
@@ -65,8 +63,7 @@ public class AccountServiceImpl implements AccountService {
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
-        ReplicationService replicationService,
-        IdsHistoryService idsHistoryService
+        ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.partnerRepository = partnerRepository;
@@ -74,13 +71,12 @@ public class AccountServiceImpl implements AccountService {
         this.budgetMaskService = budgetMaskService;
         this.accountMapper = accountMapper;
         this.replicationService = replicationService;
-        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Account getAccount(String digitalId, String id) {
-        var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+        var account = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(id))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return accountMapper.toAccount(account, budgetMaskService);
     }
@@ -112,9 +108,10 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Audit(eventType = ACCOUNT_CREATE)
     public Account saveAccount(AccountCreate account) {
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(account.getDigitalId(), UUID.fromString(account.getPartnerId()));
+        var digitalId = account.getDigitalId();
+        var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, mapUuid(account.getPartnerId()));
         if (foundPartner.isEmpty()) {
-            throw new EntryNotFoundException("partner", account.getDigitalId(), account.getPartnerId());
+            throw new EntryNotFoundException("partner", digitalId, account.getPartnerId());
         }
         var accountEntity = accountMapper.toAccount(account);
         try {
@@ -162,7 +159,6 @@ public class AccountServiceImpl implements AccountService {
                     accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccountUuid);
                 accountSignEntity.ifPresent(accountSignRepository::delete);
                 replicationService.deleteCounterparty(digitalId, foundAccountUuid.toString());
-                idsHistoryService.delete(digitalId, foundAccountUuid);
             } catch (RuntimeException e) {
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
@@ -173,7 +169,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public Account changePriority(AccountPriority accountPriority) {
         var digitalId = accountPriority.getDigitalId();
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountPriority.getId()))
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(accountPriority.getId()))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountPriority.getId()));
         var foundPriorityAccounts = accountRepository
             .findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(digitalId, foundAccount.getPartnerUuid());
@@ -205,7 +201,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
         List<AccountEntity> accountsWithKppField = accounts;
-        if (Objects.nonNull(request.getKpp()) && !Objects.equals(request.getKpp(), "0")) {
+        if (nonNull(request.getKpp()) && !Objects.equals(request.getKpp(), "0")) {
             accountsWithKppField = accounts.stream()
                 .filter(value -> Objects.equals(value.getPartner().getKpp(), request.getKpp()))
                 .collect(Collectors.toList());
@@ -263,7 +259,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private AccountEntity findAccountEntity(String digitalId, String accountId, Long version) {
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountId))
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(accountId))
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
         if (!Objects.equals(version, foundAccount.getVersion())) {
             throw new OptimisticLockException(foundAccount.getVersion(), version);

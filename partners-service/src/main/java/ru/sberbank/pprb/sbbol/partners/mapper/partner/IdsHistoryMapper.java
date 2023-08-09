@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -24,12 +22,6 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 )
 public interface IdsHistoryMapper {
 
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "digitalId", source = "digitalId")
-    @Mapping(target = "externalId", source = "externalId")
-    @Mapping(target = "pprbEntityId", source = "pprbId")
-    IdsHistoryEntity toIdsHistoryEntity(String digitalId, UUID externalId, UUID pprbId);
-
     default ExternalInternalIdLinksResponse toAccountIdsByExternalIdsResponse(List<String> externalIds, List<IdsHistoryEntity> idsHistoryEntities) {
         if (isEmpty(externalIds)) {
             return null;
@@ -39,11 +31,11 @@ public interface IdsHistoryMapper {
             pprbIdByExternalIdMap = idsHistoryEntities.stream()
                 .collect(Collectors.toMap(
                     it -> it.getExternalId().toString(),
-                    it -> it.getPprbEntityId().toString())
+                    it -> it.getAccount().getUuid().toString())
                 );
         }
         List<ExternalInternalIdLink> idLinks = new ArrayList<>(idsHistoryEntities.size());
-        for (String externalId: externalIds) {
+        for (String externalId : externalIds) {
             idLinks.add(
                 new ExternalInternalIdLink()
                     .externalId(externalId)

@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.decorator.Migratio
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
 
 @Mapper(
@@ -78,6 +80,7 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "idLinks", ignore = true)
     AccountEntity toAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source);
 
     default AccountStateType toSigned(boolean signed) {
@@ -234,5 +237,26 @@ public interface MigrationPartnerMapper {
 
     default String stringNotEmpty(final String value) {
         return StringUtils.isEmpty(value) ? null : value;
+    }
+
+    default AccountEntity fillIdLinks(AccountEntity account, String externalId) {
+        var externalUuid = StringUtils.isNotEmpty(externalId) ? mapUuid(externalId) : null;
+        var idLink = new IdsHistoryEntity();
+        idLink.setAccount(account);
+        idLink.setExternalId(externalUuid);
+        idLink.setDigitalId(account.getDigitalId());
+        var idLinks = account.getIdLinks();
+        if (!CollectionUtils.isEmpty(idLinks) && Objects.nonNull(externalUuid)) {
+            long count = idLinks.stream()
+                .filter(link -> link.getExternalId().equals(externalUuid))
+                .count();
+            if (count != 0) {
+                return account;
+            }
+            idLinks.add(idLink);
+            return account;
+        }
+        account.setIdLinks(List.of(idLink));
+        return account;
     }
 }

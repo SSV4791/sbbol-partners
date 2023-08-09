@@ -19,11 +19,9 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
@@ -40,20 +38,17 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
-    private final IdsHistoryService idsHistoryService;
 
     public CorrespondentMigrationServiceImpl(
         MigrationPartnerMapper migrationPartnerMapper,
         PartnerRepository partnerRepository,
         AccountRepository accountRepository,
-        AccountSignRepository accountSignRepository,
-        IdsHistoryService idsHistoryService
+        AccountSignRepository accountSignRepository
     ) {
         this.migrationPartnerMapper = migrationPartnerMapper;
         this.partnerRepository = partnerRepository;
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
-        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
@@ -65,8 +60,6 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         for (MigrationCorrespondentCandidate correspondent : correspondents) {
             try {
                 savedAccount = saveOrUpdate(digitalId, correspondent, true);
-                UUID replicationGuid = mapUuid(correspondent.getReplicationGuid());
-                idsHistoryService.create(digitalId, replicationGuid, savedAccount.getUuid());
             } catch (Exception ex) {
                 LOGGER.error(
                     "В процессе миграции контрагента с sbbolReplicationGuid: {}",
@@ -107,23 +100,20 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         if (isEmpty(pprbGuid)) {
             return;
         }
-        var uuid = UUID.fromString(pprbGuid);
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(pprbGuid));
         if (foundAccount.isPresent()) {
             var accountEntity = foundAccount.get();
             accountRepository.delete(accountEntity);
-            idsHistoryService.delete(digitalId, accountEntity.getUuid());
             var accountSignEntity =
                 accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountEntity.getUuid());
             accountSignEntity.ifPresent(accountSignRepository::delete);
         }
     }
 
-
     private AccountEntity saveOrUpdate(String digitalId, MigrationCorrespondentCandidate correspondent, boolean migration) {
         var pprbGuid = correspondent.getPprbGuid();
         if (pprbGuid != null) {
-            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(pprbGuid));
+            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(pprbGuid));
             if (foundAccount.isPresent()) {
                 var account = foundAccount.get();
                 checkAccountForSign(account, migration);
@@ -180,10 +170,10 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     @Override
     @Transactional
     public void migrateReplicationGuid(String digitalId, List<MigrationReplicationGuidCandidate> candidates) {
-        for (MigrationReplicationGuidCandidate candidate : candidates) {
-            idsHistoryService.create(
-                digitalId, mapUuid(candidate.getReplicationGuid()), mapUuid(candidate.getPprbGuid())
-            );
-        }
+        candidates.forEach(candidate -> {
+            var account = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(candidate.getPprbGuid()))
+                .orElseThrow(() -> new EntryNotFoundException("account", digitalId, candidate.getPprbGuid()));
+            accountRepository.save(migrationPartnerMapper.fillIdLinks(account, candidate.getReplicationGuid()));
+        });
     }
 }
