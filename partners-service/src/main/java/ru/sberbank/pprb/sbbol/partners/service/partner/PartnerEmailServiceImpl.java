@@ -9,8 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.EmailRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
-import java.util.UUID;
-
 @Loggable
 public class PartnerEmailServiceImpl extends EmailServiceImpl {
 
@@ -28,10 +26,10 @@ public class PartnerEmailServiceImpl extends EmailServiceImpl {
     @Override
     @Transactional
     public Email saveEmail(EmailCreate email) {
-        var uuid = UUID.fromString(email.getUnifiedId());
-        var partner = partnerRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid);
+        var partnerId = email.getUnifiedId();
+        var partner = partnerRepository.getByDigitalIdAndUuid(email.getDigitalId(), partnerId);
         if (partner.isEmpty()) {
-            throw new EntryNotFoundException("partner", uuid);
+            throw new EntryNotFoundException("partner", partnerId);
         }
         return super.saveEmail(email);
     }

@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners account sign
-  version: 1.1.1
+  version: 1.1.2
   description: OpenAPI Specification for partner account sign
 
 servers:
@@ -66,6 +66,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
           description: Идентификатор счёта
       responses:
         200:
@@ -107,6 +108,7 @@ paths:
             type: array
             items:
               type: string
+              format: uuid
               maxItems: 200
           description: Идентификатор счёта
       responses:

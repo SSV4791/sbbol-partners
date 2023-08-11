@@ -9,21 +9,22 @@ import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Loggable
 @Mapper(uses = {BaseMapper.class})
 public interface ContactEmailMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "contact.uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "contact.uuid")
     Email toEmail(ContactEmailEntity email);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "contact", ignore = true)
     ContactEmailEntity toEmail(Email email);
 
-    Email toEmail(EmailChangeFullModel email, String digitalId, String unifiedId);
+    Email toEmail(EmailChangeFullModel email, String digitalId, UUID unifiedId);
 
     default String toEmailStr(EmailChangeFullModel email) {
         return Optional.ofNullable(email).map(EmailChangeFullModel::getEmail).orElse(null);

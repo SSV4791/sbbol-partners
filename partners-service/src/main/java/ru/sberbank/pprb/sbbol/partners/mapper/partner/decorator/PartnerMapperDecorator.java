@@ -64,7 +64,7 @@ public abstract class PartnerMapperDecorator implements PartnerMapper {
         var upgradedInitialPhones = initialPhones.stream()
             .filter(initialPhone ->
                 updatedPhones.stream()
-                    .noneMatch(updatedPhone -> initialPhone.getUuid().toString().equals(updatedPhone.getId()))
+                    .noneMatch(updatedPhone -> initialPhone.getUuid().equals(updatedPhone.getId()))
             )
             .map(phoneMapper::toPhoneChangeFullModel)
             .collect(Collectors.toList());
@@ -90,7 +90,7 @@ public abstract class PartnerMapperDecorator implements PartnerMapper {
         var upgradedInitialEmails = initialEmails.stream()
             .filter(initialEmail ->
                 updatedEmails.stream()
-                    .noneMatch(updatedEmail -> initialEmail.getUuid().toString().equals(updatedEmail.getId()))
+                    .noneMatch(updatedEmail -> initialEmail.getUuid().equals(updatedEmail.getId()))
             )
             .map(emailMapper::toEmailChangeFullModel)
             .collect(Collectors.toList());

@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Loggable
 @RestController
@@ -43,13 +44,13 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+    public ResponseEntity<Void> delete(String digitalId, List<UUID> ids) {
         accountService.deleteAccounts(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<ExternalInternalIdLinksResponse> getAccountIdsByExternalIds(String digitalId, List<String> externalIds) {
+    public ResponseEntity<ExternalInternalIdLinksResponse> getAccountIdsByExternalIds(String digitalId, List<UUID> externalIds) {
         return ResponseEntity.ok(idsHistoryService.getInternalIds(digitalId, externalIds));
     }
 
@@ -64,7 +65,7 @@ public class AccountController implements PartnerAccountsApi {
     }
 
     @Override
-    public ResponseEntity<Account> getById(String digitalId, String id) {
+    public ResponseEntity<Account> getById(String digitalId, UUID id) {
         return ResponseEntity.ok(accountService.getAccount(digitalId, id));
     }
 

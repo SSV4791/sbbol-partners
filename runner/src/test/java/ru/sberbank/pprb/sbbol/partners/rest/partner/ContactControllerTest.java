@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import io.qameta.allure.Allure;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -197,8 +199,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
-            assertThat(response.getContacts().size())
-                .isEqualTo(1);
+            assertThat(response.getContacts())
+                .hasSize(1);
         });
     }
 
@@ -237,8 +239,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
-            assertThat(response.getContacts().size())
-                .isEqualTo(4);
+            assertThat(response.getContacts())
+                .hasSize(4);
             assertThat(response.getPagination().getHasNextPage())
                 .isEqualTo(Boolean.TRUE);
         });
@@ -334,9 +336,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     @DisplayName("POST /partner/contact создание контакта для не существующего контрагента")
     void testCreateContactForNonExistentCounterparty() {
         var contactWithoutCounterparty = Allure.step("Подготовка тестовых данных", () -> {
-            var randomValidPartnerUuid = "0a3a0293-6bae-4667-b765-af20c093de12";
-            var randomValidDigitalId = "QeOvUVDbSA";
-            return getValidContact(randomValidPartnerUuid, randomValidDigitalId);
+            return getValidContact(UUID.randomUUID(), RandomStringUtils.randomAlphabetic(10));
         });
         var contact = Allure.step("Выполнение post-запроса /partner/contact, код ответа 404",
             () -> createContactWithError(contactWithoutCounterparty));
@@ -780,7 +780,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
         });
     }
 
-    public static ContactCreate getValidContact(String partnerUuid, String digitalId) {
+    public static ContactCreate getValidContact(UUID partnerUuid, String digitalId) {
         return new ContactCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
@@ -801,7 +801,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             ;
     }
 
-    protected static Contact createValidContact(String partnerUuid, String digitalId) {
+    protected static Contact createValidContact(UUID partnerUuid, String digitalId) {
         return Allure.step("Создание валидных реквизитов", () -> post(
             baseRoutePath + "/contact",
             HttpStatus.CREATED,

@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Loggable
 @RestController
@@ -29,7 +30,7 @@ public class PartnerController implements PartnersApi {
     }
 
     @Override
-    public ResponseEntity<Partner> getById(String digitalId, String id) {
+    public ResponseEntity<Partner> getById(String digitalId, UUID id) {
         return ResponseEntity.ok(partnerService.getPartner(digitalId, id));
     }
 
@@ -45,7 +46,7 @@ public class PartnerController implements PartnersApi {
 
     @FraudValid
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids, FraudMetaData fraudMetaData) {
+    public ResponseEntity<Void> delete(String digitalId, List<UUID> ids, FraudMetaData fraudMetaData) {
         partnerService.deletePartners(digitalId, ids, fraudMetaData);
         return ResponseEntity.noContent().build();
     }

@@ -33,9 +33,9 @@ class AccountSignMapperTest extends BaseUnitConfiguration {
             .isEqualTo(actual.getExternalDataFileId());
         assertThat(expected.getExternalDataSignFileId())
             .isEqualTo(actual.getExternalDataSignFileId());
-        assertThat(expected.getAccountUuid().toString())
+        assertThat(expected.getAccountUuid())
             .isEqualTo(actual.getAccountId());
-        assertThat(expected.getEntityUuid().toString())
+        assertThat(expected.getEntityUuid())
             .isEqualTo(actual.getEntityId());
     }
 
@@ -58,9 +58,9 @@ class AccountSignMapperTest extends BaseUnitConfiguration {
             .isEqualTo(detail.getExternalDataFileId());
         assertThat(expected.getExternalDataSignFileId())
             .isEqualTo(detail.getExternalDataSignFileId());
-        assertThat(expected.getAccountUuid().toString())
+        assertThat(expected.getAccountUuid())
             .isEqualTo(detail.getAccountId());
-        assertThat(expected.getEntityUuid().toString())
+        assertThat(expected.getEntityUuid())
             .isEqualTo(detail.getEntityId());
     }
 
@@ -72,13 +72,13 @@ class AccountSignMapperTest extends BaseUnitConfiguration {
         var actual = mapper.toSing(expected, partnerUuid, digitalId);
 
         assertThat(expected.getEntityId())
-            .isEqualTo(actual.getEntityUuid().toString());
+            .isEqualTo(actual.getEntityUuid());
         assertThat(expected.getDigest())
             .isEqualTo(actual.getDigest());
         assertThat(expected.getSign())
             .isEqualTo(actual.getSign());
         assertThat(expected.getAccountId())
-            .isEqualTo(actual.getAccountUuid().toString());
+            .isEqualTo(actual.getAccountUuid());
         assertThat(expected.getExternalDataSignFileId())
             .isEqualTo(actual.getExternalDataSignFileId());
         assertThat(expected.getExternalDataFileId())

@@ -5,10 +5,8 @@
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор"
     },
     "digitalId": {
       "type": "string",
@@ -19,10 +17,8 @@
     },
     "partnerId": {
       "type": "string",
-      "title": "Идентификатор партнера",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор партнера"
     },
     "orgName": {
       "type": "string",

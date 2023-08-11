@@ -5,20 +5,16 @@
   "properties": {
     "partnerId": {
       "type": "string",
-      "title": "Идентификатор партнера",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор партнера"
     },
     "ids": {
       "type": "array",
-      "x-extra-field-annotation": "@UuidFormatArrayValidation",
       "title": "Идентификаторы контактов",
       "maximum": 30,
       "items": {
         "type": "string",
-        "minLength": 36,
-        "maxLength": 36,
+        "format": "uuid",
         "x-not-empty": true
       }
     },

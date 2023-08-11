@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,8 +70,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             );
         assertThat(response1)
             .isNotNull();
-        assertThat(response1.getAddresses().size())
-            .isEqualTo(4);
+        assertThat(response1.getAddresses())
+            .hasSize(4);
         var filter2 = new AddressesFilter()
             .digitalId(partner.getDigitalId())
             .unifiedIds(List.of(partner.getId()))
@@ -87,8 +88,8 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             );
         assertThat(response2)
             .isNotNull();
-        assertThat(response2.getAddresses().size())
-            .isEqualTo(4);
+        assertThat(response2.getAddresses())
+            .hasSize(4);
         assertThat(response2.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
@@ -205,7 +206,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
-    private static Address createValidAddress(String partnerUuid, String digitalId) {
+    private static Address createValidAddress(UUID partnerUuid, String digitalId) {
         return post(
             baseRoutePath + "/address",
             HttpStatus.CREATED,
@@ -223,7 +224,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
         );
     }
 
-    private static AddressCreate getValidPartnerAddress(String partnerUuid, String digitalId) {
+    private static AddressCreate getValidPartnerAddress(UUID partnerUuid, String digitalId) {
         return new AddressCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)

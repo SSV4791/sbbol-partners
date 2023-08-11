@@ -12,7 +12,7 @@ import ru.sbrf.journal.standin.StandinResourceHelper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class SystemInfoControllerTest extends AbstractIntegrationTest {
+class SystemInfoControllerTest extends AbstractIntegrationTest {
     private static final String URL = "/system-info";
 
     @MockBean

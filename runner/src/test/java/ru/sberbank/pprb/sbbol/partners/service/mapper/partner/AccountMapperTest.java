@@ -30,7 +30,6 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
-import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.ArrayList;
@@ -90,7 +89,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
             assertThat(expected.get(i).getComment())
                 .isEqualTo(actual.get(i).getComment());
             assertThat(expected.get(i).getPartnerUuid())
-                .hasToString(actual.get(i).getPartnerId());
+                .isEqualTo(actual.get(i).getPartnerId());
         }
     }
 
@@ -125,9 +124,9 @@ class AccountMapperTest extends BaseUnitConfiguration {
         assertThat(actual)
             .isNotNull();
         assertThat(expected.getPartnerUuid())
-            .hasToString(actual.getPartnerId());
+            .isEqualTo(actual.getPartnerId());
         assertThat(expected.getUuid())
-            .hasToString(actual.getId());
+            .isEqualTo(actual.getId());
         assertThat(expected.getDigitalId())
             .isEqualTo(actual.getDigitalId());
         assertThat(expected.getAccount())
@@ -195,7 +194,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
 
     private AccountWithPartnerResponse getExpectedAccountWithPartnerResponse(AccountEntity accountEntity) {
         return new AccountWithPartnerResponse()
-            .id(accountEntity.getPartner().getUuid().toString())
+            .id(accountEntity.getPartner().getUuid())
             .digitalId(accountEntity.getPartner().getDigitalId())
             .version(accountEntity.getPartner().getVersion())
             .legalForm(PartnerMapper.toLegalType(accountEntity.getPartner().getLegalType()))
@@ -209,26 +208,26 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .gku(false)
             .account(
                 new Account()
-                    .id(accountEntity.getUuid().toString())
+                    .id(accountEntity.getUuid())
                     .digitalId(accountEntity.getDigitalId())
                     .version(accountEntity.getVersion())
-                    .partnerId(accountEntity.getPartnerUuid().toString())
+                    .partnerId(accountEntity.getPartnerUuid())
                     .account(accountEntity.getAccount())
                     .priorityAccount(accountEntity.getPriorityAccount())
                     .state(mapSignType(accountEntity.getState()))
                     .comment(accountEntity.getComment())
                     .bank(
                         new Bank()
-                            .id(accountEntity.getBank().getUuid().toString())
+                            .id(accountEntity.getBank().getUuid())
                             .version(accountEntity.getBank().getVersion())
-                            .accountId(accountEntity.getBank().getAccount().getUuid().toString())
+                            .accountId(accountEntity.getBank().getAccount().getUuid())
                             .name(accountEntity.getBank().getName())
                             .bic(accountEntity.getBank().getBic())
                             .bankAccount(
                                 new BankAccount()
-                                    .id(accountEntity.getBank().getBankAccount().getUuid().toString())
+                                    .id(accountEntity.getBank().getBankAccount().getUuid())
                                     .version(accountEntity.getBank().getBankAccount().getVersion())
-                                    .bankId(accountEntity.getBank().getBankAccount().getBank().getUuid().toString())
+                                    .bankId(accountEntity.getBank().getBankAccount().getBank().getUuid())
                                     .bankAccount(accountEntity.getBank().getBankAccount().getAccount())
                             )
                     )
@@ -246,7 +245,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
     void mapAccountChangeFullModelToAccountChange() {
         var accountChangeFullModel = factory.manufacturePojo(AccountChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var partnerId = factory.manufacturePojo(String.class);
+        var partnerId = UUID.randomUUID();
         var actualAccountChange = accountMapper.toAccount(accountChangeFullModel, digitalId, partnerId);
         var expectedAccountChange = new AccountChange()
             .id(accountChangeFullModel.getId())
@@ -284,7 +283,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
     void mapAccountChangeFullModelToAccountCreate() {
         var accountChangeFullModel = factory.manufacturePojo(AccountChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var partnerId = factory.manufacturePojo(String.class);
+        var partnerId = UUID.randomUUID();
         var actualAccountCreate = accountMapper.toAccountCreate(accountChangeFullModel, digitalId, partnerId);
         var expectedAccountCreate = new AccountCreate()
             .digitalId(digitalId)
@@ -316,8 +315,8 @@ class AccountMapperTest extends BaseUnitConfiguration {
         var actualAccountEntity = factory.manufacturePojo(AccountEntity.class);
         accountMapper.updateAccount(accountChange, actualAccountEntity);
         var expectedAccountEntity = new AccountEntity();
-        expectedAccountEntity.setUuid(UUID.fromString(accountChange.getId()));
-        expectedAccountEntity.setPartnerUuid(UUID.fromString(accountChange.getPartnerId()));
+        expectedAccountEntity.setUuid(accountChange.getId());
+        expectedAccountEntity.setPartnerUuid(accountChange.getPartnerId());
         expectedAccountEntity.setAccount(accountChange.getAccount());
         expectedAccountEntity.setComment(accountChange.getComment());
         expectedAccountEntity.setDigitalId(accountChange.getDigitalId());
@@ -325,7 +324,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
         Optional.ofNullable(accountChange.getBank())
             .ifPresent(bank -> {
                 var bankEntity = new BankEntity();
-                bankEntity.setUuid(UUID.fromString(bank.getId()));
+                bankEntity.setUuid(bank.getId());
                 bankEntity.setVersion(bank.getVersion());
                 bankEntity.setBic(bank.getBic());
                 bankEntity.setName(bank.getName());
@@ -333,7 +332,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 Optional.ofNullable(bank.getBankAccount())
                     .ifPresent(bankAccount -> {
                         var bankAccountEntity = new BankAccountEntity();
-                        bankAccountEntity.setUuid(UUID.fromString(bankAccount.getId()));
+                        bankAccountEntity.setUuid(bankAccount.getId());
                         bankAccountEntity.setVersion(bankAccount.getVersion());
                         bankAccountEntity.setAccount(bankAccount.getBankAccount());
                         bankAccountEntity.setBank(bankEntity);

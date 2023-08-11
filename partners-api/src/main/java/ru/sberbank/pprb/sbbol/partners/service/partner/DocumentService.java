@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сервис по работе с документами
@@ -22,7 +23,7 @@ public interface DocumentService {
      * @param id        Идентификатор документа
      * @return Документ
      */
-    Document getDocument(String digitalId, String id);
+    Document getDocument(String digitalId, UUID id);
 
     /**
      * Получение списка документов партнеров по заданному фильтру
@@ -63,7 +64,7 @@ public interface DocumentService {
      * @param partnerId Идентификатор партнера
      * @param document  Документ для создания/частичного обновления
      */
-    void saveOrPatchDocument(String digitalId, String partnerId, DocumentChangeFullModel document);
+    void saveOrPatchDocument(String digitalId, UUID partnerId, DocumentChangeFullModel document);
 
     /**
      * Создание/частичного обновление адресов
@@ -72,7 +73,7 @@ public interface DocumentService {
      * @param partnerId Идентификатор партнера
      * @param documents Список документов для создания/частичное обновление
      */
-    void saveOrPatchDocuments(String digitalId, String partnerId, Set<DocumentChangeFullModel> documents);
+    void saveOrPatchDocuments(String digitalId, UUID partnerId, Set<DocumentChangeFullModel> documents);
 
     /**
      * Удаление документа
@@ -80,5 +81,5 @@ public interface DocumentService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param ids       Идентификаторы документов
      */
-    void deleteDocuments(String digitalId, List<String> ids);
+    void deleteDocuments(String digitalId, List<UUID> ids);
 }

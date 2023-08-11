@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,7 +37,7 @@ public abstract class ContactMapperDecorator implements ContactMapper {
     private ContactEmailMapper emailMapper;
 
     @Override
-    public Contact toContact(ContactChangeFullModel contactChangeFullModel, String digitalId, String partnerId) {
+    public Contact toContact(ContactChangeFullModel contactChangeFullModel, String digitalId, UUID partnerId) {
         var contact = delegate.toContact(contactChangeFullModel, digitalId, partnerId);
         Optional.ofNullable(contact.getPhones())
             .ifPresent(phones ->
@@ -84,7 +85,7 @@ public abstract class ContactMapperDecorator implements ContactMapper {
         var upgradedInitialPhones = initialPhones.stream()
             .filter(initialPhone ->
                 updatedPhones.stream()
-                    .noneMatch(updatedPhone -> initialPhone.getUuid().toString().equals(updatedPhone.getId()))
+                    .noneMatch(updatedPhone -> initialPhone.getUuid().equals(updatedPhone.getId()))
             )
             .map(phoneMapper::toPhone)
             .collect(Collectors.toList());
@@ -107,7 +108,7 @@ public abstract class ContactMapperDecorator implements ContactMapper {
         var upgradedInitialEmails = initialEmails.stream()
             .filter(initialEmail ->
                 updatedEmails.stream()
-                    .noneMatch(updatedEmail -> initialEmail.getUuid().toString().equals(updatedEmail.getId()))
+                    .noneMatch(updatedEmail -> initialEmail.getUuid().equals(updatedEmail.getId()))
             )
             .map(emailMapper::toEmail)
             .collect(Collectors.toList());

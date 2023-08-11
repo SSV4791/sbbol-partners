@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
@@ -20,8 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
-
 abstract class AddressServiceImpl implements AddressService {
 
     public static final String DOCUMENT_NAME = "contact_address";
@@ -29,7 +26,7 @@ abstract class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
 
-    public AddressServiceImpl(
+    protected AddressServiceImpl(
         AddressRepository addressRepository,
         AddressMapper addressMapper
     ) {
@@ -39,8 +36,8 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional(readOnly = true)
-    public Address getAddress(String digitalId, String id) {
-        var address = addressRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+    public Address getAddress(String digitalId, UUID id) {
+        var address = addressRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return addressMapper.toAddress(address);
     }
@@ -93,18 +90,17 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public void deleteAddresses(String digitalId, List<String> ids) {
-        for (String id : ids) {
-            var uuid = mapUuid(id);
-            var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, uuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
+    public void deleteAddresses(String digitalId, List<UUID> ids) {
+        for (var id : ids) {
+            var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, id)
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
             addressRepository.delete(foundAddress);
         }
     }
 
     @Override
     @Transactional
-    public void saveOrPatchAddresses(String digitalId, String partnerId, Set<AddressChangeFullModel> addresses) {
+    public void saveOrPatchAddresses(String digitalId, UUID partnerId, Set<AddressChangeFullModel> addresses) {
         Optional.ofNullable(addresses)
             .ifPresent(addressList ->
                 addressList.forEach(addressChangeFullModel -> saveOrPatchAddress(digitalId, partnerId, addressChangeFullModel)));
@@ -112,8 +108,8 @@ abstract class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public void saveOrPatchAddress(String digitalId, String partnerId, AddressChangeFullModel addressChangeFullModel) {
-        if (StringUtils.hasText(addressChangeFullModel.getId())) {
+    public void saveOrPatchAddress(String digitalId, UUID partnerId, AddressChangeFullModel addressChangeFullModel) {
+        if (Objects.nonNull(addressChangeFullModel.getId())) {
             var address = addressMapper.toAddress(addressChangeFullModel, digitalId, partnerId);
             patchAddress(address);
         } else {
@@ -122,8 +118,8 @@ abstract class AddressServiceImpl implements AddressService {
         }
     }
 
-    private AddressEntity findAddressEntity(String digitalId, String addressId, Long version) {
-        var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(addressId))
+    private AddressEntity findAddressEntity(String digitalId, UUID addressId, Long version) {
+        var foundAddress = addressRepository.getByDigitalIdAndUuid(digitalId, addressId)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, addressId));
         if (!Objects.equals(version, foundAddress.getVersion())) {
             throw new OptimisticLockException(foundAddress.getVersion(), version);

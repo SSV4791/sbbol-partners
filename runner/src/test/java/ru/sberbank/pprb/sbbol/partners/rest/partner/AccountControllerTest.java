@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -87,7 +88,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenGkuAttributeIsDefinedAndIsTrue() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -119,7 +120,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenGkuAttributeIsDefinedAndIsFalse() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -153,7 +154,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testNegativeViewFilter_whenPaginationIsNull() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+            List<UUID> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
@@ -186,7 +187,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testNegativeViewFilter_whenPaginationCountAndOffsetIsNull() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+            List<UUID> account = List.of(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
@@ -229,7 +230,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedPartnerName() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -264,7 +265,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             var partnerWithoutAccount = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -298,7 +299,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedInn() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -332,7 +333,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedInn() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -366,7 +367,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedKpp() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -400,7 +401,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndDontContainsMatchedKpp() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -434,7 +435,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsNotMatchedPattern() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> account = new ArrayList<>();
+            List<UUID> account = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 account.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -468,7 +469,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsMatchedAccount() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> accounts = new ArrayList<>();
+            List<UUID> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -504,7 +505,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsPartAccount() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> accounts = new ArrayList<>();
+            List<UUID> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -540,7 +541,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndContainsIncorrectAccountNumber() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> accounts = new ArrayList<>();
+            List<UUID> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
             }
@@ -574,9 +575,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testViewFilter_whenPartnerSearchAttributeIsDefinedAndMatchWithName() {
         var accountsFilter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            List<String> accounts = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
-                accounts.add(createValidAccount(partner.getId(), partner.getDigitalId()).getId());
+                createValidAccount(partner.getId(), partner.getDigitalId());
             }
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
@@ -2328,7 +2328,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .inn(partner.getInn())
                 .kpp(partner.getKpp())
                 .name(partner.getOrgName()));
-        step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
+        step("Очищаем локальный кэш ЖКУ ИНН", () -> Objects.requireNonNull(cacheManager.getCache(CacheNames.IS_GKU_INN)).clear());
         List<AccountWithPartnerResponse> accountsWithPartner =
             step("Выполнение post-запроса /partner/account/get-at-requisites",
                 () -> post(
@@ -2882,8 +2882,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
             step("Подготовка тестовых данных - создание externalIds", () ->
                 List.of(
                     account.getId(),
-                    UUID.randomUUID().toString(),
-                    UUID.randomUUID().toString()
+                    UUID.randomUUID(),
+                    UUID.randomUUID()
                 ));
         var expectedResponse =
             step("Подготовка ожидаемого ответа", () ->
@@ -2937,7 +2937,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(actualResponse)
                 .isNotNull();
             assertThat(actualResponse.getMessage())
-                .isEqualTo("Invalid UUID string: " + externalIds.get(0));
+                .contains("Invalid UUID string: " + externalIds.get(0));
         });
     }
 

@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
@@ -22,8 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
-
 abstract class DocumentServiceImpl implements DocumentService {
 
     public static final String DOCUMENT_NAME = "document";
@@ -32,7 +29,7 @@ abstract class DocumentServiceImpl implements DocumentService {
     private final DocumentDictionaryRepository documentDictionaryRepository;
     private final DocumentMapper documentMapper;
 
-    public DocumentServiceImpl(
+    protected DocumentServiceImpl(
         DocumentRepository documentRepository,
         DocumentDictionaryRepository documentDictionaryRepository,
         DocumentMapper documentMapper
@@ -44,8 +41,8 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Document getDocument(String digitalId, String id) {
-        var document = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+    public Document getDocument(String digitalId, UUID id) {
+        var document = documentRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return documentMapper.toDocument(document);
     }
@@ -103,12 +100,11 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional
-    public void deleteDocuments(String digitalId, List<String> ids) {
-        for (String id : ids) {
-            var uuid = mapUuid(id);
-            var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, uuid);
+    public void deleteDocuments(String digitalId, List<UUID> ids) {
+        for (var id : ids) {
+            var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, id);
             if (foundDocument.isEmpty()) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
             documentRepository.delete(foundDocument.get());
         }
@@ -116,7 +112,7 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional
-    public void saveOrPatchDocuments(String digitalId, String partnerId, Set<DocumentChangeFullModel> documents) {
+    public void saveOrPatchDocuments(String digitalId, UUID partnerId, Set<DocumentChangeFullModel> documents) {
         Optional.ofNullable(documents)
             .ifPresent(documentList ->
                 documentList.forEach(documentChangeFullModel -> saveOrPatchDocument(digitalId, partnerId, documentChangeFullModel)));
@@ -124,8 +120,8 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional
-    public void saveOrPatchDocument(String digitalId, String partnerId, DocumentChangeFullModel documentChangeFullModel) {
-        if (StringUtils.hasText(documentChangeFullModel.getId())) {
+    public void saveOrPatchDocument(String digitalId, UUID partnerId, DocumentChangeFullModel documentChangeFullModel) {
+        if (Objects.nonNull((documentChangeFullModel.getId()))) {
             var document = documentMapper.toDocument(documentChangeFullModel, digitalId, partnerId);
             patchDocument(document);
         } else {
@@ -134,15 +130,15 @@ abstract class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    private DocumentEntity findDocumentEntity(String digitalId, String documentId, Long version, String documentTypeId) {
-        var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(documentId))
+    private DocumentEntity findDocumentEntity(String digitalId, UUID documentId, Long version, UUID documentTypeId) {
+        var foundDocument = documentRepository.getByDigitalIdAndUuid(digitalId, documentId)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, documentId));
         if (!Objects.equals(version, foundDocument.getVersion())) {
             throw new OptimisticLockException(foundDocument.getVersion(), version);
         }
-        if (StringUtils.hasText(documentTypeId)) {
+        if (Objects.nonNull((documentTypeId))) {
             var foundDocumentType =
-                documentDictionaryRepository.getByUuid(UUID.fromString(documentTypeId));
+                documentDictionaryRepository.getByUuid(documentTypeId);
             if (foundDocumentType.isEmpty()) {
                 throw new EntryNotFoundException("documentType", digitalId, documentId);
             }

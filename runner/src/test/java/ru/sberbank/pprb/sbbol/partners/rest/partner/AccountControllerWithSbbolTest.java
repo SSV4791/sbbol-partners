@@ -45,7 +45,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     void testViewAccount() {
         var filter = new AccountsFilter()
             .digitalId(randomAlphabetic(10))
-            .partnerIds(List.of(UUID.randomUUID().toString()))
+            .partnerIds(List.of(UUID.randomUUID()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0));
@@ -59,7 +59,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
 
     @Test
     void testCreateAccount() {
-        var account = getValidAccount("bcd979a0-47ab-4337-84b8-8b4160448391", randomAlphabetic(10));
+        var account = getValidAccount(UUID.fromString("bcd979a0-47ab-4337-84b8-8b4160448391"), randomAlphabetic(10));
         var response = post(baseRoutePath + "/account", HttpStatus.NOT_FOUND, account, Error.class);
         assertThat(response)
             .isNotNull();
@@ -70,9 +70,9 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
     @Test
     void testUpdateAccount() {
         var account = new AccountChange()
-            .id(UUID.randomUUID().toString())
+            .id(UUID.randomUUID())
             .digitalId(randomAlphabetic(10))
-            .partnerId(UUID.randomUUID().toString())
+            .partnerId(UUID.randomUUID())
             .comment("111111")
             .version(0L)
             .account("40802810500490014206")
@@ -95,7 +95,7 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
         var response = delete(
             baseRoutePath + "/accounts" + "/{digitalId}",
             HttpStatus.NOT_FOUND,
-            Map.of("ids", randomAlphabetic(10)),
+            Map.of("ids", UUID.randomUUID()),
             randomAlphabetic(10)
         ).as(Error.class);
         assertThat(response)

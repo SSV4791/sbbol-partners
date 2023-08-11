@@ -5,17 +5,13 @@
   "properties": {
     "entityId": {
       "type": "string",
-      "title": "Глобальный уникальный идентификатор подписи из БПС Подтверждения",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Глобальный уникальный идентификатор подписи из БПС Подтверждения"
     },
     "accountId": {
       "type": "string",
-      "title": "Идентификатор счёта или контрагента",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор счёта или контрагента"
     },
     "accountVersion": {
       "type": "integer",

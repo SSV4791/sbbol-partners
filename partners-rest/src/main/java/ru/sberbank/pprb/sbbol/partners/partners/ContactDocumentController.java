@@ -13,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Loggable
 @RestController
@@ -30,13 +31,13 @@ public class ContactDocumentController implements ContactDocumentApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+    public ResponseEntity<Void> delete(String digitalId, List<UUID> ids) {
         contactDocumentService.deleteDocuments(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Document> getById(String digitalId, String id) {
+    public ResponseEntity<Document> getById(String digitalId, UUID id) {
         return ResponseEntity.ok(contactDocumentService.getDocument(digitalId, id));
     }
 

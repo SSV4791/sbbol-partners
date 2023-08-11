@@ -14,7 +14,7 @@ public abstract class BaseException extends RuntimeException {
     private final Map<String, List<String>> errors = new HashMap<>();
     private final String logMessage;
 
-    public BaseException(Error.TypeEnum errorType, String text, String field, List<String> errors, ErrorCode errorCode, String logMessage) {
+    protected BaseException(Error.TypeEnum errorType, String text, String field, List<String> errors, ErrorCode errorCode, String logMessage) {
         this.errorType = errorType;
         this.text = text;
         this.errorCode = errorCode;
@@ -22,7 +22,7 @@ public abstract class BaseException extends RuntimeException {
         this.errors.put(field, errors);
     }
 
-    public BaseException(Error.TypeEnum errorType, String text, Map<String, List<String>> errors, ErrorCode errorCode, String logMessage) {
+    protected BaseException(Error.TypeEnum errorType, String text, Map<String, List<String>> errors, ErrorCode errorCode, String logMessage) {
         this.errorType = errorType;
         this.text = text;
         this.errorCode = errorCode;

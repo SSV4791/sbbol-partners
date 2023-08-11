@@ -13,23 +13,23 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 @Mapper(uses = {BaseMapper.class})
 public interface PhoneMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "unifiedUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid")
     Phone toPhone(PhoneEntity phone);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PhoneEntity toPhone(PhoneCreate phone);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     @Mapping(target = "lastModifiedDate", ignore = true)
     PhoneEntity toPhone(Phone phone);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     void updatePhone(Phone phone, @MappingTarget PhoneEntity foundPhone);
 }

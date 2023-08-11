@@ -6,6 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис по работе с подписями счётов Партнера
@@ -15,7 +16,7 @@ public interface AccountSignService {
     /**
      * Создание информации о подписи счетов Партнера
      *
-     * @param accountsSign новые данные о подписях счетов Партнера
+     * @param accountsSign  новые данные о подписях счетов Партнера
      * @param fraudMetaData метаданные для Фрод-мониторинга
      * @return Информация о подписях счетов партнера
      */
@@ -24,10 +25,10 @@ public interface AccountSignService {
     /**
      * Удаление информации о подписи счёта Партнера
      *
-     * @param digitalId Идентификатор личного кабинета
+     * @param digitalId  Идентификатор личного кабинета
      * @param accountIds Идентификаторы счетов
      */
-    void deleteAccountsSign(String digitalId, List<String> accountIds);
+    void deleteAccountsSign(String digitalId, List<UUID> accountIds);
 
     /**
      * Получение информации о подписи счёта Партнера
@@ -36,6 +37,6 @@ public interface AccountSignService {
      * @param accountId Идентификатор счёта
      * @return информация о подписи счёта Партнера
      */
-    AccountSignInfo getAccountSign(String digitalId, String accountId);
+    AccountSignInfo getAccountSign(String digitalId, UUID accountId);
 
 }

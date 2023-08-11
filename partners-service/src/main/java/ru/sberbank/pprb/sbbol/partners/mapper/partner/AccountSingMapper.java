@@ -19,8 +19,8 @@ import java.util.UUID;
 public interface AccountSingMapper {
 
     @Named("toSignAccount")
-    @Mapping(target = "entityId", source = "entityUuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "accountId", source = "accountUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "entityId", source = "entityUuid")
+    @Mapping(target = "accountId", source = "accountUuid")
     @Mapping(target = "digest", source = "digest")
     @Mapping(target = "sign", source = "sign")
     @Mapping(target = "externalDataFileId", source = "externalDataFileId")
@@ -33,8 +33,8 @@ public interface AccountSingMapper {
     @Mapping(target = "accountSignDetail", source = "sign", qualifiedByName = "toSignAccount")
     AccountSignInfo toSignAccount(SignEntity sign, String digitalId);
 
-    @Mapping(target = "entityUuid", source = "sing.entityId", qualifiedByName = "mapUuid")
-    @Mapping(target = "accountUuid", source = "sing.accountId", qualifiedByName = "mapUuid")
+    @Mapping(target = "entityUuid", source = "sing.entityId")
+    @Mapping(target = "accountUuid", source = "sing.accountId")
     @Mapping(target = "partnerUuid", source = "partnerUuid")
     @Mapping(target = "digitalId", source = "digitalId")
     @Mapping(target = "uuid", ignore = true)

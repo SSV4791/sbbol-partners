@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -123,8 +124,8 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        assertThat(response.getEmails().size())
-            .isEqualTo(4);
+        assertThat(response.getEmails())
+            .hasSize(4);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
@@ -332,14 +333,14 @@ public class PartnerEmailControllerTest extends AbstractIntegrationTest {
             .isNull();
     }
 
-    private static EmailCreate getEmail(String partnerUuid, String digitalId) {
+    private static EmailCreate getEmail(UUID partnerUuid, String digitalId) {
         return new EmailCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .email(RandomStringUtils.randomAlphabetic(10) + "@mail.ru");
     }
 
-    private static Email createEmail(String partnerUuid, String digitalId) {
+    private static Email createEmail(UUID partnerUuid, String digitalId) {
         var emailResponse = post(baseRoutePath, HttpStatus.CREATED, getEmail(partnerUuid, digitalId), Email.class);
         assertThat(emailResponse)
             .isNotNull();

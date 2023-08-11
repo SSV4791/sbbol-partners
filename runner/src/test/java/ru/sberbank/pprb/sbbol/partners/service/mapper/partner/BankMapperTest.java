@@ -16,7 +16,6 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.BankChangeFullModel;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,7 +36,7 @@ class BankMapperTest extends BaseUnitConfiguration {
         var expected = factory.manufacturePojo(Bank.class);
         var actual = bankMapper.toBank(expected);
         var account = new AccountEntity();
-        account.setUuid(UUID.fromString(expected.getAccountId()));
+        account.setUuid(expected.getAccountId());
         actual.setAccount(account);
         var bankAccount = actual.getBankAccount();
         bankAccount.setBank(actual);
@@ -79,7 +78,7 @@ class BankMapperTest extends BaseUnitConfiguration {
         Optional.ofNullable(bank.getBankAccount())
             .ifPresent(bankAccount -> {
                 var bankAccountEntity = new BankAccountEntity();
-                bankAccountEntity.setUuid(UUID.fromString(bankAccount.getId()));
+                bankAccountEntity.setUuid(bankAccount.getId());
                 bankAccountEntity.setVersion(bankAccount.getVersion());
                 bankAccountEntity.setAccount(bankAccount.getBankAccount());
                 bankAccountEntity.setBank(expectedBankEntity);

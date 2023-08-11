@@ -9,8 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
-import java.util.UUID;
-
 @Loggable
 public class PartnerAddressServiceImpl extends AddressServiceImpl {
 
@@ -28,9 +26,10 @@ public class PartnerAddressServiceImpl extends AddressServiceImpl {
     @Override
     @Transactional
     public Address saveAddress(AddressCreate address) {
-        var partner = partnerRepository.getByDigitalIdAndUuid(address.getDigitalId(), UUID.fromString(address.getUnifiedId()));
+        var partnerId = address.getUnifiedId();
+        var partner = partnerRepository.getByDigitalIdAndUuid(address.getDigitalId(), partnerId);
         if (partner.isEmpty()) {
-            throw new EntryNotFoundException("partner", address.getDigitalId());
+            throw new EntryNotFoundException("partner", partnerId);
         }
         return super.saveAddress(address);
     }

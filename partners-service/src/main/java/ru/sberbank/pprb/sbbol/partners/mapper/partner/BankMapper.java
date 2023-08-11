@@ -20,8 +20,8 @@ import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 @DecoratedWith(BankMapperDecorator.class)
 public interface BankMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "accountId", source = "account.uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "accountId", source = "account.uuid")
     Bank toBank(BankEntity bank);
 
     @Mapping(target = "account", ignore = true)
@@ -32,7 +32,7 @@ public interface BankMapper {
 
     Bank toBank(BankChangeFullModel bankChangeFullModel);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     BankEntity toBank(Bank bank);

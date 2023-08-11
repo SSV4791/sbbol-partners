@@ -9,6 +9,8 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactEmailMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ContactEmailMapperTest extends BaseUnitConfiguration {
@@ -44,7 +46,7 @@ class ContactEmailMapperTest extends BaseUnitConfiguration {
     void mapEmailChangeFullModelToEmail() {
         var emailChangeFullModel = factory.manufacturePojo(EmailChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var unifiedId = factory.manufacturePojo(String.class);
+        var unifiedId = UUID.randomUUID();
         var actualEmail = mapper.toEmail(emailChangeFullModel, digitalId, unifiedId);
         var expectedEmail = new Email()
             .id(emailChangeFullModel.getId())

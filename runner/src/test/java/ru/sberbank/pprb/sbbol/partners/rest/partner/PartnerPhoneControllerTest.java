@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +28,7 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMIS
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
-public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
+class PartnerPhoneControllerTest extends AbstractIntegrationTest {
 
     private static final String baseRoutePath = "/partner/phone";
 
@@ -124,8 +125,8 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        assertThat(response.getPhones().size())
-            .isEqualTo(4);
+        assertThat(response.getPhones())
+            .hasSize(4);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
@@ -334,14 +335,14 @@ public class PartnerPhoneControllerTest extends AbstractIntegrationTest {
             .isNull();
     }
 
-    private static PhoneCreate getPhone(String partnerUuid, String digitalId) {
+    private static PhoneCreate getPhone(UUID partnerUuid, String digitalId) {
         return new PhoneCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .phone(RandomStringUtils.randomNumeric(13));
     }
 
-    private static Phone createPhone(String partnerUuid, String digitalId) {
+    private static Phone createPhone(UUID partnerUuid, String digitalId) {
         var phoneResponse = post(baseRoutePath, HttpStatus.CREATED, getPhone(partnerUuid, digitalId), Phone.class);
         assertThat(phoneResponse)
             .isNotNull();

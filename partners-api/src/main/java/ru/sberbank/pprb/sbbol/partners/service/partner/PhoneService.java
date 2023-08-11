@@ -6,6 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис по работе с Телефонами
@@ -42,5 +43,5 @@ public interface PhoneService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param ids       Идентификаторы документов
      */
-    void deletePhones(String digitalId, List<String> ids);
+    void deletePhones(String digitalId, List<UUID> ids);
 }

@@ -12,12 +12,10 @@
     },
     "partnerIds": {
       "type": "array",
-      "x-extra-field-annotation": "@UuidFormatArrayValidation",
       "maximum": 30,
       "items": {
         "type": "string",
-        "minLength": 36,
-        "maxLength": 36,
+        "format": "uuid",
         "x-not-empty": true
       },
       "title": "Идентификаторы партнеров"
@@ -25,12 +23,10 @@
     "accountIds": {
       "title": "Идентификаторы счетов",
       "type": "array",
-      "x-extra-field-annotation": "@UuidFormatArrayValidation",
       "maximum": 30,
       "items": {
         "type": "string",
-        "minLength": 36,
-        "maxLength": 36,
+        "format": "uuid",
         "x-not-empty": true
       }
     },

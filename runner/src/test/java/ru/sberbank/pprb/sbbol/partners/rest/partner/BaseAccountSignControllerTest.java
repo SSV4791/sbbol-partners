@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import ru.sberbank.pprb.sbbol.partners.model.Error;
 
 @SuppressWarnings("java:S2187")
 public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
@@ -26,7 +26,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
 
     public static AccountsSignInfoResponse createValidAccountsSign(
         String digitalId,
-        String accountId,
+        UUID accountId,
         Long version,
         String base64FraudMetaData
     ) {
@@ -44,7 +44,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
 
     public static Error createInvalidAccountsSignWithInvalidFraudMetaData(
         String digitalId,
-        String accountId,
+        UUID accountId,
         Long version,
         String base64InvalidFraudMetaData
     ) {
@@ -60,7 +60,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    public static Error createAccountSignWithBadRequest(String digitalId, String accountId, Long version, String base64FraudMetaData) {
+    public static Error createAccountSignWithBadRequest(String digitalId, UUID accountId, Long version, String base64FraudMetaData) {
         var response = post(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
@@ -73,7 +73,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    public static Error createAccountSignWithNotFound(String digitalId, String accountId, Long version, String base64FraudMetaData) {
+    public static Error createAccountSignWithNotFound(String digitalId, UUID accountId, Long version, String base64FraudMetaData) {
         var response = post(
             baseRoutePath,
             HttpStatus.NOT_FOUND,
@@ -86,7 +86,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    public static ResponseBody deleteAccountSign(String digitalId, String accountId) {
+    public static ResponseBody deleteAccountSign(String digitalId, UUID accountId) {
         var deleteAccountSign =
             delete(
                 baseRoutePath + "/{digitalId}",
@@ -116,14 +116,14 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         return Map.of("Fraud-Meta-Data", base64FraudMetaData);
     }
 
-    public static AccountsSignInfo getValidAccountsSign(String digitalId, String accountId, Long version) {
+    public static AccountsSignInfo getValidAccountsSign(String digitalId, UUID accountId, Long version) {
         return new AccountsSignInfo()
             .digitalId(digitalId)
             .digitalUserId(RandomStringUtils.randomAlphabetic(10))
             .accountsSignDetail(
                 List.of(
                     new AccountSignDetail()
-                        .entityId(UUID.randomUUID().toString())
+                        .entityId(UUID.randomUUID())
                         .accountId(accountId)
                         .accountVersion(version)
                         .digest(RandomStringUtils.randomAlphabetic(10))
@@ -141,7 +141,7 @@ public class BaseAccountSignControllerTest extends AbstractIntegrationTest {
         for (var account : accounts) {
             accountSignDetails.add(
                 new AccountSignDetail()
-                    .entityId(UUID.randomUUID().toString())
+                    .entityId(UUID.randomUUID())
                     .accountId(account.getId())
                     .accountVersion(account.getVersion())
                     .digest(RandomStringUtils.randomAlphabetic(10))

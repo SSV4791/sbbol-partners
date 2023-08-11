@@ -12,21 +12,21 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 @Mapper(uses = {BaseMapper.class})
 public interface PartnerEmailMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "partner.uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "partner.uuid")
     Email toEmail(PartnerEmailEntity email);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "partner", ignore = true)
     PartnerEmailEntity toEmail(Email email);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "digitalId", ignore = true)
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerEmailEntity toEmail(EmailChangeFullModel email);
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
     EmailChangeFullModel toEmailChangeFullModel(PartnerEmailEntity email);
 }

@@ -45,14 +45,14 @@ public interface AccountMapper {
     @InheritConfiguration
     List<Account> toAccounts(List<AccountEntity> accounts);
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "partnerId", source = "partnerUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "partnerId", source = "partnerUuid")
     @Mapping(target = "budget", ignore = true)
     Account toAccount(AccountEntity account);
 
-    AccountChange toAccount(AccountChangeFullModel account, String digitalId, String partnerId);
+    AccountChange toAccount(AccountChangeFullModel account, String digitalId, UUID partnerId);
 
-    AccountCreate toAccountCreate(AccountChangeFullModel account, String digitalId, String partnerId);
+    AccountCreate toAccountCreate(AccountChangeFullModel account, String digitalId, UUID partnerId);
 
     @InheritConfiguration(name = "toAccount")
     Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
@@ -81,7 +81,7 @@ public interface AccountMapper {
     AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
+    @Mapping(target = "partnerUuid", source = "partnerId")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "state", constant = "NOT_SIGNED")
     @Mapping(target = "createDate", ignore = true)
@@ -93,7 +93,7 @@ public interface AccountMapper {
     AccountEntity toAccount(AccountCreate account);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
+    @Mapping(target = "partnerUuid", source = "partnerId")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
@@ -105,7 +105,7 @@ public interface AccountMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "partnerUuid", source = "partnerId", qualifiedByName = "mapUuid")
+    @Mapping(target = "partnerUuid", source = "partnerId")
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "priorityAccount", ignore = true)
@@ -117,7 +117,7 @@ public interface AccountMapper {
 
     @AfterMapping
     default void mapBidirectional(@MappingTarget AccountEntity account) {
-        var partnerUUID = account.getPartnerUuid().toString();
+        var partnerUUID = account.getPartnerUuid();
         var accountNumber = account.getAccount();
         String bic = null;
         String corAccount = null;
@@ -148,7 +148,7 @@ public interface AccountMapper {
     List<AccountWithPartnerResponse> toAccountsWithPartner(List<AccountEntity> accounts);
 
     @Mapping(target = "account", source = "accountDto")
-    @Mapping(target = "id", expression = "java(accountDto.getPartner().getUuid().toString())")
+    @Mapping(target = "id", source = "partner.uuid")
     @Mapping(target = "digitalId", source = "partner.digitalId")
     @Mapping(target = "legalForm", source = "partner.legalType")
     @Mapping(target = "orgName", source = "partner.orgName")
@@ -166,17 +166,17 @@ public interface AccountMapper {
         return List.of(toAccountWithPartner(partner));
     }
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
     @Mapping(target = "legalForm", source = "legalType")
     @Mapping(target = "account", ignore = true)
     AccountWithPartnerResponse toAccountWithPartner(PartnerEntity partner);
 
     default String prepareSearchField(
-        String partnerUUID,
+        UUID partnerUUID,
         String account,
         String bic,
         String corAccount
     ) {
-        return saveSearchString(partnerUUID, account, bic, corAccount);
+        return saveSearchString(partnerUUID.toString(), account, bic, corAccount);
     }
 }

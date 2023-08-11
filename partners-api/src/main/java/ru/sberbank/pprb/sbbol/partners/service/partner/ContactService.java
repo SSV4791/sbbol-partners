@@ -8,6 +8,7 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сервис по работе с контактами Партнера
@@ -21,7 +22,7 @@ public interface ContactService {
      * @param id        Идентификатор контакта
      * @return Контакт
      */
-    Contact getContact(String digitalId, String id);
+    Contact getContact(String digitalId, UUID id);
 
     /**
      * Получение списка контактов партнеров по заданному фильтру
@@ -62,7 +63,7 @@ public interface ContactService {
      * @param partnerId Идентификатор партнера
      * @param contact Коонтакт для создания/частичного обновления
      */
-    void saveOrPatchContact(String digitalId, String partnerId, ContactChangeFullModel contact);
+    void saveOrPatchContact(String digitalId, UUID partnerId, ContactChangeFullModel contact);
 
     /**
      * Создание/частичное обновление контактов партнера
@@ -71,7 +72,7 @@ public interface ContactService {
      * @param partnerId Идентификатор партнера
      * @param contacts Список контактов для создания/частичного обновления
      */
-    void saveOrPatchContacts(String digitalId, String partnerId, Set<ContactChangeFullModel> contacts);
+    void saveOrPatchContacts(String digitalId, UUID partnerId, Set<ContactChangeFullModel> contacts);
 
     /**
      * Удаление контакта Партнера
@@ -79,5 +80,5 @@ public interface ContactService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param ids       Идентификаторы контактов Партнера
      */
-    void deleteContacts(String digitalId, List<String> ids);
+    void deleteContacts(String digitalId, List<UUID> ids);
 }

@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сервис по работе с счётами Партнера
@@ -25,7 +26,7 @@ public interface AccountService {
      * @param id        Идентификатор счёта
      * @return Счёт
      */
-    Account getAccount(String digitalId, String id);
+    Account getAccount(String digitalId, UUID id);
 
     /**
      * Получение списка счётов партнеров по заданному фильтру
@@ -66,16 +67,16 @@ public interface AccountService {
      * @param partnerId Идентификатор партнера
      * @param account   Счет для создания/частичного обновления
      */
-    void saveOrPatchAccount(String digitalId, String partnerId, AccountChangeFullModel account);
+    void saveOrPatchAccount(String digitalId, UUID partnerId, AccountChangeFullModel account);
 
     /**
      * Создание/частичное обновление счетов партнера
      *
      * @param digitalId Идентификатор личного кабинета клиента
      * @param partnerId Идентификатор партнера
-     * @param accounts Список счетов для создания/частичного обновления
+     * @param accounts  Список счетов для создания/частичного обновления
      */
-    void saveOrPatchAccounts(String digitalId, String partnerId, Set<AccountChangeFullModel> accounts);
+    void saveOrPatchAccounts(String digitalId, UUID partnerId, Set<AccountChangeFullModel> accounts);
 
     /**
      * Удаление счёта Партнера
@@ -83,7 +84,7 @@ public interface AccountService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param ids       Идентификаторы счетов Партнера
      */
-    void deleteAccounts(String digitalId, List<String> ids);
+    void deleteAccounts(String digitalId, List<UUID> ids);
 
     /**
      * Изменение приоритетного счета

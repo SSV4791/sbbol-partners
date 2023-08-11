@@ -14,7 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BudgetMaskForm;
 @Mapper(uses = {BaseMapper.class})
 public interface BudgetMaskMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
     @Mapping(target = "maskType", source = "type", qualifiedByName = "toBudgetMaskType")
     BudgetMask toBudgetMask(BudgetMaskEntity budgetMask);
 
@@ -23,7 +23,7 @@ public interface BudgetMaskMapper {
         return budgetMaskType != null ? BudgetMaskForm.valueOf(budgetMaskType.name()) : null;
     }
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "type", source = "maskType", qualifiedByName = "toBudgetMaskType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)

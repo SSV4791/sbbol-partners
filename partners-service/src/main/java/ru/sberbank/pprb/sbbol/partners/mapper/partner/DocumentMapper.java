@@ -35,8 +35,8 @@ import java.util.stream.Collectors;
 )
 public interface DocumentMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "unifiedUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid")
     @Mapping(target = "documentType", source = "type")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     Document toDocument(DocumentEntity document);
@@ -62,7 +62,7 @@ public interface DocumentMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "certifierType", source = "document.certifierType", qualifiedByName = "toCertifierType")
-    @Mapping(target = "typeUuid", source = "document.documentTypeId", qualifiedByName = "mapUuid")
+    @Mapping(target = "typeUuid", source = "document.documentTypeId")
     @Mapping(target = "series", source = "document.series")
     @Mapping(target = "number", source = "document.number")
     @Mapping(target = "dateIssue", source = "document.dateIssue")
@@ -72,17 +72,17 @@ public interface DocumentMapper {
     @Mapping(target = "positionCertifier", source = "document.positionCertifier")
     DocumentEntity toDocument(DocumentCreateFullModel document, String digitalId, UUID unifiedUuid);
 
-    DocumentChange toDocument(DocumentChangeFullModel document, String digitalId, String unifiedId);
+    DocumentChange toDocument(DocumentChangeFullModel document, String digitalId, UUID unifiedId);
 
-    DocumentCreate toDocumentCreate(DocumentChangeFullModel document, String digitalId, String unifiedId);
+    DocumentCreate toDocumentCreate(DocumentChangeFullModel document, String digitalId, UUID unifiedId);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
-    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "mapUuid")
+    @Mapping(target = "typeUuid", source = "documentTypeId")
     DocumentEntity toDocument(DocumentCreate document);
 
     @Named("toCertifierType")
@@ -93,8 +93,8 @@ public interface DocumentMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
-    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
+    @Mapping(target = "typeUuid", source = "documentTypeId")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void updateDocument(DocumentChange document, @MappingTarget DocumentEntity documentEntity);
 
@@ -102,8 +102,8 @@ public interface DocumentMapper {
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
-    @Mapping(target = "typeUuid", source = "documentTypeId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
+    @Mapping(target = "typeUuid", source = "documentTypeId")
     @Mapping(target = "certifierType", source = "certifierType", qualifiedByName = "toCertifierType")
     void patchDocument(DocumentChange document, @MappingTarget DocumentEntity documentEntity);
 }

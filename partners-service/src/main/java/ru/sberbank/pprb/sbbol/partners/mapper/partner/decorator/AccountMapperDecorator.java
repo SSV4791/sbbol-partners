@@ -71,7 +71,7 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     }
 
     @Override
-    public AccountChange toAccount(AccountChangeFullModel accountChangeFullModel, String digitalId, String partnerId) {
+    public AccountChange toAccount(AccountChangeFullModel accountChangeFullModel, String digitalId, UUID partnerId) {
         var account = delegate.toAccount(accountChangeFullModel, digitalId, partnerId);
         Optional.ofNullable(account.getBank())
             .ifPresent(bank -> bank.setAccountId(account.getId()));

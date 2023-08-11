@@ -32,10 +32,11 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class PactData {
     public static final String DIGITAL_ID = "777";
-    public static final String UUID_ID = "00000000-1111-2222-3333-444444444444";
+    public static final UUID UUID_ID = UUID.fromString("00000000-1111-2222-3333-444444444444");
     public static final String DESCRIPTION = "SOME DESCRIPTION";
     public static final Integer ERROR_CODE = 100;
     public static final String MESSAGE = "SOME MESSAGE";

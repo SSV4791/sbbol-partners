@@ -5,8 +5,8 @@ import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
-import ru.sberbank.pprb.sbbol.partners.exception.ModelDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
+import ru.sberbank.pprb.sbbol.partners.exception.ModelDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
@@ -46,7 +46,6 @@ import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_DELE
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -114,8 +113,8 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional(readOnly = true)
-    public Partner getPartner(String digitalId, String id) {
-        PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, mapUuid(id))
+    public Partner getPartner(String digitalId, UUID id) {
+        PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id)
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         var response = partnerMapper.toPartner(partner);
@@ -210,7 +209,7 @@ public class PartnerServiceImpl implements PartnerService {
         var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
         partnerMapper.updatePartner(partner, foundPartner);
         PartnerEntity savePartner = partnerRepository.save(foundPartner);
-        var accountEntities = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, mapUuid(partnerId));
+        var accountEntities = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId);
         if (!isEmpty(accountEntities)) {
             var accounts = accountMapper.toAccounts(accountEntities);
             replicationService.updateCounterparty(accounts);
@@ -226,7 +225,6 @@ public class PartnerServiceImpl implements PartnerService {
     public PartnerFullModelResponse patchPartner(PartnerChangeFullModel partner) {
         var digitalId = partner.getDigitalId();
         var partnerId = partner.getId();
-        var partnerUuid = mapUuid(partnerId);
         var foundPartner = findPartnerEntity(digitalId, partnerId, partner.getVersion());
         checkPartnerDuplicate(partner, foundPartner);
         partnerMapper.patchPartner(partner, foundPartner);
@@ -235,16 +233,16 @@ public class PartnerServiceImpl implements PartnerService {
         partnerDocumentService.saveOrPatchDocuments(digitalId, partnerId, partner.getDocuments());
         contactService.saveOrPatchContacts(digitalId, partnerId, partner.getContacts());
         accountService.saveOrPatchAccounts(digitalId, partnerId, partner.getAccounts());
-        var addresses = addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid).stream()
+        var addresses = addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId).stream()
             .map(addressMapper::toAddress)
             .collect(Collectors.toList());
-        var documents = documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid).stream()
+        var documents = documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId).stream()
             .map(documentMapper::toDocument)
             .collect(Collectors.toList());
-        var contacts = contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid).stream()
+        var contacts = contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId).stream()
             .map(contactMapper::toContact)
             .collect(Collectors.toList());
-        var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid).stream()
+        var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId).stream()
             .map(accountMapper::toAccount)
             .collect(Collectors.toList());
         return partnerMapper.toPartnerMullResponse(savedPartner)
@@ -258,26 +256,25 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @Transactional
     @Audit(eventType = PARTNER_DELETE)
-    public void deletePartners(String digitalId, List<String> ids, FraudMetaData fraudMetaData) {
+    public void deletePartners(String digitalId, List<UUID> ids, FraudMetaData fraudMetaData) {
         deletePartners(digitalId, Set.copyOf(ids), fraudMetaData);
     }
 
-    private void deletePartners(String digitalId, Set<String> ids, FraudMetaData fraudMetaData) {
-        for (String partnerId : ids) {
-            var partnerUuid = mapUuid(partnerId);
-            PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
+    private void deletePartners(String digitalId, Set<UUID> ids, FraudMetaData fraudMetaData) {
+        for (UUID partnerId : ids) {
+            PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerId)
                 .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerUuid));
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
             if (nonNull(fraudMetaData)) {
                 fraudServiceManager
                     .getService(FraudEventType.DELETE_PARTNER)
                     .sendEvent(fraudMetaData, foundPartner);
             }
             partnerRepository.delete(foundPartner);
-            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
-            contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid));
-            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerUuid));
-            var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid);
+            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId));
+            contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId));
+            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId));
+            var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId);
             if (!isEmpty(accounts)) {
                 accountRepository.deleteAll(accounts);
                 replicationService.deleteCounterparties(accounts);
@@ -285,8 +282,8 @@ public class PartnerServiceImpl implements PartnerService {
         }
     }
 
-    private PartnerEntity findPartnerEntity(String digitalId, String partnerId, Long version) {
-        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, mapUuid(partnerId))
+    private PartnerEntity findPartnerEntity(String digitalId, UUID partnerId, Long version) {
+        PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerId)
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
         if (!Objects.equals(version, foundPartner.getVersion())) {
@@ -325,7 +322,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     private void checkPartnerDuplicate(Partner partner) {
         checkPartnerDuplicate(
-            UUID.fromString(partner.getId()),
+            partner.getId(),
             partner.getDigitalId(),
             partner.getInn(),
             partner.getKpp(),
@@ -350,7 +347,7 @@ public class PartnerServiceImpl implements PartnerService {
         var middleName = Optional.ofNullable(partner.getMiddleName())
             .orElse(partnerEntity.getMiddleName());
         checkPartnerDuplicate(
-            UUID.fromString(partner.getId()),
+            partner.getId(),
             partner.getDigitalId(),
             inn,
             kpp,

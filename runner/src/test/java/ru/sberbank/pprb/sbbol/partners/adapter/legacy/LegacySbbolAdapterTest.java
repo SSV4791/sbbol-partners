@@ -87,7 +87,7 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
     @DisplayName("Сббол Адаптер контрагенты. Проверка получения контрагента по ППРБ гуиду")
     void getByPprbGuidTest() {
         Counterparty result = adapter.getByPprbGuid(DIGITAL_ID, PPRB_GUID);
-        assertEquals(result.getPprbGuid(), PPRB_GUID);
+        assertEquals(PPRB_GUID, result.getPprbGuid());
     }
 
     /**

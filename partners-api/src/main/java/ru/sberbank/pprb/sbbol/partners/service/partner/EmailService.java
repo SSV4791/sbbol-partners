@@ -6,6 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис по работе с Электронными адресами
@@ -42,5 +43,5 @@ public interface EmailService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param ids       Идентификаторы документов
      */
-    void deleteEmails(String digitalId, List<String> ids);
+    void deleteEmails(String digitalId, List<UUID> ids);
 }

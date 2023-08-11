@@ -9,6 +9,8 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactPhoneMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ContactPhoneMapperTest extends BaseUnitConfiguration {
@@ -44,7 +46,7 @@ class ContactPhoneMapperTest extends BaseUnitConfiguration {
     void mapPhoneChangeFullModelToPhone() {
         var phoneChangeFullModel = factory.manufacturePojo(PhoneChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var unifiedId = factory.manufacturePojo(String.class);
+        var unifiedId = UUID.randomUUID();
         var actualPhone = mapper.toPhone(phoneChangeFullModel, digitalId, unifiedId);
         var expectedPhone = new Phone()
             .id(phoneChangeFullModel.getId())

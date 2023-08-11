@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for contact email
-  version: 1.1.1
+  version: 1.1.2
   description: OpenAPI Specification for contact email
 
 servers:
@@ -59,6 +59,7 @@ paths:
             type: array
             items:
               type: string
+              format: uuid
               maxItems: 200
           description: Идентификатор электронного адреса
       responses:

@@ -168,7 +168,7 @@ public interface RenterPartnerMapper {
     @Mapping(target = "flat", source = "address.flat")
     AddressEntity toAddress(RenterAddress address, UUID partnerUuid, String digitalId);
 
-    @Mapping(target = "uuid", source = "partnerUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "partnerUuid")
     @Mapping(target = "digitalId", source = "renter.digitalId")
     @Mapping(target = "series", source = "renter.dulSerie")
     @Mapping(target = "number", source = "renter.dulNumber")

@@ -18,6 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,8 +127,8 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        assertThat(response.getPhones().size())
-            .isEqualTo(4);
+        assertThat(response.getPhones())
+            .hasSize(4);
         assertThat(response.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
@@ -342,14 +343,14 @@ public class ContactPhoneControllerTest extends AbstractIntegrationTest {
             .isNull();
     }
 
-    private static PhoneCreate getPhone(String partnerUuid, String digitalId) {
+    private static PhoneCreate getPhone(UUID partnerUuid, String digitalId) {
         return new PhoneCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
             .phone(randomNumeric(13));
     }
 
-    private static Phone createPhone(String partnerUuid, String digitalId) {
+    private static Phone createPhone(UUID partnerUuid, String digitalId) {
         return post(baseRoutePath, HttpStatus.CREATED, getPhone(partnerUuid, digitalId), Phone.class);
     }
 
