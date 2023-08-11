@@ -1,5 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
+import com.sbt.pprb.integration.hibernate.standin.annotations.Replication;
+import com.sbt.pprb.integration.hibernate.standin.annotations.Standin;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,6 +34,10 @@ public class IdsHistoryEntity extends BaseEntity {
     @Column(name = "external_id", nullable = false)
     private UUID externalId;
 
+    @Standin(replication = Replication.DISABLED)
+    @Column(name = "pprb_entity_id", insertable = false, updatable = false)
+    private UUID pprbEntityId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pprb_entity_id")
     private AccountEntity account;
@@ -49,6 +56,14 @@ public class IdsHistoryEntity extends BaseEntity {
 
     public void setExternalId(UUID externalId) {
         this.externalId = externalId;
+    }
+
+    public UUID getPprbEntityId() {
+        return pprbEntityId;
+    }
+
+    public void setPprbEntityId(UUID pprbEntityId) {
+        this.pprbEntityId = pprbEntityId;
     }
 
     public AccountEntity getAccount() {
