@@ -106,7 +106,7 @@ pr_check:
     jenkins_job: 'OAFSIEKO/SBBOL/EFS/DEV/OpenShift/Deploy/sbbol-ufs/deploy-partners-DEV'
     label: 'prcheck'
     branch: 'release/3.2'
-    istio_tag: 'test_2.5'
+    istio_tag: '2.5'
   build_gradle:
     match:
       files:
@@ -196,7 +196,7 @@ release:
     parallel_build: true
     params_branch: master
     params_folder: develop
-    istio_tag: 'test_2.5'
+    istio_tag: '2.5'
     commit_or_tag: '02.007.00_0017_i-test_2.5'
     release_key: DCBBRAIN-4502
     reverse_and_publish: false
