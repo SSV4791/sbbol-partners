@@ -59,7 +59,6 @@ class BankMapperTest extends BaseUnitConfiguration {
             .ignoringFields(
                 "account",
                 "lastModifiedDate",
-                "intermediary",
                 "bankAccount.bank",
                 "bankAccount.lastModifiedDate"
             )
@@ -91,11 +90,9 @@ class BankMapperTest extends BaseUnitConfiguration {
                 "uuid",
                 "lastModifiedDate",
                 "account",
-                "intermediary",
                 "bankAccount.uuid",
                 "bankAccount.bank.uuid",
                 "bankAccount.bank.account",
-                "bankAccount.bank.intermediary",
                 "bankAccount.lastModifiedDate",
                 "account.uuid",
                 "account.search",
@@ -122,7 +119,6 @@ class BankMapperTest extends BaseUnitConfiguration {
             .ignoringFields(
                 "uuid",
                 "lastModifiedDate",
-                "intermediary",
                 "account",
                 "bankAccount.uuid",
                 "bankAccount.bank.uuid",

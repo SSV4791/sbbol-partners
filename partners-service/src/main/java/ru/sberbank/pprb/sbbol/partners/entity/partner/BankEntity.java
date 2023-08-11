@@ -1,8 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
-import com.sbt.pprb.integration.hibernate.standin.annotations.Replication;
-import com.sbt.pprb.integration.hibernate.standin.annotations.Standin;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -42,11 +39,6 @@ public class BankEntity extends BaseEntity {
     @Column(name = "bic", length = 9)
     private String bic;
 
-    @Column(name = "intermediary")
-    @ColumnDefault(value = "false")
-    @Standin(replication = Replication.DISABLED)
-    private Boolean intermediary;
-
     @OneToOne(mappedBy = "bank", cascade = CascadeType.ALL, orphanRemoval = true)
     private BankAccountEntity bankAccount;
 
@@ -80,14 +72,6 @@ public class BankEntity extends BaseEntity {
 
     public void setBankAccount(BankAccountEntity bankAccount) {
         this.bankAccount = bankAccount;
-    }
-
-    public Boolean getIntermediary() {
-        return intermediary;
-    }
-
-    public void setIntermediary(Boolean intermediary) {
-        this.intermediary = intermediary;
     }
 
     @Override
