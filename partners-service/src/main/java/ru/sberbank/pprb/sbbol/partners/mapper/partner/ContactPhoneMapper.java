@@ -9,21 +9,22 @@ import ru.sberbank.pprb.sbbol.partners.model.Phone;
 import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Loggable
 @Mapper(uses = {BaseMapper.class})
 public interface ContactPhoneMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "contact.uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "contact.uuid")
     Phone toPhone(ContactPhoneEntity phone);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "contact", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     ContactPhoneEntity toPhone(Phone phone);
 
-    Phone toPhone(PhoneChangeFullModel phone, String digitalId, String unifiedId);
+    Phone toPhone(PhoneChangeFullModel phone, String digitalId, UUID unifiedId);
 
     default String toPhoneStr(PhoneChangeFullModel phone) {
         return Optional.ofNullable(phone).map(PhoneChangeFullModel::getPhone).orElse(null);

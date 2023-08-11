@@ -27,7 +27,6 @@ import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_DELETE;
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 
 @Loggable
 public class AccountSignServiceImpl implements AccountSignService {
@@ -62,7 +61,7 @@ public class AccountSignServiceImpl implements AccountSignService {
         var digitalId = accountsSign.getDigitalId();
         response.setDigitalId(digitalId);
         for (var accountSign : accountsSign.getAccountsSignDetail()) {
-            var account = accountRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(accountSign.getAccountId()))
+            var account = accountRepository.getByDigitalIdAndUuid(digitalId, accountSign.getAccountId())
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountSign.getAccountId()));
             if (account.getState() == AccountStateType.SIGNED) {
                 throw new AccountAlreadySignedException(account.getAccount());
@@ -90,10 +89,9 @@ public class AccountSignServiceImpl implements AccountSignService {
     @Override
     @Transactional
     @Audit(eventType = SIGN_ACCOUNTS_DELETE)
-    public void deleteAccountsSign(String digitalId, List<String> accountIds) {
-        for (String accountId : accountIds) {
-            var accountUuid = mapUuid(accountId);
-            var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountUuid);
+    public void deleteAccountsSign(String digitalId, List<UUID> accountIds) {
+        for (var accountId : accountIds) {
+            var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountId);
             // Сделанно в рамках поддержания миграции чтоб не создавать пустушку для мигрированных подписанных счетов
             if (sign.isPresent()) {
                 SignEntity signEntity = sign.get();
@@ -103,12 +101,12 @@ public class AccountSignServiceImpl implements AccountSignService {
                     throw new EntryDeleteException(DOCUMENT_NAME, signEntity.getEntityUuid(), e);
                 }
             }
-            var account = accountRepository.getByDigitalIdAndUuid(digitalId, accountUuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountUuid));
+            var account = accountRepository.getByDigitalIdAndUuid(digitalId, accountId)
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
             try {
                 account.setState(AccountStateType.NOT_SIGNED);
                 accountRepository.save(account);
-                replicationService.deleteSign(digitalId, accountUuid);
+                replicationService.deleteSign(digitalId, accountId);
             } catch (RuntimeException e) {
                 throw new EntrySaveException(DOCUMENT_NAME, e);
             }
@@ -117,14 +115,13 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     @Override
     @Transactional(readOnly = true)
-    public AccountSignInfo getAccountSign(String digitalId, String accountId) {
-        var uuid = UUID.fromString(accountId);
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid);
+    public AccountSignInfo getAccountSign(String digitalId, UUID accountId) {
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountId);
         if (foundAccount.isEmpty()) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId);
         }
-        var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, uuid)
-            .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, uuid));
+        var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountId)
+            .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
         return accountSingMapper.toSignAccount(sign, digitalId);
     }
 }

@@ -164,7 +164,7 @@ class CorrespondentMigrationServiceTest extends AbstractIntegrationTest {
                 new MigrateReplicationGuidRequest(
                     account.getDigitalId(),
                     List.of(
-                        new MigrationReplicationGuidCandidate(UUID.randomUUID().toString(), account.getId())
+                        new MigrationReplicationGuidCandidate(UUID.randomUUID().toString(), account.getId().toString())
                     ))
             ),
             new TypeRef<>() {

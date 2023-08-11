@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис по работе с Партнерами
@@ -23,7 +24,7 @@ public interface PartnerService {
      * @param id        Идентификатор Партнера
      * @return Партнер
      */
-    Partner getPartner(String digitalId, String id);
+    Partner getPartner(String digitalId, UUID id);
 
     /**
      * Получение списка Партнеров по заданному фильтру
@@ -71,5 +72,5 @@ public interface PartnerService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param id        Идентификаторы Партнеров
      */
-    void deletePartners(String digitalId, List<String> id, FraudMetaData fraudMetaData);
+    void deletePartners(String digitalId, List<UUID> id, FraudMetaData fraudMetaData);
 }

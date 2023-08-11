@@ -99,8 +99,8 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     @Override
     public void createCounterparty(Account account) {
-        var partnerUuid = mapUuid(account.getPartnerId());
-        var accountUuid = mapUuid(account.getId());
+        var partnerUuid = account.getPartnerId();
+        var accountUuid = account.getId();
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .orElseThrow(() -> new EntryNotFoundException(PARTNER_ENTRY, partnerUuid));
@@ -126,8 +126,8 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     @Override
     public void updateCounterparty(Account account) {
-        var partnerUuid = mapUuid(account.getPartnerId());
-        var accountUuid = mapUuid(account.getId());
+        var partnerUuid = account.getPartnerId();
+        var accountUuid = account.getId();
         var digitalId = account.getDigitalId();
         var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerUuid)
             .orElseThrow(() -> new EntryNotFoundException(PARTNER_ENTRY, partnerUuid));

@@ -27,10 +27,10 @@ class BankAccountMapperTest extends BaseUnitConfiguration {
     @Test
     void testToBankAccount() {
         var expected = factory.manufacturePojo(BankAccount.class)
-            .id(UUID.randomUUID().toString());
+            .id(UUID.randomUUID());
         var actual = bankAccountMapper.toBankAccount(expected);
         var bank = new BankEntity();
-        bank.setUuid(UUID.fromString(expected.getBankId()));
+        bank.setUuid(expected.getBankId());
         actual.setBank(bank);
         assertThat(expected)
             .usingRecursiveComparison()

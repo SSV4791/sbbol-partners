@@ -5,10 +5,8 @@
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор адреса",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор адреса"
     },
     "version": {
       "type": "integer",
@@ -27,10 +25,8 @@
     },
     "unifiedId": {
       "type": "string",
-      "title": "Идентификатор партнера/контакта",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор партнера/контакта"
     },
     "zipCode": {
       "type": "string",

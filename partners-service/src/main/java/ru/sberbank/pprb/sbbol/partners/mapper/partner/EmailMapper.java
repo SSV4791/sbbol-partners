@@ -13,23 +13,23 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailCreate;
 @Mapper(uses = {BaseMapper.class})
 public interface EmailMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "unifiedUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid")
     Email toEmail(EmailEntity email);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     EmailEntity toEmail(EmailCreate email);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     EmailEntity toEmail(Email email);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     @Mapping(target = "lastModifiedDate", ignore = true)
     void updateEmail(Email email, @MappingTarget() EmailEntity foundEmail);
 }

@@ -5,6 +5,7 @@ import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.UUID;
 
 public interface IdsHistoryService {
 
@@ -16,5 +17,5 @@ public interface IdsHistoryService {
      * @return Список внутренних идентификаторов
      */
 
-    ExternalInternalIdLinksResponse getInternalIds(@NotEmpty String digitalId, @NotEmpty List<String> externalIds);
+    ExternalInternalIdLinksResponse getInternalIds(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds);
 }

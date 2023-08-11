@@ -67,7 +67,7 @@ class AddressMapperTest extends BaseUnitConfiguration {
     void mapAddressChangeFullModelToAddress() {
         var addressChangeFullModel = factory.manufacturePojo(AddressChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var unifiedId = factory.manufacturePojo(String.class);
+        var unifiedId = UUID.randomUUID();
         var actualAddress = mapper.toAddress(addressChangeFullModel, digitalId, unifiedId);
         var expectedAddress = new Address()
             .id(addressChangeFullModel.getId())
@@ -95,7 +95,7 @@ class AddressMapperTest extends BaseUnitConfiguration {
     void mapAddressChangeFullModelToAddressCreate() {
         var addressChangeFullModel = factory.manufacturePojo(AddressChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var unifiedId = factory.manufacturePojo(String.class);
+        var unifiedId = UUID.randomUUID();
         var actualAddressCreate = mapper.toAddressCreate(addressChangeFullModel, digitalId, unifiedId);
         var expectedAddressCreate = new AddressCreate()
             .digitalId(digitalId)

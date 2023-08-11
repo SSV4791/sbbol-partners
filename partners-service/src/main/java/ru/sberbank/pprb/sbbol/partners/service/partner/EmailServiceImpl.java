@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
-
 abstract class EmailServiceImpl implements EmailService {
 
     public static final String DOCUMENT_NAME = "email";
@@ -25,7 +23,7 @@ abstract class EmailServiceImpl implements EmailService {
     private final EmailRepository emailRepository;
     private final EmailMapper emailMapper;
 
-    public EmailServiceImpl(
+    protected EmailServiceImpl(
         EmailRepository emailRepository,
         EmailMapper emailMapper
     ) {
@@ -66,9 +64,9 @@ abstract class EmailServiceImpl implements EmailService {
     @Override
     @Transactional
     public Email updateEmail(Email email) {
-        var uuid = UUID.fromString(email.getId());
-        var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), uuid)
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
+        var emailId = email.getId();
+        var foundEmail = emailRepository.getByDigitalIdAndUuid(email.getDigitalId(), emailId)
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, emailId));
         if (!Objects.equals(email.getVersion(), foundEmail.getVersion())) {
             throw new OptimisticLockException(foundEmail.getVersion(), email.getVersion());
         }
@@ -81,12 +79,11 @@ abstract class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional
-    public void deleteEmails(String digitalId, List<String> ids) {
-        for (String id : ids) {
-            var uuid = mapUuid(id);
-            var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, uuid);
+    public void deleteEmails(String digitalId, List<UUID> ids) {
+        for (var id : ids) {
+            var foundEmail = emailRepository.getByDigitalIdAndUuid(digitalId, id);
             if (foundEmail.isEmpty()) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
             emailRepository.delete(foundEmail.get());
         }

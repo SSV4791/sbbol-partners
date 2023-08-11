@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,8 +88,8 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(responseWithFourElements)
                 .isNotNull();
-            assertThat(responseWithFourElements.getAddresses().size())
-                .isEqualTo(4);
+            assertThat(responseWithFourElements.getAddresses())
+                .hasSize(4);
         });
         var filterWithPagination = Allure.step("Подготовка фильтра с пагинацией", () -> {
             return new AddressesFilter()
@@ -108,8 +109,8 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(responseWithPagination)
                 .isNotNull();
-            assertThat(responseWithPagination.getAddresses().size())
-                .isEqualTo(4);
+            assertThat(responseWithPagination.getAddresses())
+                .hasSize(4);
             assertThat(responseWithPagination.getPagination().getHasNextPage())
                 .isEqualTo(Boolean.TRUE);
         });
@@ -352,7 +353,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             .body("message", equalTo("Искомая сущность contact_address с id: " + address.getId() + ", digitalId: " + address.getDigitalId() + " не найдена")));
     }
 
-    private static Address createValidAddress(String partnerUuid, String digitalId) {
+    private static Address createValidAddress(UUID partnerUuid, String digitalId) {
         return post(baseRoutePath + "/address", HttpStatus.CREATED, getValidPartnerAddress(partnerUuid, digitalId), Address.class);
     }
 
@@ -360,7 +361,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
         return post(baseRoutePath + "/address", HttpStatus.CREATED, address, Address.class);
     }
 
-    private static AddressCreate getValidPartnerAddress(String partnerUuid, String digitalId) {
+    private static AddressCreate getValidPartnerAddress(UUID partnerUuid, String digitalId) {
         return new AddressCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)

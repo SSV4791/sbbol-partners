@@ -10,8 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepo
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
-import java.util.UUID;
-
 @Loggable
 public class PartnerDocumentServiceImpl extends DocumentServiceImpl {
 
@@ -30,9 +28,10 @@ public class PartnerDocumentServiceImpl extends DocumentServiceImpl {
     @Override
     @Transactional
     public Document saveDocument(DocumentCreate document) {
-        var partner = partnerRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getUnifiedId()));
+        var partnerId = document.getUnifiedId();
+        var partner = partnerRepository.getByDigitalIdAndUuid(document.getDigitalId(), partnerId);
         if (partner.isEmpty()) {
-            throw new EntryNotFoundException("partner", document.getDigitalId());
+            throw new EntryNotFoundException("partner", partnerId);
         }
         return super.saveDocument(document);
     }

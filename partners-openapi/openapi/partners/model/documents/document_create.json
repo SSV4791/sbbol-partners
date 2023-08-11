@@ -5,10 +5,8 @@
   "properties": {
     "unifiedId": {
       "type": "string",
-      "title": "Идентификатор партнера или контакта",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор партнера или контакта"
     },
     "digitalId": {
       "type": "string",
@@ -19,10 +17,8 @@
     },
     "documentTypeId": {
       "type": "string",
-      "title": "Идентификатор типа документа",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор типа документа"
     },
     "series": {
       "type": "string",

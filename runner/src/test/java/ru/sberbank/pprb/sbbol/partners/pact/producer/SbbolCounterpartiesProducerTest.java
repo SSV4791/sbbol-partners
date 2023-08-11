@@ -32,7 +32,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @PactBroker
 @Provider("sbbol-partners--CIBPPRB")
-public class SbbolCounterpartiesProducerTest {
+class SbbolCounterpartiesProducerTest {
+
     private static final String HOST = "localhost";
     @LocalServerPort
     protected int port;

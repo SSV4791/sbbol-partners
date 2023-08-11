@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -23,8 +22,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 
 @Loggable
 public class ContactServiceImpl implements ContactService {
@@ -53,8 +50,8 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional(readOnly = true)
-    public Contact getContact(String digitalId, String id) {
-        var contact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(id))
+    public Contact getContact(String digitalId, UUID id) {
+        var contact = contactRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return contactMapper.toContact(contact);
     }
@@ -84,7 +81,7 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public Contact saveContact(ContactCreate contact) {
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(contact.getDigitalId(), UUID.fromString(contact.getPartnerId()));
+        var foundPartner = partnerRepository.getByDigitalIdAndUuid(contact.getDigitalId(), contact.getPartnerId());
         if (foundPartner.isEmpty()) {
             throw new EntryNotFoundException("partner", contact.getDigitalId(), contact.getPartnerId());
         }
@@ -111,20 +108,19 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public void deleteContacts(String digitalId, List<String> ids) {
-        for (String id : ids) {
-            var contactUuid = mapUuid(id);
-            var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactUuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactUuid));
+    public void deleteContacts(String digitalId, List<UUID> ids) {
+        for (var contactId : ids) {
+            var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactId)
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactId));
             contactRepository.delete(foundContact);
-            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
-            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactUuid));
+            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactId));
+            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactId));
         }
     }
 
     @Override
     @Transactional
-    public void saveOrPatchContacts(String digitalId, String partnerId, Set<ContactChangeFullModel> contacts) {
+    public void saveOrPatchContacts(String digitalId, UUID partnerId, Set<ContactChangeFullModel> contacts) {
         Optional.ofNullable(contacts)
             .ifPresent(contactList ->
                 contactList.forEach(contactChangeFullModel -> saveOrPatchContact(digitalId, partnerId, contactChangeFullModel)));
@@ -132,8 +128,8 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public void saveOrPatchContact(String digitalId, String partnerId, ContactChangeFullModel contactChangeFullModel) {
-        if (StringUtils.hasText(contactChangeFullModel.getId())) {
+    public void saveOrPatchContact(String digitalId, UUID partnerId, ContactChangeFullModel contactChangeFullModel) {
+        if (Objects.nonNull(contactChangeFullModel.getId())) {
             var contact = contactMapper.toContact(contactChangeFullModel, digitalId, partnerId);
             patchContact(contact);
         } else {
@@ -142,8 +138,8 @@ public class ContactServiceImpl implements ContactService {
         }
     }
 
-    private ContactEntity findContactEntity(String digitalId, String contactId, Long version) {
-        var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, UUID.fromString(contactId))
+    private ContactEntity findContactEntity(String digitalId, UUID contactId, Long version) {
+        var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactId)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactId));
         if (!Objects.equals(version, foundContact.getVersion())) {
             throw new OptimisticLockException(foundContact.getVersion(), version);

@@ -18,7 +18,7 @@ import java.util.Locale;
 @Configuration
 public class CustomLocaleResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
 
-    private final List<Locale> LOCALES = List.of(
+    private final List<Locale> locales = List.of(
         new Locale("ru"));
 
     @NotNull
@@ -27,7 +27,7 @@ public class CustomLocaleResolver extends AcceptHeaderLocaleResolver implements 
         String headerLang = request.getHeader("Accept-Language");
         return headerLang == null || headerLang.isEmpty()
             ? Locale.getDefault()
-            : Locale.lookup(Locale.LanguageRange.parse(headerLang), LOCALES);
+            : Locale.lookup(Locale.LanguageRange.parse(headerLang), locales);
     }
 
     @Bean

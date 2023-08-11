@@ -15,8 +15,8 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 @Mapper(uses = {BaseMapper.class})
 public interface BankAccountMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "bankId", source = "bank.uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "bankId", source = "bank.uuid")
     @Mapping(target = "bankAccount", source = "account")
     BankAccount toBankAccount(BankAccountEntity bankAccount);
 
@@ -27,7 +27,7 @@ public interface BankAccountMapper {
     @Mapping(target = "account", source = "bankAccount")
     BankAccountEntity toBankAccount(BankAccountCreate bankAccount);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "account", source = "bankAccount")

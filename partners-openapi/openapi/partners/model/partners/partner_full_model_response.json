@@ -5,9 +5,8 @@
   "properties": {
     "id": {
       "type": "string",
+      "format": "uuid",
       "title": "Уникальный идентификатор партнера",
-      "minLength": 36,
-      "maxLength": 36,
       "example": "8c4e48ff-1d06-47ab-83b1-fb6683cab6da"
     },
     "digitalId": {

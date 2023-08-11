@@ -1084,49 +1084,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testNegativeGetAllPartnersInvalidIds() {
-        var partnersFilter = step("Подготовка тестовых данных. Создание PartnersFilter", () -> {
-            var filter = podamFactory.manufacturePojo(PartnersFilter.class);
-            filter.setIds(List.of("", "invalid", UUID.randomUUID().toString()));
-            return filter;
-        });
-
-        var response = step("Выполнение POST-запроса /partners/view Ошибка валидации", () ->
-            post(
-                "/partners/view",
-                HttpStatus.BAD_REQUEST,
-                partnersFilter,
-                Error.class)
-        );
-
-        step("Проверка результата", () -> {
-            assertThat(response)
-                .isNotNull();
-            assertThat(response.getCode())
-                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-
-            var messages = response.getDescriptions().stream()
-                .flatMap(o -> o.getMessage().stream())
-                .collect(Collectors.toList());
-
-            assertThat(messages)
-                .isNotEmpty()
-                .asList()
-                .contains(MessagesTranslator.toLocale("validation.uuid_id.format"));
-
-            var fields = response.getDescriptions().stream()
-                .map(Descriptions::getField)
-                .collect(Collectors.toList());
-
-            assertThat(fields)
-                .isNotEmpty()
-                .asList()
-                .contains("ids[0]", "ids[1]")
-                .doesNotContain("ids[2]");
-        });
-    }
-
-    @Test
     void testNegativeGetAllPartners() {
         var digitalId = randomAlphabetic(10);
         var createdPartner1 = post(
@@ -2713,7 +2670,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление документов")
     @MethodSource("documentArgumentsForUpdatingPartnerFullModel")
     void testUpdatePartnerFullModel_changeDocument(Set<String> initialDocuments, Set<Pair<String, String>> updatedDocuments) {
-        var documentTypeId = "8a4d4464-64a1-4f3d-ab86-fd3be614f7a2";
+        var documentTypeId = UUID.fromString("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2");
         var createdFullModelPartner = step("Создание Партнера с документами", () -> {
             var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
             partnerCreateFullModel.setDocuments(
@@ -3141,14 +3098,9 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         });
         var partnerChangeFullModel = step("Подготавливаем запрос на обновление электронных адресов контакта", () -> {
             var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
-            Optional.ofNullable(contactEmailChangeFullModelList)
-                .ifPresent(it ->
-                    Optional.ofNullable(partnerChange.getContacts())
-                        .ifPresent(contacts ->
-                            contacts.forEach(contact ->
-                                contact.setEmails(new ArrayList<>(contactEmailChangeFullModelList)))
-                        )
-                );
+            Optional.ofNullable(contactEmailChangeFullModelList).flatMap(it -> Optional.ofNullable(partnerChange.getContacts())).ifPresent(contacts ->
+                contacts.forEach(contact ->
+                    contact.setEmails(new ArrayList<>(contactEmailChangeFullModelList))));
             return partnerChange;
         });
         var expectedContactEmails = step("Подготавливаем ожидаемый список электронных адресов контакта после обновления партнера", () -> {
@@ -3520,7 +3472,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                     .number(RandomStringUtils.randomAlphanumeric(50))
                     .series(RandomStringUtils.randomAlphanumeric(50))
                     .positionCertifier(RandomStringUtils.randomAlphanumeric(100))
-                    .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2")
+                    .documentTypeId(UUID.fromString("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2"))
                 )
             )
             .address(Set.of(new AddressCreateFullModel()

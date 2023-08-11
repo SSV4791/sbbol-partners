@@ -5,15 +5,13 @@
   "properties": {
     "externalId": {
       "type": "string",
-      "title": "Внешний идентификатор",
-      "minLength": 36,
-      "maxLength": 36
+      "format": "uuid",
+      "title": "Внешний идентификатор"
     },
     "internalId": {
       "type": "string",
-      "title": "Внутренний идентификатор",
-      "minLength": 36,
-      "maxLength": 36
+      "format": "uuid",
+      "title": "Внутренний идентификатор"
     }
   }
 }

@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Loggable
 @RestController
@@ -30,13 +31,13 @@ public class AccountSignController implements AccountsSignApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> accountIds) {
+    public ResponseEntity<Void> delete(String digitalId, List<UUID> accountIds) {
         accountSignService.deleteAccountsSign(digitalId, accountIds);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<AccountSignInfo> getById(String digitalId, String accountId) {
+    public ResponseEntity<AccountSignInfo> getById(String digitalId, UUID accountId) {
         return ResponseEntity.ok(accountSignService.getAccountSign(digitalId, accountId));
     }
 }

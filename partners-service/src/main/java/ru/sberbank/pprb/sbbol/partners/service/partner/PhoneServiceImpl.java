@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
-
 abstract class PhoneServiceImpl implements PhoneService {
 
     public static final String DOCUMENT_NAME = "phone";
@@ -25,7 +23,7 @@ abstract class PhoneServiceImpl implements PhoneService {
     private final PhoneRepository phoneRepository;
     private final PhoneMapper phoneMapper;
 
-    public PhoneServiceImpl(
+    protected PhoneServiceImpl(
         PhoneRepository phoneRepository,
         PhoneMapper phoneMapper
     ) {
@@ -66,9 +64,9 @@ abstract class PhoneServiceImpl implements PhoneService {
     @Override
     @Transactional
     public Phone updatePhone(Phone phone) {
-        var uuid = UUID.fromString(phone.getId());
-        var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid)
-            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, uuid));
+        var phoneId = phone.getId();
+        var foundPhone = phoneRepository.getByDigitalIdAndUuid(phone.getDigitalId(), phoneId)
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, phoneId));
         if (!Objects.equals(phone.getVersion(), foundPhone.getVersion())) {
             throw new OptimisticLockException(foundPhone.getVersion(), phone.getVersion());
         }
@@ -81,12 +79,11 @@ abstract class PhoneServiceImpl implements PhoneService {
 
     @Override
     @Transactional
-    public void deletePhones(String digitalId, List<String> ids) {
-        for (String id : ids) {
-            var uuid = mapUuid(id);
-            var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, uuid);
+    public void deletePhones(String digitalId, List<UUID> ids) {
+        for (var id : ids) {
+            var foundPhone = phoneRepository.getByDigitalIdAndUuid(digitalId, id);
             if (foundPhone.isEmpty()) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid);
+                throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
             phoneRepository.delete(foundPhone.get());
         }

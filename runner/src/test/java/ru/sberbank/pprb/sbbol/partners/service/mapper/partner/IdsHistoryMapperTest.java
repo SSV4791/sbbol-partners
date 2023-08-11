@@ -28,12 +28,12 @@ class IdsHistoryMapperTest extends BaseUnitConfiguration {
     void toAccountIdsByExternalIdsResponse() {
         var externalIds = step("Подготовка тестовых данных. Создание externalIds", () ->
             List.of(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
-                ));
+                UUID.randomUUID(),
+                UUID.randomUUID()
+            ));
         var idsHistoryEntities = step("Подготовка тестовых данных. Создание idsHistoryEntities", () -> {
             var idsHistoryEntity1 = factory.manufacturePojo(IdsHistoryEntity.class);
-            idsHistoryEntity1.setExternalId(UUID.fromString(externalIds.get(0)));
+            idsHistoryEntity1.setExternalId(externalIds.get(0));
             var idsHistoryEntity2 = factory.manufacturePojo(IdsHistoryEntity.class);
             return List.of(idsHistoryEntity1, idsHistoryEntity2);
         });
@@ -42,7 +42,7 @@ class IdsHistoryMapperTest extends BaseUnitConfiguration {
                 .addIdLinksItem(
                     new ExternalInternalIdLink()
                         .externalId(externalIds.get(0))
-                        .internalId(idsHistoryEntities.get(0).getAccount().getUuid().toString())
+                        .internalId(idsHistoryEntities.get(0).getAccount().getUuid())
                 )
                 .addIdLinksItem(
                     new ExternalInternalIdLink()

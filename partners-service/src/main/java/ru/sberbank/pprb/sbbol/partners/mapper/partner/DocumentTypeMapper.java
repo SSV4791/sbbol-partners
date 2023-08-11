@@ -20,13 +20,13 @@ import java.util.List;
 )
 public interface DocumentTypeMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
     @Mapping(target = "documentType", source = "systemName")
     DocumentType toDocumentType(DocumentTypeEntity documentType);
 
     List<DocumentType> toDocumentType(List<DocumentTypeEntity> documentType);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "systemName", source = "documentType")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)

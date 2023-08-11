@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 @Mapper(uses = {BaseMapper.class})
 public interface AddressMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "unifiedUuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     Address toAddress(AddressEntity address);
 
@@ -62,7 +62,7 @@ public interface AddressMapper {
     @Mapping(target = "flat", source = "address.flat")
     AddressEntity toAddress(AddressCreateFullModel address, String digitalId, UUID unifiedUuid);
 
-    @Mapping(target = "uuid", source = "address.id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "address.id")
     @Mapping(target = "version", source = "address.version")
     @Mapping(target = "unifiedUuid", source = "unifiedUuid")
     @Mapping(target = "digitalId", source = "digitalId")
@@ -77,10 +77,10 @@ public interface AddressMapper {
     @Mapping(target = "building", source = "address.building")
     @Mapping(target = "buildingBlock", source = "address.buildingBlock")
     @Mapping(target = "flat", source = "address.flat")
-    AddressEntity toAddress(AddressChangeFullModel address, String digitalId, UUID unifiedUuid);
+    AddressEntity toAddressEntity(AddressChangeFullModel address, String digitalId, UUID unifiedUuid);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
@@ -92,23 +92,23 @@ public interface AddressMapper {
     }
 
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     @Mapping(target = "type", source = "type", qualifiedByName = "toAddressType")
     AddressEntity toAddress(Address address);
 
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     void updateAddress(Address address, @MappingTarget() AddressEntity addressEntity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedId", qualifiedByName = "mapUuid")
+    @Mapping(target = "unifiedUuid", source = "unifiedId")
     void patchAddress(Address address, @MappingTarget() AddressEntity addressEntity);
 
-    Address toAddress(AddressChangeFullModel address, String digitalId, String unifiedId);
+    Address toAddress(AddressChangeFullModel address, String digitalId, UUID unifiedId);
 
-    AddressCreate toAddressCreate(AddressChangeFullModel address, String digitalId, String unifiedId);
+    AddressCreate toAddressCreate(AddressChangeFullModel address, String digitalId, UUID unifiedId);
 }

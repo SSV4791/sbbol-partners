@@ -19,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolC
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,32 +116,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testCreatePartnerDocumentWithEmptyUnifiedId() {
-        var errorText = "Поле обязательно для заполнения";
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var response = createPartnerDocumentWithErrors("", partner.getDigitalId());
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .contains(errorText);
-    }
-
-    @Test
-    void testCreatePartnerDocumentWithBadUnifiedId() {
-        var errorText = "размер должен находиться в диапазоне от 36 до 36";
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var response = createPartnerDocumentWithErrors(RandomStringUtils.randomAlphanumeric(37), partner.getDigitalId());
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        assertThat(response.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .contains(errorText);
-    }
-
-    @Test
     void testCreatePartnerDocumentWithBadRequest() {
         List<Descriptions> errorDescriptions = List.of(
             new Descriptions()
@@ -204,8 +179,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
                 Document.class,
                 document.getDigitalId(), document.getId()
             );
-        assertThat(actualDocument)
-            .isNotNull();
+
         assertThat(actualDocument)
             .isNotNull()
             .isEqualTo(document);
@@ -232,8 +206,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         );
         assertThat(responseForQuantity)
             .isNotNull();
-        assertThat(responseForQuantity.getDocuments().size())
-            .isEqualTo(2);
+        assertThat(responseForQuantity.getDocuments())
+            .hasSize(2);
     }
 
     @Test
@@ -255,7 +229,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(responseForQuantity)
             .isNotNull();
         assertThat(responseForQuantity.getDocuments())
-            .isEqualTo(null);
+            .isNull();
     }
 
     @Test
@@ -280,8 +254,8 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         );
         assertThat(responseForDocumentType)
             .isNotNull();
-        assertThat(responseForDocumentType.getDocuments().size())
-            .isEqualTo(2);
+        assertThat(responseForDocumentType.getDocuments())
+            .hasSize(2);
         assertThat(responseForDocumentType.getPagination().getHasNextPage())
             .isEqualTo(Boolean.TRUE);
     }
@@ -309,7 +283,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         assertThat(responseForDocumentType)
             .isNotNull();
         assertThat(responseForDocumentType.getDocuments())
-            .isEqualTo(null);
+            .isNull();
     }
 
     @Test
@@ -323,7 +297,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         updateDocument.unifiedId(document.getUnifiedId());
         updateDocument.number(newName);
         updateDocument.setVersion(document.getVersion());
-        updateDocument.documentTypeId("3422aec8-7f44-4089-9a43-f8e3c5b00722");
+        updateDocument.documentTypeId(UUID.fromString("3422aec8-7f44-4089-9a43-f8e3c5b00722"));
         Document newUpdateDocument = put(baseRoutePath + "/document", HttpStatus.OK, updateDocument, Document.class);
 
         assertThat(newUpdateDocument)
@@ -383,8 +357,6 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
                 Document.class,
                 document.getDigitalId(), document.getId()
             );
-        assertThat(actualDocument)
-            .isNotNull();
 
         assertThat(actualDocument)
             .isNotNull()
@@ -415,7 +387,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
     }
 
-    private static Document createValidPartnerDocument(String partnerUuid, String digitalId) {
+    private static Document createValidPartnerDocument(UUID partnerUuid, String digitalId) {
         var response = post(baseRoutePath + "/document", HttpStatus.CREATED, getValidPartnerDocument(partnerUuid, digitalId), Document.class);
         assertThat(response)
             .isNotNull();
@@ -429,7 +401,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    private static Error createPartnerDocumentWithErrors(String partnerUuid, String digitalId) {
+    private static Error createPartnerDocumentWithErrors(UUID partnerUuid, String digitalId) {
         var response = post(baseRoutePath + "/document", HttpStatus.BAD_REQUEST, getValidPartnerDocument(partnerUuid, digitalId), Error.class);
         assertThat(response)
             .isNotNull();
@@ -443,7 +415,7 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
         return response;
     }
 
-    private static DocumentCreate getValidPartnerDocument(String partnerUuid, String digitalId) {
+    private static DocumentCreate getValidPartnerDocument(UUID partnerUuid, String digitalId) {
         return new DocumentCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
@@ -455,14 +427,14 @@ public class PartnerDocumentControllerTest extends AbstractIntegrationTest {
             .number(RandomStringUtils.randomAlphanumeric(50))
             .series(RandomStringUtils.randomAlphanumeric(50))
             .positionCertifier(RandomStringUtils.randomAlphanumeric(100))
-            .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2");
+            .documentTypeId(UUID.fromString("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2"));
     }
 
-    private static DocumentCreate getEmptyPartnerDocument(String partnerUuid, String digitalId) {
+    private static DocumentCreate getEmptyPartnerDocument(UUID partnerUuid, String digitalId) {
         return new DocumentCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
-            .documentTypeId("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2");
+            .documentTypeId(UUID.fromString("8a4d4464-64a1-4f3d-ab86-fd3be614f7a2"));
     }
 
     public static DocumentChange updateDocument(Document document) {

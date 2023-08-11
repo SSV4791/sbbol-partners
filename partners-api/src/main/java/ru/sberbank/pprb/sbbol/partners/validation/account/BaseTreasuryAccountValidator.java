@@ -8,6 +8,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class BaseTreasuryAccountValidator extends BaseValidator {
@@ -24,7 +25,7 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
 
     protected boolean isBudgetCorrAccount(
         String digitalId,
-        String partnerId,
+        UUID partnerId,
         String corrAccount
     ) {
         if (isPartnerLegalFormNotLegalEntity(digitalId, partnerId)) {
@@ -79,7 +80,7 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
         return isBudgetCorrAccount(corrAccount);
     }
 
-    private boolean isPartnerLegalFormNotLegalEntity(String digitalId, String partnerId) {
+    private boolean isPartnerLegalFormNotLegalEntity(String digitalId, UUID partnerId) {
         if (ObjectUtils.isEmpty(digitalId) || ObjectUtils.isEmpty(partnerId)) {
             return true;
         }

@@ -13,7 +13,6 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 abstract class BaseRepository<T, F> {
 
@@ -56,16 +55,13 @@ abstract class BaseRepository<T, F> {
 
     abstract void pagination(TypedQuery<T> query, F filter);
 
-    protected void inPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<?> root, String field, List<String> ids) {
+    protected void inPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<?> root, String field, List<UUID> ids) {
         if (!CollectionUtils.isEmpty(ids)) {
-            List<UUID> uuids = ids.stream()
-                .map(UUID::fromString)
-                .collect(Collectors.toList());
             if (ids.size() == 1) {
-                predicates.add(builder.equal(root.get(field), uuids.get(0)));
+                predicates.add(builder.equal(root.get(field), ids.get(0)));
             } else {
                 predicates.add(
-                    root.get(field).in(uuids)
+                    root.get(field).in(ids)
                 );
             }
         }

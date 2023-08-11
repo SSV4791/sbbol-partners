@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -44,7 +44,6 @@ import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_UPDATE;
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
@@ -77,8 +76,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional(readOnly = true)
-    public Account getAccount(String digitalId, String id) {
-        var account = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(id))
+    public Account getAccount(String digitalId, UUID id) {
+        var account = accountRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return accountMapper.toAccount(account, budgetMaskService);
     }
@@ -112,7 +111,7 @@ public class AccountServiceImpl implements AccountService {
     public Account saveAccount(AccountCreate account) {
         checkAccountDuplicate(account);
         var digitalId = account.getDigitalId();
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, mapUuid(account.getPartnerId()));
+        var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, account.getPartnerId());
         if (foundPartner.isEmpty()) {
             throw new EntryNotFoundException("partner", digitalId, account.getPartnerId());
         }
@@ -152,11 +151,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     @Audit(eventType = ACCOUNTS_DELETE)
-    public void deleteAccounts(String digitalId, List<String> ids) {
-        for (String id : ids) {
-            var uuid = mapUuid(id);
-            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, uuid)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, uuid));
+    public void deleteAccounts(String digitalId, List<UUID> ids) {
+        for (var accountId : ids) {
+            var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountId)
+                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
             try {
                 accountRepository.delete(foundAccount);
                 var foundAccountUuid = foundAccount.getUuid();
@@ -174,7 +172,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public Account changePriority(AccountPriority accountPriority) {
         var digitalId = accountPriority.getDigitalId();
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(accountPriority.getId()))
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountPriority.getId())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountPriority.getId()));
         var foundPriorityAccounts = accountRepository
             .findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(digitalId, foundAccount.getPartnerUuid());
@@ -245,7 +243,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public void saveOrPatchAccounts(String digitalId, String partnerId, Set<AccountChangeFullModel> accounts) {
+    public void saveOrPatchAccounts(String digitalId, UUID partnerId, Set<AccountChangeFullModel> accounts) {
         Optional.ofNullable(accounts)
             .ifPresent(addressList ->
                 addressList.forEach(accountChangeFullModel -> saveOrPatchAccount(digitalId, partnerId, accountChangeFullModel)));
@@ -253,8 +251,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public void saveOrPatchAccount(String digitalId, String partnerId, AccountChangeFullModel accountChangeFullModel) {
-        if (StringUtils.hasText(accountChangeFullModel.getId())) {
+    public void saveOrPatchAccount(String digitalId, UUID partnerId, AccountChangeFullModel accountChangeFullModel) {
+        if (Objects.nonNull(accountChangeFullModel.getId())) {
             var account = accountMapper.toAccount(accountChangeFullModel, digitalId, partnerId);
             patchAccount(account);
         } else {
@@ -263,8 +261,8 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private AccountEntity findAccountEntity(String digitalId, String accountId, Long version) {
-        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(accountId))
+    private AccountEntity findAccountEntity(String digitalId, UUID accountId, Long version) {
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountId)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
         if (!Objects.equals(version, foundAccount.getVersion())) {
             throw new OptimisticLockException(foundAccount.getVersion(), version);
@@ -363,9 +361,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private void checkAccountDuplicate(
-        String accountUuid,
+        UUID accountUuid,
         String digitalId,
-        String partnerUuid,
+        UUID partnerUuid,
         String account,
         String bic,
         String corAccount

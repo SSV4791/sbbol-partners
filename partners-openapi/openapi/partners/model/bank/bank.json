@@ -6,17 +6,13 @@
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор"
     },
     "accountId": {
       "type": "string",
-      "title": "Идентификатор счёта партнера",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор счёта партнера"
     },
     "version": {
       "type": "integer",

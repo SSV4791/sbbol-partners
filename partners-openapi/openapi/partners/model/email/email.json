@@ -5,10 +5,8 @@
   "properties": {
     "id": {
       "type": "string",
-      "title": "Идентификатор электронного адреса",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор электронного адреса"
     },
     "digitalId": {
       "type": "string",
@@ -19,10 +17,8 @@
     },
     "unifiedId": {
       "type": "string",
-      "title": "Идентификатор партнера или контакта",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор партнера или контакта"
     },
     "email": {
       "type": "string",

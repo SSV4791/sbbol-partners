@@ -28,8 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.ERROR;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.CANCEL;
+import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.ERROR;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.INIT;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_COUNTERPARTY;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_SIGN;
@@ -87,7 +87,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             partner.getId(),
             partner.getDigitalId()
         );
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             CREATING_COUNTERPARTY,
@@ -118,7 +118,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         );
         var createdAccounts = createdPartner.getAccounts();
         for (var account : createdAccounts) {
-            var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+            var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
             checkReplicationEntityList(
                 actualReplicationEntities,
                 CREATING_COUNTERPARTY,
@@ -155,7 +155,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             partner,
             Partner.class
         );
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             UPDATING_COUNTERPARTY,
@@ -189,7 +189,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .when(legacySbbolAdapter)
             .getByPprbGuid(any(), any());
         changeAccount(updateAccount(account));
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             UPDATING_COUNTERPARTY,
@@ -223,7 +223,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .when(legacySbbolAdapter)
             .getByPprbGuid(any(), any());
         deleteAccount(account.getDigitalId(), account.getId());
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             DELETING_COUNTERPARTY,
@@ -263,7 +263,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             Map.of("Fraud-Meta-Data", getBase64FraudMetaData()),
             partner.getDigitalId()
         ).getBody();
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             DELETING_COUNTERPARTY,
@@ -297,7 +297,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .when(legacySbbolAdapter)
             .getByPprbGuid(any(), any());
         createValidAccountsSign(account.getDigitalId(), account.getId(), account.getVersion(), getBase64FraudMetaData());
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             CREATING_SIGN,
@@ -307,6 +307,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             0
         );
     }
+
     @Test
     void testDeletingSignReplica_whenDeletingSignAccount() throws JsonProcessingException {
         doReturn(false)
@@ -331,7 +332,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         createValidAccountsSign(account.getDigitalId(), account.getId(), account.getVersion(), getBase64FraudMetaData());
         deleteAccountSign(account.getDigitalId(), account.getId());
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             DELETING_SIGN,
@@ -343,7 +344,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testRaceConditionResolver_whenUpdatingAccount() throws JsonProcessingException, InterruptedException {
+    void testRaceConditionResolver_whenUpdatingAccount() {
         doReturn(false)
             .when(legacySbbolAdapter)
             .checkNotMigration(any());
@@ -365,7 +366,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .when(legacySbbolAdapter)
             .getByPprbGuid(any(), any());
         var updatedAccount = changeAccount(updateAccount(account));
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             UPDATING_COUNTERPARTY,
@@ -375,7 +376,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             0
         );
         replicationJob.run();
-        actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         checkReplicationEntityList(
             actualReplicationEntities,
             UPDATING_COUNTERPARTY,
@@ -388,7 +389,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .when(legacySbbolAdapter)
             .update(any(), any());
         changeAccount(updateAccount(updatedAccount));
-        actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         assertThat(actualReplicationEntities)
             .isNotNull();
         checkReplicationEntityList(
@@ -401,7 +402,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testRaceConditionResolver_whenCreatingAccount() throws JsonProcessingException, InterruptedException {
+    void testRaceConditionResolver_whenCreatingAccount() {
         doReturn(false)
             .when(legacySbbolAdapter)
             .checkNotMigration(any());
@@ -418,8 +419,8 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             partner.getId(),
             partner.getDigitalId()
         );
-        var actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
-        actualReplicationEntities = replicationRepository.findByEntityId(UUID.fromString(account.getId()));
+        var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
+        actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         assertThat(actualReplicationEntities)
             .isNotNull();
         checkReplicationEntityList(
@@ -435,7 +436,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         List<ReplicationEntity> actualEntities,
         ReplicationEntityType expectedEntityType,
         String expectedDigitalId,
-        String expectedAccountId,
+        UUID expectedAccountId,
         ReplicationEntityStatus entityStatus
     ) {
         checkReplicationEntityList(
@@ -452,7 +453,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         List<ReplicationEntity> actualEntities,
         ReplicationEntityType expectedEntityType,
         String expectedDigitalId,
-        String expectedAccountId,
+        UUID expectedAccountId,
         ReplicationEntityStatus entityStatus,
         Integer retry
     ) {
@@ -460,7 +461,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .isNotEmpty();
         var expectedReplicationEntity = new ReplicationEntity()
             .digitalId(expectedDigitalId)
-            .entityId(UUID.fromString(expectedAccountId))
+            .entityId(expectedAccountId)
             .entityType(expectedEntityType)
             .entityStatus(entityStatus);
         var actualReplicationEntities = actualEntities.stream()

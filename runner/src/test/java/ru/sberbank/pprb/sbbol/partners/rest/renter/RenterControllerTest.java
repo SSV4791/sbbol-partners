@@ -246,7 +246,7 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .as(RenterListResponse.class);
 
         assertThat(response).isNotNull();
-        assertThat(response.getItems().size()).isZero();
+        assertThat(response.getItems()).isEmpty();
 
         Renter renter = getValidRenter();
         renter.setDigitalId(filter.getDigitalId());
@@ -270,7 +270,7 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(RenterListResponse.class);
         assertThat(response).isNotNull();
-        assertThat(response.getItems().size()).isEqualTo(1);
+        assertThat(response.getItems()).hasSize(1);
 
         Renter renter2 = getValidRenter();
         renter2.setDigitalId(filter.getDigitalId());
@@ -293,6 +293,6 @@ class RenterControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(RenterListResponse.class);
         assertThat(response).isNotNull();
-        assertThat(response.getItems().size()).isEqualTo(2);
+        assertThat(response.getItems()).hasSize(2);
     }
 }

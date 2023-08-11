@@ -12,21 +12,21 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 @Mapper(uses = {BaseMapper.class})
 public interface PartnerPhoneMapper {
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
-    @Mapping(target = "unifiedId", source = "partner.uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "unifiedId", source = "partner.uuid")
     Phone toPhone(PartnerPhoneEntity phone);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerPhoneEntity toPhone(Phone phone);
 
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "digitalId", ignore = true)
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     PartnerPhoneEntity toPhone(PhoneChangeFullModel phone);
 
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
     PhoneChangeFullModel toPhoneChangeFullModel(PartnerPhoneEntity phone);
 }

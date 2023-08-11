@@ -54,7 +54,7 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.p
 public interface PartnerMapper {
 
     @Mapping(target = "gku", ignore = true)
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     Partner toPartner(PartnerEntity partner);
@@ -138,7 +138,7 @@ public interface PartnerMapper {
 
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "uuid", source = "id", qualifiedByName = "mapUuid")
+    @Mapping(target = "uuid", source = "id")
     @Mapping(target = "orgName", source = "orgName", qualifiedByName = "toTrimmed")
     @Mapping(target = "firstName", source = "firstName", qualifiedByName = "toTrimmed")
     @Mapping(target = "secondName", source = "secondName", qualifiedByName = "toTrimmed")
@@ -216,7 +216,7 @@ public interface PartnerMapper {
     }
 
     @Mapping(target = "gku", ignore = true)
-    @Mapping(target = "id", source = "uuid", qualifiedByName = "mapUuid")
+    @Mapping(target = "id", source = "uuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "accounts", ignore = true)

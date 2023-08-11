@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,8 +93,8 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response1)
                 .isNotNull();
-            assertThat(response1.getDocuments().size())
-                .isEqualTo(4);
+            assertThat(response1.getDocuments())
+                .hasSize(4);
         });
 
         DocumentsFilter filter2 = Allure.step("Формирование списка документов (тип документа = паспорт РФ)", () -> new DocumentsFilter()
@@ -112,8 +113,8 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response2)
                 .isNotNull();
-            assertThat(response2.getDocuments().size())
-                .isEqualTo(4);
+            assertThat(response2.getDocuments())
+                .hasSize(4);
             assertThat(response2.getPagination().getHasNextPage())
                 .isEqualTo(Boolean.TRUE);
         });
@@ -122,8 +123,8 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("POST /partner/contact/documents/view с пустым телом запроса")
     void testViewContactDocumentWithEmptyBodyResponse() {
-        DocumentsFilter filter = Allure.step("Подготовка тестовых данных", () -> new DocumentsFilter());
-        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view, код ответа 400", () -> post (
+        DocumentsFilter filter = Allure.step("Подготовка тестовых данных", DocumentsFilter::new);
+        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view, код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter,
@@ -147,7 +148,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             assertThat(response.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             for (var text : response.getDescriptions()) {
-                assertThat(errorTexts.contains(text)).isTrue();
+                assertThat(errorTexts).contains(text);
             }
         });
     }
@@ -160,7 +161,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .pagination(new Pagination()
                 .count(4)
                 .offset(0)));
-        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view (digitalId равен null), код ответа 400", () -> post (
+        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view (digitalId равен null), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter,
@@ -173,17 +174,17 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             Optional<Descriptions> description = response.getDescriptions().stream()
                 .filter(value -> value.getField().equals("digitalId")).findFirst();
-            assertThat(description.isPresent()).isTrue();
+            assertThat(description).isPresent();
             assertThat(description.get().getMessage()).contains("Поле обязательно для заполнения");
         });
 
         DocumentsFilter filter2 = Allure.step("Формирование списка документов (digitalId пуст)", () -> new DocumentsFilter()
             .digitalId("")
-            .unifiedIds(List.of(""))
+            .unifiedIds(List.of(UUID.randomUUID()))
             .pagination(new Pagination()
                 .count(4)
                 .offset(0)));
-        var response2 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (digitalId пуст), код ответа 400", () -> post (
+        var response2 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (digitalId пуст), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter2,
@@ -196,7 +197,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             Optional<Descriptions> description2 = response2.getDescriptions().stream()
                 .filter(value -> value.getField().equals("digitalId")).findFirst();
-            assertThat(description2.isPresent()).isTrue();
+            assertThat(description2).isPresent();
             assertThat(description2.get().getMessage()).contains("Поле обязательно для заполнения");
         });
     }
@@ -204,15 +205,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("POST /partner/contact/documents/view негативные проверки pagination")
     void testTest() {
-        Partner partner = Allure.step("Подготовка тестовых данных", () -> {
-            Partner partnerContact = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-            return partnerContact;
-        });
+        Partner partner = Allure.step("Подготовка тестовых данных", () ->
+            createValidPartner(RandomStringUtils.randomAlphabetic(10)));
 
         DocumentsFilter filter = Allure.step("Подготовка фильтра (pagination равен null)", () -> new DocumentsFilter()
             .digitalId(partner.getDigitalId())
             .pagination(null));
-        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view (pagination равен null), код ответа 400", () -> post (
+        var response = Allure.step("Выполнение post-запроса /partner/contact/documents/view (pagination равен null), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter,
@@ -225,7 +224,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             Optional<Descriptions> description = response.getDescriptions().stream()
                 .filter(value -> value.getField().equals("pagination")).findFirst();
-            assertThat(description.isPresent()).isTrue();
+            assertThat(description).isPresent();
             assertThat(description.get().getMessage()).contains("Поле обязательно для заполнения");
         });
 
@@ -233,7 +232,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .digitalId(partner.getDigitalId())
             .pagination(new Pagination()
                 .offset(0)));
-        var response2 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (count отсутсвует в теле запроса), код ответа 400", () -> post (
+        var response2 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (count отсутсвует в теле запроса), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter2,
@@ -246,7 +245,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             Optional<Descriptions> description2 = response2.getDescriptions().stream()
                 .filter(value -> value.getField().equals("pagination.count")).findFirst();
-            assertThat(description2.isPresent()).isTrue();
+            assertThat(description2).isPresent();
             assertThat(description2.get().getMessage()).contains("Поле обязательно для заполнения");
         });
 
@@ -254,7 +253,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .digitalId(partner.getDigitalId())
             .pagination(new Pagination()
                 .count(4)));
-        var response3 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (offset отсутсвует в теле запроса), код ответа 400", () -> post (
+        var response3 = Allure.step("Выполнение post-запроса /partner/contact/documents/view (offset отсутсвует в теле запроса), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter3,
@@ -267,7 +266,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
             Optional<Descriptions> description3 = response3.getDescriptions().stream()
                 .filter(value -> value.getField().equals("pagination.offset")).findFirst();
-            assertThat(description3.isPresent()).isTrue();
+            assertThat(description3).isPresent();
             assertThat(description3.get().getMessage()).contains("Поле обязательно для заполнения");
         });
     }
@@ -354,7 +353,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             assertThat(updateDocument.getCode())
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
             assertThat(updateDocument.getMessage())
-                .isEqualTo("Искомая сущность document с id: "+ document.getId() + ", digitalId: " + document.getDigitalId() + " не найдена");
+                .isEqualTo("Искомая сущность document с id: " + document.getId() + ", digitalId: " + document.getDigitalId() + " не найдена");
         });
     }
 
@@ -467,11 +466,11 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             return createValidContactDocument(contact.getId(), contact.getDigitalId());
         });
         Allure.step("Выполнение delete-запроса /partner/contact/documents/{digitalId}(удаление документа), код ответа 204", () -> delete(
-                baseRoutePath + "/documents" + "/{digitalId}",
-                HttpStatus.NO_CONTENT,
-                Map.of("ids", document.getId()),
-                document.getDigitalId()
-            ));
+            baseRoutePath + "/documents" + "/{digitalId}",
+            HttpStatus.NO_CONTENT,
+            Map.of("ids", document.getId()),
+            document.getDigitalId()
+        ));
         var searchDocument = Allure.step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 404", () ->
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
@@ -496,7 +495,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
 
     }
 
-    public static DocumentCreate getValidContactDocument(String partnerUuid, String digitalId) {
+    public static DocumentCreate getValidContactDocument(UUID partnerUuid, String digitalId) {
         return new DocumentCreate()
             .unifiedId(partnerUuid)
             .digitalId(digitalId)
@@ -505,10 +504,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .dateIssue(LocalDate.now())
             .divisionCode("1111")
             .number("23")
-            .documentTypeId("3422aec8-7f44-4089-9a43-f8e3c5b00722");
+            .documentTypeId(UUID.fromString("3422aec8-7f44-4089-9a43-f8e3c5b00722"));
     }
 
-    private static Document createValidContactDocument(String contactUuid, String digitalId) {
+    private static Document createValidContactDocument(UUID contactUuid, String digitalId) {
         return Allure.step("Создание валидного документа", () -> post(
             baseRoutePath + "/document",
             HttpStatus.CREATED,

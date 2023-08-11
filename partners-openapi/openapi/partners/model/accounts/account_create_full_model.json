@@ -7,8 +7,7 @@
     "externalId": {
       "type": "string",
       "format": "uuid",
-      "title": "Внешний идентификатор",
-      "x-not-empty": true
+      "title": "Внешний идентификатор"
     },
     "account": {
       "type": "string",

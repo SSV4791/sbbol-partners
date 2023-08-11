@@ -8,6 +8,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сервис по работе с адресами
@@ -21,7 +22,7 @@ public interface AddressService {
      * @param id        Идентификатор документа
      * @return Адрес
      */
-    Address getAddress(String digitalId, String id);
+    Address getAddress(String digitalId, UUID id);
 
     /**
      * Получение списка адресов по заданному фильтру
@@ -62,7 +63,7 @@ public interface AddressService {
      * @param partnerId Идентификатор партнера
      * @param address   Адрес для создания/частичного обновления
      */
-    void saveOrPatchAddress(String digitalId, String partnerId, AddressChangeFullModel address);
+    void saveOrPatchAddress(String digitalId, UUID partnerId, AddressChangeFullModel address);
 
     /**
      * Создание/частичное обновление адресов партнера
@@ -71,7 +72,7 @@ public interface AddressService {
      * @param partnerId Идентификатор партнера
      * @param addresses Список адресов для создания/частичное обновление
      */
-    void saveOrPatchAddresses(String digitalId, String partnerId, Set<AddressChangeFullModel> addresses);
+    void saveOrPatchAddresses(String digitalId, UUID partnerId, Set<AddressChangeFullModel> addresses);
 
     /**
      * Удаление адреса
@@ -79,5 +80,5 @@ public interface AddressService {
      * @param digitalId Идентификатор личного кабинета клиента
      * @param ids       Идентификаторы адресов Контакта
      */
-    void deleteAddresses(String digitalId, List<String> ids);
+    void deleteAddresses(String digitalId, List<UUID> ids);
 }

@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners account
-  version: 1.1.4
+  version: 1.1.5
   description: OpenAPI Specification for partners account
 
 servers:
@@ -57,6 +57,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
           description: Идентефикатор счёта
       responses:
         200:
@@ -98,6 +99,7 @@ paths:
             type: array
             items:
               type: string
+              format: uuid
               maxItems: 200
           description: Идентефикатор счёта
       responses:
@@ -295,6 +297,7 @@ paths:
             type: array
             items:
               type: string
+              format: uuid
               maxItems: 200
           description: Внешний идентификатор счета
       responses:

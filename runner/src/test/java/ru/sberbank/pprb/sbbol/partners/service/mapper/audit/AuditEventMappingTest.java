@@ -6,14 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.AuditEventMapperAgent;
-import ru.sberbank.pprb.sbbol.partners.model.Account;
-import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
-import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
-import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Partner;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
-import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.AccountCreateErrorAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.AccountCreateSuccessAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.AccountUpdateErrorAuditMapperAgent;
@@ -32,6 +24,14 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccou
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccountsCreateSuccessAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccountsDeleteErrorAuditMapperAgent;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.impl.SignAccountsDeleteSuccessAuditMapperAgent;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
+import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
+import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AuditEventMappingTest extends BaseUnitConfiguration {
+class AuditEventMappingTest extends BaseUnitConfiguration {
 
     @Test
     void accountCreateErrorAgentMappingTest() {
@@ -58,7 +58,7 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
                 .isNotNull()
                 .isNotEmpty()
                 .containsValues(
-                    accountCreate.getPartnerId(),
+                    accountCreate.getPartnerId().toString(),
                     accountCreate.getDigitalId(),
                     accountCreate.getAccount(),
                     accountCreate.getComment(),
@@ -80,8 +80,8 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
                 .isNotNull()
                 .isNotEmpty()
                 .containsValues(
-                    accountCreate.getId(),
-                    accountCreate.getPartnerId(),
+                    accountCreate.getId().toString(),
+                    accountCreate.getPartnerId().toString(),
                     accountCreate.getDigitalId(),
                     accountCreate.getVersion().toString(),
                     accountCreate.getBudget().toString(),
@@ -152,7 +152,7 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
                 .isNotNull()
                 .isNotEmpty()
                 .containsValues(
-                    accountChange.getPartnerId(),
+                    accountChange.getPartnerId().toString(),
                     accountChange.getDigitalId(),
                     accountChange.getAccount(),
                     accountChange.getComment(),
@@ -209,7 +209,7 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
                 .isNotNull()
                 .isNotEmpty()
                 .containsValues(
-                    partner.getId(),
+                    partner.getId().toString(),
                     partner.getDigitalId(),
                     partner.getVersion().toString(),
                     partner.getLegalForm().toString(),
@@ -290,7 +290,7 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
                 .isNotNull()
                 .isNotEmpty()
                 .containsValues(
-                    partner.getId(),
+                    partner.getId().toString(),
                     partner.getDigitalId(),
                     partner.getLegalForm().toString(),
                     partner.getVersion().toString(),
@@ -332,7 +332,7 @@ public class AuditEventMappingTest extends BaseUnitConfiguration {
                 .isNotNull()
                 .isNotEmpty()
                 .containsValues(
-                    partner.getId(),
+                    partner.getId().toString(),
                     partner.getDigitalId(),
                     partner.getVersion().toString(),
                     partner.getLegalForm().toString(),

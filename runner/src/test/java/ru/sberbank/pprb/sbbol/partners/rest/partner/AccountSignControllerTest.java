@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.qameta.allure.Allure;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_ALREADY_SIGNED_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
@@ -36,7 +34,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
-public class AccountSignControllerTest extends BaseAccountSignControllerTest {
+class AccountSignControllerTest extends BaseAccountSignControllerTest {
     @Autowired
     AccountSignService accountSignService;
 
@@ -76,11 +74,11 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
         });
         var errorSign = Allure.step("Первое подписание счёта",
             () -> createInvalidAccountsSignWithInvalidFraudMetaData(
-            account.getDigitalId(),
-            account.getId(),
-            account.getVersion(),
-            getBase64InvalidFraudMetaData()
-        ));
+                account.getDigitalId(),
+                account.getId(),
+                account.getVersion(),
+                getBase64InvalidFraudMetaData()
+            ));
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(errorSign)
                 .isNotNull();
@@ -129,29 +127,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             assertThat(savedDuplicateSign.getCode())
                 .isEqualTo(ACCOUNT_ALREADY_SIGNED_EXCEPTION.getValue());
             for (var text : savedDuplicateSign.getDescriptions()) {
-                assertThat(errorText.contains(text)).isTrue();
-            }
-        });
-    }
-
-    @Test
-    @DisplayName("POST /partner/accounts/sign Попытка подписания счёта без AccountId")
-    void testCreateSignAccountWithoutAccountId() {
-        var errorText = Allure.step("Подготовка текста ошибки",
-            () -> List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36"));
-        var account = Allure.step("Создание счёта для партнера", () -> {
-            var partner = createValidPartner();
-            return createValidAccount(partner.getId(), partner.getDigitalId());
-        });
-        var response = Allure.step("Попытка подписания счёта без AccountId",
-            () -> createAccountSignWithBadRequest(account.getDigitalId(), "", account.getVersion(), getBase64FraudMetaData()));
-        Allure.step("Проверка корректности ответа", () -> {
-            assertThat(response)
-                .isNotNull();
-            assertThat(response.getCode())
-                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            for (var description : response.getDescriptions()) {
-                assertTrue(description.getMessage().containsAll(errorText));
+                assertThat(errorText).contains(text);
             }
         });
     }
@@ -201,56 +177,6 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
             assertThat(response.getMessage())
                 .isEqualTo(errorText);
-        });
-    }
-
-    @Test
-    @DisplayName("POST /partner/accounts/sign Попытка подписания счёта с не корректным AccountId")
-    void testCreateSignAccountWithBadAccountId() {
-        List<Descriptions> errorText = Allure.step("Подготовка текста ошибки", () -> List.of(
-            new Descriptions()
-                .field("accountsSignDetail[0].accountId")
-                .message(
-                    List.of("размер должен находиться в диапазоне от 36 до 36")
-                )
-        ));
-        var account = Allure.step("Создание счёта для партнера", () -> {
-            var partner = createValidPartner();
-            return createValidAccount(partner.getId(), partner.getDigitalId());
-        });
-        var response = Allure.step("Попытка подписания счёта с не корректным AccountId",
-            () -> createAccountSignWithBadRequest(
-                account.getDigitalId(),
-                RandomStringUtils.randomAlphabetic(37),
-                account.getVersion(),
-                getBase64FraudMetaData()
-            ));
-        Allure.step("Проверка корректности ответа", () -> {
-            assertThat(response)
-                .isNotNull();
-            assertThat(response.getCode())
-                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            for (var text : response.getDescriptions()) {
-                assertThat(errorText.contains(text)).isTrue();
-            }
-        });
-    }
-
-    @Test
-    @DisplayName("POST /partner/accounts/sign Попытка подписания счёта без Id")
-    void testCreateSignAccountWithoutIds() {
-        var errorText = Allure.step("Подготовка текста ошибки",
-            () -> List.of("Поле обязательно для заполнения", "размер должен находиться в диапазоне от 36 до 36"));
-        var response = Allure.step("Попытка подписания счёта с не корректным AccountId",
-            () -> createAccountSignWithBadRequest("", "", 0L, getBase64FraudMetaData()));
-        Allure.step("Проверка корректности ответа", () -> {
-            assertThat(response)
-                .isNotNull();
-            assertThat(response.getCode())
-                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            for (var description : response.getDescriptions()) {
-                assertTrue(description.getMessage().containsAll(errorText));
-            }
         });
     }
 
@@ -400,7 +326,7 @@ public class AccountSignControllerTest extends BaseAccountSignControllerTest {
             assertThat(signInfo.getCode())
                 .isEqualTo(EXCEPTION.getValue());
             assertThat(signInfo.getMessage())
-                .isEqualTo(errorText);
+                .contains(errorText);
         });
     }
 

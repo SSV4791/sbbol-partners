@@ -18,7 +18,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.AuditEventMapp
         AuditConfiguration.class
     }
 )
-public class AuditEventMapperAgentRegistryTest extends BaseUnitConfiguration {
+class AuditEventMapperAgentRegistryTest extends BaseUnitConfiguration {
 
     @Autowired
     private AuditEventMapperAgentRegistry auditEventMapperAgentRegistry;

@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners address
-  version: 1.1.1
+  version: 1.1.2
   description: OpenAPI Specification for partner address
 
 servers:
@@ -57,6 +57,7 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
           description: Идентификатор адреса
       responses:
         200:
@@ -98,6 +99,7 @@ paths:
             type: array
             items:
               type: string
+              format: uuid
               maxItems: 200
           description: Идентефикатор адреса
       responses:

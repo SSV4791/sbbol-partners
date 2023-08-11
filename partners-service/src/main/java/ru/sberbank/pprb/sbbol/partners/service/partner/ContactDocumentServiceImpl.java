@@ -10,8 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
-import java.util.UUID;
-
 @Loggable
 public class ContactDocumentServiceImpl extends DocumentServiceImpl {
 
@@ -30,7 +28,7 @@ public class ContactDocumentServiceImpl extends DocumentServiceImpl {
     @Override
     @Transactional
     public Document saveDocument(DocumentCreate document) {
-        var contact = contactRepository.getByDigitalIdAndUuid(document.getDigitalId(), UUID.fromString(document.getUnifiedId()));
+        var contact = contactRepository.getByDigitalIdAndUuid(document.getDigitalId(), document.getUnifiedId());
         if (contact.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, document.getDigitalId());
         }

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,7 +44,7 @@ class DocumentMapperTest extends BaseUnitConfiguration {
             .isNotNull();
         assertThat(expected)
             .hasSameSizeAs(actual);
-        for(var actualObj: actual) {
+        for (var actualObj : actual) {
             assertThat(actualObj.getDigitalId())
                 .isEqualTo(digitalId);
             assertThat(unifiedUuid)
@@ -53,8 +54,8 @@ class DocumentMapperTest extends BaseUnitConfiguration {
 
     @Test
     void testToDocumentWithDocumentCreateFullModel() {
-        var digitalId = factory.manufacturePojo(String.class);
-        var unifiedUuid = factory.manufacturePojo(UUID.class);
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var unifiedUuid = UUID.randomUUID();
         var expected = factory.manufacturePojo(DocumentCreateFullModel.class);
         var actual = mapper.toDocument(expected, digitalId, unifiedUuid);
         assertThat(actual)
@@ -66,7 +67,7 @@ class DocumentMapperTest extends BaseUnitConfiguration {
             )
             .isEqualTo(actual);
         assertThat(actual.getTypeUuid())
-            .hasToString(expected.getDocumentTypeId());
+            .isEqualTo(expected.getDocumentTypeId());
     }
 
     @Test
@@ -98,8 +99,8 @@ class DocumentMapperTest extends BaseUnitConfiguration {
     @Test
     void mapDocumentChangeFullModelToDocumentChange() {
         var documentChangeFullModel = factory.manufacturePojo(DocumentChangeFullModel.class);
-        var digitalId = factory.manufacturePojo(String.class);
-        var unifiedId = factory.manufacturePojo(String.class);
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var unifiedId = UUID.randomUUID();
         var actualDocumentChange = mapper.toDocument(documentChangeFullModel, digitalId, unifiedId);
         var expectedDocumentChange = new DocumentChange()
             .id(documentChangeFullModel.getId())
@@ -124,8 +125,8 @@ class DocumentMapperTest extends BaseUnitConfiguration {
     @Test
     void mapDocumentChangeFullModelToDocumentCreate() {
         var documentChangeFullModel = factory.manufacturePojo(DocumentChangeFullModel.class);
-        var digitalId = factory.manufacturePojo(String.class);
-        var unifiedId = factory.manufacturePojo(String.class);
+        var digitalId = RandomStringUtils.randomAlphabetic(10);
+        var unifiedId = UUID.randomUUID();
         var actualDocumentCreate = mapper.toDocumentCreate(documentChangeFullModel, digitalId, unifiedId);
         var expectedDocumentCreate = new DocumentCreate()
             .digitalId(digitalId)

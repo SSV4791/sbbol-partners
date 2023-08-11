@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.EmailsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.EmailService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Loggable
 @RestController
@@ -29,7 +30,7 @@ public class PartnerEmailController implements PartnerEmailApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+    public ResponseEntity<Void> delete(String digitalId, List<UUID> ids) {
         partnerEmailService.deleteEmails(digitalId, ids);
         return ResponseEntity.noContent().build();
     }

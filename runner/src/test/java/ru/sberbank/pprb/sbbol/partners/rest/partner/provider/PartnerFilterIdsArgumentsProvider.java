@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -25,10 +26,10 @@ public class PartnerFilterIdsArgumentsProvider implements ArgumentsProvider {
 
         int partnersSize = 5;
         String digitalId = randomAlphabetic(10);
-        List<String> ids = new ArrayList<>(partnersSize);
+        List<UUID> ids = new ArrayList<>(partnersSize);
         for (int i = 0; i < partnersSize; i++) {
             Partner partner = post(
-                    BASE_ROUTE_PATH,
+                BASE_ROUTE_PATH,
                 HttpStatus.CREATED,
                 getValidPartner(digitalId, LegalForm.LEGAL_ENTITY),
                 Partner.class

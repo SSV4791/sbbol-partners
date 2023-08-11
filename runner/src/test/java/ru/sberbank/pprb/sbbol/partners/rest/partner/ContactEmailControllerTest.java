@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,8 +65,8 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
-            assertThat(response.getEmails().size())
-                .isEqualTo(4);
+            assertThat(response.getEmails())
+                .hasSize(4);
             assertThat(response.getPagination().getHasNextPage())
                 .isEqualTo(Boolean.TRUE);
         });
@@ -194,11 +195,11 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         });
         var response = Allure.step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () ->
             post(
-            "/partner/contact/emails/view",
-            HttpStatus.BAD_REQUEST,
-            filter,
-            Error.class
-        ));
+                "/partner/contact/emails/view",
+                HttpStatus.BAD_REQUEST,
+                filter,
+                Error.class
+            ));
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -223,11 +224,11 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
         });
         var response = Allure.step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () ->
             post(
-            "/partner/contact/emails/view",
-            HttpStatus.OK,
-            filter,
-            EmailsResponse.class
-        ));
+                "/partner/contact/emails/view",
+                HttpStatus.OK,
+                filter,
+                EmailsResponse.class
+            ));
         Allure.step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -345,10 +346,10 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             getEmail(partner.getId(), partner.getDigitalId()),
             Error.class));
         Allure.step("Проверка корректности ответа", () -> {
-        assertThat(emailCreate.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
-        assertThat(emailCreate.getMessage())
-            .contains("Искомая сущность contact c id: " + partner.getId() + " не найдена");
+            assertThat(emailCreate.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+            assertThat(emailCreate.getMessage())
+                .contains("Искомая сущность contact c id: " + partner.getId() + " не найдена");
         });
     }
 
@@ -573,14 +574,14 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             .isNull();
     }
 
-    private static EmailCreate getEmail(String contactUuid, String digitalId) {
+    private static EmailCreate getEmail(UUID contactUuid, String digitalId) {
         return new EmailCreate()
             .unifiedId(contactUuid)
             .digitalId(digitalId)
             .email(randomAlphabetic(10) + "@mail.ru");
     }
 
-    private static Email createEmail(String contactUuid, String digitalId) {
+    private static Email createEmail(UUID contactUuid, String digitalId) {
         return post(baseRoutePath, HttpStatus.CREATED, getEmail(contactUuid, digitalId), Email.class);
     }
 
@@ -600,7 +601,7 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
     private void assertMessage(Error response, String field, String message) {
         Optional<Descriptions> description = response.getDescriptions().stream()
             .filter(value -> value.getField().equals(field)).findFirst();
-        assertThat(description.isPresent()).isTrue();
+        assertThat(description).isPresent();
         assertThat(description.get().getMessage()).contains(message);
     }
 }

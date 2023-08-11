@@ -9,8 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneCreate;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PhoneRepository;
 
-import java.util.UUID;
-
 @Loggable
 public class PartnerPhoneServiceImpl extends PhoneServiceImpl {
 
@@ -28,10 +26,10 @@ public class PartnerPhoneServiceImpl extends PhoneServiceImpl {
     @Override
     @Transactional
     public Phone savePhone(PhoneCreate phone) {
-        var uuid = UUID.fromString(phone.getUnifiedId());
-        var partner = partnerRepository.getByDigitalIdAndUuid(phone.getDigitalId(), uuid);
+        var partnerId = phone.getUnifiedId();
+        var partner = partnerRepository.getByDigitalIdAndUuid(phone.getDigitalId(), partnerId);
         if (partner.isEmpty()) {
-            throw new EntryNotFoundException("partner", uuid);
+            throw new EntryNotFoundException("partner", partnerId);
         }
         return super.savePhone(phone);
     }

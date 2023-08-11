@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.ContactService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Loggable
 @RestController
@@ -29,13 +30,13 @@ public class ContactController implements PartnerContactsApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+    public ResponseEntity<Void> delete(String digitalId, List<UUID> ids) {
         contactService.deleteContacts(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Contact> getById(String digitalId, String id) {
+    public ResponseEntity<Contact> getById(String digitalId, UUID id) {
         return ResponseEntity.ok(contactService.getContact(digitalId, id));
     }
 

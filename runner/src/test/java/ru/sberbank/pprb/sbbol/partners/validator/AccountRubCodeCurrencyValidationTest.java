@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 
-public class AccountRubCodeCurrencyValidationTest extends BaseUnitConfiguration {
+class AccountRubCodeCurrencyValidationTest extends BaseUnitConfiguration {
     private static final String BUDGET_CORR_ACCOUNT = "40102810045370000002";
     private static final String VALID_ACCOUNT = "40702810643810010294";
     private static final String INVALID_ACCOUNT = "00000000000000000000";

@@ -17,10 +17,10 @@ public abstract class AbstractFilter implements Serializable {
      */
     private String orderBy;
 
-    public AbstractFilter() {
+    protected AbstractFilter() {
     }
 
-    public AbstractFilter(Pagination pagination) {
+    protected AbstractFilter(Pagination pagination) {
         this.pagination = pagination;
     }
 

@@ -6,16 +6,13 @@
   "properties": {
     "partnerId": {
       "type": "string",
-      "title": "Идентификатор партнера",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Идентификатор партнера"
     },
     "externalId": {
       "type": "string",
       "format": "uuid",
-      "title": "Внешний идентификатор",
-      "x-not-empty": true
+      "title": "Внешний идентификатор"
     },
     "digitalId": {
       "type": "string",

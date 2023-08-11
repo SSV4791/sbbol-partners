@@ -75,7 +75,7 @@ class ContactMapperTest extends BaseUnitConfiguration {
             .isNotNull();
         assertThat(expected)
             .hasSameSizeAs(actual);
-        for(var actualEntity: actual) {
+        for (var actualEntity : actual) {
             assertThat(digitalId)
                 .isEqualTo(actualEntity.getDigitalId());
             assertThat(unifiedUuid)
@@ -109,14 +109,14 @@ class ContactMapperTest extends BaseUnitConfiguration {
 
         assertThat(actual.getEmails())
             .isNotNull();
-        for(var email: actual.getEmails()) {
+        for (var email : actual.getEmails()) {
             assertThat(expected.getEmails())
                 .contains(email.getEmail());
         }
 
         assertThat(actual.getPhones())
             .isNotNull();
-        for(var phone: actual.getPhones()) {
+        for (var phone : actual.getPhones()) {
             assertThat(expected.getPhones())
                 .contains(phone.getPhone());
         }
@@ -154,7 +154,7 @@ class ContactMapperTest extends BaseUnitConfiguration {
     void mapContactChangeFullModelToContact() {
         var contactChangeFullModel = factory.manufacturePojo(ContactChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var partnerId = factory.manufacturePojo(String.class);
+        var partnerId = UUID.randomUUID();
         var actualContact = mapper.toContact(contactChangeFullModel, digitalId, partnerId);
         var expectedContact = new Contact()
             .id(contactChangeFullModel.getId())
@@ -168,20 +168,20 @@ class ContactMapperTest extends BaseUnitConfiguration {
             .position(contactChangeFullModel.getPosition())
             .version(contactChangeFullModel.getVersion());
         Optional.ofNullable(contactChangeFullModel.getPhones())
-                .ifPresent(phones -> {
-                    expectedContact.setPhones(
-                        phones.stream()
-                            .map(phoneChangeFullModel ->
-                                new Phone()
-                                    .id(phoneChangeFullModel.getId())
-                                    .version(phoneChangeFullModel.getVersion())
-                                    .phone(phoneChangeFullModel.getPhone())
-                                    .digitalId(digitalId)
-                                    .unifiedId(contactChangeFullModel.getId())
-                                )
-                            .collect(Collectors.toSet())
-                    );
-                });
+            .ifPresent(phones -> {
+                expectedContact.setPhones(
+                    phones.stream()
+                        .map(phoneChangeFullModel ->
+                            new Phone()
+                                .id(phoneChangeFullModel.getId())
+                                .version(phoneChangeFullModel.getVersion())
+                                .phone(phoneChangeFullModel.getPhone())
+                                .digitalId(digitalId)
+                                .unifiedId(contactChangeFullModel.getId())
+                        )
+                        .collect(Collectors.toSet())
+                );
+            });
         Optional.ofNullable(contactChangeFullModel.getEmails())
             .ifPresent(emails -> {
                 expectedContact.setEmails(
@@ -207,7 +207,7 @@ class ContactMapperTest extends BaseUnitConfiguration {
     void mapContactChangeFullModelToContactCreate() {
         var contactChangeFullModel = factory.manufacturePojo(ContactChangeFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
-        var partnerId = factory.manufacturePojo(String.class);
+        var partnerId = UUID.randomUUID();
         var actualContactCreate = mapper.toContactCreate(contactChangeFullModel, digitalId, partnerId);
         var expectedContactCreate = new ContactCreate()
             .digitalId(digitalId)
@@ -269,9 +269,9 @@ class ContactMapperTest extends BaseUnitConfiguration {
     @Test
     void patchContactWithMergedPhonesAndEmails() {
         var updatedPhone = factory.manufacturePojo(Phone.class);
-        updatedPhone.setId(UUID.randomUUID().toString());
+        updatedPhone.setId(UUID.randomUUID());
         var updatedEmail = factory.manufacturePojo(Email.class);
-        updatedEmail.setId(UUID.randomUUID().toString());
+        updatedEmail.setId(UUID.randomUUID());
         var updatedPhones = Set.of(updatedPhone);
         var updatedEmails = Set.of(updatedEmail);
         var contact = new Contact()
@@ -279,7 +279,7 @@ class ContactMapperTest extends BaseUnitConfiguration {
             .emails(updatedEmails);
         var actualContactEntity = factory.manufacturePojo(ContactEntity.class);
         var initialPhones = new ArrayList<>(actualContactEntity.getPhones());
-        var initialEmails= new ArrayList<>(actualContactEntity.getEmails());
+        var initialEmails = new ArrayList<>(actualContactEntity.getEmails());
         mapper.patchContact(contact, actualContactEntity);
         var expectedContactEntity = new ContactEntity();
         expectedContactEntity.setUuid(actualContactEntity.getUuid());
@@ -297,7 +297,7 @@ class ContactMapperTest extends BaseUnitConfiguration {
                 initialPhones.stream().peek(phone -> phone.setContact(actualContactEntity)),
                 updatedPhones.stream().map(phone -> {
                     var contactPhoneEntity = new ContactPhoneEntity();
-                    contactPhoneEntity.setUuid(UUID.fromString(phone.getId()));
+                    contactPhoneEntity.setUuid(phone.getId());
                     contactPhoneEntity.setDigitalId(phone.getDigitalId());
                     contactPhoneEntity.setVersion(phone.getVersion());
                     contactPhoneEntity.setContact(actualContactEntity);
@@ -311,7 +311,7 @@ class ContactMapperTest extends BaseUnitConfiguration {
                 initialEmails.stream().peek(email -> email.setContact(actualContactEntity)),
                 updatedEmails.stream().map(email -> {
                     var contactEmailEntity = new ContactEmailEntity();
-                    contactEmailEntity.setUuid(UUID.fromString(email.getId()));
+                    contactEmailEntity.setUuid(email.getId());
                     contactEmailEntity.setDigitalId(email.getDigitalId());
                     contactEmailEntity.setVersion(email.getVersion());
                     contactEmailEntity.setContact(actualContactEntity);

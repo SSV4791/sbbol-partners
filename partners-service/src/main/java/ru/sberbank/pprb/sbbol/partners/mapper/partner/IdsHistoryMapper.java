@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -22,20 +23,20 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 )
 public interface IdsHistoryMapper {
 
-    default ExternalInternalIdLinksResponse toAccountIdsByExternalIdsResponse(List<String> externalIds, List<IdsHistoryEntity> idsHistoryEntities) {
+    default ExternalInternalIdLinksResponse toAccountIdsByExternalIdsResponse(List<UUID> externalIds, List<IdsHistoryEntity> idsHistoryEntities) {
         if (isEmpty(externalIds)) {
             return null;
         }
-        Map<String, String> pprbIdByExternalIdMap = new HashMap<>();
+        Map<UUID, UUID> pprbIdByExternalIdMap = new HashMap<>();
         if (!isEmpty(idsHistoryEntities)) {
             pprbIdByExternalIdMap = idsHistoryEntities.stream()
                 .collect(Collectors.toMap(
-                    it -> it.getExternalId().toString(),
-                    it -> it.getAccount().getUuid().toString())
+                    it -> it.getExternalId(),
+                    it -> it.getAccount().getUuid())
                 );
         }
         List<ExternalInternalIdLink> idLinks = new ArrayList<>(idsHistoryEntities.size());
-        for (String externalId : externalIds) {
+        for (var externalId : externalIds) {
             idLinks.add(
                 new ExternalInternalIdLink()
                     .externalId(externalId)

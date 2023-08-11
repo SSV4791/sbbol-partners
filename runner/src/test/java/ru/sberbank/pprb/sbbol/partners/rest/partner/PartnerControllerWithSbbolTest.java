@@ -35,7 +35,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
             "/partners/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
-            RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)
+            RandomStringUtils.randomAlphabetic(10), UUID.randomUUID()
         );
         assertThat(response)
             .isNotNull();
@@ -76,7 +76,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
     @Test
     void testUpdatePartner() {
         var partner = new Partner()
-            .id(UUID.randomUUID().toString())
+            .id(UUID.randomUUID())
             .legalForm(LegalForm.LEGAL_ENTITY)
             .orgName("Наименование компании")
             .firstName("Имя клиента")
@@ -101,7 +101,7 @@ class PartnerControllerWithSbbolTest extends AbstractIntegrationTest {
         var response = delete(
             "/partners/{digitalId}",
             HttpStatus.NOT_FOUND,
-            Map.of("ids", RandomStringUtils.randomAlphabetic(10)),
+            Map.of("ids", UUID.randomUUID()),
             Map.of("Fraud-Meta-Data", getBase64FraudMetaData()),
             RandomStringUtils.randomAlphabetic(10)
         ).as(Error.class);

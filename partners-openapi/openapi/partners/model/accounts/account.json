@@ -5,10 +5,12 @@
   "properties": {
     "id": {
       "type": "string",
+      "format": "uuid",
       "title": "Идентификатор счёта"
     },
     "partnerId": {
       "type": "string",
+      "format": "uuid",
       "title": "Идентификатор партнера"
     },
     "digitalId": {

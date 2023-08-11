@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AddressService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Loggable
 @RestController
@@ -29,13 +30,13 @@ public class PartnerAddressController implements PartnerAddressApi {
     }
 
     @Override
-    public ResponseEntity<Void> delete(String digitalId, List<String> ids) {
+    public ResponseEntity<Void> delete(String digitalId, List<UUID> ids) {
         partnerAddressService.deleteAddresses(digitalId, ids);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Address> getById(String digitalId, String id) {
+    public ResponseEntity<Address> getById(String digitalId, UUID id) {
         return ResponseEntity.ok(partnerAddressService.getAddress(digitalId, id));
     }
 

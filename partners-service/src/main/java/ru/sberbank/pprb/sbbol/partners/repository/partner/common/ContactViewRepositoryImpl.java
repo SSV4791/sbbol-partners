@@ -12,7 +12,6 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.UUID;
 
 public class ContactViewRepositoryImpl extends BaseRepository<ContactEntity, ContactsFilter> implements ContactViewRepository {
 
@@ -34,7 +33,7 @@ public class ContactViewRepositoryImpl extends BaseRepository<ContactEntity, Con
         ContactsFilter filter
     ) {
         predicates.add(builder.equal(root.get(ContactEntity_.DIGITAL_ID), filter.getDigitalId()));
-        predicates.add(builder.equal(root.get(ContactEntity_.PARTNER_UUID), UUID.fromString(filter.getPartnerId())));
+        predicates.add(builder.equal(root.get(ContactEntity_.PARTNER_UUID), filter.getPartnerId()));
         inPredicate(builder, predicates, root, ContactEntity_.UUID, filter.getIds());
     }
 

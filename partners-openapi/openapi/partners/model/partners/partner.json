@@ -6,10 +6,8 @@
   "properties": {
     "id": {
       "type": "string",
-      "title": "Уникальный идентификатор партнера",
-      "minLength": 36,
-      "maxLength": 36,
-      "x-not-empty": true
+      "format": "uuid",
+      "title": "Уникальный идентификатор партнера"
     },
     "digitalId": {
       "type": "string",

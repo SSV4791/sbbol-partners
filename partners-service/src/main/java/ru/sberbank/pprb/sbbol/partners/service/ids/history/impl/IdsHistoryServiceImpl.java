@@ -2,14 +2,13 @@ package ru.sberbank.pprb.sbbol.partners.service.ids.history.impl;
 
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.IdsHistoryMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Loggable
 public class IdsHistoryServiceImpl implements IdsHistoryService {
@@ -23,12 +22,9 @@ public class IdsHistoryServiceImpl implements IdsHistoryService {
     }
 
     @Override
-    public ExternalInternalIdLinksResponse getInternalIds(@NotEmpty String digitalId, @NotEmpty List<String> externalIds) {
-        var externalUuids = externalIds.stream()
-            .map(BaseMapper::mapUuid)
-            .collect(Collectors.toList());
+    public ExternalInternalIdLinksResponse getInternalIds(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds) {
         var idsHistoryEntities =
-            repository.findByDigitalIdAndExternalIdIn(digitalId, externalUuids);
+            repository.findByDigitalIdAndExternalIdIn(digitalId, externalIds);
         return mapper.toAccountIdsByExternalIdsResponse(externalIds, idsHistoryEntities);
     }
 }
