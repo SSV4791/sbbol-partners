@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
@@ -15,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
@@ -46,14 +46,14 @@ public abstract class AccountMapperDecorator implements AccountMapper {
         return accountWithPartnerResponse;
     }
 
-    public AccountWithPartnerResponse toAccountWithPartner(PartnerEntity partner) {
+    public AccountWithPartnerResponse toAccountWithPartner(Partner partner) {
         var accountWithPartnerResponse = delegate.toAccountWithPartner(partner);
         accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
         return accountWithPartnerResponse;
     }
 
     @Override
-    public List<AccountWithPartnerResponse> toAccountsWithPartner(PartnerEntity partner) {
+    public List<AccountWithPartnerResponse> toAccountsWithPartner(Partner partner) {
         var accountWithPartnerResponseList = delegate.toAccountsWithPartner(partner);
         accountWithPartnerResponseList.forEach(accountWithPartnerResponse ->
             accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn())));
