@@ -47,6 +47,7 @@ public interface AccountMapper {
 
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "partnerId", source = "partnerUuid")
+    @Mapping(target = "changeDate", source = "lastModifiedDate")
     @Mapping(target = "budget", ignore = true)
     Account toAccount(AccountEntity account);
 

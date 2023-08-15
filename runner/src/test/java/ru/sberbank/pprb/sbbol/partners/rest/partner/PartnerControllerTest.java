@@ -173,6 +173,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 .isNotNull();
             assertThat(actualPartner)
                 .isNotNull()
+                .usingRecursiveComparison()
+                .ignoringFields("changeDate")
                 .isEqualTo(createdPartner);
         });
     }
@@ -1518,6 +1520,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(actualPartner)
             .isNotNull()
+            .usingRecursiveComparison()
+            .ignoringFields("changeDate")
             .isEqualTo(createdPartner);
 
         delete(
@@ -2299,6 +2303,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             assertThat(actualPartnerFullModelResponse)
                 .usingRecursiveComparison()
                 .ignoringFields(
+                    "changeDate",
                     "version",
                     "phones",
                     "emails",

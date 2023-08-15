@@ -57,6 +57,7 @@ public interface PartnerMapper {
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "changeDate", source = "lastModifiedDate")
     Partner toPartner(PartnerEntity partner);
 
     @Named("toLegalType")
@@ -219,6 +220,7 @@ public interface PartnerMapper {
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "changeDate", source = "lastModifiedDate")
     @Mapping(target = "accounts", ignore = true)
     @Mapping(target = "documents", ignore = true)
     @Mapping(target = "address", ignore = true)

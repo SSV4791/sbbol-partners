@@ -61,8 +61,8 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_V
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PRIORITY_ACCOUNT_MORE_ONE;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.*;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidLegalEntityPartner;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidPhysicalPersonPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -745,6 +745,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isEqualTo("Это тестовый комментарий");
             assertThat(actualAccount)
                 .isNotNull()
+                .usingRecursiveComparison()
+                .ignoringFields("changeDate")
                 .isEqualTo(account);
         });
     }
@@ -1056,15 +1058,23 @@ class AccountControllerTest extends BaseAccountControllerTest {
         });
         expected.setExternalId(UUID.randomUUID());
         var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createValidAccount(expected));
-        step("Проверка корректности ответа", () -> assertThat(account)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "uuid",
-                "bank.uuid",
-                "bank.accountUuid",
-                "bank.bankAccount.uuid",
-                "bank.bankAccount.bankUuid")
-            .isEqualTo(account));
+        step("Проверка корректности ответа", () ->
+            assertThat(account)
+                .usingRecursiveComparison()
+                .ignoringFields(
+                    "id",
+                    "changeDate",
+                    "version",
+                    "priorityAccount",
+                    "state",
+                    "budget",
+                    "bank.accountId",
+                    "bank.id",
+                    "bank.version",
+                    "bank.bankAccount.bankId",
+                    "bank.bankAccount.id",
+                    "bank.bankAccount.version")
+                .isEqualTo(expected));
     }
 
     @Test
@@ -2131,6 +2141,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
         step("Проверка корректности ответа get-запроса", () -> {
             assertThat(actualAccount)
                 .isNotNull()
+                .usingRecursiveComparison()
+                .ignoringFields("changeDate")
                 .isEqualTo(account);
         });
 
@@ -2173,6 +2185,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
         step("Проверка корректности ответа", () -> {
             assertThat(foundAccount)
                 .isNotNull()
+                .usingRecursiveComparison()
+                .ignoringFields("changeDate")
                 .isEqualTo(account);
             assertThat(foundAccount.getPriorityAccount())
                 .isFalse();

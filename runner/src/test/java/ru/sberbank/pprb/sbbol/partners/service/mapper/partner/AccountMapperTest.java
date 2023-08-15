@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,7 +31,6 @@ import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,8 +66,9 @@ class AccountMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testToAccounts() {
-        List<AccountEntity> expected = factory.manufacturePojo(ArrayList.class, AccountEntity.class);
+        List<AccountEntity> expected = factory.manufacturePojo(List.class, AccountEntity.class);
         var actual = accountMapper.toAccounts(expected);
         assertThat(actual)
             .isNotNull();
@@ -155,7 +154,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
         bank.setAccount(account);
         var bankAccount = bank.getBankAccount();
         bankAccount.setBank(bank);
-        var actual = accountMapper.toAccount(account, Mockito.mock(BudgetMaskService.class));
+        var actual = accountMapper.toAccount(account, budgetMaskService);
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -214,6 +213,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                     .partnerId(accountEntity.getPartnerUuid())
                     .account(accountEntity.getAccount())
                     .priorityAccount(accountEntity.getPriorityAccount())
+                    .changeDate(accountEntity.getLastModifiedDate())
                     .state(mapSignType(accountEntity.getState()))
                     .comment(accountEntity.getComment())
                     .bank(

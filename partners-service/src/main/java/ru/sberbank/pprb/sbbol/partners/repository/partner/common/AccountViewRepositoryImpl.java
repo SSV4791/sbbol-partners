@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
+import ru.sberbank.pprb.sbbol.partners.model.SearchDateTime;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
 import javax.persistence.EntityManager;
@@ -59,6 +60,7 @@ public class AccountViewRepositoryImpl
         addPartnerTypePredicate(builder, predicates, root);
         addStatePredicate(builder, predicates, root, filter);
         addSearchPredicate(builder, predicates, root, filter);
+        addChangeDatePredicate(builder, predicates, root, filter);
         addBudgetPredicate(builder, predicates, root, filter);
         addGkuPredicate(predicates, root, filter);
         addPartnerSearchPredicate(builder, predicates, root, filter);
@@ -97,6 +99,22 @@ public class AccountViewRepositoryImpl
                     builder.lower(root.get(AccountEntity_.SEARCH)),
                     "%" + searchPattern + "%"
                 )
+
+            );
+        }
+    }
+
+    private void addChangeDatePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
+        var filterChangeDate = filter.getChangeDate();
+        if (filterChangeDate != null) {
+            SearchDateTime.ConditionEnum condition = filterChangeDate.getCondition();
+            predicates.add(
+                switch (condition) {
+                    case LESS ->
+                        builder.lessThan(root.get(AccountEntity_.LAST_MODIFIED_DATE), filterChangeDate.getDate());
+                    default ->
+                        builder.greaterThan(root.get(AccountEntity_.LAST_MODIFIED_DATE), filterChangeDate.getDate());
+                }
             );
         }
     }
