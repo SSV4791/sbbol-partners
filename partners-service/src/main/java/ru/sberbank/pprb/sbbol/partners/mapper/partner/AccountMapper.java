@@ -13,7 +13,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.AccountMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
@@ -22,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.Collections;
@@ -162,14 +162,12 @@ public interface AccountMapper {
     @Mapping(target = "gku", ignore = true)
     AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto);
 
-    default List<AccountWithPartnerResponse> toAccountsWithPartner(PartnerEntity partner) {
+    default List<AccountWithPartnerResponse> toAccountsWithPartner(Partner partner) {
         return List.of(toAccountWithPartner(partner));
     }
 
-    @Mapping(target = "id", source = "uuid")
-    @Mapping(target = "legalForm", source = "legalType")
     @Mapping(target = "account", ignore = true)
-    AccountWithPartnerResponse toAccountWithPartner(PartnerEntity partner);
+    AccountWithPartnerResponse toAccountWithPartner(Partner partner);
 
     default String prepareSearchField(
         UUID partnerUUID,

@@ -15,7 +15,6 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,23 +28,23 @@ public class ContactServiceImpl implements ContactService {
     public static final String DOCUMENT_NAME = "contact";
 
     private final ContactRepository contactRepository;
-    private final PartnerRepository partnerRepository;
     private final AddressRepository addressRepository;
     private final DocumentRepository documentRepository;
     private final ContactMapper contactMapper;
+    private final PartnerService partnerService;
 
     public ContactServiceImpl(
         ContactRepository contactRepository,
-        PartnerRepository partnerRepository,
         AddressRepository addressRepository,
         DocumentRepository documentRepository,
-        ContactMapper contactMapper
+        ContactMapper contactMapper,
+        PartnerService partnerService
     ) {
         this.contactRepository = contactRepository;
-        this.partnerRepository = partnerRepository;
         this.addressRepository = addressRepository;
         this.documentRepository = documentRepository;
         this.contactMapper = contactMapper;
+        this.partnerService = partnerService;
     }
 
     @Override
@@ -81,10 +80,7 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public Contact saveContact(ContactCreate contact) {
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(contact.getDigitalId(), contact.getPartnerId());
-        if (foundPartner.isEmpty()) {
-            throw new EntryNotFoundException("partner", contact.getDigitalId(), contact.getPartnerId());
-        }
+        partnerService.getPartner(contact.getDigitalId(), contact.getPartnerId());
         var requestContact = contactMapper.toContact(contact);
         var saveContact = contactRepository.save(requestContact);
         return contactMapper.toContact(saveContact);

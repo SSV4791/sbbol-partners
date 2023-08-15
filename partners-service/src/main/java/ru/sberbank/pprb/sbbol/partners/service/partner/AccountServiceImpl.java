@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -29,7 +28,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -52,25 +50,25 @@ public class AccountServiceImpl implements AccountService {
     public static final String DOCUMENT_NAME = "account";
 
     private final AccountRepository accountRepository;
-    private final PartnerRepository partnerRepository;
     private final AccountSignRepository accountSignRepository;
     private final BudgetMaskService budgetMaskService;
     private final AccountMapper accountMapper;
+    private final PartnerService partnerService;
     private final ReplicationService replicationService;
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
-        PartnerRepository partnerRepository,
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
+        PartnerService partnerService,
         ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
-        this.partnerRepository = partnerRepository;
         this.accountSignRepository = accountSignRepository;
         this.budgetMaskService = budgetMaskService;
         this.accountMapper = accountMapper;
+        this.partnerService = partnerService;
         this.replicationService = replicationService;
     }
 
@@ -111,10 +109,7 @@ public class AccountServiceImpl implements AccountService {
     public Account saveAccount(AccountCreate account) {
         checkAccountDuplicate(account);
         var digitalId = account.getDigitalId();
-        var foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, account.getPartnerId());
-        if (foundPartner.isEmpty()) {
-            throw new EntryNotFoundException("partner", digitalId, account.getPartnerId());
-        }
+        partnerService.getPartner(digitalId, account.getPartnerId());
         var accountEntity = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(accountEntity);
@@ -189,13 +184,8 @@ public class AccountServiceImpl implements AccountService {
     public List<AccountWithPartnerResponse> getAtRequisites(AccountAndPartnerRequest request) {
         List<AccountEntity> accounts = accountRepository.findByRequest(request);
         if (CollectionUtils.isEmpty(accounts)) {
-            var search =
-                prepareSearchString(request.getInn(), request.getKpp(), request.getName());
-            PartnerEntity partner = partnerRepository.findByDigitalIdAndSearchAndType(request.getDigitalId(), search, PartnerType.PARTNER);
-            if (Objects.isNull(partner)) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
-            }
-            return accountMapper.toAccountsWithPartner(partner);
+            var foundPartner = partnerService.findPartner(request.getDigitalId(), request.getName(), request.getInn(), request.getKpp());
+            return accountMapper.toAccountsWithPartner(foundPartner);
         }
         if (accounts.size() == 1) {
             AccountEntity account = accounts.get(0);
@@ -233,7 +223,8 @@ public class AccountServiceImpl implements AccountService {
     public AccountWithPartnerResponse getAtAllRequisites(AccountAndPartnerRequest request) {
         List<AccountEntity> accounts = accountRepository.findByAllRequestAttributes(request);
         if (CollectionUtils.isEmpty(accounts)) {
-            throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
+            var foundPartner = partnerService.findPartner(request.getDigitalId(), request.getName(), request.getInn(), request.getKpp());
+            return accountMapper.toAccountWithPartner(foundPartner);
         }
         if (accounts.size() > 1) {
             throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());

@@ -32,6 +32,7 @@ import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,6 +47,7 @@ import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_DELE
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
 public class PartnerServiceImpl implements PartnerService {
@@ -120,6 +122,17 @@ public class PartnerServiceImpl implements PartnerService {
         var response = partnerMapper.toPartner(partner);
         response.setGku(isGkuInn(response.getInn()));
         return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Partner findPartner(@NotNull String digitalId, String name, String inn, String kpp) {
+        var search = prepareSearchString(inn, kpp, name);
+        var foundPartner = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
+        if (Objects.isNull(foundPartner)) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId);
+        }
+        return partnerMapper.toPartner(foundPartner);
     }
 
     @Override

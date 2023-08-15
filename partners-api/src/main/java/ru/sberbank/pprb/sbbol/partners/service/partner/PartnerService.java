@@ -35,6 +35,17 @@ public interface PartnerService {
     PartnersResponse getPartners(PartnersFilter partnersFilter);
 
     /**
+     * Получение Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param name      Наименование Партнера
+     * @param inn       ИНН Партнера
+     * @param kpp       КПП Партнера
+     * @return Партнер
+     */
+    Partner findPartner(String digitalId, String name, String inn, String kpp);
+
+    /**
      * Создание нового Партнера со всеми дочерними сущностями
      *
      * @param partner данные Партнера

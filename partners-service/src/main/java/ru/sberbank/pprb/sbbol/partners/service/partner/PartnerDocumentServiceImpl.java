@@ -2,37 +2,32 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentDictionaryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 @Loggable
 public class PartnerDocumentServiceImpl extends DocumentServiceImpl {
 
-    private final PartnerRepository partnerRepository;
+    private final PartnerService partnerService;
 
     public PartnerDocumentServiceImpl(
-        PartnerRepository partnerRepository,
+        PartnerService partnerService,
         DocumentRepository documentRepository,
         DocumentDictionaryRepository documentDictionaryRepository,
         DocumentMapper documentMapper
     ) {
         super(documentRepository, documentDictionaryRepository, documentMapper);
-        this.partnerRepository = partnerRepository;
+        this.partnerService = partnerService;
     }
 
     @Override
     @Transactional
     public Document saveDocument(DocumentCreate document) {
         var partnerId = document.getUnifiedId();
-        var partner = partnerRepository.getByDigitalIdAndUuid(document.getDigitalId(), partnerId);
-        if (partner.isEmpty()) {
-            throw new EntryNotFoundException("partner", partnerId);
-        }
+        partnerService.getPartner(document.getDigitalId(), partnerId);
         return super.saveDocument(document);
     }
 }

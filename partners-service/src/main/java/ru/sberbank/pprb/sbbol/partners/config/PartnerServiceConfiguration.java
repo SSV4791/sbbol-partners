@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
@@ -138,18 +139,18 @@ public class PartnerServiceConfiguration {
     @Bean
     AccountService accountService(
         AccountRepository accountRepository,
-        PartnerRepository partnerRepository,
         AccountSignRepository accountSignRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
+        PartnerService partnerService,
         ReplicationService replicationService
     ) {
         return new AccountServiceImpl(
             accountRepository,
-            partnerRepository,
             accountSignRepository,
             budgetMaskService,
             accountMapper,
+            partnerService,
             replicationService
         );
     }
@@ -206,18 +207,18 @@ public class PartnerServiceConfiguration {
     @Bean
     ContactService contactService(
         ContactRepository contactRepository,
-        PartnerRepository partnerRepository,
         AddressRepository addressRepository,
         DocumentRepository documentRepository,
-        ContactMapper contactMapper
+        ContactMapper contactMapper,
+        PartnerService partnerService
     ) {
         return new ContactServiceImpl(
             contactRepository,
-            partnerRepository,
             addressRepository,
             documentRepository,
-            contactMapper)
-            ;
+            contactMapper,
+            partnerService
+        );
     }
 
     @Bean
@@ -230,22 +231,22 @@ public class PartnerServiceConfiguration {
 
     @Bean
     AddressService partnerAddressService(
-        PartnerRepository partnerRepository,
+        PartnerService partnerService,
         AddressRepository addressRepository,
         AddressMapper addressMapper
     ) {
-        return new PartnerAddressServiceImpl(partnerRepository, addressRepository, addressMapper);
+        return new PartnerAddressServiceImpl(partnerService, addressRepository, addressMapper);
     }
 
     @Bean
     DocumentService partnerDocumentService(
-        PartnerRepository partnerRepository,
+        PartnerService partnerService,
         DocumentRepository documentRepository,
         DocumentDictionaryRepository documentDictionaryRepository,
         DocumentMapper documentMapper
     ) {
         return new PartnerDocumentServiceImpl(
-            partnerRepository,
+            partnerService,
             documentRepository,
             documentDictionaryRepository,
             documentMapper
@@ -254,11 +255,11 @@ public class PartnerServiceConfiguration {
 
     @Bean
     PhoneService partnerPhoneService(
-        PartnerRepository partnerRepository,
+        PartnerService partnerService,
         PhoneRepository phoneRepository,
         PhoneMapper phoneMapper
     ) {
-        return new PartnerPhoneServiceImpl(partnerRepository, phoneRepository, phoneMapper);
+        return new PartnerPhoneServiceImpl(partnerService, phoneRepository, phoneMapper);
     }
 
     @Bean
@@ -272,11 +273,11 @@ public class PartnerServiceConfiguration {
 
     @Bean
     EmailService partnerEmailService(
-        PartnerRepository partnerRepository,
+        PartnerService partnerService,
         EmailRepository emailRepository,
         EmailMapper emailMapper
     ) {
-        return new PartnerEmailServiceImpl(partnerRepository, emailRepository, emailMapper);
+        return new PartnerEmailServiceImpl(partnerService, emailRepository, emailMapper);
     }
 
     @Bean
@@ -303,11 +304,11 @@ public class PartnerServiceConfiguration {
         AddressMapper addressMapper,
         ContactMapper contactMapper,
         PartnerMapper partnerMapper,
-        ReplicationService replicationService,
-        AddressService partnerAddressService,
-        DocumentService partnerDocumentService,
-        ContactService contactService,
-        AccountService accountService
+        @Lazy ReplicationService replicationService,
+        @Lazy AddressService partnerAddressService,
+        @Lazy DocumentService partnerDocumentService,
+        @Lazy ContactService contactService,
+        @Lazy AccountService accountService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
             accountRepository,
