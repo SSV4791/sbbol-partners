@@ -61,6 +61,7 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_V
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PRIORITY_ACCOUNT_MORE_ONE;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.*;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidPhysicalPersonPartner;
 
@@ -2502,7 +2503,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
 
         var partner =
             step("Создание партнера",
-                () -> PartnerControllerTest.createValidPartner(creatingPartner));
+                () -> createValidPartner(creatingPartner));
 
         Account account =
             step("Создание счета",
@@ -2559,7 +2560,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         var partner =
             step("Создание партнера",
                 (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
+        step("Запись ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
         Account account =
             step("Создание счета",
                 () -> createValidAccount(partner.getId(), partner.getDigitalId()));
@@ -2703,27 +2704,21 @@ class AccountControllerTest extends BaseAccountControllerTest {
         "КПП не определен у контрагента и не задан в запросе")
     void testGetAtAllRequisites_thenFindPartner(String dbKppValue, String requestKppValue) {
         var creatingPartner =
-            step("Подготовка данных о партнере", () -> {
-                return PartnerControllerTest.getValidLegalEntityPartner()
-                    .kpp(dbKppValue);
-            });
+            step("Подготовка данных о партнере", () -> getValidLegalEntityPartner().kpp(dbKppValue));
         var partner =
-            step("Создание партнера",
-                () -> PartnerControllerTest.createValidPartner(creatingPartner));
+            step("Создание партнера", () -> createValidPartner(creatingPartner));
         Account account =
-            step("Создание счета",
-                () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+            step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
         var request =
-            step("Подготовка тестовых данных",
-                () ->
-                    new AccountAndPartnerRequest()
-                        .digitalId(partner.getDigitalId())
-                        .account(account.getAccount())
-                        .bic(account.getBank().getBic())
-                        .bankAccount(account.getBank().getBankAccount().getBankAccount())
-                        .inn(partner.getInn())
-                        .kpp(requestKppValue)
-                        .name(partner.getOrgName()));
+            step("Подготовка тестовых данных", () ->
+                new AccountAndPartnerRequest()
+                    .digitalId(partner.getDigitalId())
+                    .account(account.getAccount())
+                    .bic(account.getBank().getBic())
+                    .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                    .inn(partner.getInn())
+                    .kpp(requestKppValue)
+                    .name(partner.getOrgName()));
         AccountWithPartnerResponse accountWithPartnerActual =
             step("Выполнение post-запроса /partner/account/get-at-all-requisites",
                 () ->
@@ -2785,18 +2780,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
         var creatingPartner =
             step("Подготовка данных о партнере",
                 (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
-
         var partner =
-            step("Создание партнера",
-                () -> PartnerControllerTest.createValidPartner(creatingPartner));
-
-        Account account =
-            step("Создание счета",
-                () -> {
-                    var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
-                    creatingAccount.getBank().setBankAccount(null);
-                    return createValidAccount(creatingAccount);
-                });
+            step("Создание партнера", () -> createValidPartner(creatingPartner));
+        Account account = step("Создание счета", () -> {
+            var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
+            creatingAccount.getBank().setBankAccount(null);
+            return createValidAccount(creatingAccount);
+        });
 
         var request =
             step("Подготовка тестовых данных",

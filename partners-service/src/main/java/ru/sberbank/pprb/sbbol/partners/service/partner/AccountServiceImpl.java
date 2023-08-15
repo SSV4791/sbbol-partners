@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +32,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -203,15 +205,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        List<AccountEntity> accountsWithPartnerNameField = accountsWithKppField.stream()
-            .filter(value -> {
-                PartnerEntity partner = value.getPartner();
-                String fio =
-                    prepareSearchString(partner.getSecondName(), partner.getFirstName(), partner.getMiddleName());
-                return Objects.equals(partner.getOrgName(), request.getName()) ||
-                    Objects.equals(fio, request.getName());
-            })
-            .collect(Collectors.toList());
+        List<AccountEntity> accountsWithPartnerNameField = findAccountByPartnerName(request, accountsWithKppField);
         if (CollectionUtils.isEmpty(accountsWithPartnerNameField)) {
             throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
         }
@@ -227,9 +221,28 @@ public class AccountServiceImpl implements AccountService {
             return accountMapper.toAccountWithPartner(foundPartner);
         }
         if (accounts.size() > 1) {
-            throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());
+            List<AccountEntity> foundAccounts = findAccountByPartnerName(request, accounts);
+            if (foundAccounts.size() > 1) {
+                throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());
+            }
         }
         return accountMapper.toAccountWithPartner(accounts.get(0));
+    }
+
+    @NotNull
+    private List<AccountEntity> findAccountByPartnerName(AccountAndPartnerRequest request, List<AccountEntity> accounts) {
+        return accounts.stream()
+            .filter(value -> {
+                PartnerEntity partner = value.getPartner();
+                String fio =
+                    prepareSearchString(partner.getSecondName(), partner.getFirstName(), partner.getMiddleName());
+                var nameLowerCase = request.getName() == null ? request.getName() : request.getName().toLowerCase(Locale.getDefault());
+                var orgNameLowerCase = partner.getOrgName() == null ? partner.getOrgName() : partner.getOrgName().toLowerCase(Locale.getDefault());
+                var fioLowerCase = fio.toLowerCase(Locale.getDefault());
+                return Objects.equals(orgNameLowerCase, nameLowerCase)
+                    || Objects.equals(fioLowerCase, nameLowerCase);
+            })
+            .collect(Collectors.toList());
     }
 
     @Override
