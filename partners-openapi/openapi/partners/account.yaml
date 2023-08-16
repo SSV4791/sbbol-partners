@@ -97,10 +97,11 @@ paths:
           required: true
           schema:
             type: array
+            minItems: 1
+            maxItems: 200
             items:
               type: string
               format: uuid
-              maxItems: 200
           description: Идентефикатор счёта
       responses:
         204:
@@ -295,10 +296,11 @@ paths:
           required: true
           schema:
             type: array
+            minItems: 1
+            maxItems: 200
             items:
               type: string
               format: uuid
-              maxItems: 200
           description: Внешний идентификатор счета
       responses:
         200:
