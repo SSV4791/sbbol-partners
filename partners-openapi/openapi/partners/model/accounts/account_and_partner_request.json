@@ -21,7 +21,8 @@
     "name": {
       "type": "string",
       "example": "ООО 'Ромашка' или ФИО",
-      "description": "Имя контрагента"
+      "description": "Имя контрагента",
+      "x-not-empty": true
     },
     "account": {
       "type": "string",
