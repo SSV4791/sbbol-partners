@@ -236,6 +236,6 @@ public interface PartnerMapper {
     }
 
     default String prepareSearchField(String inn, String kpp, String orgName, String secondName, String firstName, String middleName) {
-        return prepareSearchString(inn, kpp, orgName, firstName, secondName, firstName, middleName);
+        return prepareSearchString(inn, kpp, orgName, secondName, firstName, middleName);
     }
 }
