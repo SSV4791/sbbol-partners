@@ -40,6 +40,11 @@
       "deprecation": true,
       "$ref": "../common/sign_type.json"
     },
+    "changeDate": {
+      "title": "Дата последней модификации",
+      "type": "object",
+      "$ref": "../search/search_date_time.json"
+    },
     "pagination": {
       "$ref": "../common/pagination.json",
       "title": "Параметры запроса Партнеров"

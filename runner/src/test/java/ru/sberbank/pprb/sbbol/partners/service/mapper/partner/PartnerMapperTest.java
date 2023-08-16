@@ -75,6 +75,7 @@ class PartnerMapperTest extends BaseUnitConfiguration {
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
+                "changeDate",
                 "phones",
                 "emails"
             )

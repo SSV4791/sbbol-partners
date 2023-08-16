@@ -21,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
+import ru.sberbank.pprb.sbbol.partners.model.SearchDateTime;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
@@ -85,6 +86,7 @@ public class PartnerViewRepositoryImpl
         addAccountSignPredicate(predicates, root, filter);
         addLegalFormPredicate(builder, predicates, root, filter);
         addPartnerFilterPredicate(builder, criteria, predicates, root, filter);
+        addChangeDatePredicate(builder, predicates, root, filter);
     }
 
     private void addDigitalIdPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
@@ -120,8 +122,10 @@ public class PartnerViewRepositoryImpl
     private void addAccountSignPredicate(List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
         if (filter.getAccountSignType() != null) {
             var accounts = switch (filter.getAccountSignType()) {
-                case SIGNED -> accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.SIGNED);
-                case NOT_SIGNED -> accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.NOT_SIGNED);
+                case SIGNED ->
+                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.SIGNED);
+                case NOT_SIGNED ->
+                    accountRepository.findByDigitalIdAndState(filter.getDigitalId(), AccountStateType.NOT_SIGNED);
             };
             predicates.add(root.get(PartnerEntity_.UUID).in(accounts.stream().map(AccountEntity::getPartnerUuid).collect(Collectors.toList())));
         }
@@ -158,6 +162,21 @@ public class PartnerViewRepositoryImpl
             case ENTREPRENEUR -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), ENTREPRENEUR));
             case PHYSICAL_PERSON -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), PHYSICAL_PERSON));
             case LEGAL_ENTITY -> predicates.add(builder.equal(root.get(PartnerEntity_.LEGAL_TYPE), LEGAL_ENTITY));
+        }
+    }
+
+    private void addChangeDatePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<PartnerEntity> root, PartnersFilter filter) {
+        var filterChangeDate = filter.getChangeDate();
+        if (filterChangeDate != null) {
+            SearchDateTime.ConditionEnum condition = filterChangeDate.getCondition();
+            predicates.add(
+                switch (condition) {
+                    case LESS ->
+                        builder.lessThan(root.get(PartnerEntity_.LAST_MODIFIED_DATE), filterChangeDate.getDate());
+                    default ->
+                        builder.greaterThan(root.get(PartnerEntity_.LAST_MODIFIED_DATE), filterChangeDate.getDate());
+                }
+            );
         }
     }
 

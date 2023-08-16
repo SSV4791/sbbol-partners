@@ -17,6 +17,11 @@
       "type": "string",
       "title": "Идентификатор личного кабинета клиента"
     },
+    "changeDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2023-08-15T15:43:00.445053+03:00"
+    },
     "version": {
       "type": "integer",
       "format": "int64",
