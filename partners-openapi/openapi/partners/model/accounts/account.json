@@ -41,6 +41,15 @@
       "title": "Избранный счёт",
       "default": false
     },
+    "externalIds": {
+      "type": "array",
+      "title": "Внешние идентификаторы",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "uniqueItems": true
+    },
     "bank": {
       "title": "Банк",
       "$ref": "../../model/bank/bank.json"

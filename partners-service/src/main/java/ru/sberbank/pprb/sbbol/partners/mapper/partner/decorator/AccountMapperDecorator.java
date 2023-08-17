@@ -39,6 +39,26 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     private BudgetMaskService budgetMaskService;
 
     @Override
+    public Account toAccount(AccountEntity account) {
+        Account accountResponse = delegate.toAccount(account);
+        fillExternalIds(account, accountResponse);
+        return accountResponse;
+    }
+
+    @Override
+    public Account toAccount(AccountEntity account, BudgetMaskService budgetMaskService) {
+        Account accountResponse = delegate.toAccount(account, budgetMaskService);
+        fillExternalIds(account, accountResponse);
+        return accountResponse;
+    }
+
+    private void fillExternalIds(AccountEntity account, Account accountResponse) {
+        for (IdsHistoryEntity idLink : account.getIdLinks()) {
+            accountResponse.addExternalIdsItem(idLink.getExternalId());
+        }
+    }
+
+    @Override
     public AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto) {
         var accountWithPartnerResponse = delegate.toAccountWithPartner(accountDto);
         accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));

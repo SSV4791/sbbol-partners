@@ -43,7 +43,7 @@ paths:
     get:
       tags:
         - Partner Accounts
-      description: Получение счётов по его идентефикатору
+      description: Получение счётов по его идентификатору
       operationId: get-by-id
       parameters:
         - name: digitalId
@@ -58,7 +58,7 @@ paths:
           schema:
             type: string
             format: uuid
-          description: Идентефикатор счёта
+          description: Идентификатор счёта
       responses:
         200:
           description: Успешный ответ
