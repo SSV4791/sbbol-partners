@@ -12,6 +12,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.UUID;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -31,9 +33,15 @@ public class WebConfig implements WebMvcConfigurer {
         return new HeaderFraudMetaDataConverter(httpHeaderFraudMetaDataObjectMapper());
     }
 
+    @Bean
+    Converter<String, List<UUID>> idsQueryParamConverter() {
+        return new UuidListQueryParamConverter();
+    }
+
     @Override
     public void addFormatters(FormatterRegistry registry) {
         WebMvcConfigurer.super.addFormatters(registry);
         registry.addConverter(headerFraudMetaDataConverter());
+        registry.addConverter(idsQueryParamConverter());
     }
 }

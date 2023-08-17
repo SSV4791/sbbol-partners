@@ -2146,10 +2146,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isEqualTo(account);
         });
 
+        var id = "[" + actualAccount.getId().toString() + "]";
         var deleteAccount = step("Выполнение delete-запроса /partner/accounts/{digitalId}, код ответа 204 (удаление счетов)", () -> delete(
-            baseRoutePath + "/accounts" + "/{digitalId}",
+            baseRoutePath + "/accounts" + "/{digitalId}" + "?ids=" + id,
             HttpStatus.NO_CONTENT,
-            Map.of("ids", actualAccount.getId()),
             actualAccount.getDigitalId()
         ).getBody());
         step("Проверка корректности ответа delete-запроса", () -> assertThat(deleteAccount)
