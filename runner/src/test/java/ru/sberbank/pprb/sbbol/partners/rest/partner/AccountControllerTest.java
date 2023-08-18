@@ -1068,6 +1068,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     "priorityAccount",
                     "state",
                     "budget",
+                    "externalIds",
                     "bank.accountId",
                     "bank.id",
                     "bank.version",
