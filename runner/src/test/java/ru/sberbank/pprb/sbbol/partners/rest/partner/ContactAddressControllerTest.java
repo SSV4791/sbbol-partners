@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static io.qameta.allure.Allure.step;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,18 +38,18 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("GET /partner/contact/addresses/{digitalId}/{id} Получение адреса")
     void testGetContactAddress() {
-        var address = Allure.step("Подготовка тестовых данных", () -> {
+        var address = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), partner.getDigitalId());
         });
-        var actualAddress = Allure.step("Выполнение get-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
+        var actualAddress = step("Выполнение get-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Address.class,
             address.getDigitalId(), address.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(actualAddress)
                 .isNotNull()
                 .isEqualTo(address);
@@ -58,55 +59,51 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("POST /partner/contact/addresses/view Получение адреса для просмотра")
     void testViewContactAddress() {
-        var partner = Allure.step("Подготовка тестового партнера", () -> {
-            return createValidPartner(randomAlphabetic(10));
-        });
-        var contact = Allure.step("Подготовка тестового контакта", () -> {
-            return createValidContact(partner.getId(), partner.getDigitalId());
-        });
-        Allure.step("Подготовка тестовых данных", () -> {
+        var partner = step("Подготовка тестового партнера", () ->
+            createValidPartner(randomAlphabetic(10)));
+        var contact = step("Подготовка тестового контакта", () ->
+            createValidContact(partner.getId(), partner.getDigitalId()));
+        step("Подготовка тестовых данных", () -> {
             createValidAddress(contact.getId(), contact.getDigitalId());
             createValidAddress(contact.getId(), contact.getDigitalId());
             createValidAddress(contact.getId(), contact.getDigitalId());
             createValidAddress(contact.getId(), contact.getDigitalId());
             createValidAddress(contact.getId(), contact.getDigitalId());
         });
-        var filterWithFourElements = Allure.step("Подготовка фильтра с четырьмя элементами", () -> {
-            return new AddressesFilter()
+        var filterWithFourElements = step("Подготовка фильтра с четырьмя элементами", () ->
+            new AddressesFilter()
                 .digitalId(contact.getDigitalId())
                 .unifiedIds(List.of(contact.getId()))
                 .pagination(new Pagination()
                     .count(4)
-                    .offset(0));
-        });
-        var responseWithFourElements = Allure.step("Выполнение post-запроса /partner/contact/addresses/view, код ответа 200", () -> post(
+                    .offset(0)));
+        var responseWithFourElements = step("Выполнение post-запроса /partner/contact/addresses/view, код ответа 200", () -> post(
             baseRoutePath + "/addresses/view",
             HttpStatus.OK,
             filterWithFourElements,
             AddressesResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(responseWithFourElements)
                 .isNotNull();
             assertThat(responseWithFourElements.getAddresses())
                 .hasSize(4);
         });
-        var filterWithPagination = Allure.step("Подготовка фильтра с пагинацией", () -> {
-            return new AddressesFilter()
+        var filterWithPagination = step("Подготовка фильтра с пагинацией", () ->
+            new AddressesFilter()
                 .digitalId(contact.getDigitalId())
                 .unifiedIds(List.of(contact.getId()))
                 .type(AddressType.LEGAL_ADDRESS)
                 .pagination(new Pagination()
                     .count(4)
-                    .offset(0));
-        });
-        var responseWithPagination = Allure.step("Выполнение post-запроса /partner/contact/addresses/view, код ответа 200, pagination true", () -> post(
+                    .offset(0)));
+        var responseWithPagination = step("Выполнение post-запроса /partner/contact/addresses/view, код ответа 200, pagination true", () -> post(
             baseRoutePath + "/addresses/view",
             HttpStatus.OK,
             filterWithPagination,
             AddressesResponse.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(responseWithPagination)
                 .isNotNull();
             assertThat(responseWithPagination.getAddresses())
@@ -119,17 +116,15 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("POST /partner/contact/address Создание контактного адреса")
     void testCreateContactAddress() {
-        var contact = Allure.step("Подготовка тестового контакта", () -> {
+        var contact = step("Подготовка тестового контакта", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
-        var expected = Allure.step("Подготовка ожидаемого результата", () -> {
-            return getValidPartnerAddress(contact.getId(), contact.getDigitalId());
-        });
-        var address = Allure.step("Подготовка валидного адреса", () -> {
-            return createValidAddress(expected);
-        });
-        Allure.step("Проверка корректности ответа", () -> {
+        var expected = step("Подготовка ожидаемого результата", () ->
+            getValidPartnerAddress(contact.getId(), contact.getDigitalId()));
+        var address = step("Подготовка валидного адреса", () ->
+            createValidAddress(expected));
+        step("Проверка корректности ответа", () -> {
             assertThat(address)
                 .usingRecursiveComparison()
                 .ignoringFields("id", "version")
@@ -140,18 +135,18 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("PUT /partner/contact/address Обновление контактного адреса")
     void testUpdateContactAddress() {
-        var address = Allure.step("Подготовка валидного адреса", () -> {
+        var address = step("Подготовка валидного адреса", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
-        var newUpdateAddress = Allure.step("Выполнение PUT-запроса /partner/contact/address, код ответа 200", () -> put(
+        var newUpdateAddress = step("Выполнение PUT-запроса /partner/contact/address, код ответа 200", () -> put(
             baseRoutePath + "/address",
             HttpStatus.OK,
             updateAddress(address),
             Address.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(newUpdateAddress)
                 .isNotNull();
             assertThat(newUpdateAddress.getStreet())
@@ -164,7 +159,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Negative PUT /partner/contact/address редактирование ненайденного адреса")
     void negativeTestUpdateDeletedAddress() {
-        var address = Allure.step("Подготовка валидного адреса", () -> {
+        var address = step("Подготовка валидного адреса", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             var address1 = createValidAddress(contact.getId(), contact.getDigitalId());
@@ -176,13 +171,13 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             ).getBody();
             return address1;
         });
-        var addressError = Allure.step("Выполнение PUT-запроса /partner/contact/address, код ответа 404", () -> put(
+        var addressError = step("Выполнение PUT-запроса /partner/contact/address, код ответа 404", () -> put(
             baseRoutePath + "/address",
             HttpStatus.NOT_FOUND,
             updateAddress(address),
             Error.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(addressError.getCode())
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
             assertThat(addressError.getMessage())
@@ -194,24 +189,22 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Negative PUT /partner/contact/address Обновление версии контактного адреса")
     void negativeTestUpdateAddressVersion() {
-        var address = Allure.step("Подготовка валидного адреса", () -> {
+        var address = step("Подготовка валидного адреса", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
-        Long version = Allure.step("Получение версии записи", () -> {
-            return address.getVersion() + 1;
-        });
-        Allure.step("Установка версии записи", () -> {
-            address.setVersion(version);
-        });
-        var addressError = Allure.step("Выполнение PUT-запроса /partner/contact/address, код ответа 400", () -> put(
+        Long version = step("Получение версии записи", () ->
+            address.getVersion() + 1);
+        step("Установка версии записи", () ->
+            address.setVersion(version));
+        var addressError = step("Выполнение PUT-запроса /partner/contact/address, код ответа 400", () -> put(
             baseRoutePath + "/address",
             HttpStatus.BAD_REQUEST,
             updateAddress(address),
             Error.class
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(addressError.getCode())
                 .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
             assertThat(addressError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
@@ -223,7 +216,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Negative POST /partner/contact/addresses контрагент не найден")
     void createAddressWithNotFoundPartner() {
-        var partner = Allure.step("Подготовка тестовых данных", () -> {
+        var partner = step("Подготовка тестовых данных", () -> {
             var createPartner = createValidPartner(randomAlphabetic(10));
             delete(
                 "/partners/{digitalId}",
@@ -234,12 +227,12 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             ).getBody();
             return createPartner;
         });
-        var response = Allure.step("Выполнение POST-запроса /partner/contact/address, код ответа 404", () -> post(
+        var response = step("Выполнение POST-запроса /partner/contact/address, код ответа 404", () -> post(
             baseRoutePath + "/address",
             HttpStatus.NOT_FOUND,
             getValidPartnerAddress(partner.getId(), partner.getDigitalId()),
             Error.class));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(response).isNotNull();
             assertThat(response.getCode()).isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
             assertThat(response.getMessage()).isEqualTo("Искомая сущность contact c digitalId: " +
@@ -250,7 +243,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Negative POST /partner/contact/addresses Попытка создания адреса с пустыми полями")
     void negativeTestCreateAddressWithAllEmptyField() {
-        Allure.step("Выполнение PUT-запроса /partner/contact/address, код ответа 400", () -> post(
+        step("Выполнение PUT-запроса /partner/contact/address, код ответа 400", () -> post(
             baseRoutePath + "/addresses",
             HttpStatus.NOT_FOUND,
             new AddressCreate())
@@ -262,24 +255,24 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("GET /partner/contact/addresses/{digitalId}/{id} Обновление версии контактного адреса")
     void positiveTestUpdateAddressVersion() {
-        var address = Allure.step("Подготовка валидного адреса", () -> {
+        var address = step("Подготовка валидного адреса", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
-        var addressUpdate = Allure.step("Выполнение PUT-запроса /partner/contact/address, код ответа 200", () -> put(
+        var addressUpdate = step("Выполнение PUT-запроса /partner/contact/address, код ответа 200", () -> put(
             baseRoutePath + "/address",
             HttpStatus.OK,
             updateAddress(address),
             Address.class
         ));
-        var checkAddress = Allure.step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
+        var checkAddress = step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Address.class,
             addressUpdate.getDigitalId(), addressUpdate.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(checkAddress)
                 .isNotNull();
             assertThat(checkAddress.getVersion())
@@ -290,39 +283,39 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("DELETE /partner/contact/addresses/{digitalId} Удаление контактного адреса")
     void testDeleteContactAddress() {
-        var address = Allure.step("Подготовка валидного адреса", () -> {
+        var address = step("Подготовка валидного адреса", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
-        var actualAddress = Allure.step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
+        var actualAddress = step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Address.class,
             address.getDigitalId(), address.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(actualAddress)
                 .isNotNull()
                 .isEqualTo(address);
         });
-        var deleteAddress = Allure.step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 204", () -> delete(
+        var deleteAddress = step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 204", () -> delete(
             baseRoutePath + "/addresses" + "/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", actualAddress.getId()),
             actualAddress.getDigitalId()
         ).getBody());
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(deleteAddress)
                 .isNotNull();
         });
-        var searchAddress = Allure.step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 404", () -> get(
+        var searchAddress = step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 404", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
             address.getDigitalId(), address.getId()
         ));
-        Allure.step("Проверка корректности ответа", () -> {
+        step("Проверка корректности ответа", () -> {
             assertThat(searchAddress)
                 .isNotNull();
             assertThat(searchAddress.getCode())
@@ -333,18 +326,18 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("DELETE /partner/contact/addresses/{digitalId} Попытка повторного удаление контактного адреса")
     void testNegativeDeleteContactAddress() {
-        var address = Allure.step("Подготовка валидного адреса", () -> {
+        var address = step("Подготовка валидного адреса", () -> {
             var partner = createValidPartner(randomAlphabetic(10));
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
-        Allure.step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 204", () -> delete(
+        step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 204", () -> delete(
             baseRoutePath + "/addresses" + "/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", address.getId()),
             address.getDigitalId()
         ).getBody());
-        Allure.step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 404", () -> delete(
+        step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 404", () -> delete(
             baseRoutePath + "/addresses" + "/{digitalId}",
             HttpStatus.NOT_FOUND,
             Map.of("ids", address.getId()),
