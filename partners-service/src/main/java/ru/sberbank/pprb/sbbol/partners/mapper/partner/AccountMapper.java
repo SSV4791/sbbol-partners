@@ -26,6 +26,7 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -140,10 +141,8 @@ public interface AccountMapper {
     default void mapBudgetMask(@MappingTarget Account account, @Context BudgetMaskService budgetMaskService) {
         var bank = account.getBank();
         if (bank != null) {
-            var bankAccount = bank.getBankAccount();
-            if (bankAccount != null) {
-                account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount.getBankAccount()));
-            }
+            var bankAccount = Objects.nonNull(bank.getBankAccount()) ? bank.getBankAccount().getBankAccount() : null;
+            account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount));
         }
     }
 
