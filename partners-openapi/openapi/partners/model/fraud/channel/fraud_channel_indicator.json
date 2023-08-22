@@ -3,6 +3,7 @@
   "title": "Тип канала",
   "enum": [
     "WEB",
-    "MOBILE"
+    "MOBILE",
+    "OTHER"
   ]
 }

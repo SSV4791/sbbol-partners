@@ -11,13 +11,13 @@ import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyEve
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyMessageHeader;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartySendToAnalyzeRq;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.model.FraudChannelIndicator;
+import ru.sberbank.pprb.sbbol.partners.model.FraudChannelInfo;
+import ru.sberbank.pprb.sbbol.partners.model.FraudEventData;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 
-import java.time.LocalDateTime;
-
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 public interface BaseFraudMetaDataMapper {
@@ -35,8 +35,8 @@ public interface BaseFraudMetaDataMapper {
     @Mapping(target = "messageHeader", source = "metaData", qualifiedByName = "toMessageHeader")
     @Mapping(target = "identificationData", source = "clientData")
     @Mapping(target = "deviceRequest", source = "deviceRequest")
-    @Mapping(target = "channelIndicator", source = "channelIndicator", qualifiedByName = "toChannelIndicator")
-    @Mapping(target = "clientDefinedChannelIndicator", expression = "java(toClientDefinedChannelIndicator())")
+    @Mapping(target = "channelIndicator", source = "metaData", qualifiedByName = "toChannelIndicator")
+    @Mapping(target = "clientDefinedChannelIndicator", source = "channelInfo", qualifiedByName = "toClientDefinedChannelIndicator")
     @Mapping(target = "eventData", source = "eventData", qualifiedByName = "toEventData")
     @Mapping(target = "clientDefinedAttributeList", ignore = true)
     CounterPartySendToAnalyzeRq mapToCounterPartySendToAnalyzeRq(FraudMetaData metaData);
@@ -90,11 +90,11 @@ public interface BaseFraudMetaDataMapper {
         );
     }
 
-    default CounterPartyEventData toEventData(FraudEventType eventType, LocalDateTime timeOfOccurrence) {
+    default CounterPartyEventData toEventData(FraudEventType eventType, FraudEventData eventData) {
         var rq = new CounterPartyEventData();
         rq.setEventType(toEventType(eventType));
-        rq.setClientDefinedEventType(getClientDefinedEventType(eventType));
-        rq.setTimeOfOccurrence(timeOfOccurrence);
+        rq.setClientDefinedEventType(getClientDefinedEventType(eventData, eventType));
+        rq.setTimeOfOccurrence(eventData.getTimeOfOccurrence().toLocalDateTime());
         return rq;
     }
 
@@ -105,7 +105,19 @@ public interface BaseFraudMetaDataMapper {
         };
     }
 
-    static ClientDefinedEventType getClientDefinedEventType(FraudEventType eventType) {
+    static ClientDefinedEventType getClientDefinedEventType(FraudEventData eventData, FraudEventType eventType) {
+        if (nonNull(eventData) && nonNull(eventData.getClientDefinedEventType())) {
+            return switch (eventData.getClientDefinedEventType()) {
+                case BROWSER_APPROVAL -> ClientDefinedEventType.BROWSER_APPROVAL;
+                case BROWSER_REMOVE_PAYEE -> ClientDefinedEventType.BROWSER_REMOVE_PAYEE;
+                //TODO убрать дефолтный кейс и расширить на все события после расширения enum в либе антифрода
+                default -> getClientDefinedEventType(eventType);
+            };
+        }
+        return getClientDefinedEventType(eventType);
+    }
+
+    private static ClientDefinedEventType getClientDefinedEventType(FraudEventType eventType) {
         return switch (eventType) {
             case SIGN_ACCOUNT -> ClientDefinedEventType.BROWSER_APPROVAL;
             case DELETE_PARTNER -> ClientDefinedEventType.BROWSER_REMOVE_PAYEE;
@@ -113,18 +125,32 @@ public interface BaseFraudMetaDataMapper {
     }
 
     @Named("toClientDefinedChannelIndicator")
-    default ClientDefinedChannelIndicator toClientDefinedChannelIndicator() {
-        return ClientDefinedChannelIndicator.PPRB_BROWSER;
+    default ClientDefinedChannelIndicator toClientDefinedChannelIndicator(FraudChannelInfo channelInfo) {
+        if (isNull(channelInfo)) {
+            return ClientDefinedChannelIndicator.PPRB_BROWSER;
+        }
+        return switch (channelInfo.getClientDefinedChannelIndicator()) {
+            case BROWSER -> ClientDefinedChannelIndicator.PPRB_BROWSER;
+            case UPG_1C -> ClientDefinedChannelIndicator.PPRB_UPG_1C;
+            case UPG_SBB -> ClientDefinedChannelIndicator.PPRB_UPG_SBB;
+            case UPG_CORP -> ClientDefinedChannelIndicator.PPRB_UPG_CORP;
+        };
     }
 
     @Named("toChannelIndicator")
-    static ChannelIndicator toChannelIndicator(FraudChannelIndicator channelIndicator) {
+    static ChannelIndicator toChannelIndicator(FraudMetaData metaData) {
+        if (isNull(metaData)) {
+            return null;
+        }
+        var channelIndicator = nonNull(metaData.getChannelInfo()) ?
+            metaData.getChannelInfo().getChannelIndicator() : metaData.getChannelIndicator();
         if (isNull(channelIndicator)) {
             return null;
         }
         return switch (channelIndicator) {
             case WEB -> ChannelIndicator.WEB;
             case MOBILE -> ChannelIndicator.MOBILE;
+            case OTHER -> ChannelIndicator.OTHER;
         };
     }
 

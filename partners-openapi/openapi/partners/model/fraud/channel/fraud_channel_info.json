@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Данные по каналу",
+  "properties": {
+    "channelIndicator": {
+      "type": "string",
+      "$ref": "fraud_channel_indicator.json",
+      "title": "Тип канала"
+    },
+    "clientDefinedChannelIndicator": {
+      "type": "string",
+      "$ref": "fraud_client_defined_channel_indicator.json",
+      "title": "Дополнительная информация об используемом канале связи"
+    }
+  },
+  "required": [
+    "channelIndicator",
+    "clientDefinedChannelIndicator"
+  ]
+}

@@ -73,7 +73,7 @@ public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMappe
 
     @Named("toEventData")
     default CounterPartyEventData toEventData(FraudEventData eventData) {
-        return toEventData(FraudEventType.SIGN_ACCOUNT, eventData.getTimeOfOccurrence().toLocalDateTime());
+        return toEventData(FraudEventType.SIGN_ACCOUNT, eventData);
     }
 
     @AfterMapping
