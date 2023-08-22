@@ -46,7 +46,7 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "region_code", length = 10)
     private String regionCode;
 
-    @Column(name = "region", length = 50)
+    @Column(name = "region", length = 300)
     private String region;
 
     @Column(name = "area", length = 300)
