@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 1692625249805_update_column_region_address_table.sql
+      relativeToChangelogFile: true
