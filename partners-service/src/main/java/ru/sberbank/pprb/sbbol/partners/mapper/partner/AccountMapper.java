@@ -10,7 +10,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
 
@@ -61,12 +59,7 @@ public interface AccountMapper {
     Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
 
     default List<AccountEntity> toAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid) {
-        if (CollectionUtils.isEmpty(accounts)) {
-            return Collections.emptyList();
-        }
-        return accounts.stream()
-            .map(value -> toAccount(value, digitalId, partnerUuid))
-            .collect(Collectors.toList());
+        return Collections.emptyList();
     }
 
     @Mapping(target = "partnerUuid", source = "partnerUuid")
