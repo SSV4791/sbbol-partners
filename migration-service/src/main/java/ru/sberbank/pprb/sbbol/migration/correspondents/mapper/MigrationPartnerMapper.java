@@ -256,7 +256,7 @@ public interface MigrationPartnerMapper {
             idLinks.add(idLink);
             return account;
         }
-        account.setIdLinks(List.of(idLink));
+        account.getIdLinks().add(idLink);
         return account;
     }
 }

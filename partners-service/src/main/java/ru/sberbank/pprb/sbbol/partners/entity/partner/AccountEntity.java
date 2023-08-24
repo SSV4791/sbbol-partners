@@ -20,6 +20,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -165,6 +166,9 @@ public class AccountEntity extends BaseEntity {
     }
 
     public List<IdsHistoryEntity> getIdLinks() {
+        if (idLinks == null) {
+            idLinks = new ArrayList<>();
+        }
         return idLinks;
     }
 
