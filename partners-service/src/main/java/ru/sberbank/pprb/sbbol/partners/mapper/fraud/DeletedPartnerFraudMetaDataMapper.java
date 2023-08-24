@@ -65,7 +65,7 @@ public interface DeletedPartnerFraudMetaDataMapper extends BaseFraudMetaDataMapp
 
     @Named("toEventData")
     default CounterPartyEventData toEventData(FraudEventData eventData) {
-        return toEventData(FraudEventType.DELETE_PARTNER, eventData.getTimeOfOccurrence().toLocalDateTime());
+        return toEventData(FraudEventType.DELETE_PARTNER, eventData);
     }
 
     @AfterMapping

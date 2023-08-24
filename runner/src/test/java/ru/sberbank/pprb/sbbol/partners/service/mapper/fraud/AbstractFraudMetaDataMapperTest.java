@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.fraud;
 
+import org.testcontainers.shaded.org.bouncycastle.asn1.cms.MetaData;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.ChannelIndicator;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.ClientDefinedChannelIndicator;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.DboOperation;
@@ -12,6 +13,7 @@ import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper;
 import ru.sberbank.pprb.sbbol.partners.model.FraudChannelIndicator;
+import ru.sberbank.pprb.sbbol.partners.model.FraudChannelInfo;
 import ru.sberbank.pprb.sbbol.partners.model.FraudClientData;
 import ru.sberbank.pprb.sbbol.partners.model.FraudDeviceRequest;
 import ru.sberbank.pprb.sbbol.partners.model.FraudEventData;
@@ -97,21 +99,22 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
         assertThat(actualEventData.getTimeOfOccurrence())
             .isEqualTo(eventData.getTimeOfOccurrence().toLocalDateTime());
         assertThat(actualEventData.getClientDefinedEventType())
-            .isEqualTo(getClientDefinedEventType(eventType));
+            .isEqualTo(getClientDefinedEventType(eventData, eventType));
     }
 
     protected void checkChannelIndicator(
         ChannelIndicator actualChannelIndicator,
-        FraudChannelIndicator channelIndicator) {
+        FraudMetaData metaData) {
         assertThat(actualChannelIndicator)
-            .isEqualTo(toChannelIndicator(channelIndicator));
+            .isEqualTo(toChannelIndicator(metaData));
     }
 
     protected void checkClientDefinedChannelIndicator(
-        ClientDefinedChannelIndicator actualClientDefinedChannelIndicator
+        ClientDefinedChannelIndicator actualClientDefinedChannelIndicator,
+        FraudChannelInfo channelInfo
     ) {
-        assertThat(actualClientDefinedChannelIndicator)
-            .isEqualTo(ClientDefinedChannelIndicator.PPRB_BROWSER);
+        assertThat(actualClientDefinedChannelIndicator.toString())
+            .hasToString(channelInfo.getClientDefinedChannelIndicator().getValue());
     }
 
     protected void checkCounterPartyClientDefinedAttributes(

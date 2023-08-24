@@ -7,6 +7,11 @@
       "type": "string",
       "format": "date-time",
       "title": "Дата и время наступления события"
+    },
+    "clientDefinedEventType": {
+      "type": "string",
+      "$ref": "../event/fraud_client_defined_event_type.json",
+      "title": "Клиентское подсобытие"
     }
   },
   "required": [

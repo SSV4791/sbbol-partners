@@ -1,0 +1,10 @@
+{
+  "type": "string",
+  "title": "Дополнительная информация об используемом канале связи",
+  "enum": [
+    "PPRB_BROWSER",
+    "PPRB_UPG_1C",
+    "PPRB_UPG_SBB",
+    "PPRB_UPG_CORP"
+  ]
+}

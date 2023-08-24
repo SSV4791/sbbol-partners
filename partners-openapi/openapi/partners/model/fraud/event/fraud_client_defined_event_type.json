@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "title": "Тип канала",
+  "enum": [
+    "BROWSER_APPROVAL",
+    "BROWSER_REMOVE_PAYEE",
+    "UPG_1C_APPROVAL",
+    "UPG_SBB_APPROVAL",
+    "UPG_CORP_APPROVAL"
+  ]
+}

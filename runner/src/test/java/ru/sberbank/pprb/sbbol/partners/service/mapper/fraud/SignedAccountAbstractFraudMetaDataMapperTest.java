@@ -56,10 +56,10 @@ class SignedAccountAbstractFraudMetaDataMapperTest extends AbstractFraudMetaData
         checkCounterPartyEventData(actualEventDate, eventData, eventType);
 
         var actualChannelIndicator = actualFraudRequest.getChannelIndicator();
-        checkChannelIndicator(actualChannelIndicator, metaData.getChannelIndicator());
+        checkChannelIndicator(actualChannelIndicator, metaData);
 
         var actualClientDefinedChannelIndicator = actualFraudRequest.getClientDefinedChannelIndicator();
-        checkClientDefinedChannelIndicator(actualClientDefinedChannelIndicator);
+        checkClientDefinedChannelIndicator(actualClientDefinedChannelIndicator, metaData.getChannelInfo());
 
         var actualClientDefinedAttributeList = actualFraudRequest.getClientDefinedAttributeList();
         checkCounterPartyClientDefinedAttributes(actualClientDefinedAttributeList, clientData, partnerEntity,
