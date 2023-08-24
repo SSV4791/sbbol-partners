@@ -5,16 +5,21 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisites;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
+
+import java.util.List;
+import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
@@ -46,6 +51,7 @@ public interface CounterpartyMapper {
     @Mapping(target = "bankName", source = "account.bank", qualifiedByName = "toBankName")
     @Mapping(target = "bankBic", source = "account.bank", qualifiedByName = "toBankBic")
     @Mapping(target = "corrAccount", source = "account.bank", qualifiedByName = "toCorrAccount")
+    @Mapping(target = "replicationGuid", source = "account.idLinks", qualifiedByName = "toReplicationGuid")
     Counterparty toCounterparty(PartnerEntity partner, AccountEntity account);
 
     @Named("toName")
@@ -98,5 +104,16 @@ public interface CounterpartyMapper {
     @Named("toSign")
     static Boolean toSign(AccountStateType sign) {
         return sign == AccountStateType.SIGNED;
+    }
+
+    @Named("toReplicationGuid")
+    static UUID toReplicationGuid(List<IdsHistoryEntity> idLinks) {
+        if (CollectionUtils.isEmpty(idLinks)) {
+            return null;
+        }
+        if (idLinks.size() > 1) {
+            throw new IllegalStateException("При репликации возникла ошибка. Найдено несколько UUID для репликации");
+        }
+        return idLinks.get(0).getExternalId();
     }
 }

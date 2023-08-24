@@ -149,8 +149,9 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     }
 
     private void createIdLink(AccountEntity account, UUID externalId) {
+        UUID accountUuid = Objects.isNull(externalId) ? account.getUuid() : externalId;
         var idHistoryEntity = new IdsHistoryEntity();
-        idHistoryEntity.setExternalId(externalId);
+        idHistoryEntity.setExternalId(accountUuid);
         idHistoryEntity.setDigitalId(account.getDigitalId());
         idHistoryEntity.setAccount(account);
         account.setIdLinks(List.of(idHistoryEntity));
