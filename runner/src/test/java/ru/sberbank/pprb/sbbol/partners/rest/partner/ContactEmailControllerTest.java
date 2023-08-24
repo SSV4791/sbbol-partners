@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.Allure;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -50,19 +49,19 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
                 .digitalId(contact.getDigitalId())
                 .unifiedIds(
                     List.of(
-                        contact.getId()
-                    )
-                )
+                        contact.getId()))
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0));
         });
-        var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 200", () -> post(
-            "/partner/contact/emails/view",
-            HttpStatus.OK,
-            filter,
-            EmailsResponse.class
-        ));
+
+        var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 200", () ->
+            post(
+                "/partner/contact/emails/view",
+                HttpStatus.OK,
+                filter,
+                EmailsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -87,16 +86,15 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
                 .digitalId(contact.getDigitalId())
                 .unifiedIds(
                     List.of(
-                        contact.getId()
-                    )
-                );
+                        contact.getId()));
         });
-        var response1 = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () -> post(
-            "/partner/contact/emails/view",
-            HttpStatus.BAD_REQUEST,
-            filter,
-            Error.class
-        ));
+        var response1 = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () ->
+            post(
+                "/partner/contact/emails/view",
+                HttpStatus.BAD_REQUEST,
+                filter,
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response1)
                 .isNotNull();
@@ -119,18 +117,18 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
                 .digitalId(contact.getDigitalId())
                 .unifiedIds(
                     List.of(
-                        contact.getId()
-                    )
-                )
+                        contact.getId()))
                 .pagination(new Pagination()
                     .count(0));
         });
-        var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () -> post(
-            "/partner/contact/emails/view",
-            HttpStatus.BAD_REQUEST,
-            filter,
-            Error.class
-        ));
+
+        var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () ->
+            post(
+                "/partner/contact/emails/view",
+                HttpStatus.BAD_REQUEST,
+                filter,
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -155,18 +153,18 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
                 .digitalId(contact.getDigitalId())
                 .unifiedIds(
                     List.of(
-                        contact.getId()
-                    )
-                )
+                        contact.getId()))
                 .pagination(new Pagination()
                     .offset(0));
         });
-        var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () -> post(
-            "/partner/contact/emails/view",
-            HttpStatus.BAD_REQUEST,
-            filter,
-            Error.class
-        ));
+
+        var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () ->
+            post(
+                "/partner/contact/emails/view",
+                HttpStatus.BAD_REQUEST,
+                filter,
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -187,20 +185,19 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
                 .digitalId(null)
                 .unifiedIds(
                     List.of(
-                        contact.getId()
-                    )
-                )
+                        contact.getId()))
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () ->
             post(
                 "/partner/contact/emails/view",
                 HttpStatus.BAD_REQUEST,
                 filter,
-                Error.class
-            ));
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -223,13 +220,14 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/contact/emails/view, код ответа 400", () ->
             post(
                 "/partner/contact/emails/view",
                 HttpStatus.OK,
                 filter,
-                EmailsResponse.class
-            ));
+                EmailsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -246,65 +244,62 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return getEmail(contact.getId(), contact.getDigitalId());
         });
+
         var email = step("Выполнение post-запроса /partner/contact/email, код ответа 200", () ->
             createEmail(expected));
+
         step("Проверка корректности ответа", () -> assertThat(email)
             .usingRecursiveComparison()
             .ignoringFields(
                 "id",
-                "version"
-            )
+                "version")
             .isEqualTo(expected));
     }
 
     @DisplayName("POST /partner/contact/email валидация email")
     @Test
     void testNegativeCreateContactEmail() {
-        var expected = step("Подготовка тестовых данных",
-            () -> {
-                var partner = createValidPartner(randomAlphabetic(10));
-                var contact = createValidContact(partner.getId(), partner.getDigitalId());
-                return getEmail(contact.getId(), contact.getDigitalId());
-            });
+        var expected = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return getEmail(contact.getId(), contact.getDigitalId());
+        });
 
-        step("Выполнение post-запроса на /partner/contact/email",
-            () -> {
-                expected.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(256));
-                var emailCreate = post(
-                    baseRoutePath,
-                    HttpStatus.BAD_REQUEST,
-                    expected,
-                    Error.class);
-                assertThat(emailCreate.getCode())
-                    .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-                assertMessage(emailCreate, "email", "должно иметь формат адреса электронной почты");
-            });
+        step("Выполнение post-запроса на /partner/contact/email", () -> {
+            expected.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(256));
+            var emailCreate = post(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                expected,
+                Error.class);
+            assertThat(emailCreate.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertMessage(emailCreate, "email", "должно иметь формат адреса электронной почты");
+        });
 
-        step("Выполнение post-запроса на /partner/contact/email",
-            () -> {
-                expected.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(254) + "@");
-                var emailCreate1 = post(
-                    baseRoutePath,
-                    HttpStatus.BAD_REQUEST,
-                    expected,
-                    Error.class);
-                assertThat(emailCreate1.getCode())
-                    .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-                assertMessage(emailCreate1, "email", "должно иметь формат адреса электронной почты");
-            });
+        step("Выполнение post-запроса на /partner/contact/email", () -> {
+            expected.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(254) + "@");
+            var emailCreate1 = post(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                expected,
+                Error.class);
+            assertThat(emailCreate1.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertMessage(emailCreate1, "email", "должно иметь формат адреса электронной почты");
+        });
 
-        step("Выполнение post-запроса на /partner/contact/email",
-            () -> {
-                expected.setEmail(randomAlphabetic(65) + "@" + randomAlphabetic(250));
-                var emailCreate2 = post(
-                    baseRoutePath,
-                    HttpStatus.BAD_REQUEST,
-                    expected,
-                    Error.class);
-                assertThat(emailCreate2.getCode())
-                    .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-                assertMessage(emailCreate2, "email", "должно иметь формат адреса электронной почты");
-            });
+        step("Выполнение post-запроса на /partner/contact/email", () -> {
+            expected.setEmail(randomAlphabetic(65) + "@" + randomAlphabetic(250));
+            var emailCreate2 = post(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                expected,
+                Error.class);
+            assertThat(emailCreate2.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertMessage(emailCreate2, "email", "должно иметь формат адреса электронной почты");
+        });
     }
 
     @Test
@@ -317,11 +312,14 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             expected1.digitalId(null);
             return expected1;
         });
-        var emailCreate = step("Выполнение post-запроса /partner/contact/email, код ответа 400", () -> post(
-            baseRoutePath,
-            HttpStatus.BAD_REQUEST,
-            expected,
-            Error.class));
+
+        var emailCreate = step("Выполнение post-запроса /partner/contact/email, код ответа 400", () ->
+            post(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                expected,
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(emailCreate.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
@@ -339,11 +337,14 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             expected1.unifiedId(null);
             return expected1;
         });
-        var emailCreate = step("Выполнение post-запроса /partner/contact/email, код ответа 400", () -> post(
-            baseRoutePath,
-            HttpStatus.BAD_REQUEST,
-            expected,
-            Error.class));
+
+        var emailCreate = step("Выполнение post-запроса /partner/contact/email, код ответа 400", () ->
+            post(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                expected,
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(emailCreate.getCode())
                 .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
@@ -354,12 +355,16 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("NEG POST /partner/contact/email без созданного contact")
     void testNegativeCreateContactEmailIsNull() {
-        var partner = step("Подготовка тестовых данных", () -> createValidPartner(randomAlphabetic(10)));
-        var emailCreate = step("Выполнение post-запроса /partner/contact/email, код ответа 400", () -> post(
-            baseRoutePath,
-            HttpStatus.NOT_FOUND,
-            getEmail(partner.getId(), partner.getDigitalId()),
-            Error.class));
+        var partner = step("Подготовка тестовых данных", () ->
+            createValidPartner(randomAlphabetic(10)));
+
+        var emailCreate = step("Выполнение post-запроса /partner/contact/email, код ответа 400", () ->
+            post(
+                baseRoutePath,
+                HttpStatus.NOT_FOUND,
+                getEmail(partner.getId(), partner.getDigitalId()),
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(emailCreate.getCode())
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
@@ -370,28 +375,25 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
 
     @Test
     void testUpdateContactEmail() {
-        var email = step("Подготовка тестовых данных",
-            () -> {
-                var partner = createValidPartner(randomAlphabetic(10));
-                var contact = createValidContact(partner.getId(), partner.getDigitalId());
-                return createEmail(contact.getId(), contact.getDigitalId());
-            });
+        var email = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createEmail(contact.getId(), contact.getDigitalId());
+        });
 
-        var newUpdateEmail = step("Выполнение put-запроса /partner/contact/email",
-            () -> put(
+        var newUpdateEmail = step("Выполнение put-запроса /partner/contact/email", () ->
+            put(
                 baseRoutePath,
                 HttpStatus.OK,
                 updateEmail(email),
-                Email.class
-            ));
+                Email.class));
 
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(newUpdateEmail)
-                    .isNotNull();
-                assertThat(newUpdateEmail.getEmail())
-                    .isNotEqualTo(email.getEmail());
-            });
+        step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateEmail)
+                .isNotNull();
+            assertThat(newUpdateEmail.getEmail())
+                .isNotEqualTo(email.getEmail());
+        });
     }
 
     @Test
@@ -401,72 +403,65 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
 
-        step("Выполнене put-запроса /partner/contact/email. Проверка email",
-            () -> {
-                var email = createEmail(contact.getId(), contact.getDigitalId());
-                updateEmail(email);
-                email.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(256));
-                var emailError = put(
-                    baseRoutePath,
-                    HttpStatus.BAD_REQUEST,
-                    email,
-                    Error.class
-                );
-                assertThat(emailError.getCode())
-                    .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            });
+        step("Выполнене put-запроса /partner/contact/email. Проверка email", () -> {
+            var email = createEmail(contact.getId(), contact.getDigitalId());
+            updateEmail(email);
+            email.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(256));
+            var emailError = put(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                email,
+                Error.class);
+            assertThat(emailError.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
 
-        step("Выполнене put-запроса /partner/contact/email. Проверка email",
-            () -> {
-                var email1 = createEmail(contact.getId(), contact.getDigitalId());
+        step("Выполнене put-запроса /partner/contact/email. Проверка email", () -> {
+            var email1 = createEmail(contact.getId(), contact.getDigitalId());
 
-                updateEmail(email1);
-                email1.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(254) + "@");
-                var emailError1 = put(
-                    baseRoutePath,
-                    HttpStatus.BAD_REQUEST,
-                    email1,
-                    Error.class
-                );
-                assertThat(emailError1.getCode())
-                    .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            });
+            updateEmail(email1);
+            email1.setEmail(randomAlphabetic(64) + "@" + randomAlphabetic(254) + "@");
+            var emailError1 = put(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                email1,
+                Error.class);
+            assertThat(emailError1.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
 
-        step("Выполнене put-запроса /partner/contact/email. Проверка email",
-            () -> {
-                var email2 = createEmail(contact.getId(), contact.getDigitalId());
+        step("Выполнене put-запроса /partner/contact/email. Проверка email", () -> {
+            var email2 = createEmail(contact.getId(), contact.getDigitalId());
 
-                updateEmail(email2);
-                email2.setEmail(randomAlphabetic(65) + "@" + randomAlphabetic(250));
-                var emailError2 = put(
-                    baseRoutePath,
-                    HttpStatus.BAD_REQUEST,
-                    email2,
-                    Error.class
-                );
-                assertThat(emailError2.getCode())
-                    .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-            });
+            updateEmail(email2);
+            email2.setEmail(randomAlphabetic(65) + "@" + randomAlphabetic(250));
+            var emailError2 = put(
+                baseRoutePath,
+                HttpStatus.BAD_REQUEST,
+                email2,
+                Error.class
+            );
+            assertThat(emailError2.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
     }
 
     @Test
     void negativeTestUpdateEmailVersion() {
-        var email = step("Подготовка тестовых данных. Email",
-            () -> {
-                var partner = createValidPartner(randomAlphabetic(10));
-                var contact = createValidContact(partner.getId(), partner.getDigitalId());
-                return createEmail(contact.getId(), contact.getDigitalId());
-            });
+        var email = step("Подготовка тестовых данных. Email", () -> {
+            var partner = createValidPartner(randomAlphabetic(10));
+            var contact = createValidContact(partner.getId(), partner.getDigitalId());
+            return createEmail(contact.getId(), contact.getDigitalId());
+        });
 
-        var version = step("Подготовка тестовых данных. Version",
-            () -> {
-                Long versionTest = email.getVersion() + 1;
-                email.setVersion(versionTest);
-                return versionTest;
-            });
+        var version = step("Подготовка тестовых данных. Version", () -> {
+            Long versionTest = email.getVersion() + 1;
+            email.setVersion(versionTest);
+            return versionTest;
+        });
 
-        var emailError = step("Выполнене put-запроса /partner/contact/email",
-            () -> put(
+        var emailError = step("Выполнене put-запроса /partner/contact/email", () ->
+            put(
                 baseRoutePath,
                 HttpStatus.BAD_REQUEST,
                 updateEmail(email),
@@ -490,8 +485,8 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             return createEmail(contact.getId(), contact.getDigitalId());
         });
 
-        var updateEmail = step("Выполнение put-запроса /partner/contact/email",
-            () -> put(
+        var updateEmail = step("Выполнение put-запроса /partner/contact/email", () ->
+            put(
                 baseRoutePath,
                 HttpStatus.OK,
                 updateEmail(email),
@@ -507,8 +502,8 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             return emailTest;
         });
 
-        var response = step("Выполнение post-запроса /partner/contact/emails/view",
-            () -> post(
+        var response = step("Выполнение post-запроса /partner/contact/emails/view", () ->
+            post(
                 "/partner/contact/emails/view",
                 HttpStatus.OK,
                 checkEmail,
@@ -539,12 +534,14 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             var email = createEmail(contact.getId(), contact.getDigitalId());
             return email.digitalId(null);
         });
-        var newUpdateEmail = step("Выполнение put-запроса /partner/contact/email, код ответа 404", () -> put(
-            baseRoutePath,
-            HttpStatus.NOT_FOUND,
-            updateEmail,
-            Error.class
-        ));
+
+        var newUpdateEmail = step("Выполнение put-запроса /partner/contact/email, код ответа 404", () ->
+            put(
+                baseRoutePath,
+                HttpStatus.NOT_FOUND,
+                updateEmail,
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateEmail)
                 .isNotNull();
@@ -564,12 +561,13 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             var email = createEmail(contact.getId(), contact.getDigitalId());
             return email.unifiedId(null);
         });
+
         var newUpdateEmail = step("Выполнение put-запроса /partner/contact/email, код ответа 404", () -> put(
             baseRoutePath,
             HttpStatus.BAD_REQUEST,
             updateEmail,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateEmail)
                 .isNotNull();
@@ -587,8 +585,8 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
 
-        var filter1 = step("Подготовка тестовых данных. Filter",
-            () -> new EmailsFilter()
+        var filter1 = step("Подготовка тестовых данных. Filter", () ->
+            new EmailsFilter()
                 .digitalId(contact.getDigitalId())
                 .unifiedIds(
                     List.of(
@@ -597,56 +595,50 @@ public class ContactEmailControllerTest extends AbstractIntegrationTest {
                     .count(4)
                     .offset(0)));
 
-        var actualEmail = step("Проверка post-запроса /partner/contact/emails/view",
-            () -> {
-                var actualEmailTest = post(
-                    "/partner/contact/emails/view",
-                    HttpStatus.OK,
-                    filter1,
-                    EmailsResponse.class
-                );
-                assertThat(actualEmailTest)
-                    .isNotNull();
-                return actualEmailTest;
-            });
+        var actualEmail = step("Проверка post-запроса /partner/contact/emails/view", () -> {
+            var actualEmailTest = post(
+                "/partner/contact/emails/view",
+                HttpStatus.OK,
+                filter1,
+                EmailsResponse.class);
+            assertThat(actualEmailTest)
+                .isNotNull();
+            return actualEmailTest;
+        });
 
-        step("Проверка delete-запроса /partner/contact/emails/{digitalId}",
-            () -> {
-                var deleteEmail =
-                    delete(
-                        "/partner/contact/emails/{digitalId}",
-                        HttpStatus.NO_CONTENT,
-                        Map.of("ids", actualEmail.getEmails().get(0).getId()),
-                        contact.getDigitalId()
-                    ).getBody();
-                assertThat(deleteEmail)
-                    .isNotNull();
-            });
+        step("Проверка delete-запроса /partner/contact/emails/{digitalId}", () -> {
+            var deleteEmail =
+                delete(
+                    "/partner/contact/emails/{digitalId}",
+                    HttpStatus.NO_CONTENT,
+                    Map.of("ids", actualEmail.getEmails().get(0).getId()),
+                    contact.getDigitalId())
+                    .getBody();
+            assertThat(deleteEmail)
+                .isNotNull();
+        });
 
-        step("Проверка повторного delete-запроса /partner/contact/emails/{digitalId}",
-            () -> {
-                var deleteEmail2 =
-                    delete(
-                        "/partner/contact/emails/{digitalId}",
-                        HttpStatus.NOT_FOUND,
-                        Map.of("ids", actualEmail.getEmails().get(0).getId()),
-                        contact.getDigitalId()
-                    ).getBody();
-                assertThat(deleteEmail2)
-                    .isNotNull();
-            });
+        step("Проверка повторного delete-запроса /partner/contact/emails/{digitalId}", () -> {
+            var deleteEmail2 =
+                delete(
+                    "/partner/contact/emails/{digitalId}",
+                    HttpStatus.NOT_FOUND,
+                    Map.of("ids", actualEmail.getEmails().get(0).getId()),
+                    contact.getDigitalId())
+                    .getBody();
+            assertThat(deleteEmail2)
+                .isNotNull();
+        });
 
-        step("Проверка после удаления post-запроса /partner/contact/emails/view",
-            () -> {
-                var searchEmail = post(
-                    "/partner/contact/emails/view",
-                    HttpStatus.OK,
-                    filter1,
-                    EmailsResponse.class
-                );
-                assertThat(searchEmail.getEmails())
-                    .isNull();
-            });
+        step("Проверка после удаления post-запроса /partner/contact/emails/view", () -> {
+            var searchEmail = post(
+                "/partner/contact/emails/view",
+                HttpStatus.OK,
+                filter1,
+                EmailsResponse.class);
+            assertThat(searchEmail.getEmails())
+                .isNull();
+        });
     }
 
     private static EmailCreate getEmail(UUID contactUuid, String digitalId) {

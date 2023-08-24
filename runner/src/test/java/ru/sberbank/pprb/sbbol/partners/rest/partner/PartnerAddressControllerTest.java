@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -13,12 +14,14 @@ import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static io.qameta.allure.Allure.step;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
@@ -31,179 +34,234 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
     public static final String baseRoutePath = "/partner";
 
     @Test
+    @DisplayName("GET /partner/addresses/{digitalId}/{id} получение адреса партнера")
     void testGetPartnerAddress() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var address = createValidAddress(partner.getId(), partner.getDigitalId());
-        var actualAddress =
+        var address = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return createValidAddress(partner.getId(), partner.getDigitalId());
+        });
+
+        var actualAddress = step("Выполнение get-запроса /partner/addresses/{digitalId}/{id}", () ->
             get(
                 baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Address.class,
-                address.getDigitalId(), address.getId()
-            );
-        assertThat(actualAddress)
-            .isNotNull()
-            .isEqualTo(address);
+                address.getDigitalId(), address.getId()));
+
+        step("Проверка корректности ответа", () ->
+            assertThat(actualAddress)
+                .isNotNull()
+                .isEqualTo(address));
     }
 
     @Test
+    @DisplayName("POST /partner/addresses/view успешный запрос адреса с фильтром")
     void testViewPartnerAddress() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        createValidAddress(partner.getId(), partner.getDigitalId());
-        createValidAddress(partner.getId(), partner.getDigitalId());
-        createValidAddress(partner.getId(), partner.getDigitalId());
-        createValidAddress(partner.getId(), partner.getDigitalId());
-        createValidAddress(partner.getId(), partner.getDigitalId());
+        var partner = step("Подготовка тестовых данных", () -> {
+            Partner validPartner = createValidPartner(randomAlphabetic(10));
+            createValidAddress(validPartner.getId(), validPartner.getDigitalId());
+            createValidAddress(validPartner.getId(), validPartner.getDigitalId());
+            createValidAddress(validPartner.getId(), validPartner.getDigitalId());
+            createValidAddress(validPartner.getId(), validPartner.getDigitalId());
+            createValidAddress(validPartner.getId(), validPartner.getDigitalId());
+            return validPartner;
+        });
 
-        var filter1 = new AddressesFilter()
-            .digitalId(partner.getDigitalId())
-            .unifiedIds(List.of(partner.getId()))
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0));
-        var response1 =
+        var filter1 = step("Фильтр для запроса адресов партнеров", () ->
+            new AddressesFilter()
+                .digitalId(partner.getDigitalId())
+                .unifiedIds(List.of(partner.getId()))
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0)));
+        var response1 = step("Выполнение post-запроса /partner/addresses/view", () ->
             post(
                 baseRoutePath + "/addresses/view",
                 HttpStatus.OK,
                 filter1,
-                AddressesResponse.class
-            );
-        assertThat(response1)
-            .isNotNull();
-        assertThat(response1.getAddresses())
-            .hasSize(4);
-        var filter2 = new AddressesFilter()
-            .digitalId(partner.getDigitalId())
-            .unifiedIds(List.of(partner.getId()))
-            .type(AddressType.LEGAL_ADDRESS)
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0));
-        var response2 =
+                AddressesResponse.class));
+        step("Проверка корректности ответа", () -> {
+            assertThat(response1)
+                .isNotNull();
+            assertThat(response1.getAddresses())
+                .hasSize(4);
+        });
+
+        var filter2 = step("Фильтр для запроса адресов партнеров", () ->
+            new AddressesFilter()
+                .digitalId(partner.getDigitalId())
+                .unifiedIds(List.of(partner.getId()))
+                .type(AddressType.LEGAL_ADDRESS)
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0)));
+        var response2 = step("Выполнение post-запроса /partner/addresses/view", () ->
             post(
                 baseRoutePath + "/addresses/view",
                 HttpStatus.OK,
                 filter2,
-                AddressesResponse.class
-            );
-        assertThat(response2)
-            .isNotNull();
-        assertThat(response2.getAddresses())
-            .hasSize(4);
-        assertThat(response2.getPagination().getHasNextPage())
-            .isEqualTo(Boolean.TRUE);
+                AddressesResponse.class));
+        step("Проверка корректности ответа", () -> {
+            assertThat(response2)
+                .isNotNull();
+            assertThat(response2.getAddresses())
+                .hasSize(4);
+            assertThat(response2.getPagination().getHasNextPage())
+                .isEqualTo(Boolean.TRUE);
+        });
     }
 
     @Test
+    @DisplayName("POST /partner/address создание валидного адреса")
     void testCreatePartnerAddress() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var expected = getValidPartnerAddress(partner.getId(), partner.getDigitalId());
-        var address = createValidAddress(expected);
-        assertThat(address)
-            .usingRecursiveComparison()
-            .ignoringFields(
-                "id",
-                "version"
-            )
-            .isEqualTo(expected);
+        var expected = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return getValidPartnerAddress(partner.getId(), partner.getDigitalId());
+        });
+
+        var address = step("Выполнение post-запроса /partner/address", () ->
+            createValidAddress(expected));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(address)
+                .usingRecursiveComparison()
+                .ignoringFields(
+                    "id",
+                    "version")
+                .isEqualTo(expected);
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/address обновление адреса партнера")
     void testUpdatePartnerAddress() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var address = createValidAddress(partner.getId(), partner.getDigitalId());
-        var newUpdateAddress = put(
-            baseRoutePath + "/address",
-            HttpStatus.OK,
-            updateAddress(address),
-            Address.class
-        );
-        assertThat(newUpdateAddress)
-            .isNotNull();
-        assertThat(newUpdateAddress.getStreet())
-            .isEqualTo(newUpdateAddress.getStreet());
-        assertThat(newUpdateAddress.getStreet())
-            .isNotEqualTo(address.getStreet());
+        var address = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return createValidAddress(partner.getId(), partner.getDigitalId());
+        });
+
+        var newUpdateAddress = step("Выполнение put-запроса /partner/address", () ->
+            put(
+                baseRoutePath + "/address",
+                HttpStatus.OK,
+                updateAddress(address),
+                Address.class));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(newUpdateAddress)
+                .isNotNull();
+            assertThat(newUpdateAddress.getStreet())
+                .isEqualTo(newUpdateAddress.getStreet());
+            assertThat(newUpdateAddress.getStreet())
+                .isNotEqualTo(address.getStreet());
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/address негативный сценарий обновления версии адреса")
     void negativeTestUpdateAddressVersion() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var address = createValidAddress(partner.getId(), partner.getDigitalId());
-        Long version = address.getVersion() + 1;
-        address.setVersion(version);
-        var addressError = put(
-            baseRoutePath + "/address",
-            HttpStatus.BAD_REQUEST,
-            updateAddress(address),
-            Error.class
-        );
-        assertThat(addressError.getCode())
-            .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
-        assertThat(addressError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .contains("Версия записи в базе данных " + (address.getVersion() - 1) +
-                " не равна версии записи в запросе version=" + version);
+        var address = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return createValidAddress(partner.getId(), partner.getDigitalId());
+        });
+
+        Long version = step("Изменение версии адреса", () -> {
+            Long versionTest = address.getVersion() + 1;
+            address.setVersion(versionTest);
+            return versionTest;
+        });
+
+        var addressError = step("Выполнение put-запроса /partner/address", () ->
+            put(
+                baseRoutePath + "/address",
+                HttpStatus.BAD_REQUEST,
+                updateAddress(address),
+                Error.class));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(addressError.getCode())
+                .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
+            assertThat(addressError.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
+                .contains("Версия записи в базе данных " + (address.getVersion() - 1) +
+                    " не равна версии записи в запросе version=" + version);
+        });
     }
 
     @Test
+    @DisplayName("PUT /partner/address позитивный сценарий обновления версии адреса")
     void positiveTestUpdateAddressVersion() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var address = createValidAddress(partner.getId(), partner.getDigitalId());
-        var addressUpdate = put(
-            baseRoutePath + "/address",
-            HttpStatus.OK,
-            updateAddress(address),
-            Address.class
-        );
-        var checkAddress = get(
-            baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
-            HttpStatus.OK,
-            Address.class,
-            addressUpdate.getDigitalId(), addressUpdate.getId());
-        assertThat(checkAddress)
-            .isNotNull();
-        assertThat(checkAddress.getVersion())
-            .isEqualTo(address.getVersion() + 1);
-    }
+        var address = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return createValidAddress(partner.getId(), partner.getDigitalId());
+        });
 
-    @Test
-    void testDeletePartnerAddress() {
-        var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
-        var address = createValidAddress(partner.getId(), partner.getDigitalId());
-        var actualAddress =
+        var addressUpdate = step("Выполнение put-запроса /partner/address", () ->
+            put(
+                baseRoutePath + "/address",
+                HttpStatus.OK,
+                updateAddress(address),
+                Address.class));
+
+        var checkAddress = step("Выполнение get-запроса /partner/addresses/{digitalId}/{id}", () ->
             get(
                 baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Address.class,
-                address.getDigitalId(), address.getId()
-            );
-        assertThat(actualAddress)
-            .isNotNull()
-            .isEqualTo(address);
+                addressUpdate.getDigitalId(), addressUpdate.getId()));
 
-        var deleteAddress =
+        step("Проверка корректности ответа", () -> {
+            assertThat(checkAddress)
+                .isNotNull();
+            assertThat(checkAddress.getVersion())
+                .isEqualTo(address.getVersion() + 1);
+        });
+    }
+
+    @Test
+    @DisplayName("DELETE /partner/addresses/{digitalId} удаление адреса")
+    void testDeletePartnerAddress() {
+        var address = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return createValidAddress(partner.getId(), partner.getDigitalId());
+        });
+
+        var actualAddress = step("Выполнение delete-запроса /partner/addresses/{digitalId}/{id}", () ->
+            get(
+                baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
+                HttpStatus.OK,
+                Address.class,
+                address.getDigitalId(), address.getId()));
+
+        step("Проверка корректности ответа", () ->
+            assertThat(actualAddress)
+                .isNotNull()
+                .isEqualTo(address));
+
+        var deleteAddress = step("Выполнение delete-запроса /partner/addresses/{digitalId}", () ->
             delete(
                 baseRoutePath + "/addresses" + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
                 Map.of("ids", actualAddress.getId()),
-                actualAddress.getDigitalId()
-            ).getBody();
-        assertThat(deleteAddress)
-            .isNotNull();
+                actualAddress.getDigitalId())
+                .getBody());
 
-        var searchAddress =
+        step("Проверка корректности ответа", () ->
+            assertThat(deleteAddress)
+                .isNotNull());
+
+        var searchAddress = step("Выполнение get-запроса /partner/addresses/{digitalId}/{id}", () ->
             get(
                 baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
-                address.getDigitalId(), address.getId()
-            );
+                address.getDigitalId(), address.getId()));
 
-        assertThat(searchAddress)
-            .isNotNull();
-
-        assertThat(searchAddress.getCode())
-            .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        step("Проверка корректности ответа", () -> {
+            assertThat(searchAddress)
+                .isNotNull();
+            assertThat(searchAddress.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
     }
 
     private static Address createValidAddress(UUID partnerUuid, String digitalId) {

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
@@ -9,6 +10,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 
 import java.util.List;
 
+import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.model.LegalForm.ENTREPRENEUR;
 
@@ -24,24 +26,43 @@ class DocumentDictionaryControllerTest extends AbstractIntegrationTest {
         );
 
     @Test
+    @DisplayName("POST /dictionary/documents/view")
     void testGetDocumentsWhenLegalFormNotDefined() {
-        var response = post(baseRoutePath + "/view", HttpStatus.OK, defaultFilter, DocumentsTypeResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getDocumentType())
-            .isNotEmpty();
+        var response = step("Выполнение post-запроса /dictionary/documents/view", () ->
+            post(baseRoutePath + "/view",
+                HttpStatus.OK,
+                defaultFilter,
+                DocumentsTypeResponse.class));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getDocumentType())
+                .isNotEmpty();
+        });
     }
 
     @Test
+    @DisplayName("POST /dictionary/documents/view + legalForms - ENTREPRENEUR")
     void testGetDocumentsWhenLegalFormIsMatched() {
-        var filter = new DocumentTypeFilter()
-            .deleted(false)
-            .pagination(new Pagination().offset(0).count(4))
-            .legalForms(List.of(ENTREPRENEUR));
-        var response = post(baseRoutePath + "/view", HttpStatus.OK, filter, DocumentsTypeResponse.class);
-        assertThat(response)
-            .isNotNull();
-        assertThat(response.getDocumentType())
-            .isNotEmpty();
+        var filter = step("Подготовка тестовых данных", () ->
+            new DocumentTypeFilter()
+                .deleted(false)
+                .pagination(new Pagination().offset(0).count(4))
+                .legalForms(List.of(ENTREPRENEUR)));
+
+        var response = step("Выполнение post-запроса /dictionary/documents/view", () ->
+            post(
+                baseRoutePath + "/view",
+                HttpStatus.OK,
+                filter,
+                DocumentsTypeResponse.class));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getDocumentType())
+                .isNotEmpty();
+        });
     }
 }

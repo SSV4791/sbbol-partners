@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,12 +45,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
+
         var actualContact = step("Выполнение get-запроса /partner/contacts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Contact.class,
-            contact.getDigitalId(), contact.getId()
-        ));
+            contact.getDigitalId(), contact.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(actualContact)
                 .isNotNull()
@@ -68,12 +68,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 .digitalId(partner.getDigitalId())
                 .partnerId(partner.getId());
         });
+
         var response = step("Выполнение post-запроса /partner/contacts/view, код ответа 400", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.BAD_REQUEST,
             filter,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -95,12 +96,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 .pagination(new Pagination()
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/contacts/view, код ответа 400", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.BAD_REQUEST,
             filter,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -135,12 +137,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 .pagination(new Pagination()
                     .count(4));
         });
+
         var response = step("Выполнение post-запроса /partner/contacts/view, код ответа 400", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.BAD_REQUEST,
             filter,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -161,12 +164,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/contacts/view, код ответа 200", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.OK,
             filter,
-            ContactsResponse.class
-        ));
+            ContactsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -195,8 +199,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contacts/view",
             HttpStatus.OK,
             filter,
-            ContactsResponse.class
-        ));
+            ContactsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -231,12 +235,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/contacts/view, код ответа 200", () -> post(
             baseRoutePath + "/contacts/view",
             HttpStatus.OK,
             filter,
-            ContactsResponse.class
-        ));
+            ContactsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -256,15 +261,14 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partnerWithContact = createValidPartner(randomAlphabetic(10));
             return createValidContact(partnerWithContact.getId(), partnerWithContact.getDigitalId());
         });
+
         var filter = step("Подготовка тестовых данных", () ->
             new ContactsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerId(partner.getId())
                 .ids(
                     List.of(
-                        contact.getId()
-                    )
-                )
+                        contact.getId()))
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0)));
@@ -272,8 +276,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contacts/view",
             HttpStatus.OK,
             filter,
-            ContactsResponse.class
-        ));
+            ContactsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -291,8 +295,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return getValidContact(partner.getId(), partner.getDigitalId());
         });
-        var contact = step("Выполнение post-запроса /partner/contact, код ответа 200",
-            () -> createValidContact(expected));
+
+        var contact = step("Выполнение post-запроса /partner/contact, код ответа 200", () ->
+            createValidContact(expected));
+
         step("Проверка корректности ответа", () -> {
             assertThat(contact)
                 .usingRecursiveComparison()
@@ -316,8 +322,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             expected1.setPhones(null);
             return expected1;
         });
-        var contact = step("Выполнение post-запроса /partner/contact, код ответа 200",
-            () -> createValidContact(expected));
+
+        var contact = step("Выполнение post-запроса /partner/contact, код ответа 200", () ->
+            createValidContact(expected));
+
         step("Проверка корректности ответа", () -> {
             assertThat(contact)
                 .usingRecursiveComparison()
@@ -334,10 +342,10 @@ public class ContactControllerTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("POST /partner/contact создание контакта для не существующего контрагента")
     void testCreateContactForNonExistentCounterparty() {
-        var contactWithoutCounterparty = step("Подготовка тестовых данных", () -> 
+        var contactWithoutCounterparty = step("Подготовка тестовых данных", () ->
             getValidContact(UUID.randomUUID(), RandomStringUtils.randomAlphabetic(10)));
-        var contact = step("Выполнение post-запроса /partner/contact, код ответа 404",
-            () -> createContactWithError(contactWithoutCounterparty));
+        var contact = step("Выполнение post-запроса /partner/contact, код ответа 404", () ->
+                createContactWithError(contactWithoutCounterparty));
 
         step("Проверка корректности ответа", () -> {
             assertThat(contact).isNotNull();
@@ -357,12 +365,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 .forEach(value -> value.setPhone("ABC" + randomAlphabetic(10)));
             return contact1;
         });
+
         var createContact = step("Выполнение put-запроса /partner/contact, код ответа 400", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
             contact,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> assertThat(createContact)
             .isNotNull());
     }
@@ -374,6 +383,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
+
         var newPhones = step("Подготовка новых номеров телефонов", () -> {
             Set<Phone> phones = new HashSet<>();
             if (contact.getPhones() != null) {
@@ -389,6 +399,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return phones;
         });
+
         var newEmails = step("Подготовка новых емайлов", () -> {
             Set<Email> emails = new HashSet<>();
             if (contact.getEmails() != null) {
@@ -404,16 +415,18 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return emails;
         });
+
         step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones);
             contact.setEmails(newEmails);
         });
+
         var newUpdateContact = step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            Contact.class
-        ));
+            Contact.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateContact)
                 .isNotNull();
@@ -438,6 +451,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return phones1;
         });
+
         var newEmails1 = step("Подготовка новых емайлов", () -> {
             Set<Email> emails1 = new HashSet<>();
             if (contact.getEmails() != null) {
@@ -453,6 +467,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return emails1;
         });
+
         step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones1);
             contact.setEmails(newEmails1);
@@ -462,8 +477,8 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
             updateContact(contact),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateContact1)
                 .isNotNull();
@@ -479,6 +494,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
+
         var newPhones = step("Подготовка новых номеров телефонов", () -> {
             Set<Phone> phones = new HashSet<>();
             if (contact.getPhones() != null) {
@@ -494,6 +510,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return phones;
         });
+
         var newEmails = step("Подготовка новых емайлов", () -> {
             Set<Email> emails = new HashSet<>();
             if (contact.getEmails() != null) {
@@ -509,16 +526,19 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return emails;
         });
+
         step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones);
             contact.setEmails(newEmails);
         });
+
         var newUpdateContact = step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
             Contact.class
         ));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateContact)
                 .isNotNull();
@@ -527,6 +547,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             assertThat(newUpdateContact.getFirstName())
                 .isNotEqualTo(contact.getFirstName());
         });
+
         var newPhones1 = step("Подготовка новых номеров телефонов", () -> {
             Set<Phone> phones1 = new HashSet<>();
             if (contact.getPhones() != null) {
@@ -542,6 +563,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return phones1;
         });
+
         var newEmails1 = step("Подготовка новых емайлов", () -> {
             Set<Email> emails1 = new HashSet<>();
             if (contact.getEmails() != null) {
@@ -557,17 +579,19 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             }
             return emails1;
         });
+
         step("Подготовка тестовых данных", () -> {
             contact.setPhones(newPhones1);
             contact.setEmails(newEmails1);
             contact.setVersion(contact.getVersion() + 1);
         });
+
         var newUpdateContact1 = step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            Contact.class
-        ));
+            Contact.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateContact1)
                 .isNotNull();
@@ -585,12 +609,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
+
         var newUpdateContact = step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            Contact.class
-        ));
+            Contact.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateContact)
                 .isNotNull();
@@ -614,12 +639,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             contactForUpdate.setPhones(null);
             return contactForUpdate;
         });
+
         var newUpdateContact = step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             contactUpdate,
-            Contact.class
-        ));
+            Contact.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateContact)
                 .isNotNull();
@@ -642,12 +668,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             contact.setVersion(versionForUpdate);
             return versionForUpdate;
         });
+
         var contactError = step("Выполнение put-запроса /partner/contact, код ответа 400", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.BAD_REQUEST,
             updateContact(contact),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(contactError.getCode())
                 .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
@@ -664,18 +691,19 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
+
         var contactUpdate = step("Выполнение put-запроса /partner/contact, код ответа 200", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.OK,
             updateContact(contact),
-            Contact.class
-        ));
+            Contact.class));
+
         var checkContact = step("Выполнение get-запроса /partner/contacts, код ответа 200", () -> get(
             baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Contact.class,
-            contactUpdate.getDigitalId(), contactUpdate.getId()
-        ));
+            contactUpdate.getDigitalId(), contactUpdate.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(checkContact)
                 .isNotNull();
@@ -691,12 +719,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
+
         var actualContact = step("Выполнение get-запроса /partner/contacts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Contact.class,
-            contact.getDigitalId(), contact.getId()
-        ));
+            contact.getDigitalId(), contact.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(actualContact)
                 .isNotNull()
@@ -708,16 +737,18 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             Map.of("ids", actualContact.getId()),
             actualContact.getDigitalId()
         ).getBody());
+
         step("Проверка корректности ответа", () -> {
             assertThat(deleteContact)
                 .isNotNull();
         });
+
         var searchContact = step("Выполнение get-запроса /partner/contacts/{digitalId}/{id}, код ответа 400", () -> get(
             baseRoutePath + "/contacts" + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
-            contact.getDigitalId(), contact.getId()
-        ));
+            contact.getDigitalId(), contact.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(searchContact)
                 .isNotNull();
@@ -736,18 +767,19 @@ public class ContactControllerTest extends AbstractIntegrationTest {
                 baseRoutePath + "/contacts" + "/{digitalId}",
                 HttpStatus.NO_CONTENT,
                 Map.of("ids", contact1.getId()),
-                contact1.getDigitalId()
-            );
+                contact1.getDigitalId());
             return contact1;
         });
+
         var deleteContact = step("Выполнение delete-запроса /partner/contacts/{digitalId}, код ответа 404", () ->
             delete(
                 baseRoutePath + "/contacts" + "/{digitalId}",
                 HttpStatus.NOT_FOUND,
                 Map.of("ids", contact.getId()),
-                contact.getDigitalId()
-            ));
-        step("Проверка корректности ответа", () -> assertThat(deleteContact).isNotNull());
+                contact.getDigitalId()));
+
+        step("Проверка корректности ответа", () ->
+            assertThat(deleteContact).isNotNull());
     }
 
     @Test
@@ -764,12 +796,13 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             ).getBody();
             return contact1;
         });
+
         var updateContact = step("Выполнение put-запроса /partner/contact, код ответа 404", () -> put(
             baseRoutePath + "/contact",
             HttpStatus.NOT_FOUND,
             updateContact(contact),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(updateContact).isNotNull();
             assertThat(updateContact.getCode()).isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
@@ -789,13 +822,9 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             .middleName("Отчество клиента")
             .position("Должность")
             .phones(
-                Set.of(
-                    "0079241111111"
-                ))
+                Set.of("0079241111111"))
             .emails(
-                Set.of(
-                    "a.a.a@sberbank.ru"
-                ))
+                Set.of("a.a.a@sberbank.ru"))
             ;
     }
 
@@ -804,8 +833,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.CREATED,
             getValidContact(partnerUuid, digitalId),
-            Contact.class
-        ));
+            Contact.class));
     }
 
     protected static Contact createValidContact(ContactCreate contact) {
@@ -813,8 +841,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.CREATED,
             contact,
-            Contact.class
-        );
+            Contact.class);
     }
 
     protected static Error createContactWithError(ContactCreate contact) {
@@ -822,8 +849,7 @@ public class ContactControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/contact",
             HttpStatus.NOT_FOUND,
             contact,
-            Error.class
-        );
+            Error.class);
     }
 
     public static Contact updateContact(Contact contact) {
