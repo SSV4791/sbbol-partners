@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator;
 import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
@@ -18,10 +19,13 @@ import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class AccountMapperDecorator implements AccountMapper {
 
@@ -50,6 +54,16 @@ public abstract class AccountMapperDecorator implements AccountMapper {
         Account accountResponse = delegate.toAccount(account, budgetMaskService);
         fillExternalIds(account, accountResponse);
         return accountResponse;
+    }
+
+    @Override
+    public List<AccountEntity> toAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid) {
+        if (CollectionUtils.isEmpty(accounts)) {
+            return Collections.emptyList();
+        }
+        return accounts.stream()
+            .map(value -> toAccount(value, digitalId, partnerUuid))
+            .collect(Collectors.toList());
     }
 
     private void fillExternalIds(AccountEntity account, Account accountResponse) {
