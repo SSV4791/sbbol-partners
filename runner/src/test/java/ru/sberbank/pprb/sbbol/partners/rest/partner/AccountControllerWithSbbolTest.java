@@ -1,8 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.Allure;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,16 +31,15 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
 
     @Test
     void testGetAccount() {
-        var response = step("Выполнение get-звапоса partner/accounts/{digitalId}/{id}",
-            () -> get(
+        var response = step("Выполнение get-запроса partner/accounts/{digitalId}/{id}", () ->
+            get(
                 baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
-                randomAlphabetic(10), UUID.randomUUID()
-            ));
+                randomAlphabetic(10), UUID.randomUUID()));
 
-        step("Проверка корректности ответа",
-            () -> Assertions.assertAll(
+        step("Проверка корректности ответа", () ->
+            Assertions.assertAll(
                 () -> assertThat(response)
                     .isNotNull(),
                 () -> assertThat(response.getCode())
@@ -51,23 +48,23 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
 
     @Test
     void testViewAccount() {
-        var filter = step("Подготовка тестовых данных",
-            () -> new AccountsFilter()
+        var filter = step("Подготовка тестовых данных", () ->
+            new AccountsFilter()
                 .digitalId(randomAlphabetic(10))
                 .partnerIds(List.of(UUID.randomUUID()))
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0)));
 
-        var response = step("Выполнение post-запроса /partner/accounts/view",
-            () -> post(
+        var response = step("Выполнение post-запроса /partner/accounts/view", () ->
+            post(
                 baseRoutePath + "/accounts/view",
                 HttpStatus.NOT_FOUND,
                 filter,
                 Error.class));
 
-        step("Проверка корректности ответа",
-            () -> Assertions.assertAll(
+        step("Проверка корректности ответа", () ->
+            Assertions.assertAll(
                 () -> assertThat(response)
                     .isNotNull(),
                 () -> assertThat(response.getCode())
@@ -76,18 +73,18 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
 
     @Test
     void testCreateAccount() {
-        var account = step("Подготовка тестовых данных",
-            () -> getValidAccount(UUID.fromString("bcd979a0-47ab-4337-84b8-8b4160448391"),
+        var account = step("Подготовка тестовых данных", () ->
+            getValidAccount(UUID.fromString("bcd979a0-47ab-4337-84b8-8b4160448391"),
                 randomAlphabetic(10)));
 
-        var response = step("Выполнение post-запроса /partner/account",
-            () -> post(baseRoutePath + "/account",
+        var response = step("Выполнение post-запроса /partner/account", () ->
+            post(baseRoutePath + "/account",
                 HttpStatus.NOT_FOUND,
                 account,
                 Error.class));
 
-        step("Проверка корректности ответа",
-            () -> Assertions.assertAll(
+        step("Проверка корректности ответа", () ->
+            Assertions.assertAll(
                 () -> assertThat(response)
                     .isNotNull(),
                 () -> assertThat(response.getCode())
@@ -96,8 +93,8 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
 
     @Test
     void testUpdateAccount() {
-        var account = step("Подготовка тестовых данных",
-            () -> new AccountChange()
+        var account = step("Подготовка тестовых данных", () ->
+            new AccountChange()
                 .id(UUID.randomUUID())
                 .digitalId(randomAlphabetic(10))
                 .partnerId(UUID.randomUUID())
@@ -111,15 +108,15 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
                         new BankAccount()
                             .bankAccount("30101810145250000411"))));
 
-        var response = step("Выполнение put-запроса /partner/account",
-            () -> put(
+        var response = step("Выполнение put-запроса /partner/account", () ->
+            put(
                 baseRoutePath + "/account",
                 HttpStatus.NOT_FOUND,
                 account,
                 Error.class));
 
-        step("Проверка корректности ответа",
-            () -> Assertions.assertAll(
+        step("Проверка корректности ответа", () ->
+            Assertions.assertAll(
                 () -> assertThat(response)
                     .isNotNull(),
                 () -> assertThat(response.getCode())
@@ -128,16 +125,16 @@ class AccountControllerWithSbbolTest extends AbstractIntegrationTest {
 
     @Test
     void testDeleteAccount() {
-        var response = step("Выполнение delete-запроса /partner/accounts/{digitalId}",
-            () -> delete(
+        var response = step("Выполнение delete-запроса /partner/accounts/{digitalId}", () ->
+            delete(
                 baseRoutePath + "/accounts" + "/{digitalId}",
                 HttpStatus.NOT_FOUND,
                 Map.of("ids", UUID.randomUUID()),
                 randomAlphabetic(10)
             ).as(Error.class));
 
-        step("Проверка корректности ответа",
-            () -> Assertions.assertAll(
+        step("Проверка корректности ответа", () ->
+            Assertions.assertAll(
                 () -> assertThat(response)
                     .isNotNull(),
                 () -> assertThat(response.getCode())

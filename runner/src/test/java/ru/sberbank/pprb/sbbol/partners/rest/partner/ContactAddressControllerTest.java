@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,17 +42,17 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), partner.getDigitalId());
         });
+
         var actualAddress = step("Выполнение get-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Address.class,
-            address.getDigitalId(), address.getId()
-        ));
-        step("Проверка корректности ответа", () -> {
+            address.getDigitalId(), address.getId()));
+
+        step("Проверка корректности ответа", () ->
             assertThat(actualAddress)
                 .isNotNull()
-                .isEqualTo(address);
-        });
+                .isEqualTo(address));
     }
 
     @Test
@@ -63,6 +62,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             createValidPartner(randomAlphabetic(10)));
         var contact = step("Подготовка тестового контакта", () ->
             createValidContact(partner.getId(), partner.getDigitalId()));
+
         step("Подготовка тестовых данных", () -> {
             createValidAddress(contact.getId(), contact.getDigitalId());
             createValidAddress(contact.getId(), contact.getDigitalId());
@@ -70,6 +70,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             createValidAddress(contact.getId(), contact.getDigitalId());
             createValidAddress(contact.getId(), contact.getDigitalId());
         });
+
         var filterWithFourElements = step("Подготовка фильтра с четырьмя элементами", () ->
             new AddressesFilter()
                 .digitalId(contact.getDigitalId())
@@ -77,18 +78,20 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0)));
+
         var responseWithFourElements = step("Выполнение post-запроса /partner/contact/addresses/view, код ответа 200", () -> post(
             baseRoutePath + "/addresses/view",
             HttpStatus.OK,
             filterWithFourElements,
-            AddressesResponse.class
-        ));
+            AddressesResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(responseWithFourElements)
                 .isNotNull();
             assertThat(responseWithFourElements.getAddresses())
                 .hasSize(4);
         });
+
         var filterWithPagination = step("Подготовка фильтра с пагинацией", () ->
             new AddressesFilter()
                 .digitalId(contact.getDigitalId())
@@ -97,12 +100,13 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0)));
+
         var responseWithPagination = step("Выполнение post-запроса /partner/contact/addresses/view, код ответа 200, pagination true", () -> post(
             baseRoutePath + "/addresses/view",
             HttpStatus.OK,
             filterWithPagination,
-            AddressesResponse.class
-        ));
+            AddressesResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(responseWithPagination)
                 .isNotNull();
@@ -120,10 +124,12 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             var partner = createValidPartner(randomAlphabetic(10));
             return createValidContact(partner.getId(), partner.getDigitalId());
         });
+
         var expected = step("Подготовка ожидаемого результата", () ->
             getValidPartnerAddress(contact.getId(), contact.getDigitalId()));
         var address = step("Подготовка валидного адреса", () ->
             createValidAddress(expected));
+
         step("Проверка корректности ответа", () -> {
             assertThat(address)
                 .usingRecursiveComparison()
@@ -140,12 +146,13 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
+
         var newUpdateAddress = step("Выполнение PUT-запроса /partner/contact/address, код ответа 200", () -> put(
             baseRoutePath + "/address",
             HttpStatus.OK,
             updateAddress(address),
-            Address.class
-        ));
+            Address.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateAddress)
                 .isNotNull();
@@ -171,12 +178,13 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             ).getBody();
             return address1;
         });
+
         var addressError = step("Выполнение PUT-запроса /partner/contact/address, код ответа 404", () -> put(
             baseRoutePath + "/address",
             HttpStatus.NOT_FOUND,
             updateAddress(address),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(addressError.getCode())
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
@@ -194,16 +202,19 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
+
         Long version = step("Получение версии записи", () ->
             address.getVersion() + 1);
+
         step("Установка версии записи", () ->
             address.setVersion(version));
+
         var addressError = step("Выполнение PUT-запроса /partner/contact/address, код ответа 400", () -> put(
             baseRoutePath + "/address",
             HttpStatus.BAD_REQUEST,
             updateAddress(address),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(addressError.getCode())
                 .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
@@ -227,11 +238,13 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             ).getBody();
             return createPartner;
         });
+
         var response = step("Выполнение POST-запроса /partner/contact/address, код ответа 404", () -> post(
             baseRoutePath + "/address",
             HttpStatus.NOT_FOUND,
             getValidPartnerAddress(partner.getId(), partner.getDigitalId()),
             Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response).isNotNull();
             assertThat(response.getCode()).isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
@@ -248,8 +261,7 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             HttpStatus.NOT_FOUND,
             new AddressCreate())
             .then()
-            .body("error", equalTo("Not Found")
-            ));
+            .body("error", equalTo("Not Found")));
     }
 
     @Test
@@ -260,18 +272,19 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
+
         var addressUpdate = step("Выполнение PUT-запроса /partner/contact/address, код ответа 200", () -> put(
             baseRoutePath + "/address",
             HttpStatus.OK,
             updateAddress(address),
-            Address.class
-        ));
+            Address.class));
+
         var checkAddress = step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Address.class,
-            addressUpdate.getDigitalId(), addressUpdate.getId()
-        ));
+            addressUpdate.getDigitalId(), addressUpdate.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(checkAddress)
                 .isNotNull();
@@ -288,33 +301,36 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
+
         var actualAddress = step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Address.class,
-            address.getDigitalId(), address.getId()
-        ));
-        step("Проверка корректности ответа", () -> {
+            address.getDigitalId(), address.getId()));
+
+        step("Проверка корректности ответа", () ->
             assertThat(actualAddress)
                 .isNotNull()
-                .isEqualTo(address);
-        });
+                .isEqualTo(address));
+
         var deleteAddress = step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 204", () -> delete(
             baseRoutePath + "/addresses" + "/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", actualAddress.getId()),
             actualAddress.getDigitalId()
         ).getBody());
+
         step("Проверка корректности ответа", () -> {
             assertThat(deleteAddress)
                 .isNotNull();
         });
+
         var searchAddress = step("Выполнение GET-запроса /partner/contact/addresses/{digitalId}/{id}, код ответа 404", () -> get(
             baseRoutePath + "/addresses" + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
-            address.getDigitalId(), address.getId()
-        ));
+            address.getDigitalId(), address.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(searchAddress)
                 .isNotNull();
@@ -331,12 +347,14 @@ public class ContactAddressControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidAddress(contact.getId(), contact.getDigitalId());
         });
+
         step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 204", () -> delete(
             baseRoutePath + "/addresses" + "/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", address.getId()),
             address.getDigitalId()
         ).getBody());
+
         step("Выполнение Delete-запроса /partner/contact/addresses/{digitalId}, код ответа 404", () -> delete(
             baseRoutePath + "/addresses" + "/{digitalId}",
             HttpStatus.NOT_FOUND,

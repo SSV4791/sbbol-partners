@@ -106,12 +106,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -138,12 +139,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -167,11 +169,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isHousingServicesProvider(false)
                 .pagination(null);
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 400", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.BAD_REQUEST,
             accountsFilter,
             Error.class));
+
         step("Проверка корректности ответа", () -> {
             Descriptions descriptions = new Descriptions()
                 .field("pagination")
@@ -202,24 +206,23 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(null)
                     .offset(null));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 400", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.BAD_REQUEST,
             accountsFilter,
             Error.class));
+
         step("Проверка корректности ответа", () -> {
             List<Descriptions> errorTexts = List.of(
                 new Descriptions()
                     .field("pagination.count")
                     .message(
-                        List.of("Поле обязательно для заполнения")
-                    ),
+                        List.of("Поле обязательно для заполнения")),
                 new Descriptions()
                     .field("pagination.offset")
                     .message(
-                        List.of("Поле обязательно для заполнения")
-                    )
-            );
+                        List.of("Поле обязательно для заполнения")));
             assertThat(response)
                 .isNotNull();
             assertThat(response.getCode())
@@ -248,12 +251,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -283,12 +287,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -317,12 +322,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -351,12 +357,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -385,12 +392,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -419,12 +427,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -453,12 +462,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -489,12 +499,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -525,12 +536,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -559,12 +571,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -591,12 +604,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(30)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             accountsFilter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -628,12 +642,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -668,12 +683,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(5)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -708,12 +724,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(5)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -734,12 +751,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+
         var actualAccount = step("Выполнение get-запроса /partner/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
-            account.getDigitalId(), account.getId()
-        ));
+            account.getDigitalId(), account.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(actualAccount.getComment())
                 .isEqualTo("Это тестовый комментарий");
@@ -766,12 +784,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -800,12 +819,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -827,7 +847,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var account3 = createValidAccount(partner.getId(), partner.getDigitalId());
             var account4 = createValidAccount(partner.getId(), partner.getDigitalId());
             var account5 = createValidAccount(partner.getId(), partner.getDigitalId());
-
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .accountIds(List.of(account1.getId(), account2.getId(), account3.getId(), account4.getId(), account5.getId()))
@@ -835,12 +854,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -860,7 +880,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
-
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
@@ -869,12 +888,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(1)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -892,7 +912,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
-
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
@@ -901,12 +920,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -924,7 +944,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
-
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
@@ -933,12 +952,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -956,7 +976,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidAccount(partner.getId(), partner.getDigitalId());
             createValidBudgetAccount(partner.getId(), partner.getDigitalId());
-
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
@@ -965,12 +984,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var response1 = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response1)
                 .isNotNull();
@@ -985,7 +1005,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
         var filter = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
             createValidBudgetAccountWith40101Balance(partner.getId(), partner.getDigitalId());
-
             return new AccountsFilter()
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
@@ -993,12 +1012,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var accountsResponse = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(accountsResponse)
                 .isNotNull();
@@ -1028,12 +1048,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     .count(4)
                     .offset(0));
         });
+
         var accountsResponse = step("Выполнение post-запроса /partner/accounts/view, код ответа 200", () -> post(
             baseRoutePath + "/accounts/view",
             HttpStatus.OK,
             filter,
-            AccountsResponse.class
-        ));
+            AccountsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(accountsResponse)
                 .isNotNull();
@@ -1054,10 +1075,14 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testCreateAccount() {
         var expected = step("Подготовка тестовых данных", () -> {
             var partner = createValidPartner();
-            return getValidAccount(partner.getId(), partner.getDigitalId());
+            var validAccount = getValidAccount(partner.getId(), partner.getDigitalId());
+            validAccount.setExternalId(UUID.randomUUID());
+            return validAccount;
         });
-        expected.setExternalId(UUID.randomUUID());
-        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createValidAccount(expected));
+
+        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () ->
+            createValidAccount(expected));
+
         step("Проверка корректности ответа", () ->
             assertThat(account)
                 .usingRecursiveComparison()
@@ -1085,8 +1110,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(getValidAccount(partner.getId(), partner.getDigitalId()));
         });
-        var idsLink = step("Выполнение запроса",
-            () -> idsHistoryService.getInternalIds(account.getDigitalId(), List.of(account.getId())));
+
+        var idsLink = step("Выполнение запроса", () ->
+            idsHistoryService.getInternalIds(account.getDigitalId(), List.of(account.getId())));
 
         step("Проверка корректности ответа", () -> {
             assertThat(idsLink)
@@ -1110,15 +1136,16 @@ class AccountControllerTest extends BaseAccountControllerTest {
             createValidAccount(account);
             return account;
         });
+
         var error = step("Выполнение post-запроса /partner/account, код ответа 400", () -> {
             expectedAccount.setAccount(null);
             return post(
                 baseRoutePath + "/account",
                 HttpStatus.BAD_REQUEST,
                 expectedAccount,
-                Error.class
-            );
+                Error.class);
         });
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -1137,15 +1164,16 @@ class AccountControllerTest extends BaseAccountControllerTest {
             createValidAccount(account);
             return account;
         });
+
         var error = step("Выполнение post-запроса /partner/account, код ответа 400", () -> {
             expectedAccount.getBank().getBankAccount().setBankAccount(null);
             return post(
                 baseRoutePath + "/account",
                 HttpStatus.BAD_REQUEST,
                 expectedAccount,
-                Error.class
-            );
+                Error.class);
         });
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -1163,12 +1191,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             createValidAccount(expected);
             return expected;
         });
+
         var error = step("Выполнение post-запроса /partner/account, код ответа 400", () -> post(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             expected_account,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -1180,35 +1209,49 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts создание невалидного счета")
     void testCreateNotValidAccount() {
-        var partner = createValidPartner();
-        var error = createNotValidAccount(partner.getId(), partner.getDigitalId());
-        assertThat(error)
-            .isNotNull();
-        assertThat(error.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        var actualAccountDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "account".equals(descriptions.getField()))
-            .findAny().orElse(null);
-        assertThat(actualAccountDescriptions)
-            .isNotNull();
-        assertThat(actualAccountDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
-        var actualBankAccountDescriptions = error.getDescriptions().stream()
-            .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
-            .findAny().orElse(null);
-        assertThat(actualBankAccountDescriptions)
-            .isNotNull();
-        assertThat(actualBankAccountDescriptions.getMessage())
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+        var error = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            return createNotValidAccount(partner.getId(), partner.getDigitalId());
+        });
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+        });
+
+        step("Проверка ошибок счета", () -> {
+            var actualAccountDescriptions = error.getDescriptions().stream()
+                .filter(descriptions -> "account".equals(descriptions.getField()))
+                .findAny().orElse(null);
+            assertThat(actualAccountDescriptions)
+                .isNotNull();
+            assertThat(actualAccountDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+        });
+
+        step("Проверка ошибок банковского счета", () -> {
+            var actualBankAccountDescriptions = error.getDescriptions().stream()
+                .filter(descriptions -> "bank.bankAccount.bankAccount".equals(descriptions.getField()))
+                .findAny().orElse(null);
+            assertThat(actualBankAccountDescriptions)
+                .isNotNull();
+            assertThat(actualBankAccountDescriptions.getMessage())
+                .asList()
+                .contains(MessagesTranslator.toLocale("validation.account.simple_pattern"));
+        });
     }
 
     @Test
     @DisplayName("POST /partner/accounts с пустыми счетом и корр. счетом")
     void testCreateWithEmptyAccountAndBankAccount() {
-        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () ->
+            createAccountEntityWithEmptyAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
+
         step("Проверка корректности ответа", () ->
             assertThat(account)
                 .isNotNull());
@@ -1217,8 +1260,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts с счетом и корр. счетомБ равные null")
     void testCreateWithNullAccountAndBankAccount() {
-        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () -> createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account = step("Выполнение post-запроса /partner/accounts, код ответа 201", () ->
+            createAccountEntityWithNullAccountAndBankAccount(partner.getId(), partner.getDigitalId()));
+
         step("Проверка корректности ответа", () ->
             assertThat(account)
                 .isNotNull());
@@ -1227,9 +1273,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account с банком равным null")
     void testCreateAccount_whenBankIsNull_thenBadRequest() {
-        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
-            () -> createAccountEntityWhenBankIsNull(partner.getId(), partner.getDigitalId()));
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () ->
+            createAccountEntityWhenBankIsNull(partner.getId(), partner.getDigitalId()));
 
         step("Проверка корректности ответа", () ->
             assertThat(error)
@@ -1252,9 +1299,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account с именем банка равным null")
     void testCreateAccount_whenBankNameIsNull_thenBadRequest() {
-        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
-            () -> createAccountEntityWhenBankNameIsNull(partner.getId(), partner.getDigitalId()));
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () ->
+            createAccountEntityWhenBankNameIsNull(partner.getId(), partner.getDigitalId()));
 
         step("Проверка корректности ответа", () ->
             assertThat(error)
@@ -1277,9 +1325,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account с пустым именем банка")
     void testCreateAccount_whenBankNameIsEmpty_thenBadRequest() {
-        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
-            () -> createAccountEntityWhenBankNameIsEmpty(partner.getId(), partner.getDigitalId()));
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () ->
+            createAccountEntityWhenBankNameIsEmpty(partner.getId(), partner.getDigitalId()));
 
         step("Проверка корректности ответа", () ->
             assertThat(error)
@@ -1302,9 +1351,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account с БИК банка равным null")
     void testCreateAccount_whenBankBicIsNull_thenBadRequest() {
-        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
-            () -> createAccountEntityWhenBankBicIsNull(partner.getId(), partner.getDigitalId()));
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () ->
+            createAccountEntityWhenBankBicIsNull(partner.getId(), partner.getDigitalId()));
 
         step("Проверка корректности ответа", () ->
             assertThat(error)
@@ -1327,9 +1377,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account с пустым БИК банка")
     void testCreateAccount_whenBankBicIsEmpty_thenBadRequest() {
-        var partner = step("Подготовка тестовых данных", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var error = step("Выполнение post-запроса /partner/account, код ответа 400",
-            () -> createAccountEntityWhenBankBicIsEmpty(partner.getId(), partner.getDigitalId()));
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var error = step("Выполнение post-запроса /partner/account, код ответа 400", () ->
+            createAccountEntityWhenBankBicIsEmpty(partner.getId(), partner.getDigitalId()));
 
         step("Проверка корректности ответа", () ->
             assertThat(error)
@@ -1358,7 +1409,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             expected.setAccount("40817840100000000001");
             return expected;
         });
-        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected_account));
+
+        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () ->
+            createInvalidAccount(expected_account));
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -1384,7 +1438,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             expectedAccount.setAccount("00817810100000000001");
             return expectedAccount;
         });
-        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected));
+
+        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () ->
+            createInvalidAccount(expected));
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -1410,7 +1467,10 @@ class AccountControllerTest extends BaseAccountControllerTest {
             expectedAccount.setAccount("10817643100000000001");
             return expectedAccount;
         });
-        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () -> createInvalidAccount(expected));
+
+        var error = step("Выполнение post-запроса /partner/accounts, код ответа 400", () ->
+            createInvalidAccount(expected));
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -1430,11 +1490,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/accounts валидный бюджетный счет")
     void testCreateValidBudgetAccount() {
-        var expected = step("Подготовка тестовых данных", () -> {
-            var partner = createValidPartner();
-            return step("Выполнение post-запроса /partner/accounts, код ответа 201", () ->
-                getValidBudgetAccount(partner.getId(), partner.getDigitalId()));
-        });
+        var partner = step("Подготовка тестовых данных",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+
+        var expected = step("Выполнение post-запроса /partner/accounts, код ответа 201", () ->
+            getValidBudgetAccount(partner.getId(), partner.getDigitalId()));
+
         step("Проверка корректности ответа", () -> {
             var actualAccount = createValidAccount(expected);
             assertThat(actualAccount)
@@ -1449,12 +1510,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+
         var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount(account),
-            Account.class
-        ));
+            Account.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
@@ -1472,12 +1534,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccountWithEmptyBankAccount(partner.getId(), partner.getDigitalId());
         });
+
         var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount(account),
-            Account.class
-        ));
+            Account.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
@@ -1500,8 +1563,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWhenBankIsNull(account),
-            Error.class
-        ));
+            Error.class));
 
         step("Проверка корректности ответа", () -> {
             assertThat(error)
@@ -1665,12 +1727,14 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+
         var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccountEntityWithEmptyAccountAndBankAccount(account),
             Account.class
         ));
+
         step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
@@ -1693,8 +1757,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccountEntityWithInvalidAccountAndBankAccount(account),
-            Error.class
-        ));
+            Error.class));
 
         var actualAccountDescriptions = step("Подготовка тестовых данных", () ->
             error.getDescriptions().stream()
@@ -1731,15 +1794,16 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+
         var accountChange = step("Подготовка тестовых данных", () ->
-            updateAccountEntityWithNullAccountAndBankAccount(accountCreate)
-        );
+            updateAccountEntityWithNullAccountAndBankAccount(accountCreate));
+
         var updateAccount = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             accountChange,
-            Account.class
-        ));
+            Account.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
@@ -1768,12 +1832,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .bankAccount(account1.getBank().getBankAccount().getBankAccount());
             return updateAccount;
         });
+
         var error = step("Выполнение put-запроса /partner/accounts, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             expected,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -1800,9 +1865,9 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.BAD_REQUEST,
                 acc,
-                Error.class
-            );
+                Error.class);
         });
+
         step("Проверка корректности ответа", () -> {
             assertThat(updateAccount)
                 .isNotNull();
@@ -1820,11 +1885,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.BAD_REQUEST,
                 acc2,
-                Error.class
-            );
+                Error.class);
         });
-        step("Проверка корректности ответа", () -> assertThat(updateAccount2.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue()));
+        step("Проверка корректности ответа", () ->
+            assertThat(updateAccount2.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue()));
 
         var updateAccount3 = step("Выполнение put-запроса /partner/accounts(не найден БИК), код ответа 400", () -> {
             var acc3 = updateAccount(account)
@@ -1834,11 +1899,11 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.BAD_REQUEST,
                 acc3,
-                Error.class
-            );
+                Error.class);
         });
-        step("Проверка корректности ответа", () -> assertThat(updateAccount3.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue()));
+        step("Проверка корректности ответа", () ->
+            assertThat(updateAccount3.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue()));
 
         var updateAccount4 = step("Выполнение put-запроса /partner/accounts(некорректный БИК), код ответа 400", () -> {
             var acc4 = updateAccount(account)
@@ -1848,8 +1913,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.BAD_REQUEST,
                 acc4,
-                Error.class
-            );
+                Error.class);
         });
         step("Проверка корректности ответа", () -> {
             assertThat(updateAccount4.getCode())
@@ -1864,9 +1928,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/accounts позитивные сценарии")
     void testPositiveUpdateAccount() {
-        var partner = step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var account = step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        var account2 = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        var partner = step("Создание партнера",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account = step("Создание счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
+        var account2 = step("Создание второго счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
 
         var updateAcc = step("Выполнение put-запроса /partner/accounts, код ответа 200", () -> {
             var acc = updateAccount(account);
@@ -1874,8 +1941,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.OK,
                 acc,
-                Account.class
-            );
+                Account.class);
             assertThat(updateAccount)
                 .isNotNull();
             return acc;
@@ -1893,8 +1959,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.OK,
                 acc1,
-                Account.class
-            );
+                Account.class);
             assertThat(updateAccount1)
                 .isNotNull();
             return acc1;
@@ -1908,8 +1973,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.OK,
                 acc2,
-                Account.class
-            );
+                Account.class);
             assertThat(updateAccount2)
                 .isNotNull();
             return acc2;
@@ -1927,8 +1991,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.OK,
                 acc3,
-                Account.class
-            );
+                Account.class);
             assertThat(updateAccount3)
                 .isNotNull();
         });
@@ -1940,8 +2003,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.OK,
                 acc4,
-                Account.class
-            );
+                Account.class);
             assertThat(updateAccount4)
                 .isNotNull();
             return acc4;
@@ -1956,8 +2018,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.OK,
                 acc5,
-                Account.class
-            );
+                Account.class);
             assertThat(updateAccount5)
                 .isNotNull();
             return acc5;
@@ -1971,8 +2032,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 baseRoutePath + "/account",
                 HttpStatus.OK,
                 acc6,
-                Account.class
-            );
+                Account.class);
             assertThat(updateAccount6)
                 .isNotNull();
         });
@@ -1988,12 +2048,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             account.setVersion(version);
             return account;
         });
+
         var accountError = step("Выполнение put-запроса /partner/accounts, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccount(expected),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(accountError.getCode())
                 .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
@@ -2010,17 +2071,19 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+
         var accountVersion = step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount(account),
-            Account.class
-        ));
+            Account.class));
+
         var checkAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion.getDigitalId(), accountVersion.getId()));
+
         step("Проверка корректности ответа get-запроса", () -> {
             assertThat(checkAccount)
                 .isNotNull();
@@ -2040,17 +2103,19 @@ class AccountControllerTest extends BaseAccountControllerTest {
             account.getBank().getBankAccount().setBankAccount("40102810545370000003");
             return account;
         });
+
         var accountVersion = step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount,
-            Account.class
-        ));
+            Account.class));
+
         var checkAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion.getDigitalId(), accountVersion.getId()));
+
         step("Проверка корректности ответа get-запроса", () -> {
             assertThat(checkAccount)
                 .isNotNull();
@@ -2065,12 +2130,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             updateAccount.getBank().getBankAccount().setBankAccount("40102810545370000003");
             return updateAccount;
         });
+
         var accountVersion1 = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccount1,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа put-запроса", () -> {
             assertThat(accountVersion1)
                 .isNotNull();
@@ -2086,12 +2152,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             updateAccount1.getBank().getBankAccount().setBankAccount("40102810945370000073");
             return updateAccount1;
         });
+
         var accountVersion2 = step("Выполнение put-запроса /partner/account, код ответа 400", () -> put(
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             updateAccount2,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа put-запроса", () -> {
             assertThat(accountVersion2)
                 .isNotNull();
@@ -2107,17 +2174,19 @@ class AccountControllerTest extends BaseAccountControllerTest {
             updateAccount2.getBank().getBankAccount().setBankAccount("40102810945370000073");
             return updateAccount2;
         });
+
         var accountVersion3 = step("Выполнение put-запроса /partner/account, код ответа 200", () -> put(
             baseRoutePath + "/account",
             HttpStatus.OK,
             updateAccount3,
-            Account.class
-        ));
+            Account.class));
+
         var checkAccount3 = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
             accountVersion3.getDigitalId(), accountVersion.getId()));
+
         step("Проверка корректности ответа get-запроса", () -> {
             assertThat(checkAccount3)
                 .isNotNull();
@@ -2133,12 +2202,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+
         var actualAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
-            account.getDigitalId(), account.getId()
-        ));
+            account.getDigitalId(), account.getId()));
+
         step("Проверка корректности ответа get-запроса", () -> {
             assertThat(actualAccount)
                 .isNotNull()
@@ -2153,15 +2223,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
             HttpStatus.NO_CONTENT,
             actualAccount.getDigitalId()
         ).getBody());
-        step("Проверка корректности ответа delete-запроса", () -> assertThat(deleteAccount)
-            .isNotNull());
+
+        step("Проверка корректности ответа delete-запроса", () ->
+            assertThat(deleteAccount)
+                .isNotNull());
 
         var searchAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 404", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.NOT_FOUND,
             Error.class,
-            account.getDigitalId(), account.getId()
-        ));
+            account.getDigitalId(), account.getId()));
+
         step("Проверка корректности ответа get-запроса", () -> {
             assertThat(searchAccount)
                 .isNotNull();
@@ -2177,12 +2249,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
+
         var foundAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
-            account.getDigitalId(), account.getId()
-        ));
+            account.getDigitalId(), account.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(foundAccount)
                 .isNotNull()
@@ -2193,14 +2266,15 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isFalse();
         });
 
-        step("Изменение приоритета на true", () -> createValidPriorityAccount(account.getId(), account.getDigitalId()));
+        step("Изменение приоритета на true", () ->
+            createValidPriorityAccount(account.getId(), account.getDigitalId()));
 
         var actualAccount = step("Выполнение get-запроса /partner/accounts/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/accounts" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Account.class,
-            account.getDigitalId(), account.getId()
-        ));
+            account.getDigitalId(), account.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(actualAccount)
                 .isNotNull();
@@ -2212,11 +2286,18 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("PUT /partner/account/priority присвоение priority для 2-х счетов")
     void testPriorityAccountException() {
-        var partner = step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        var account1 = step("Создание первого счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        var account2 = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        step("Выполнение put-запроса /partner/account/priority, код ответа 200 (для 1 счета)", () -> createValidPriorityAccount(account1.getId(), account1.getDigitalId()));
-        var error = step("Выполнение put-запроса /partner/account/priority, код ответа 400 (для 2 счета)", () -> notCreatePriorityAccount(account2.getId(), account2.getDigitalId()));
+        var partner = step("Создание партнера",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        var account1 = step("Создание первого счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
+        var account2 = step("Создание второго счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
+
+        step("Выполнение put-запроса /partner/account/priority, код ответа 200 (для 1 счета)", () ->
+            createValidPriorityAccount(account1.getId(), account1.getDigitalId()));
+        var error = step("Выполнение put-запроса /partner/account/priority, код ответа 400 (для 2 счета)", () ->
+            notCreatePriorityAccount(account2.getId(), account2.getDigitalId()));
+
         step("Проверка корректности ответа для 2 счета", () -> {
             assertThat(error)
                 .isNotNull();
@@ -2245,8 +2326,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             account,
-            Error.class
-        ));
+            Error.class));
 
         step("Проверка корректности ответа", () -> {
             assertThat(error)
@@ -2278,8 +2358,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             baseRoutePath + "/account",
             HttpStatus.BAD_REQUEST,
             account,
-            Error.class
-        ));
+            Error.class));
 
         step("Проверка корректности ответа", () -> {
             assertThat(error)
@@ -2299,16 +2378,18 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account проверка сохранения счёта физического лица с бюджетным корр счётом")
     void testSaveAccountPhysicalPersonNotSetBudgetCorrAccount() {
-        var partner =
-            Allure.step("Создание партнера Физ лицо", () -> post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(), Partner.class));
-        var account = Allure.step("Создание тестового счета", () -> {
+        var partner = step("Создание партнера Физ лицо", () ->
+            post(baseRoutePath, HttpStatus.CREATED, getValidPhysicalPersonPartner(), Partner.class));
+        var account = step("Создание тестового счета", () -> {
             var acc = getValidAccount(partner.getId(), partner.getDigitalId());
             acc.getBank().getBankAccount().setBankAccount("40102643145250000411");
             return acc;
         });
-        var error = Allure.step("Запрос создания счета, невалидный счет",
-            () -> post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class));
-        Allure.step("Проверка результата", () -> {
+
+        var error = step("Запрос создания счета, невалидный счет", () ->
+            post(baseRoutePath + "/account", HttpStatus.BAD_REQUEST, account, Error.class));
+
+        step("Проверка результата", () -> {
             assertThat(error)
                 .isNotNull();
             List<String> errorsMessage = error.getDescriptions().stream()
@@ -2325,22 +2406,27 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account/get-at-requisites получение счета партнера вместе с партнером")
     void testGetAtRequisites_whenRequestIsCorrect() {
-        var partner =
-            step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
-        Account account = step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        var partner = step("Создание партнера",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        step("Проливка ИНН партнера в справочник ЖКУ", () ->
+            saveGkuInn(partner.getInn()));
+        Account account = step("Создание счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
+
         step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId())
             .account(account.getAccount())
             .getBank()
             .bic(account.getBank().getBic())
             .bankAccount(account.getBank().getBankAccount()));
+
         step("Создание третьего счета", () -> createValidAccount(partner.getId(), partner.getDigitalId())
             .account(account.getAccount())
             .getBank()
             .bic(account.getBank().getBic())
             .bankAccount(account.getBank().getBankAccount()));
-        var request = step("Подготовка тестовых данных",
-            () -> new AccountAndPartnerRequest()
+
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
                 .digitalId(partner.getDigitalId())
                 .account(account.getAccount())
                 .bic(account.getBank().getBic())
@@ -2348,15 +2434,17 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .inn(partner.getInn())
                 .kpp(partner.getKpp())
                 .name(partner.getOrgName()));
-        step("Очищаем локальный кэш ЖКУ ИНН", () -> Objects.requireNonNull(cacheManager.getCache(CacheNames.IS_GKU_INN)).clear());
+        step("Очищаем локальный кэш ЖКУ ИНН", () ->
+            Objects.requireNonNull(cacheManager.getCache(CacheNames.IS_GKU_INN)).clear());
+
         List<AccountWithPartnerResponse> accountsWithPartner =
             step("Выполнение post-запроса /partner/account/get-at-requisites",
                 () -> post(
                     baseRoutePath + "/account/get-at-requisites",
                     request,
                     new TypeRef<>() {
-                    }
-                ));
+                    }));
+
         step("Проверка корректности ответа", () -> {
             assertThat(accountsWithPartner)
                 .isNotNull();
@@ -2384,12 +2472,15 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account/get-at-requisites получение бюджетного счета партнера вместе с партнером")
     void testGetAtRequisites_whenBudgetAccount() {
-        var partner =
-            step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
-        Account account = step("Создание бюджетного счета", () -> createValidBudgetAccount(partner.getId(), partner.getDigitalId()));
-        var request = step("Подготовка тестовых данных",
-            () -> new AccountAndPartnerRequest()
+        var partner = step("Создание партнера",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        step("Проливка ИНН партнера в справочник ЖКУ", () ->
+            saveGkuInn(partner.getInn()));
+        Account account = step("Создание бюджетного счета", () ->
+            createValidBudgetAccount(partner.getId(), partner.getDigitalId()));
+
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
                 .digitalId(partner.getDigitalId())
                 .account(account.getAccount())
                 .bic(account.getBank().getBic())
@@ -2397,15 +2488,15 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .inn(partner.getInn())
                 .kpp(partner.getKpp())
                 .name(partner.getOrgName()));
-        step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
+        step("Очищаем локальный кэш ЖКУ ИНН", () ->
+            cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
         List<AccountWithPartnerResponse> accountsWithPartner =
-            step("Выполнение post-запроса /partner/account/get-at-requisites",
-                () -> post(
+            step("Выполнение post-запроса /partner/account/get-at-requisites", () ->
+                post(
                     baseRoutePath + "/account/get-at-requisites",
                     request,
                     new TypeRef<>() {
-                    }
-                ));
+                    }));
         step("Проверка корректности ответа", () -> {
             assertThat(accountsWithPartner)
                 .isNotNull();
@@ -2435,11 +2526,12 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account/get-at-requisites получение c партнером")
     void testGetAtRequisites_whenRequestIsCorrect_thenFindPartner() {
-        var partner =
-            step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        Account account = step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        var request = step("Подготовка тестовых данных",
-            () -> new AccountAndPartnerRequest()
+        var partner = step("Создание партнера",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        Account account = step("Создание счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
                 .digitalId(partner.getDigitalId())
                 .account(account.getAccount())
                 .bic(getBic())
@@ -2453,8 +2545,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                     baseRoutePath + "/account/get-at-requisites",
                     request,
                     new TypeRef<>() {
-                    }
-                ));
+                    }));
         step("Проверка корректности ответа", () -> {
             assertThat(accountsWithPartner)
                 .isNotNull();
@@ -2480,12 +2571,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account/get-at-requisites получение счета партнера вместе с партнером результат не найден")
     void testGetAtRequisites_whenRequestIsCorrect_thenNotFound() {
-        var partner =
-            step("Создание партнера", (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        Account account = step("Создание второго счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
+        var partner = step("Создание партнера",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        Account account = step("Создание второго счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
 
-        var request = step("Подготовка тестовых данных",
-            () -> new AccountAndPartnerRequest()
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
                 .digitalId(partner.getDigitalId())
                 .account(account.getAccount())
                 .bic(getBic())
@@ -2493,14 +2585,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .inn(getValidInnNumber(partner.getLegalForm()))
                 .kpp(partner.getKpp())
                 .name(partner.getOrgName()));
-        Error error =
-            step("Выполнение post-запроса /partner/account/get-at-requisites",
-                () -> post(
-                    baseRoutePath + "/account/get-at-requisites",
-                    HttpStatus.NOT_FOUND,
-                    request,
-                    Error.class
-                ));
+
+        Error error = step("Выполнение post-запроса /partner/account/get-at-requisites", () -> post(
+            baseRoutePath + "/account/get-at-requisites",
+            HttpStatus.NOT_FOUND,
+            request,
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -2512,113 +2603,101 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account/get-at-requisites получение счета и партнера когда отсутствует корсчет Банка")
     void testGetAtRequisites_whenBankAccountIsNull() {
-        var creatingPartner =
-            step("Подготовка данных о партнере",
-                (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
+        var creatingPartner = step("Подготовка данных о партнере",
+            (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
 
-        var partner =
-            step("Создание партнера",
-                () -> createValidPartner(creatingPartner));
+        var partner = step("Создание партнера", () ->
+            createValidPartner(creatingPartner));
 
-        Account account =
-            step("Создание счета",
-                () -> {
-                    var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
-                    creatingAccount.getBank().setBankAccount(null);
-                    return createValidAccount(creatingAccount);
-                });
+        Account account = step("Создание счета", () -> {
+            var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
+            creatingAccount.getBank().setBankAccount(null);
+            return createValidAccount(creatingAccount);
+        });
 
-        var request =
-            step("Подготовка тестовых данных",
-                () ->
-                    new AccountAndPartnerRequest()
-                        .digitalId(partner.getDigitalId())
-                        .account(account.getAccount())
-                        .bic(account.getBank().getBic())
-                        .bankAccount(null)
-                        .inn(partner.getInn())
-                        .kpp(partner.getKpp())
-                        .name(partner.getOrgName())
-            );
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
+                .digitalId(partner.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic())
+                .bankAccount(null)
+                .inn(partner.getInn())
+                .kpp(partner.getKpp())
+                .name(partner.getOrgName()));
 
         List<AccountWithPartnerResponse> actualAccountWithPartnerList =
-            step("Выполнение post-запроса /account/get-at-requisites",
-                () ->
-                    post(
-                        baseRoutePath + "/account/get-at-requisites",
-                        request,
-                        new TypeRef<>() {
-                        }
-                    ));
+            step("Выполнение post-запроса /account/get-at-requisites", () ->
+                post(
+                    baseRoutePath + "/account/get-at-requisites",
+                    request,
+                    new TypeRef<>() {
+                    }));
 
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(actualAccountWithPartnerList).asList()
-                    .hasSize(1);
-                var actualAccountWithPartner = actualAccountWithPartnerList.get(0);
-                assertThat(actualAccountWithPartner.getId())
-                    .isEqualTo(partner.getId());
-                assertThat(actualAccountWithPartner.getInn())
-                    .isEqualTo(partner.getInn());
-                assertThat(actualAccountWithPartner.getKpp())
-                    .isEqualTo(partner.getKpp());
-                Account actualAccount = actualAccountWithPartner.getAccount();
-                assertThat(actualAccount)
-                    .isNotNull();
-            });
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualAccountWithPartnerList).asList()
+                .hasSize(1);
+            var actualAccountWithPartner = actualAccountWithPartnerList.get(0);
+            assertThat(actualAccountWithPartner.getId())
+                .isEqualTo(partner.getId());
+            assertThat(actualAccountWithPartner.getInn())
+                .isEqualTo(partner.getInn());
+            assertThat(actualAccountWithPartner.getKpp())
+                .isEqualTo(partner.getKpp());
+            Account actualAccount = actualAccountWithPartner.getAccount();
+            assertThat(actualAccount)
+                .isNotNull();
+        });
     }
 
     @Test
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса " +
         "когда все атрибуты запроса валидные")
     void testGetAtAllRequisites_whenAllAttributesIsValid_thenFindPartner() {
-        var partner =
-            step("Создание партнера",
-                (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        step("Запись ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
-        Account account =
-            step("Создание счета",
-                () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        var request =
-            step("Подготовка тестовых данных",
-                () ->
-                    new AccountAndPartnerRequest()
-                        .digitalId(partner.getDigitalId())
-                        .account(account.getAccount())
-                        .bic(account.getBank().getBic())
-                        .bankAccount(account.getBank().getBankAccount().getBankAccount())
-                        .inn(partner.getInn())
-                        .kpp(partner.getKpp())
-                        .name(partner.getOrgName())
-            );
-        step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
+        var partner = step("Создание партнера",
+            (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
+        step("Запись ИНН партнера в справочник ЖКУ", () ->
+            saveGkuInn(partner.getInn()));
+        Account account = step("Создание счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
+
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
+                .digitalId(partner.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic())
+                .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                .inn(partner.getInn())
+                .kpp(partner.getKpp())
+                .name(partner.getOrgName()));
+
+        step("Очищаем локальный кэш ЖКУ ИНН", () ->
+            cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
+
         AccountWithPartnerResponse accountWithPartnerActual =
-            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
-                () ->
-                    post(
-                        baseRoutePath + "/account/get-at-all-requisites",
-                        request,
-                        new TypeRef<>() {
-                        }
-                    ));
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(accountWithPartnerActual)
-                    .isNotNull();
-                assertThat(accountWithPartnerActual.getId())
-                    .isEqualTo(partner.getId());
-                assertThat(accountWithPartnerActual.getInn())
-                    .isEqualTo(partner.getInn());
-                assertThat(accountWithPartnerActual.getKpp())
-                    .isEqualTo(partner.getKpp());
-                assertThat(accountWithPartnerActual.getGku())
-                    .isTrue();
-                assertThat(accountWithPartnerActual.getVersion())
-                    .isNotNull();
-                Account actualAccount = accountWithPartnerActual.getAccount();
-                assertThat(actualAccount)
-                    .isNotNull();
-            });
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites", () ->
+                post(
+                    baseRoutePath + "/account/get-at-all-requisites",
+                    request,
+                    new TypeRef<>() {
+                    }));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountWithPartnerActual)
+                .isNotNull();
+            assertThat(accountWithPartnerActual.getId())
+                .isEqualTo(partner.getId());
+            assertThat(accountWithPartnerActual.getInn())
+                .isEqualTo(partner.getInn());
+            assertThat(accountWithPartnerActual.getKpp())
+                .isEqualTo(partner.getKpp());
+            assertThat(accountWithPartnerActual.getGku())
+                .isTrue();
+            assertThat(accountWithPartnerActual.getVersion())
+                .isNotNull();
+            Account actualAccount = accountWithPartnerActual.getAccount();
+            assertThat(actualAccount)
+                .isNotNull();
+        });
     }
 
     @Test
@@ -2627,49 +2706,50 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testGetAtAllRequisites_whenBudgetAccount() {
         var partner = step("Создание партнера",
             (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        step("Проливка ИНН партнера в справочник ЖКУ", () -> saveGkuInn(partner.getInn()));
-        Account account = step("Создание счета",
-            () -> createValidBudgetAccount(partner.getId(), partner.getDigitalId()));
-        var request = step("Подготовка тестовых данных",
-            () ->
-                new AccountAndPartnerRequest()
-                    .digitalId(partner.getDigitalId())
-                    .account(account.getAccount())
-                    .bic(account.getBank().getBic())
-                    .bankAccount(account.getBank().getBankAccount().getBankAccount())
-                    .inn(partner.getInn())
-                    .kpp(partner.getKpp())
-                    .name(partner.getOrgName())
+        step("Проливка ИНН партнера в справочник ЖКУ", () ->
+            saveGkuInn(partner.getInn()));
+        Account account = step("Создание счета", () ->
+            createValidBudgetAccount(partner.getId(), partner.getDigitalId()));
+
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
+                .digitalId(partner.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic())
+                .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                .inn(partner.getInn())
+                .kpp(partner.getKpp())
+                .name(partner.getOrgName())
         );
+
         step("Очищаем локальный кэш ЖКУ ИНН", () -> cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
         AccountWithPartnerResponse accountWithPartnerActual =
-            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
-                () -> post(
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites", () ->
+                post(
                     baseRoutePath + "/account/get-at-all-requisites",
                     request,
                     new TypeRef<>() {
-                    }
-                ));
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(accountWithPartnerActual)
-                    .isNotNull();
-                assertThat(accountWithPartnerActual.getId())
-                    .isEqualTo(partner.getId());
-                assertThat(accountWithPartnerActual.getInn())
-                    .isEqualTo(partner.getInn());
-                assertThat(accountWithPartnerActual.getKpp())
-                    .isEqualTo(partner.getKpp());
-                assertThat(accountWithPartnerActual.getGku())
-                    .isTrue();
-                assertThat(accountWithPartnerActual.getVersion())
-                    .isNotNull();
-                Account actualAccount = accountWithPartnerActual.getAccount();
-                assertThat(actualAccount)
-                    .isNotNull();
-                assertThat(actualAccount.getBudget())
-                    .isTrue();
-            });
+                    }));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountWithPartnerActual)
+                .isNotNull();
+            assertThat(accountWithPartnerActual.getId())
+                .isEqualTo(partner.getId());
+            assertThat(accountWithPartnerActual.getInn())
+                .isEqualTo(partner.getInn());
+            assertThat(accountWithPartnerActual.getKpp())
+                .isEqualTo(partner.getKpp());
+            assertThat(accountWithPartnerActual.getGku())
+                .isTrue();
+            assertThat(accountWithPartnerActual.getVersion())
+                .isNotNull();
+            Account actualAccount = accountWithPartnerActual.getAccount();
+            assertThat(actualAccount)
+                .isNotNull();
+            assertThat(actualAccount.getBudget())
+                .isTrue();
+        });
     }
 
     @Test
@@ -2677,40 +2757,39 @@ class AccountControllerTest extends BaseAccountControllerTest {
     void testGetAtAllRequisites_whenOnlyPartner() {
         var partner = step("Создание партнера",
             (Allure.ThrowableRunnable<Partner>) PartnerControllerTest::createValidPartner);
-        AccountCreate account = step("Поулчение счета",
-            () -> getValidBudgetAccount(partner.getId(), partner.getDigitalId()));
-        var request = step("Подготовка тестовых данных",
-            () ->
-                new AccountAndPartnerRequest()
-                    .digitalId(partner.getDigitalId())
-                    .account(account.getAccount())
-                    .bic(account.getBank().getBic())
-                    .bankAccount(account.getBank().getBankAccount().getBankAccount())
-                    .inn(partner.getInn())
-                    .kpp(partner.getKpp())
-                    .name(partner.getOrgName())
-        );
+        AccountCreate account = step("Поулчение счета", () ->
+            getValidBudgetAccount(partner.getId(), partner.getDigitalId()));
+
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
+                .digitalId(partner.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic())
+                .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                .inn(partner.getInn())
+                .kpp(partner.getKpp())
+                .name(partner.getOrgName()));
+
         AccountWithPartnerResponse accountWithPartnerActual =
-            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
-                () -> post(
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites", () ->
+                post(
                     baseRoutePath + "/account/get-at-all-requisites",
                     request,
                     new TypeRef<>() {
-                    }
-                ));
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(accountWithPartnerActual)
-                    .isNotNull();
-                assertThat(accountWithPartnerActual.getId())
-                    .isEqualTo(partner.getId());
-                assertThat(accountWithPartnerActual.getInn())
-                    .isEqualTo(partner.getInn());
-                assertThat(accountWithPartnerActual.getKpp())
-                    .isEqualTo(partner.getKpp());
-                assertThat(accountWithPartnerActual.getVersion())
-                    .isNotNull();
-            });
+                    }));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountWithPartnerActual)
+                .isNotNull();
+            assertThat(accountWithPartnerActual.getId())
+                .isEqualTo(partner.getId());
+            assertThat(accountWithPartnerActual.getInn())
+                .isEqualTo(partner.getInn());
+            assertThat(accountWithPartnerActual.getKpp())
+                .isEqualTo(partner.getKpp());
+            assertThat(accountWithPartnerActual.getVersion())
+                .isNotNull();
+        });
     }
 
     @ParameterizedTest
@@ -2718,54 +2797,53 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса. " +
         "КПП не определен у контрагента и не задан в запросе")
     void testGetAtAllRequisites_thenFindPartner(String dbKppValue, String requestKppValue) {
-        var creatingPartner =
-            step("Подготовка данных о партнере", () -> getValidLegalEntityPartner().kpp(dbKppValue));
-        var partner =
-            step("Создание партнера", () -> createValidPartner(creatingPartner));
-        Account account =
-            step("Создание счета", () -> createValidAccount(partner.getId(), partner.getDigitalId()));
-        var request =
-            step("Подготовка тестовых данных", () ->
-                new AccountAndPartnerRequest()
-                    .digitalId(partner.getDigitalId())
-                    .account(account.getAccount())
-                    .bic(account.getBank().getBic())
-                    .bankAccount(account.getBank().getBankAccount().getBankAccount())
-                    .inn(partner.getInn())
-                    .kpp(requestKppValue)
-                    .name(partner.getOrgName()));
+        var creatingPartner = step("Подготовка данных о партнере", () ->
+            getValidLegalEntityPartner().kpp(dbKppValue));
+        var partner = step("Создание партнера", () ->
+            createValidPartner(creatingPartner));
+        Account account = step("Создание счета", () ->
+            createValidAccount(partner.getId(), partner.getDigitalId()));
+
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
+                .digitalId(partner.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic())
+                .bankAccount(account.getBank().getBankAccount().getBankAccount())
+                .inn(partner.getInn())
+                .kpp(requestKppValue)
+                .name(partner.getOrgName()));
+
         AccountWithPartnerResponse accountWithPartnerActual =
-            step("Выполнение post-запроса /partner/account/get-at-all-requisites",
-                () ->
-                    post(
-                        baseRoutePath + "/account/get-at-all-requisites",
-                        request,
-                        new TypeRef<>() {
-                        }
-                    ));
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(accountWithPartnerActual)
-                    .isNotNull();
-                assertThat(accountWithPartnerActual.getId())
-                    .isEqualTo(partner.getId());
-                assertThat(accountWithPartnerActual.getInn())
-                    .isEqualTo(partner.getInn());
-                assertThat(accountWithPartnerActual.getGku())
-                    .isFalse();
-                assertThat(accountWithPartnerActual.getVersion())
-                    .isNotNull();
-                Account actualAccount = accountWithPartnerActual.getAccount();
-                assertThat(actualAccount)
-                    .isNotNull();
-                if (dbKppValue == null) {
-                    assertThat(accountWithPartnerActual.getKpp())
-                        .isNull();
-                } else {
-                    assertThat(accountWithPartnerActual.getKpp())
-                        .isEmpty();
-                }
-            });
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites", () ->
+                post(
+                    baseRoutePath + "/account/get-at-all-requisites",
+                    request,
+                    new TypeRef<>() {
+                    }));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountWithPartnerActual)
+                .isNotNull();
+            assertThat(accountWithPartnerActual.getId())
+                .isEqualTo(partner.getId());
+            assertThat(accountWithPartnerActual.getInn())
+                .isEqualTo(partner.getInn());
+            assertThat(accountWithPartnerActual.getGku())
+                .isFalse();
+            assertThat(accountWithPartnerActual.getVersion())
+                .isNotNull();
+            Account actualAccount = accountWithPartnerActual.getAccount();
+            assertThat(actualAccount)
+                .isNotNull();
+            if (dbKppValue == null) {
+                assertThat(accountWithPartnerActual.getKpp())
+                    .isNull();
+            } else {
+                assertThat(accountWithPartnerActual.getKpp())
+                    .isEmpty();
+            }
+        });
     }
 
     @ParameterizedTest
@@ -2773,14 +2851,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса. " +
         "КПП определен у контрагента и не задан в запросе")
     void testGetAtAllRequisites_thenNotFindPartner(AccountAndPartnerRequest request) {
-        Error error = step("Выполнение post-запроса /partner/account/get-at-all-requisites",
-            () -> post(
+        Error error = step("Выполнение post-запроса /partner/account/get-at-all-requisites", () ->
+            post(
                 baseRoutePath + "/account/get-at-all-requisites",
                 HttpStatus.NOT_FOUND,
                 request,
-                Error.class
-            )
-        );
+                Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(error)
                 .isNotNull();
@@ -2792,54 +2869,48 @@ class AccountControllerTest extends BaseAccountControllerTest {
     @Test
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера когда отсутствует корсчет Банка")
     void testGetAtAllRequisites_whenBankAccountIsNull() {
-        var creatingPartner =
-            step("Подготовка данных о партнере",
-                (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
-        var partner =
-            step("Создание партнера", () -> createValidPartner(creatingPartner));
+        var creatingPartner = step("Подготовка данных о партнере",
+            (Allure.ThrowableRunnable<PartnerCreate>) PartnerControllerTest::getValidLegalEntityPartner);
+        var partner = step("Создание партнера", () ->
+            createValidPartner(creatingPartner));
         Account account = step("Создание счета", () -> {
             var creatingAccount = getValidAccount(partner.getId(), partner.getDigitalId());
             creatingAccount.getBank().setBankAccount(null);
             return createValidAccount(creatingAccount);
         });
 
-        var request =
-            step("Подготовка тестовых данных",
-                () ->
-                    new AccountAndPartnerRequest()
-                        .digitalId(partner.getDigitalId())
-                        .account(account.getAccount())
-                        .bic(account.getBank().getBic())
-                        .bankAccount(null)
-                        .inn(partner.getInn())
-                        .kpp(partner.getKpp())
-                        .name(partner.getOrgName())
-            );
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
+                .digitalId(partner.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic())
+                .bankAccount(null)
+                .inn(partner.getInn())
+                .kpp(partner.getKpp())
+                .name(partner.getOrgName())
+        );
 
         AccountWithPartnerResponse accountWithPartnerActual =
-            step("Выполнение post-запроса /account/get-at-all-requisites",
-                () ->
-                    post(
-                        baseRoutePath + "/account/get-at-all-requisites",
-                        request,
-                        new TypeRef<>() {
-                        }
-                    ));
+            step("Выполнение post-запроса /account/get-at-all-requisites", () ->
+                post(
+                    baseRoutePath + "/account/get-at-all-requisites",
+                    request,
+                    new TypeRef<>() {
+                    }));
 
-        step("Проверка корректности ответа",
-            () -> {
-                assertThat(accountWithPartnerActual)
-                    .isNotNull();
-                assertThat(accountWithPartnerActual.getId())
-                    .isEqualTo(partner.getId());
-                assertThat(accountWithPartnerActual.getInn())
-                    .isEqualTo(partner.getInn());
-                assertThat(accountWithPartnerActual.getKpp())
-                    .isEqualTo(partner.getKpp());
-                Account actualAccount = accountWithPartnerActual.getAccount();
-                assertThat(actualAccount)
-                    .isNotNull();
-            });
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountWithPartnerActual)
+                .isNotNull();
+            assertThat(accountWithPartnerActual.getId())
+                .isEqualTo(partner.getId());
+            assertThat(accountWithPartnerActual.getInn())
+                .isEqualTo(partner.getInn());
+            assertThat(accountWithPartnerActual.getKpp())
+                .isEqualTo(partner.getKpp());
+            Account actualAccount = accountWithPartnerActual.getAccount();
+            assertThat(actualAccount)
+                .isNotNull();
+        });
     }
 
     @Test
@@ -2849,60 +2920,53 @@ class AccountControllerTest extends BaseAccountControllerTest {
             var partner = createValidPartner();
             return createValidAccount(getValidAccount(partner.getId(), partner.getDigitalId()));
         });
-        var externalIds =
-            step("Подготовка тестовых данных - создание externalIds", () ->
-                List.of(
-                    account.getId(),
-                    UUID.randomUUID(),
-                    UUID.randomUUID()
-                ));
-        var expectedResponse =
-            step("Подготовка ожидаемого ответа", () ->
-                new ExternalInternalIdLinksResponse()
-                    .idLinks(externalIds.stream()
-                        .map(externalId ->
-                            new ExternalInternalIdLink()
-                                .externalId(externalId)
-                                .internalId(
-                                    externalId.equals(account.getId())
-                                        ? account.getId()
-                                        : null
-                                )
-                        )
-                        .collect(Collectors.toList()))
-            );
+        var externalIds = step("Подготовка тестовых данных - создание externalIds", () ->
+            List.of(
+                account.getId(),
+                UUID.randomUUID(),
+                UUID.randomUUID()));
+
+        var expectedResponse = step("Подготовка ожидаемого ответа", () ->
+            new ExternalInternalIdLinksResponse()
+                .idLinks(externalIds.stream()
+                    .map(externalId ->
+                        new ExternalInternalIdLink()
+                            .externalId(externalId)
+                            .internalId(
+                                externalId.equals(account.getId())
+                                    ? account.getId()
+                                    : null))
+                    .collect(Collectors.toList())));
+
         var actualResponse =
-            step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds",
-                () -> get(
+            step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds", () ->
+                get(
                     baseRoutePath + "/accounts/get-accountIds-by-externalIds" + "/{digitalId}",
                     HttpStatus.OK,
                     ExternalInternalIdLinksResponse.class,
                     Map.of("externalIds", externalIds),
-                    account.getDigitalId()
-                ));
-        step("Проверка корректности ответа",
-            () ->
-                assertThat(actualResponse)
-                    .usingRecursiveComparison()
-                    .isEqualTo(expectedResponse));
+                    account.getDigitalId()));
+
+        step("Проверка корректности ответа", () ->
+            assertThat(actualResponse)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResponse));
     }
 
     @Test
     @DisplayName("GET /partner/accounts/get-accountIds-by-externalIds/{digitalId} внутреннего идентификатора счета по внешнему идентификатору. Невалидный запрос")
     void testGetAccountIdsByExternalIds_whenInvalidRequest() {
-        var externalIds =
-            step("Подготовка тестовых данных - создание externalIds", () ->
-                List.of(RandomStringUtils.randomAlphabetic(10)));
+        var externalIds = step("Подготовка тестовых данных - создание externalIds", () ->
+            List.of(RandomStringUtils.randomAlphabetic(10)));
 
         var actualResponse =
-            step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds",
-                () -> get(
+            step("Выполнение post-запроса /partner/accounts/get-accountIds-by-externalIds", () ->
+                get(
                     baseRoutePath + "/accounts/get-accountIds-by-externalIds" + "/{digitalId}",
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     Error.class,
                     Map.of("externalIds", externalIds),
-                    RandomStringUtils.randomAlphabetic(10)
-                ));
+                    RandomStringUtils.randomAlphabetic(10)));
 
         step("Проверка результата", () -> {
             assertThat(actualResponse)

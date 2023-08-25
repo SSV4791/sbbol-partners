@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.rest.partner;
 
-import io.qameta.allure.Allure;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,13 +48,14 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidContactDocument(contact.getId(), contact.getDigitalId());
         });
+
         var actualDocument = step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 200", () ->
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Document.class,
-                document.getDigitalId(), document.getId()
-            ));
+                document.getDigitalId(), document.getId()));
+
         step("Проверка корректности ответа", () -> assertThat(actualDocument)
             .isNotNull()
             .isEqualTo(document));
@@ -75,22 +75,21 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             return partnerContact;
         });
 
-        DocumentsFilter filter1 = step("Формирование списка документов", () -> new DocumentsFilter()
-            .digitalId(contact.getDigitalId())
-            .unifiedIds(
-                List.of(
-                    contact.getId()
-                )
-            )
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0)));
+        DocumentsFilter filter1 = step("Формирование списка документов", () ->
+            new DocumentsFilter()
+                .digitalId(contact.getDigitalId())
+                .unifiedIds(
+                    List.of(
+                        contact.getId()))
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0)));
         var response1 = step("Выполнение post-запроса /partner/contact/documents/view, код ответа 200", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.OK,
             filter1,
-            DocumentsResponse.class
-        ));
+            DocumentsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response1)
                 .isNotNull();
@@ -98,19 +97,21 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 .hasSize(4);
         });
 
-        DocumentsFilter filter2 = step("Формирование списка документов (тип документа = паспорт РФ)", () -> new DocumentsFilter()
-            .digitalId(contact.getDigitalId())
-            .unifiedIds(List.of(contact.getId()))
-            .documentType("PASSPORT_OF_RUSSIA")
-            .pagination(new Pagination()
-                .count(4)
-                .offset(0)));
+        DocumentsFilter filter2 = step("Формирование списка документов (тип документа = паспорт РФ)", () ->
+            new DocumentsFilter()
+                .digitalId(contact.getDigitalId())
+                .unifiedIds(List.of(contact.getId()))
+                .documentType("PASSPORT_OF_RUSSIA")
+                .pagination(new Pagination()
+                    .count(4)
+                    .offset(0)));
+
         var response2 = step("Выполнение post-запроса /partner/contact/documents/view, код ответа 200", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.OK,
             filter2,
-            DocumentsResponse.class
-        ));
+            DocumentsResponse.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response2)
                 .isNotNull();
@@ -129,21 +130,18 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             List<Descriptions> errorTexts = List.of(
                 new Descriptions()
                     .field("pagination")
                     .message(
-                        List.of("Поле обязательно для заполнения")
-                    ),
+                        List.of("Поле обязательно для заполнения")),
                 new Descriptions()
                     .field("digitalId")
                     .message(
-                        List.of("Поле обязательно для заполнения", "Поле обязательно для заполнения")
-                    )
-            );
+                        List.of("Поле обязательно для заполнения", "Поле обязательно для заполнения")));
             assertThat(response)
                 .isNotNull();
             assertThat(response.getCode())
@@ -162,12 +160,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .pagination(new Pagination()
                 .count(4)
                 .offset(0)));
+
         var response = step("Выполнение post-запроса /partner/contact/documents/view (digitalId равен null), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -185,12 +184,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .pagination(new Pagination()
                 .count(4)
                 .offset(0)));
+
         var response2 = step("Выполнение post-запроса /partner/contact/documents/view (digitalId пуст), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter2,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response2)
                 .isNotNull();
@@ -209,15 +209,17 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
         Partner partner = step("Подготовка тестовых данных", () ->
             createValidPartner(RandomStringUtils.randomAlphabetic(10)));
 
-        DocumentsFilter filter = step("Подготовка фильтра (pagination равен null)", () -> new DocumentsFilter()
-            .digitalId(partner.getDigitalId())
-            .pagination(null));
+        DocumentsFilter filter = step("Подготовка фильтра (pagination равен null)", () ->
+            new DocumentsFilter()
+                .digitalId(partner.getDigitalId())
+                .pagination(null));
+
         var response = step("Выполнение post-запроса /partner/contact/documents/view (pagination равен null), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response)
                 .isNotNull();
@@ -233,12 +235,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .digitalId(partner.getDigitalId())
             .pagination(new Pagination()
                 .offset(0)));
+
         var response2 = step("Выполнение post-запроса /partner/contact/documents/view (count отсутсвует в теле запроса), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter2,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response2)
                 .isNotNull();
@@ -254,12 +257,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             .digitalId(partner.getDigitalId())
             .pagination(new Pagination()
                 .count(4)));
+
         var response3 = step("Выполнение post-запроса /partner/contact/documents/view (offset отсутсвует в теле запроса), код ответа 400", () -> post(
             baseRoutePath + "/documents/view",
             HttpStatus.BAD_REQUEST,
             filter3,
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response3)
                 .isNotNull();
@@ -280,8 +284,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return getValidContactDocument(contact.getId(), contact.getDigitalId());
         });
+
         var document = step("Выполнение post-запроса /partner/contact/document, код ответа 201", () ->
             createValidContactDocument(expected));
+
         step("Проверка корректности ответа", () -> {
             assertThat(document)
                 .usingRecursiveComparison()
@@ -297,12 +303,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
     @DisplayName("POST /partner/contact/document создание документа без реквизитова")
     void testCreateDocumentWithoutContact() {
         Partner partner = step("Подготовка тестовых данных", () -> createValidPartner(RandomStringUtils.randomAlphabetic(10)));
+
         var response1 = step("Выполнение post-запроса /partner/contact/document, код ответа 404", () -> post(
             baseRoutePath + "/document",
             HttpStatus.NOT_FOUND,
             getValidContactDocument(partner.getId(), partner.getDigitalId()),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(response1)
                 .isNotNull();
@@ -319,8 +326,10 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidContactDocument(contact.getId(), contact.getDigitalId());
         });
+
         var newUpdateDocument = step("Выполнение put-запроса /partner/contact/document, код ответа 200", () ->
             put(baseRoutePath + "/document", HttpStatus.OK, updateDocument(document), Document.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(newUpdateDocument)
                 .isNotNull();
@@ -337,17 +346,19 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidContactDocument(contact.getId(), contact.getDigitalId());
         });
+
         step("Выполнение delete-запроса /partner/contact/documents/{digitalId}, код ответа 204", () -> delete(
             baseRoutePath + "/documents" + "/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", document.getId()),
-            document.getDigitalId()
-        ));
+            document.getDigitalId()));
+
         var updateDocument = step("Выполнение put-запроса /partner/contact/document, код ответа 404", () -> put(
             baseRoutePath + "/document",
             HttpStatus.NOT_FOUND,
             updateDocument(document),
             Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(updateDocument)
                 .isNotNull();
@@ -369,12 +380,13 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             document.setVersion(version);
             return document;
         });
+
         var documentError = step("Выполнение put-запроса /partner/contact/document, код ответа 400", () -> put(
             baseRoutePath + "/document",
             HttpStatus.BAD_REQUEST,
             updateDocument(documentWithNewVersion),
-            Error.class
-        ));
+            Error.class));
+
         step("Проверка корректности ответа", () -> {
             assertThat(documentError.getCode())
                 .isEqualTo(OPTIMISTIC_LOCK_EXCEPTION.getValue());
@@ -392,17 +404,19 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidContactDocument(contact.getId(), contact.getDigitalId());
         });
+
         var documentUpdate = step("Выполнение put-запроса /partner/contact/document, код ответа 200", () -> put(
             baseRoutePath + "/document",
             HttpStatus.OK,
             updateDocument(document),
-            Document.class
-        ));
+            Document.class));
+
         var checkDocument = step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 200", () -> get(
             baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
             HttpStatus.OK,
             Document.class,
             documentUpdate.getDigitalId(), documentUpdate.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(checkDocument)
                 .isNotNull();
@@ -419,16 +433,18 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidContactDocument(contact.getId(), contact.getDigitalId());
         });
+
         var actualDocument = step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 200", () ->
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.OK,
                 Document.class,
-                document.getDigitalId(), document.getId()
-            ));
-        step("Проверка корректности ответа", () -> assertThat(actualDocument)
-            .isNotNull()
-            .isEqualTo(document));
+                document.getDigitalId(), document.getId()));
+
+        step("Проверка корректности ответа", () ->
+            assertThat(actualDocument)
+                .isNotNull()
+                .isEqualTo(document));
 
         step("Выполнение delete-запроса /partner/contact/documents/{digitalId}, код ответа 204", () -> {
             var deleteDocument =
@@ -447,12 +463,11 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
-                document.getDigitalId(), document.getId()
-            ));
+                document.getDigitalId(), document.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(searchDocument)
                 .isNotNull();
-
             assertThat(searchDocument.getCode())
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
         });
@@ -466,26 +481,27 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             var contact = createValidContact(partner.getId(), partner.getDigitalId());
             return createValidContactDocument(contact.getId(), contact.getDigitalId());
         });
+
         step("Выполнение delete-запроса /partner/contact/documents/{digitalId}(удаление документа), код ответа 204", () -> delete(
             baseRoutePath + "/documents" + "/{digitalId}",
             HttpStatus.NO_CONTENT,
             Map.of("ids", document.getId()),
-            document.getDigitalId()
-        ));
+            document.getDigitalId()));
+
         var searchDocument = step("Выполнение get-запроса /partner/contact/documents/{digitalId}/{id}, код ответа 404", () ->
             get(
                 baseRoutePath + "/documents" + "/{digitalId}" + "/{id}",
                 HttpStatus.NOT_FOUND,
                 Error.class,
-                document.getDigitalId(), document.getId()
-            ));
+                document.getDigitalId(), document.getId()));
+
         step("Проверка корректности ответа", () -> {
             assertThat(searchDocument)
                 .isNotNull();
-
             assertThat(searchDocument.getCode())
                 .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
         });
+
         step("Выполнение delete-запроса /partner/contact/documents/{digitalId}(повторное удаление документа), код ответа 404", () -> delete(
             baseRoutePath + "/documents" + "/{digitalId}",
             HttpStatus.NOT_FOUND,
@@ -513,8 +529,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/document",
             HttpStatus.CREATED,
             getValidContactDocument(contactUuid, digitalId),
-            Document.class
-        ));
+            Document.class));
     }
 
     private static Document createValidContactDocument(DocumentCreate document) {
@@ -522,8 +537,7 @@ public class ContactDocumentControllerTest extends AbstractIntegrationTest {
             baseRoutePath + "/document",
             HttpStatus.CREATED,
             document,
-            Document.class
-        ));
+            Document.class));
     }
 
     public static DocumentChange updateDocument(Document document) {
