@@ -1,11 +1,16 @@
 package ru.sberbank.pprb.sbbol.partners.legacy.model;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Контрагент
  */
 public class Counterparty implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1;
 
     /**
      * GUID операции в справочнике контрагентов
@@ -61,6 +66,11 @@ public class Counterparty implements Serializable {
      * GUID контрагента в ППРБ
      */
     private String pprbGuid;
+
+    /**
+     * Глобальный идентификатор объекта
+     */
+    private UUID replicationGuid;
 
     /**
      * Признак 'подписан'
@@ -170,6 +180,14 @@ public class Counterparty implements Serializable {
         this.pprbGuid = pprbGuid;
     }
 
+    public UUID getReplicationGuid() {
+        return replicationGuid;
+    }
+
+    public void setReplicationGuid(UUID replicationGuid) {
+        this.replicationGuid = replicationGuid;
+    }
+
     public Boolean getSigned() {
         return signed;
     }
@@ -216,6 +234,7 @@ public class Counterparty implements Serializable {
             ", bankCity='" + bankCity + '\'' +
             ", settlementType='" + settlementType + '\'' +
             ", pprbGuid='" + pprbGuid + '\'' +
+            ", replicationGuid=" + replicationGuid +
             ", signed=" + signed +
             ", counterpartyPhone='" + counterpartyPhone + '\'' +
             ", counterpartyEmail='" + counterpartyEmail + '\'' +

@@ -55,6 +55,7 @@ class CounterpartyMapperTest extends BaseUnitConfiguration {
         var bankAccount = factory.manufacturePojo(BankAccountEntity.class);
         bank.setBankAccount(bankAccount);
         account.setBank(bank);
+        account.setIdLinks(null);
         Counterparty response = mapper.toCounterparty(partner, account);
         if (LegalType.PHYSICAL_PERSON.equals(partner.getLegalType())) {
             assertThat(response.getName())
