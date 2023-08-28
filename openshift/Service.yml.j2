@@ -15,6 +15,7 @@ metadata:
   name: {{ os_project.name }}
   labels:
     app: {{ os_project.name }}-{{ suffix_app_label }}
+    templates/type: app
 spec:
   ports:
 {% for port in os_project.ports %}

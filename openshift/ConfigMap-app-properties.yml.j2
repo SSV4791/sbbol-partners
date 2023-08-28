@@ -3,6 +3,8 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: cm-app-properties-{{ canary_suffix }}
+  labels:
+    templates/type: app
 data:
   application.properties: |-
     server.port=8080
