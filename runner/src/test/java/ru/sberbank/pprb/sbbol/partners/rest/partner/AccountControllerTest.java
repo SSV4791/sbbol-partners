@@ -60,6 +60,7 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_N
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PRIORITY_ACCOUNT_MORE_ONE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountSignControllerTest.createValidAccountsSign;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidLegalEntityPartner;
@@ -2699,6 +2700,61 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
         });
     }
+
+    @Test
+    @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса " +
+        "когда два партнера имеют одинаковые реквизиты счета но разные имена")
+    void testGetAtAllRequisites_whenPartnersHaveIdenticalAccountDetailsAndDifferentOrgName() {
+        var creatingPartner = step("Подготовка данных о партнере", () -> {
+            var partnerCreate = getValidPhysicalPersonPartner();
+            partnerCreate.setInn(null);
+            partnerCreate.setKpp(null);
+            partnerCreate.setMiddleName(null);
+            return partnerCreate;
+        });
+        var creatingPartnerName = step("Сохранение названия партнере", () ->
+            prepareSearchString(creatingPartner.getSecondName(), creatingPartner.getFirstName(), creatingPartner.getMiddleName()));
+        var partner1 = step("Создание первого партнера ", () -> createValidPartner(creatingPartner));
+        var creatingAccount = step("Подготовка данных о счете партнера", () -> getValidAccount(partner1.getId(), partner1.getDigitalId()));
+        var account1 = step("Создание счета для первого партнера", () -> createValidAccount(creatingAccount));
+        var partner2 = step("Создание второго партнера", () -> {
+            creatingPartner.setMiddleName("middleName");
+            return createValidPartner(creatingPartner);
+        });
+        step("Создание счета для второго партнера", () -> {
+            creatingAccount.setPartnerId(partner2.getId());
+            createValidAccount(creatingAccount);
+        });
+
+        var request = step("Подготовка тестовых данных", () ->
+            new AccountAndPartnerRequest()
+                .digitalId(partner1.getDigitalId())
+                .account(account1.getAccount())
+                .bic(account1.getBank().getBic())
+                .bankAccount(account1.getBank().getBankAccount().getBankAccount())
+                .inn(partner1.getInn())
+                .kpp(partner1.getKpp())
+                .name(creatingPartnerName));
+
+        step("Очищаем локальный кэш ЖКУ ИНН", () ->
+            cacheManager.getCache(CacheNames.IS_GKU_INN).clear());
+
+        AccountWithPartnerResponse accountWithPartnerActual =
+            step("Выполнение post-запроса /partner/account/get-at-all-requisites", () ->
+                post(
+                    baseRoutePath + "/account/get-at-all-requisites",
+                    request,
+                    new TypeRef<>() {
+                    }));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(accountWithPartnerActual)
+                .isNotNull();
+            assertThat(accountWithPartnerActual.getId())
+                .isEqualTo(partner1.getId());
+        });
+    }
+
 
     @Test
     @DisplayName("POST /partner/account/get-at-all-requisites получение счета и партнера по всем реквизитам запроса " +
