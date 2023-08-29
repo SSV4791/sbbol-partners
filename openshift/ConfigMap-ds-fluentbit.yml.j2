@@ -3,6 +3,8 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: cm-ds-fluentbit-{{ canary_suffix }}
+  labels:
+    templates/type: app
 data:
   fluent-bit.conf: >-
     [SERVICE]
@@ -26,6 +28,7 @@ data:
         Add moduleVersion ${moduleVersion}
         Add nodeId ${nodeId}
         Add standId ${standId}
+        Add namespace ${namespace}
     [OUTPUT]
         Name http
         Match *
@@ -46,6 +49,14 @@ data:
     [OUTPUT]
         Name stdout
         Match *
+{% if fluentbit.kafka.app.enabled is defined and fluentbit.kafka.app.enabled | bool %}
+    [OUTPUT]
+        Name kafka
+        Match *
+        #timestamp_key time
+        Topics {{ fluentbit.kafka.app.topic }}
+        Brokers {% for entry in int_entry.logs %}{{ entry.ip }}:{{ entry.port }}{% if not loop.last %},{% endif %}{% endfor %}
+{% endif %}
   parsers.conf: |-
     [PARSER]
         Name custom

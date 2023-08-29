@@ -9,6 +9,7 @@ metadata:
     app: {{ os_project.name }}-{{ suffix_app_label }}
     version: {{ version | default('v1') }}
     app.kubernetes.io/part-of: istio
+    templates/type: app
 spec:
   strategy:
     type: RollingUpdate
