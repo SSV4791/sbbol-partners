@@ -222,9 +222,12 @@ public class AccountServiceImpl implements AccountService {
         }
         if (accounts.size() > 1) {
             List<AccountEntity> foundAccounts = findAccountByPartnerName(request, accounts);
-            if (foundAccounts.size() > 1) {
+            if (foundAccounts.isEmpty()) {
+                throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
+            } else if (foundAccounts.size() > 1) {
                 throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());
             }
+            return accountMapper.toAccountWithPartner(foundAccounts.get(0));
         }
         return accountMapper.toAccountWithPartner(accounts.get(0));
     }
