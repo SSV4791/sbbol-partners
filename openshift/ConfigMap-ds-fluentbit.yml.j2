@@ -57,6 +57,7 @@ data:
         Topics {{ fluentbit.kafka.app.topic }}
         Brokers {% for entry in int_entry.logs %}{{ entry.ip }}:{{ entry.port }}{% if not loop.last %},{% endif %}{% endfor %}
 {% endif %}
+
   parsers.conf: |-
     [PARSER]
         Name custom
