@@ -51,7 +51,7 @@ public interface BaseFraudMetaDataMapper {
     @Mapping(target = "osbNumber", source = "clientData.gosbNumber")
     @Mapping(target = "vspNumber", source = "clientData.vspNumber")
     @Mapping(target = "dboOperationName", expression = "java(getDboOperationName())")
-    @Mapping(target = "privateIpAddress", source = "deviceRequest.ipAddress")
+    @Mapping(target = "privateIpAddress", source = "deviceRequest.privateIpAddress")
     @Mapping(target = "userComment", ignore = true)
     @Mapping(target = "receiverBicSwift", ignore = true)
     @Mapping(target = "receiverAccount", ignore = true)

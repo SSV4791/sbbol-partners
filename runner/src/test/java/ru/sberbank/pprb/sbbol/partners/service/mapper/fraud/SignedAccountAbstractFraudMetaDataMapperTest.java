@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyClientDefinedAttributes;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.FraudClientDataMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.FraudDeviceRequestMapperImpl;
-import ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.SignedAccountFraudMetaDataMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.SignedAccountFraudMetaDataMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.model.FraudClientData;
@@ -21,7 +21,7 @@ import static ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType.SIGN_AC
 
 class SignedAccountAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDataMapperTest {
 
-    private SignedAccountFraudMetaDataMapper fraudMapper = new SignedAccountFraudMetaDataMapperImpl(
+    private final SignedAccountFraudMetaDataMapper fraudMapper = new SignedAccountFraudMetaDataMapperImpl(
         new FraudClientDataMapperImpl(),
         new FraudDeviceRequestMapperImpl()
     );
@@ -35,7 +35,6 @@ class SignedAccountAbstractFraudMetaDataMapperTest extends AbstractFraudMetaData
         var clientData = metaData.getClientData();
         var deviceRequest = metaData.getDeviceRequest();
         var eventData = metaData.getEventData();
-        var eventType = SIGN_ACCOUNT;
         var requestData = metaData.getDeviceRequest();
         var cryptoProfileData = metaData.getCryptoProfileData();
 
@@ -53,7 +52,7 @@ class SignedAccountAbstractFraudMetaDataMapperTest extends AbstractFraudMetaData
         checkCounterPartyDeviceRequest(actualDeviceRequest, deviceRequest);
 
         var actualEventDate = actualFraudRequest.getEventData();
-        checkCounterPartyEventData(actualEventDate, eventData, eventType);
+        checkCounterPartyEventData(actualEventDate, eventData, SIGN_ACCOUNT);
 
         var actualChannelIndicator = actualFraudRequest.getChannelIndicator();
         checkChannelIndicator(actualChannelIndicator, metaData);

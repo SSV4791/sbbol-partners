@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.fraud;
 
-import org.testcontainers.shaded.org.bouncycastle.asn1.cms.MetaData;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.ChannelIndicator;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.ClientDefinedChannelIndicator;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.DboOperation;
@@ -12,7 +11,6 @@ import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyMes
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper;
-import ru.sberbank.pprb.sbbol.partners.model.FraudChannelIndicator;
 import ru.sberbank.pprb.sbbol.partners.model.FraudChannelInfo;
 import ru.sberbank.pprb.sbbol.partners.model.FraudClientData;
 import ru.sberbank.pprb.sbbol.partners.model.FraudDeviceRequest;
@@ -146,6 +144,6 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
         assertThat(actualClientDefinedAttributeList.getDboOperationName())
             .isEqualTo(DBO_OPERATION_NAME);
         assertThat(actualClientDefinedAttributeList.getPrivateIpAddress())
-            .isEqualTo(requestData.getIpAddress());
+            .isEqualTo(requestData.getPrivateIpAddress());
     }
 }

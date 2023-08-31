@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.service.mapper.fraud;
 
 import org.junit.jupiter.api.Test;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyClientDefinedAttributes;
-
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.DeletedPartnerFraudMetaDataMapper;
@@ -19,7 +18,7 @@ import static ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType.DELETE_
 
 class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDataMapperTest {
 
-    private DeletedPartnerFraudMetaDataMapper fraudMapper = new DeletedPartnerFraudMetaDataMapperImpl(
+    private final DeletedPartnerFraudMetaDataMapper fraudMapper = new DeletedPartnerFraudMetaDataMapperImpl(
         new FraudClientDataMapperImpl(),
         new FraudDeviceRequestMapperImpl()
     );
@@ -32,7 +31,6 @@ class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDat
         var clientData = metaData.getClientData();
         var deviceRequest = metaData.getDeviceRequest();
         var eventData = metaData.getEventData();
-        var eventType = DELETE_PARTNER;
         var requestData = metaData.getDeviceRequest();
 
         var actualFraudRequest = fraudMapper.mapToCounterPartySendToAnalyzeRq(metaData, partnerEntity);
@@ -49,7 +47,7 @@ class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDat
         checkCounterPartyDeviceRequest(actualDeviceRequest, deviceRequest);
 
         var actualEventDate = actualFraudRequest.getEventData();
-        checkCounterPartyEventData(actualEventDate, eventData, eventType);
+        checkCounterPartyEventData(actualEventDate, eventData, DELETE_PARTNER);
 
         var actualChannelIndicator = actualFraudRequest.getChannelIndicator();
         checkChannelIndicator(actualChannelIndicator, metaData);
@@ -77,7 +75,7 @@ class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDat
         assertThat(actualClientDefinedAttributeList.getSenderEmail())
             .isEqualTo(clientData.getEmail());
         assertThat(actualClientDefinedAttributeList.getSenderSource())
-            .isEqualTo(PPRB_BROWSER );
+            .isEqualTo(PPRB_BROWSER);
     }
 
     @Override
