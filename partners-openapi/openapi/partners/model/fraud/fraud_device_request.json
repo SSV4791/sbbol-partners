@@ -35,7 +35,13 @@
     },
     "ipAddress": {
       "type": "string",
-      "title": "IP-адрес пользовательского устройства Значение заголовка ip-address HTTP-запросаа",
+      "title": "IP-адрес пользовательского устройства Значение заголовка ip-address HTTP-запроса",
+      "maxLength": 15,
+      "x-not-empty": true
+    },
+    "privateIpAddress": {
+      "type": "string",
+      "title": "IP-адрес устройства принявшего запрос",
       "maxLength": 15,
       "x-not-empty": true
     },
