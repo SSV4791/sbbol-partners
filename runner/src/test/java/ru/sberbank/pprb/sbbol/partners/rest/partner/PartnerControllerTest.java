@@ -79,6 +79,7 @@ import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidCorrAccountNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
@@ -3437,6 +3438,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     public static PartnerCreateFullModel getValidFullModelLegalEntityPartner(String digitalId) {
+        var bic = getBic();
         return new PartnerCreateFullModel()
             .digitalId(digitalId)
             .legalForm(LegalForm.LEGAL_ENTITY)
@@ -3458,14 +3460,14 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 ))
             .comment("555555")
             .accounts(Set.of(new AccountCreateFullModel()
-                .account(getValidAccountNumber(getBic()))
+                .account(getValidAccountNumber(bic))
                 .comment("Это тестовый комментарий")
                 .bank(new BankCreate()
-                    .bic("044525411")
+                    .bic(bic)
                     .name(randomAlphabetic(10))
                     .bankAccount(
                         new BankAccountCreate()
-                            .bankAccount("30101810145250000411"))
+                            .bankAccount(getValidCorrAccountNumber(bic)))
                 ))
             )
             .documents(Set.of(new DocumentCreateFullModel()

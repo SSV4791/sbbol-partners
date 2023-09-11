@@ -19,8 +19,9 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidCorrAccountNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
-import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.getBic;
 
 @SuppressWarnings("java:S2187")
 public class BaseAccountControllerTest extends AbstractIntegrationTest {
@@ -31,29 +32,31 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     protected static final String BUDGET_CORR_ACCOUNT_VALID = "40102810300000000001";
 
     public static AccountCreate getValidAccountWithEmptyBankAccount(UUID partnerUuid, String digitalId) {
+        var bic = getBic();
         return new AccountCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
-            .account(getValidAccountNumber(getBic()))
+            .account(getValidAccountNumber(bic))
             .comment("Это тестовый комментарий")
             .bank(new BankCreate()
-                .bic(getBic())
+                .bic(bic)
                 .name(randomAlphabetic(10))
             );
     }
 
     public static AccountCreate getValidAccount(UUID partnerUuid, String digitalId) {
+        var bic = getBic();
         return new AccountCreate()
             .partnerId(partnerUuid)
             .digitalId(digitalId)
-            .account(getValidAccountNumber(getBic()))
+            .account(getValidAccountNumber(bic))
             .comment("Это тестовый комментарий")
             .bank(new BankCreate()
-                .bic(getBic())
+                .bic(bic)
                 .name(randomAlphabetic(10))
                 .bankAccount(
                     new BankAccountCreate()
-                        .bankAccount("30101810145250000411"))
+                        .bankAccount(getValidCorrAccountNumber(getBic())))
             );
     }
 
@@ -94,18 +97,19 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     }
 
     public static AccountChange updateAccount(Account account) {
+        var bic = getBic();
         return new AccountChange()
             .comment(randomAlphabetic(20))
             .version(account.getVersion())
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account(getValidAccountNumber(getBic()))
+            .account(getValidAccountNumber(bic))
             .bank(new Bank()
-                .bic("044525411")
+                .bic(bic)
                 .name(account.getBank().getName())
                 .bankAccount(new BankAccount()
-                    .bankAccount("30101810145250000411")));
+                    .bankAccount(getValidCorrAccountNumber(bic))));
     }
 
     public static AccountChange updateAccountEntityWhenBankIsNull(Account account) {
@@ -120,63 +124,67 @@ public class BaseAccountControllerTest extends AbstractIntegrationTest {
     }
 
     public static AccountChange updateAccountEntityWhenBankNameIsNull(Account account) {
+        var bic = getBic();
         return new AccountChange()
             .comment(randomAlphabetic(20))
             .version(account.getVersion())
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account(getValidAccountNumber(getBic()))
+            .account(getValidAccountNumber(bic))
             .bank(new Bank()
-                .bic("044525411")
+                .bic(bic)
                 .name(null)
                 .bankAccount(new BankAccount()
-                    .bankAccount("30101810145250000411")));
+                    .bankAccount(getValidCorrAccountNumber(bic))));
     }
 
     public static AccountChange updateAccountEntityWhenBankNameIsEmpty(Account account) {
+        var bic = getBic();
         return new AccountChange()
             .comment(randomAlphabetic(20))
             .version(account.getVersion())
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account(getValidAccountNumber(getBic()))
+            .account(getValidAccountNumber(bic))
             .bank(new Bank()
-                .bic("044525411")
+                .bic(bic)
                 .name("")
                 .bankAccount(new BankAccount()
-                    .bankAccount("30101810145250000411")));
+                    .bankAccount(getValidCorrAccountNumber(bic))));
     }
 
     public static AccountChange updateAccountEntityWhenBankBicIsNull(Account account) {
+        var bic = getBic();
         return new AccountChange()
             .comment(randomAlphabetic(20))
             .version(account.getVersion())
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account(getValidAccountNumber(getBic()))
+            .account(getValidAccountNumber(bic))
             .bank(new Bank()
                 .bic(null)
                 .name(account.getBank().getName())
                 .bankAccount(new BankAccount()
-                    .bankAccount("30101810145250000411")));
+                    .bankAccount(getValidCorrAccountNumber(bic))));
     }
 
     public static AccountChange updateAccountEntityWhenBankBicIsEmpty(Account account) {
+        var bic = getBic();
         return new AccountChange()
             .comment(randomAlphabetic(20))
             .version(account.getVersion())
             .digitalId(account.getDigitalId())
             .id(account.getId())
             .partnerId(account.getPartnerId())
-            .account(getValidAccountNumber(getBic()))
+            .account(getValidAccountNumber(bic))
             .bank(new Bank()
                 .bic("")
                 .name(account.getBank().getName())
                 .bankAccount(new BankAccount()
-                    .bankAccount("30101810145250000411")));
+                    .bankAccount(getValidCorrAccountNumber(bic))));
     }
 
     public static AccountChange updateAccountEntityWithEmptyAccountAndBankAccount(Account account) {
