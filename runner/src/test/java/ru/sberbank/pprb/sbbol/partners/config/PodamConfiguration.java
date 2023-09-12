@@ -84,6 +84,7 @@ public class PodamConfiguration {
                 case "ogrn" -> getValidOgrnNumber(LegalForm.LEGAL_ENTITY);
                 case "bic" -> bic;
                 case "account" -> getValidAccountNumber(bic);
+                case "bankAccount" -> getValidCorrAccountNumber(bic);
                 default -> super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
             };
         }
