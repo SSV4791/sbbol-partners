@@ -29,6 +29,7 @@ public class PodamConfiguration {
     public static final int PHONE_LENGTH = 13;
     private static final int[] WEIGHT_FACTOR = new int[]{7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1, 3, 7, 1};
     private static final String STATIC_ACCOUNT_PART = "40702810";
+    private static final String STATIC_ACCOUNT_PART_CORR = "30101810";
     private static final String ACCOUNT_KEY = "0";
     private static final String STATIC_INN_PART = "7707";
     private static final int[] WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN = new int[]{2, 4, 10, 3, 5, 9, 4, 6, 8};
@@ -42,7 +43,7 @@ public class PodamConfiguration {
     @Bean
     PodamFactory podamFactory() {
         var factory = new PodamFactoryImpl();
-        RandomDataProviderStrategyImpl strategy = (RandomDataProviderStrategyImpl) factory.getStrategy();
+        var strategy = (RandomDataProviderStrategyImpl) factory.getStrategy();
         strategy
             .addOrReplaceTypeManufacturer(BigDecimal.class, new BigDecimalManufacturerImpl())
             .addOrReplaceTypeManufacturer(String.class, new StringManufacturerImpl())
@@ -65,7 +66,7 @@ public class PodamConfiguration {
             if (attributeMetadata.getAttributeName() == null) {
                 return super.getType(strategy, attributeMetadata, genericTypesArgumentsMap);
             }
-            String bic = getBic();
+            var bic = getBic();
             return switch (attributeMetadata.getAttributeName()) {
                 case "id",
                     "uuid",
@@ -123,20 +124,40 @@ public class PodamConfiguration {
      */
     public static String getValidAccountNumber(String bic) {
 
-        String randomAccountPart = RandomStringUtils.randomNumeric(11);
-        String accountForCalculate = STATIC_ACCOUNT_PART + ACCOUNT_KEY + randomAccountPart;
-        String stringForCalculate = bic.substring(6) + accountForCalculate;
+        var randomAccountPart = randomNumeric(11);
+        var accountForCalculate = STATIC_ACCOUNT_PART + ACCOUNT_KEY + randomAccountPart;
+        var stringForCalculate = bic.substring(6) + accountForCalculate;
         int[] numberForCalculate = Arrays.stream(stringForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
-        int[] result = new int[numberForCalculate.length];
+        var result = new int[numberForCalculate.length];
         for (int i = 0; i < WEIGHT_FACTOR.length; i++) {
             result[i] = numberForCalculate[i] * WEIGHT_FACTOR[i];
         }
-        int resulSumma = 0;
+        var resulSumma = 0;
         for (int j : result) {
             resulSumma += j % 10;
         }
 
         return STATIC_ACCOUNT_PART + resulSumma * 3 % 10 + randomAccountPart;
+    }
+
+    /**
+     * Алгоритм расчета контрольного ключа коррсчета:
+     * Значение контрольного ключа приравнивается нулю (К = 0).
+     * Рассчитываются произведения значений разрядов на соответствующие весовые коэффициенты.
+     * Рассчитывается остаток деления суммы произведений на 10.
+     * полученная сумма умножается на 3.
+     * Значение контрольного ключа (К) принимается равным младшему разряду полученного произведения.
+     */
+    public static String getValidCorrAccountNumber(String bic) {
+        var randomAccountPart = randomNumeric(11);
+        var accountForCalculate = STATIC_ACCOUNT_PART_CORR + ACCOUNT_KEY + randomAccountPart;
+        var stringForCalculate = "0" + bic.substring(4,6) + accountForCalculate;
+        int[] numberForCalculate = Arrays.stream(stringForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
+        var sum = 0;
+        for (int i = 0; i < WEIGHT_FACTOR.length; i++) {
+            sum = sum + numberForCalculate[i] * WEIGHT_FACTOR[i];
+        }
+        return STATIC_ACCOUNT_PART_CORR + sum * 3 % 10 + randomAccountPart;
     }
 
     /**
@@ -159,18 +180,18 @@ public class PodamConfiguration {
     public static String getValidInnNumber(LegalForm legalForm) {
 
         if (legalForm == LegalForm.LEGAL_ENTITY) {
-            String randomInnPart = RandomStringUtils.randomNumeric(5);
-            String innForCalculate = STATIC_INN_PART + randomInnPart;
-            int calculateValidKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN);
+            var randomInnPart = randomNumeric(5);
+            var innForCalculate = STATIC_INN_PART + randomInnPart;
+            var calculateValidKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_LEGAL_ENTITY_INN);
 
             return STATIC_INN_PART + randomInnPart + calculateValidKeyForInn;
         } else {
-            String randomInnPart = RandomStringUtils.randomNumeric(6);
-            String innForCalculate = STATIC_INN_PART + randomInnPart;
-            int calculateElevenKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_ELEVEN_KEY);
+            var randomInnPart = randomNumeric(6);
+            var innForCalculate = STATIC_INN_PART + randomInnPart;
+            var calculateElevenKeyForInn = calculateValidKeyForInn(innForCalculate, WEIGHT_FACTOR_FOR_ELEVEN_KEY);
 
-            String innForCalculateTwelveKey = innForCalculate + calculateElevenKeyForInn;
-            int calculateTwelveKeyForInn = calculateValidKeyForInn(innForCalculateTwelveKey, WEIGHT_FACTOR_FOR_TWELVE_KEY);
+            var innForCalculateTwelveKey = innForCalculate + calculateElevenKeyForInn;
+            var calculateTwelveKeyForInn = calculateValidKeyForInn(innForCalculateTwelveKey, WEIGHT_FACTOR_FOR_TWELVE_KEY);
 
             return STATIC_INN_PART + randomInnPart + calculateElevenKeyForInn + calculateTwelveKeyForInn;
         }
@@ -185,15 +206,15 @@ public class PodamConfiguration {
      */
     public static String getValidOgrnNumber(LegalForm legalForm) {
         if (legalForm == LegalForm.LEGAL_ENTITY) {
-            String randomOgrnPart = RandomStringUtils.randomNumeric(7);
-            String ogrnForCalculate = STATIC_OGRN_PART + randomOgrnPart;
-            long validKeyForOgrn = calculateValidKeyForOgrn(ogrnForCalculate, legalForm);
+            var randomOgrnPart = randomNumeric(7);
+            var ogrnForCalculate = STATIC_OGRN_PART + randomOgrnPart;
+            var validKeyForOgrn = calculateValidKeyForOgrn(ogrnForCalculate, legalForm);
 
             return ogrnForCalculate + validKeyForOgrn;
         } else {
-            String randomOgrnPart = RandomStringUtils.randomNumeric(9);
-            String ogrnForCalculate = STATIC_OGRN_PART + randomOgrnPart;
-            long validKeyForOgrn = calculateValidKeyForOgrn(ogrnForCalculate, legalForm);
+            var randomOgrnPart = randomNumeric(9);
+            var ogrnForCalculate = STATIC_OGRN_PART + randomOgrnPart;
+            var validKeyForOgrn = calculateValidKeyForOgrn(ogrnForCalculate, legalForm);
 
             return ogrnForCalculate + validKeyForOgrn;
         }
@@ -201,11 +222,11 @@ public class PodamConfiguration {
 
     private static int calculateValidKeyForInn(String innForCalculate, int[] weightFactorForCalculate) {
         int[] numberForCalculate = Arrays.stream(innForCalculate.split("")).mapToInt(Integer::parseInt).toArray();
-        int[] result = new int[numberForCalculate.length];
+        var result = new int[numberForCalculate.length];
         for (int i = 0; i < weightFactorForCalculate.length; i++) {
             result[i] = numberForCalculate[i] * weightFactorForCalculate[i];
         }
-        int resulSumma = 0;
+        var resulSumma = 0;
         for (int numberForCalculatingElevenKey : result) {
             resulSumma += numberForCalculatingElevenKey;
         }
@@ -214,15 +235,15 @@ public class PodamConfiguration {
     }
 
     private static long calculateValidKeyForOgrn(String ogrnForCalculate, LegalForm legalForm) {
-        long ogrnNumber = Long.parseLong(ogrnForCalculate);
+        var ogrnNumber = Long.parseLong(ogrnForCalculate);
         if (legalForm == LegalForm.LEGAL_ENTITY) {
-            long key = ogrnNumber % DIVIDER_FOR_LEGAL_ENTITY;
+            var key = ogrnNumber % DIVIDER_FOR_LEGAL_ENTITY;
             if (key > NUMBER_FOR_CHECK) {
                 key = key % 10;
             }
             return key;
         } else {
-            long key = ogrnNumber % DIVIDER_FOR_PHYSICAL_PERSON;
+            var key = ogrnNumber % DIVIDER_FOR_PHYSICAL_PERSON;
             if (key > NUMBER_FOR_CHECK) {
                 key = key % 10;
             }
@@ -231,7 +252,7 @@ public class PodamConfiguration {
     }
 
     public static String getBic() {
-        String bic = "525411";
+        var bic = "525411";
         var key = randomNumeric(3);
         return key + bic;
     }

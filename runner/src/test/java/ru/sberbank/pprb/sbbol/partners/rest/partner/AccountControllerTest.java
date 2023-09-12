@@ -54,6 +54,7 @@ import java.util.stream.Stream;
 import static io.qameta.allure.Allure.step;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
@@ -567,7 +568,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .digitalId(partner.getDigitalId())
                 .partnerIds(List.of(partner.getId()))
                 .accountIds(accounts)
-                .partnerSearch(RandomStringUtils.randomNumeric(20))
+                .partnerSearch(randomNumeric(20))
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0));
@@ -2305,12 +2306,6 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error.getCode())
                 .isEqualTo(PRIORITY_ACCOUNT_MORE_ONE.getValue());
         });
-    }
-
-    public static String getBic() {
-        String bic = "525411";
-        var key = randomNumeric(3);
-        return key + bic;
     }
 
     @Test
