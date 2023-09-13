@@ -189,6 +189,7 @@ public class AccountServiceImpl implements AccountService {
             var foundPartner = partnerService.findPartner(request.getDigitalId(), request.getName(), request.getInn(), request.getKpp());
             return accountMapper.toAccountsWithPartner(foundPartner);
         }
+        accounts = findAccountByPartnerName(request, accounts);
         if (accounts.size() == 1) {
             AccountEntity account = accounts.get(0);
             if (account.getAccount() != null || account.getPartner().getInn() != null) {
@@ -220,16 +221,13 @@ public class AccountServiceImpl implements AccountService {
             var foundPartner = partnerService.findPartner(request.getDigitalId(), request.getName(), request.getInn(), request.getKpp());
             return accountMapper.toAccountWithPartner(foundPartner);
         }
-        if (accounts.size() > 1) {
-            List<AccountEntity> foundAccounts = findAccountByPartnerName(request, accounts);
-            if (foundAccounts.isEmpty()) {
-                throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
-            } else if (foundAccounts.size() > 1) {
-                throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());
-            }
-            return accountMapper.toAccountWithPartner(foundAccounts.get(0));
+        List<AccountEntity> foundAccounts = findAccountByPartnerName(request, accounts);
+        if (foundAccounts.isEmpty()) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
+        } else if (foundAccounts.size() > 1) {
+            throw new MultipleEntryFoundException(DOCUMENT_NAME, request.getDigitalId());
         }
-        return accountMapper.toAccountWithPartner(accounts.get(0));
+        return accountMapper.toAccountWithPartner(foundAccounts.get(0));
     }
 
     @NotNull
