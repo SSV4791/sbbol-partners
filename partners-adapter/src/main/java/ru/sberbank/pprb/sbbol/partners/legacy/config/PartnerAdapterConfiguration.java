@@ -43,12 +43,13 @@ public class PartnerAdapterConfiguration {
     @Bean
     RestTemplate restTemplate(
         @Value("${sbbol.url}") String rootLegacyUrl,
-        @Value("${sbbol.time_out:10000}") long timeOut,
+        @Value("${sbbol.read_time_out:5000}") long readTimeOut,
+        @Value("${sbbol.connection_time_out:1000}") long connectionTimeOut,
         RestTemplateBuilder restTemplateBuilder
     ) {
         return restTemplateBuilder
-            .setReadTimeout(Duration.ofMillis(timeOut))
-            .setConnectTimeout(Duration.ofMillis(timeOut))
+            .setReadTimeout(Duration.ofMillis(readTimeOut))
+            .setConnectTimeout(Duration.ofMillis(connectionTimeOut))
             .messageConverters(mappingJacksonHttpMessageConverter())
             .requestFactory(new ClientHttpRequestFactorySupplier())
             .uriTemplateHandler(

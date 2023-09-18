@@ -24,12 +24,13 @@ public class PartnerAuditConfiguration {
 
     @Bean
     RestTemplate auditRestTemplate(
-        @Value("${audit.time_out}") long timeOut,
+        @Value("${audit.read_time_out:5000}") long readTimeOut,
+        @Value("${audit.connection_time_out:1000}") long connectionTimeOut,
         RestTemplateBuilder restTemplateBuilder
     ) {
         return restTemplateBuilder
-            .setConnectTimeout(Duration.ofMillis(timeOut))
-            .setReadTimeout(Duration.ofMillis(timeOut))
+            .setReadTimeout(Duration.ofMillis(readTimeOut))
+            .setConnectTimeout(Duration.ofMillis(connectionTimeOut))
             .build();
     }
 
