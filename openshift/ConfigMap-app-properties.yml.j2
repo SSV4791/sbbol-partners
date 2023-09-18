@@ -51,7 +51,8 @@ data:
 
     # Audit
     audit.enabled={{ os_project.audit.enabled | default('false')}}
-    audit.time_out={{ os_project.audit.time_out | default('10000')}}
+    audit.read_time_out={{ os_project.audit.read_time_out | default('5000')}}
+    audit.connection_time_out={{ os_project.audit.connection_time_out | default('1000')}}
     audit.x-node-id={{ openshift.env }}
     audit.event.publish.retry.max_attempts={{ os_project.audit.event.publish.retry.max_attempts | default('10')}}
     audit.event.publish.retry.interval={{ os_project.audit.event.publish.retry.interval | default('5000')}}
@@ -60,13 +61,15 @@ data:
 
     # Sbbol connect
     sbbol.url={% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.host }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='host') | first }}{% endif %}:{% if int_entry.sbbol.rest_in is mapping %}{{ int_entry.sbbol.rest_in.istio_mesh_port | default('80') }}{% else %}{{ int_entry.sbbol.rest_in | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}/ss-rest/api
-    sbbol.time_out={{ os_project.sbbol.time_out | default('10000') }}
+    sbbol.read_time_out={{ os_project.sbbol.read_time_out | default('5000') }}
+    sbbol.connection_time_out={{ os_project.sbbol.connection_time_out | default('1000') }}
     sbbol.retry.max_attempts={{  os_project.sbbol.retry.max_attempts | default('3') }}
     sbbol.retry.interval={{  os_project.sbbol.retry.interval | default('5000') }}
 
     # Fraud
     fraud.enabled={{ os_project.fraud.enabled | default('true') }}
-    fraud.time_out={{ os_project.fraud.time_out | default('10000') }}
+    fraud.read_time_out={{ os_project.fraud.read_time_out | default('5000') }}
+    fraud.connection_time_out={{ os_project.fraud.connection_time_out | default('1000') }}
     fraud.endpoint={{ os_project.fraud.endpoint | default('/antifraud/v2/counterparty') }}
     fraud.url={% if int_entry.pprb.fraud is mapping %}{{ int_entry.pprb.fraud.host }}{% else %}{{ int_entry.pprb.fraud | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.fraud is mapping %}{{ int_entry.pprb.fraud.istio_mesh_port }}{% else %}{{ int_entry.pprb.fraud | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
 

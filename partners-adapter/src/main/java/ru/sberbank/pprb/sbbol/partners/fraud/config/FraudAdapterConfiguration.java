@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
 import com.googlecode.jsonrpc4j.ProxyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -42,9 +43,15 @@ public class FraudAdapterConfiguration {
 
     @ConditionalOnProperty(prefix = "fraud", name = "enabled")
     @Bean
-    JsonRpcHttpClient fraudJsonRpcHttpClient() throws MalformedURLException {
+    JsonRpcHttpClient fraudJsonRpcHttpClient(
+        @Value("${fraud.read_time_out:5000}") int readTimeOut,
+        @Value("${fraud.connection_time_out:1000}") int connectionTimeOut
+    ) throws MalformedURLException {
         URL fraudURL = new URL("http://" + fraudProperties.getUrl() + fraudProperties.getEndpoint());
-        return new JsonRpcHttpClient(fraudObjectMapper(), fraudURL,  new HashMap<>());
+        JsonRpcHttpClient client = new JsonRpcHttpClient(fraudObjectMapper(), fraudURL, new HashMap<>());
+        client.setReadTimeoutMillis(readTimeOut);
+        client.setConnectionTimeoutMillis(connectionTimeOut);
+        return client;
     }
 
     @ConditionalOnProperty(prefix = "fraud", name = "enabled")
@@ -57,7 +64,7 @@ public class FraudAdapterConfiguration {
     }
 
     @Bean
-    FraudAdapter fraudAdapter(@Autowired(required = false)  CounterPartyService fraudRpcProxy) {
+    FraudAdapter fraudAdapter(@Autowired(required = false) CounterPartyService fraudRpcProxy) {
         return new FraudAdapterImpl(fraudRpcProxy);
     }
 }
