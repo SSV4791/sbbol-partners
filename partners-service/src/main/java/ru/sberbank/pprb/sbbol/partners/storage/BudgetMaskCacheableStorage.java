@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRe
 
 import java.util.List;
 
-import static ru.sberbank.pprb.sbbol.partners.storage.CacheNames.GET_BUDGET_MASKS;
 import static ru.sberbank.pprb.sbbol.partners.storage.CacheNames.GET_BUDGET_MASKS_BY_TYPE;
 
 public class BudgetMaskCacheableStorage {
@@ -22,11 +21,6 @@ public class BudgetMaskCacheableStorage {
     @Cacheable(GET_BUDGET_MASKS_BY_TYPE)
     public List<BudgetMaskEntity> findAllByType(BudgetMaskType type) {
         return budgetMaskDictionaryRepository.findAllByType(type);
-    }
-
-    @Cacheable(GET_BUDGET_MASKS)
-    public List<BudgetMaskEntity> findAll() {
-        return budgetMaskDictionaryRepository.findAll();
     }
 
     public List<BudgetMaskEntity> findByFilter(BudgetMaskFilter filter) {

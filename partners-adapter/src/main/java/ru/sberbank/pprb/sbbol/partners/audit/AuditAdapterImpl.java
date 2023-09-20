@@ -90,7 +90,7 @@ public class AuditAdapterImpl implements AuditAdapter {
                 ),
                 executorService
             ).exceptionally(ex -> {
-                LOGGER.error("Ошибка записи в журнал аудита auditEvent = {}, ошибка {}", auditEvent, ex);
+                LOGGER.error("Ошибка записи в журнал аудита auditEvent = {}", auditEvent, ex);
                 return null;
             });
     }

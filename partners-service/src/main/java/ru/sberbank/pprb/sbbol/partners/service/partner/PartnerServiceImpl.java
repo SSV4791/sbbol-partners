@@ -30,7 +30,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
-import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -59,7 +58,6 @@ public class PartnerServiceImpl implements PartnerService {
     private final ContactRepository contactRepository;
     private final AddressRepository addressRepository;
     private final PartnerRepository partnerRepository;
-    private final GkuInnCacheableStorage gkuInnCacheableStorage;
     private final BudgetMaskService budgetMaskService;
     private final FraudServiceManager fraudServiceManager;
     private final AccountMapper accountMapper;
@@ -79,7 +77,6 @@ public class PartnerServiceImpl implements PartnerService {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        GkuInnCacheableStorage gkuInnCacheableStorage,
         BudgetMaskService budgetMaskService,
         FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
@@ -98,7 +95,6 @@ public class PartnerServiceImpl implements PartnerService {
         this.contactRepository = contactRepository;
         this.addressRepository = addressRepository;
         this.partnerRepository = partnerRepository;
-        this.gkuInnCacheableStorage = gkuInnCacheableStorage;
         this.budgetMaskService = budgetMaskService;
         this.fraudServiceManager = fraudServiceManager;
         this.accountMapper = accountMapper;
@@ -119,9 +115,7 @@ public class PartnerServiceImpl implements PartnerService {
         PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id)
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        var response = partnerMapper.toPartner(partner);
-        response.setGku(isGkuInn(response.getInn()));
-        return response;
+        return partnerMapper.toPartner(partner);
     }
 
     @Override
@@ -158,9 +152,6 @@ public class PartnerServiceImpl implements PartnerService {
         if (isEmpty(partners)) {
             return partnersResponse;
         }
-        for (Partner partner : partners) {
-            partner.setGku(isGkuInn(partner.getInn()));
-        }
         return partnersResponse.partners(partners);
     }
 
@@ -192,8 +183,7 @@ public class PartnerServiceImpl implements PartnerService {
         if (!isEmpty(accounts)) {
             replicationService.createCounterparty(accounts);
         }
-        return partnerMapper.toPartnerMullResponse(savedPartner)
-            .gku(isGkuInn(savedPartner.getInn()))
+        return partnerMapper.toPartnerFullResponse(savedPartner)
             .accounts(accounts)
             .address(addresses)
             .documents(documents)
@@ -207,9 +197,7 @@ public class PartnerServiceImpl implements PartnerService {
         checkPartnerDuplicate(partner);
         var partnerEntity = partnerMapper.toPartner(partner);
         var savePartner = partnerRepository.save(partnerEntity);
-        var response = partnerMapper.toPartner(savePartner);
-        response.setGku(isGkuInn(response.getInn()));
-        return response;
+        return partnerMapper.toPartner(savePartner);
     }
 
     @Override
@@ -227,9 +215,7 @@ public class PartnerServiceImpl implements PartnerService {
             var accounts = accountMapper.toAccounts(accountEntities);
             replicationService.updateCounterparty(accounts);
         }
-        var response = partnerMapper.toPartner(savePartner);
-        response.setGku(isGkuInn(response.getInn()));
-        return response;
+        return partnerMapper.toPartner(savePartner);
     }
 
     @Override
@@ -258,8 +244,7 @@ public class PartnerServiceImpl implements PartnerService {
         var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId).stream()
             .map(accountMapper::toAccount)
             .collect(Collectors.toList());
-        return partnerMapper.toPartnerMullResponse(savedPartner)
-            .gku(isGkuInn(savedPartner.getInn()))
+        return partnerMapper.toPartnerFullResponse(savedPartner)
             .address(addresses)
             .documents(documents)
             .contacts(contacts)
@@ -303,10 +288,6 @@ public class PartnerServiceImpl implements PartnerService {
             throw new OptimisticLockException(foundPartner.getVersion(), version);
         }
         return foundPartner;
-    }
-
-    private boolean isGkuInn(String inn) {
-        return gkuInnCacheableStorage.isGkuInn(inn);
     }
 
     private void checkPartnerDuplicate(PartnerCreateFullModel partner) {

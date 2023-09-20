@@ -80,7 +80,6 @@ import ru.sberbank.pprb.sbbol.partners.service.renter.ValidationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.impl.ReplicationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.storage.BudgetMaskCacheableStorage;
-import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
@@ -296,7 +295,6 @@ public class PartnerServiceConfiguration {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        GkuInnCacheableStorage gkuInnCacheableStorage,
         BudgetMaskService budgetMaskService,
         FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
@@ -316,7 +314,6 @@ public class PartnerServiceConfiguration {
             contactRepository,
             addressRepository,
             partnerRepository,
-            gkuInnCacheableStorage,
             budgetMaskService,
             fraudServiceManager,
             accountMapper,

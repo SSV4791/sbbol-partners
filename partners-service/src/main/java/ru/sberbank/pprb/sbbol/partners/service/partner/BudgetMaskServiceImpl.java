@@ -99,7 +99,7 @@ public class BudgetMaskServiceImpl implements BudgetMaskService {
     /**
      * Метод определения подпадает ли строка под проверку по заданным маскам
      *
-     * @param param номера счета или бик для проверки
+     * @param param номер счета или бик для проверки
      * @param masks список масок номеров счетов или бик'ов
      * @return true если счёт или бик попадает под одну из масок
      */

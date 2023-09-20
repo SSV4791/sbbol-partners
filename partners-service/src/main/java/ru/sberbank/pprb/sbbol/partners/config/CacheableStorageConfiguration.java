@@ -12,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryReposi
 import ru.sberbank.pprb.sbbol.partners.storage.BudgetMaskCacheableStorage;
 import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
-import static ru.sberbank.pprb.sbbol.partners.storage.CacheNames.GET_BUDGET_MASKS;
 import static ru.sberbank.pprb.sbbol.partners.storage.CacheNames.GET_BUDGET_MASKS_BY_TYPE;
 import static ru.sberbank.pprb.sbbol.partners.storage.CacheNames.IS_GKU_INN;
 import static ru.sberbank.pprb.sbbol.partners.storage.CacheNames.MIGRATION;
@@ -45,7 +44,6 @@ public class CacheableStorageConfiguration {
         net.sf.ehcache.config.Configuration config = new net.sf.ehcache.config.Configuration();
         config.addCache(createCacheConfig(MIGRATION, legacyMaxEntriesLocalHeap, legacyCacheTime));
         config.addCache(createCacheConfig(IS_GKU_INN, gkuInnMaxEntriesLocalHeap, gkuInnCacheTime));
-        config.addCache(createCacheConfig(GET_BUDGET_MASKS, budgetMaskMaxEntriesLocalHeap));
         config.addCache(createCacheConfig(GET_BUDGET_MASKS_BY_TYPE, budgetMaskMaxEntriesLocalHeap));
         return net.sf.ehcache.CacheManager.create(config);
     }

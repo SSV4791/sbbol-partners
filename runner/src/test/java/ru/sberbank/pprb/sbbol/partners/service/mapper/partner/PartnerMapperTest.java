@@ -119,9 +119,9 @@ class PartnerMapperTest extends BaseUnitConfiguration {
     }
 
     @Test
-    void testToPartnerMullResponse() {
+    void testToPartnerFullResponse() {
         var expected = factory.manufacturePojo(PartnerEntity.class);
-        var actual = mapper.toPartnerMullResponse(expected);
+        var actual = mapper.toPartnerFullResponse(expected);
         assertThat(actual)
             .isNotNull();
         assertThat(expected)
