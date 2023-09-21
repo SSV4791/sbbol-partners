@@ -17,12 +17,6 @@
       "$ref": "channel/fraud_channel_info.json",
       "title": "Тип канала связи, через который осуществляется связь клиента с банком"
     },
-    "channelIndicator": {
-      "deprecated": true,
-      "deprecationMessage": "Для обратной совместимости с БП Контрагенты. Передавать информацию о канале в channelInfo",
-      "$ref": "channel/fraud_channel_indicator.json",
-      "title": "Тип канала связи, через который осуществляется связь клиента с банком"
-    },
     "eventData": {
       "type": "object",
       "$ref": "event/fraud_event_data.json",
@@ -36,6 +30,7 @@
   },
   "required": [
     "clientData",
+    "channelInfo",
     "deviceRequest",
     "eventData"
   ]

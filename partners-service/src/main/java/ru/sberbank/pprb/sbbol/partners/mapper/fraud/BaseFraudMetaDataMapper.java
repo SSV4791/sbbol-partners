@@ -142,12 +142,7 @@ public interface BaseFraudMetaDataMapper {
         if (isNull(metaData)) {
             return null;
         }
-        var channelIndicator = nonNull(metaData.getChannelInfo()) ?
-            metaData.getChannelInfo().getChannelIndicator() : metaData.getChannelIndicator();
-        if (isNull(channelIndicator)) {
-            return null;
-        }
-        return switch (channelIndicator) {
+        return switch (metaData.getChannelInfo().getChannelIndicator()) {
             case WEB -> ChannelIndicator.WEB;
             case MOBILE -> ChannelIndicator.MOBILE;
             case OTHER -> ChannelIndicator.OTHER;
