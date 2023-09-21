@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 1692625249905_normalization_partner_search.sql
+      relativeToChangelogFile: true
