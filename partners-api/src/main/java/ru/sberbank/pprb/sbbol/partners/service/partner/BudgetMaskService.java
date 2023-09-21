@@ -9,7 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BudgetMasksResponse;
 public interface BudgetMaskService {
 
     /**
-     * Получение списка бюджетным масок по фильтру
+     * Получение списка бюджетных масок по фильтру
      *
      * @param budgetMaskFilter фильтр для поиска бюджетных масок
      * @return список бюджетных масок

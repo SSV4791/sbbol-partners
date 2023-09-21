@@ -11,6 +11,7 @@ import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
@@ -53,11 +54,11 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.p
 @DecoratedWith(PartnerMapperDecorator.class)
 public interface PartnerMapper {
 
-    @Mapping(target = "gku", ignore = true)
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "changeDate", source = "lastModifiedDate")
+    @Mapping(target = "gku", source = "gkuInnEntity", qualifiedByName = "isGku")
     Partner toPartner(PartnerEntity partner);
 
     @Named("toLegalType")
@@ -68,6 +69,11 @@ public interface PartnerMapper {
     @Named("toCitizenshipType")
     static Citizenship toCitizenshipType(PartnerCitizenshipType citizenshipType) {
         return citizenshipType != null ? Citizenship.valueOf(citizenshipType.name()) : null;
+    }
+
+    @Named("isGku")
+    static Boolean isGku(GkuInnEntity isGkuInn) {
+        return isGkuInn != null;
     }
 
     @Mapping(target = "createDate", ignore = true)
@@ -216,7 +222,6 @@ public interface PartnerMapper {
         }
     }
 
-    @Mapping(target = "gku", ignore = true)
     @Mapping(target = "id", source = "uuid")
     @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
@@ -225,7 +230,8 @@ public interface PartnerMapper {
     @Mapping(target = "documents", ignore = true)
     @Mapping(target = "address", ignore = true)
     @Mapping(target = "contacts", ignore = true)
-    PartnerFullModelResponse toPartnerMullResponse(PartnerEntity partner);
+    @Mapping(target = "gku", source = "gkuInnEntity", qualifiedByName = "isGku")
+    PartnerFullModelResponse toPartnerFullResponse(PartnerEntity partner);
 
     @NotNull
     default String saveSearchString(String... search) {
