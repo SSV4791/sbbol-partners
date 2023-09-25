@@ -6,6 +6,8 @@ import ru.sberbank.pprb.sbbol.partners.AccountsSignApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValid;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisitesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
@@ -39,5 +41,10 @@ public class AccountSignController implements AccountsSignApi {
     @Override
     public ResponseEntity<AccountSignInfo> getById(String digitalId, UUID accountId) {
         return ResponseEntity.ok(accountSignService.getAccountSign(digitalId, accountId));
+    }
+
+    @Override
+    public ResponseEntity<AccountSignInfoRequisitesResponse> getSignInfoByRequisites(AccountSignInfoRequisites accountSignInfoRequisites) {
+        return ResponseEntity.ok(accountSignService.getSignInfoByRequisites(accountSignInfoRequisites));
     }
 }

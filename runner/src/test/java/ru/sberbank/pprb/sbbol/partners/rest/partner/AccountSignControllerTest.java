@@ -7,17 +7,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisitesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
-import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
 
@@ -31,7 +33,11 @@ import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
+import static ru.sberbank.pprb.sbbol.partners.model.SignType.NOT_SIGNED;
+import static ru.sberbank.pprb.sbbol.partners.model.SignType.SIGNED;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
+import static ru.sberbank.pprb.sbbol.partners.rest.partner.BaseAccountControllerTest.getValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -66,9 +72,111 @@ class AccountSignControllerTest extends BaseAccountSignControllerTest {
             assertThat(savedSign)
                 .isNotNull();
             assertThat(getAccount.getState())
-                .isEqualTo(SignType.SIGNED);
+                .isEqualTo(SIGNED);
         });
     }
+
+    @Test
+    @DisplayName("POST /partner/accounts/sign/info Проверка подписания счёта по реквизитам. Счета не подписаны")
+    void testGetSignByRequisites() {
+        var account = step("Создание счётов с одинаковыми реквизитами для партнеров", () -> {
+            var partner = createValidPartner();
+            var acc = getValidAccount(partner.getId(), partner.getDigitalId());
+            var partner2 = createValidPartner(partner.getDigitalId());
+            var acc2 = getValidAccount(partner2.getId(), partner2.getDigitalId());
+            acc2.account(acc.getAccount());
+            acc2.getBank().bic(acc.getBank().getBic());
+            createValidAccount(acc2);
+            return createValidAccount(acc);
+        });
+
+        var response = step("Выполнение запроса. Оба счета не подписаны", () -> {
+            var request = new AccountSignInfoRequisites()
+                .digitalId(account.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic());
+            return post(
+                baseRoutePath + "/info",
+                HttpStatus.OK,
+                request,
+                AccountSignInfoRequisitesResponse.class);
+        });
+        step("Проверка результата", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getStatus())
+                .isEqualTo(NOT_SIGNED);
+            assertThat(response.getAccountId())
+                .isNotNull();
+        });
+    }
+
+    @Test
+    @DisplayName("POST /partner/accounts/sign/info Проверка подписания счёта по реквизитам. Счет не найден")
+    void testGetSignByRequisitesAccountNotFound() {
+        var response = step("Запрос с несуществующими реквизитами", () -> {
+            var request = new AccountSignInfoRequisites()
+                .digitalId(RandomStringUtils.randomAlphabetic(10))
+                .account(RandomStringUtils.randomNumeric(20))
+                .bic(RandomStringUtils.randomNumeric(9));
+            return post(
+                baseRoutePath + "/info",
+                HttpStatus.NOT_FOUND,
+                request,
+                Error.class);
+        });
+        step("Проверка результата", () -> {
+            assertThat(response)
+                .isNotNull();
+            assertThat(response.getType())
+                .isEqualTo(BUSINESS);
+            assertThat(response.getCode())
+                .isEqualTo(MODEL_NOT_FOUND_EXCEPTION.getValue());
+        });
+    }
+
+    @Test
+    @DisplayName("POST /partner/accounts/sign/info Проверка подписания счёта по реквизитам. Один счет подписан")
+    void testGetSignByRequisites2() {
+        var account = step("Создание счётов с одинаковыми реквизитами для партнеров", () -> {
+            var partner = createValidPartner();
+            var acc = getValidAccount(partner.getId(), partner.getDigitalId());
+            var partner2 = createValidPartner(partner.getDigitalId());
+            var acc2 = getValidAccount(partner2.getId(), partner2.getDigitalId());
+            acc2.account(acc.getAccount());
+            acc2.getBank().bic(acc.getBank().getBic());
+            createValidAccount(acc2);
+            return createValidAccount(acc);
+        });
+
+        step("Подписание счёта", () ->
+            createValidAccountsSign(
+                account.getDigitalId(),
+                account.getId(),
+                account.getVersion(),
+                getBase64FraudMetaData()));
+
+        var response3 = step("Выполнение запроса. Один счет подписан", () -> {
+            var request = new AccountSignInfoRequisites()
+                .digitalId(account.getDigitalId())
+                .account(account.getAccount())
+                .bic(account.getBank().getBic());
+            return post(
+                baseRoutePath + "/info",
+                HttpStatus.OK,
+                request,
+                AccountSignInfoRequisitesResponse.class);
+        });
+        step("Проверка результата", () -> {
+            assertThat(response3)
+                .isNotNull();
+            assertThat(response3.getStatus())
+                .isEqualTo(SIGNED);
+            assertThat(response3.getAccountId())
+                .isEqualTo(account.getId());
+        });
+    }
+
 
     @Test
     @DisplayName("POST /partner/accounts/sign Ошибка валидации FraudMetaData")
@@ -181,9 +289,9 @@ class AccountSignControllerTest extends BaseAccountSignControllerTest {
             return createValidAccount(partner.getId(), partner.getDigitalId());
         });
         var errorText = step("Подготовка текста ошибки", () ->
-                "Искомая сущность account с id: " + account.getId() + ", digitalId:  не найдена");
+            "Искомая сущность account с id: " + account.getId() + ", digitalId:  не найдена");
         var response = step("Попытка подписания счёта без DigitalId", () ->
-                createAccountSignWithNotFound("", account.getId(), account.getVersion(), getBase64FraudMetaData()));
+            createAccountSignWithNotFound("", account.getId(), account.getVersion(), getBase64FraudMetaData()));
 
         step("Проверка корректности ответа", () -> {
             assertThat(response)
@@ -253,7 +361,7 @@ class AccountSignControllerTest extends BaseAccountSignControllerTest {
                 .isNotNull());
 
         var notSignedAccount = step("Создание не подписанного счёта для партнера", () ->
-                createValidAccount(partner.getId(), partner.getDigitalId()));
+            createValidAccount(partner.getId(), partner.getDigitalId()));
 
         var signInfo = step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 404", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
@@ -262,7 +370,7 @@ class AccountSignControllerTest extends BaseAccountSignControllerTest {
             notSignedAccount.getDigitalId(), notSignedAccount.getId()));
 
         var errorText = step("Подготовка текста ошибки", () ->
-                "Искомая сущность sign с id: " + notSignedAccount.getId() + ", digitalId: " + notSignedAccount.getDigitalId() + " не найдена");
+            "Искомая сущность sign с id: " + notSignedAccount.getId() + ", digitalId: " + notSignedAccount.getDigitalId() + " не найдена");
 
         step("Проверка корректности ответа", () -> {
             assertThat(signInfo)
@@ -342,7 +450,7 @@ class AccountSignControllerTest extends BaseAccountSignControllerTest {
                 .isNotNull());
 
         var errorText = step("Подготовка текста ошибки", () ->
-                "Invalid UUID string: " + account.getDigitalId());
+            "Invalid UUID string: " + account.getDigitalId());
 
         step("Проверка корректности ответа", () -> {
             assertThat(signInfo.getCode())
@@ -398,9 +506,9 @@ class AccountSignControllerTest extends BaseAccountSignControllerTest {
         });
 
         var savedSign = step("Создание подписанного счёта", () ->
-                createValidAccountsSign(account.getDigitalId(), account.getId(), account.getVersion(), getBase64FraudMetaData()));
+            createValidAccountsSign(account.getDigitalId(), account.getId(), account.getVersion(), getBase64FraudMetaData()));
         var accountSignDetail = step("Получение деталей подписи", () ->
-                savedSign.getAccountsSignDetail().get(0));
+            savedSign.getAccountsSignDetail().get(0));
 
         var actualAccountSign = step("Выполнение get-запроса /partner/accounts/sign/{digitalId}/{accountId}, код ответа 200", () -> get(
             baseRoutePath + "/{digitalId}" + "/{accountId}",
@@ -455,7 +563,7 @@ class AccountSignControllerTest extends BaseAccountSignControllerTest {
             createValidAccountsSign(account.getDigitalId(), account.getId(), account.getVersion(), getBase64FraudMetaData()));
 
         var accountWithoutSign = step("Создание счёта без подписи", () ->
-                createValidAccount(partner.getId(), partner.getDigitalId()));
+            createValidAccount(partner.getId(), partner.getDigitalId()));
 
         var deleteAccountSign = step("Выполнение delete-запроса /partner/accounts/sign/{digitalId}, код ответа 204 (удаление подписи)", () -> delete(
             baseRoutePath + "/{digitalId}",

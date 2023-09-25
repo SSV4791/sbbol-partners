@@ -4,15 +4,22 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisitesResponse;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.UUID;
+
+import static ru.sberbank.pprb.sbbol.partners.model.SignType.NOT_SIGNED;
+import static ru.sberbank.pprb.sbbol.partners.model.SignType.SIGNED;
 
 @Loggable
 @Mapper(uses = {BaseMapper.class})
@@ -49,6 +56,18 @@ public interface AccountSingMapper {
     @Mapping(target = "digest", source = "digest")
     @Mapping(target = "dcsId", expression = "java(\"default\")")
     CounterpartySignData toCounterpartySignData(SignEntity signEntity);
+
+    @Mapping(target = "accountId", source = "uuid")
+    @Mapping(target = "status", source = "state", qualifiedByName = "getStatus")
+    AccountSignInfoRequisitesResponse toAccountSignRequisitesResponse(AccountEntity account);
+
+    @Named("getStatus")
+    default SignType getStatus(AccountStateType state) {
+        return switch (state) {
+            case SIGNED -> SIGNED;
+            case NOT_SIGNED -> NOT_SIGNED;
+        };
+    }
 
     @Named("toSignDate")
     default Date toSignDate(OffsetDateTime dateTimeOfSign) {

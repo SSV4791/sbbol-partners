@@ -1,8 +1,10 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
@@ -12,6 +14,8 @@ import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisitesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
@@ -24,6 +28,7 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.SIGN_ACCOUNTS_DELETE;
@@ -123,5 +128,34 @@ public class AccountSignServiceImpl implements AccountSignService {
         var sign = accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, accountId)
             .orElseThrow(() -> new EntryNotFoundException("sign", digitalId, accountId));
         return accountSingMapper.toSignAccount(sign, digitalId);
+    }
+
+    @Override
+    public AccountSignInfoRequisitesResponse getSignInfoByRequisites(AccountSignInfoRequisites accountSignInfoRequisites) {
+        List<AccountEntity> foundAccounts = accountRepository.findByRequisites(accountSignInfoRequisites);
+        return accountSingMapper.toAccountSignRequisitesResponse(getCorrectAccount(foundAccounts, accountSignInfoRequisites));
+    }
+
+    private AccountEntity getCorrectAccount(List<AccountEntity> accounts, AccountSignInfoRequisites accountSignInfoRequisites) {
+        if (CollectionUtils.isEmpty(accounts)) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, accountSignInfoRequisites.getDigitalId());
+        }
+        List<AccountEntity> filteredAccounts = accounts.stream()
+            .filter(acc -> Objects.equals(accountSignInfoRequisites.getAccount(), acc.getAccount()))
+            .filter(acc -> Objects.equals(accountSignInfoRequisites.getBic(), acc.getBank().getBic()))
+            .sorted((acc1, acc2) -> {
+                if (AccountStateType.SIGNED.equals(acc1.getState())) {
+                    return -1;
+                } else if (AccountStateType.SIGNED.equals(acc2.getState())) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
+            .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(filteredAccounts)) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, accountSignInfoRequisites.getDigitalId());
+        }
+        return filteredAccounts.get(0);
     }
 }

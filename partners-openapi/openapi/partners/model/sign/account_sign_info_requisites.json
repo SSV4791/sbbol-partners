@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Реквизиты счета для получения информации о подписи",
+  "properties": {
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
+    },
+    "account": {
+      "type": "string",
+      "title": "Счёт",
+      "pattern": "^(\\d{20})*$",
+      "x-pattern-message": "{validation.account.simple_pattern}"
+    },
+    "bic": {
+      "type": "string",
+      "title": "БИК",
+      "pattern": "[0-9]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "minLength": 9,
+      "maxLength": 9,
+      "x-length-message": "{validation.account.bank.bic.length}"
+    }
+  },
+  "required": [
+    "digitalId",
+    "bic"
+  ]
+}
