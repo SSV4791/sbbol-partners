@@ -1,18 +1,29 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.SignEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartySignData;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignDetail;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisitesResponse;
+import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
+import ru.sberbank.pprb.sbbol.partners.model.SearchAccounts;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.sberbank.pprb.sbbol.partners.model.SignType.NOT_SIGNED;
+import static ru.sberbank.pprb.sbbol.partners.model.SignType.SIGNED;
 
 class AccountSignMapperTest extends BaseUnitConfiguration {
 
@@ -104,6 +115,19 @@ class AccountSignMapperTest extends BaseUnitConfiguration {
 
         assertThat(actual)
             .usingRecursiveComparison()
+            .isEqualTo(expected);
+    }
+
+    @Test
+    void testToAccountSignRequisitesResponse() {
+        var account = factory.manufacturePojo(AccountEntity.class);
+        var actual = mapper.toAccountSignRequisitesResponse(account);
+        var expected = new AccountSignInfoRequisitesResponse()
+            .accountId(account.getUuid())
+            .status(AccountStateType.SIGNED.equals(account.getState()) ? SIGNED : NOT_SIGNED);
+
+        assertThat(actual)
+            .isNotNull()
             .isEqualTo(expected);
     }
 }

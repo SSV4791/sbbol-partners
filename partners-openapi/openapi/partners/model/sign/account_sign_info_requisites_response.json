@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Информация о подписи счета",
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Уникальный идентификатор счета"
+    },
+    "status": {
+      "$ref": "../common/sign_type.json"
+    }
+  }
+}

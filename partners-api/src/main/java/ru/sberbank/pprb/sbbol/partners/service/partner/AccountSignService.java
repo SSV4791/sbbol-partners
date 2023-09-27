@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfo;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisitesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
@@ -39,4 +41,11 @@ public interface AccountSignService {
      */
     AccountSignInfo getAccountSign(String digitalId, UUID accountId);
 
+    /**
+     * Получение информации о подписи счета по реквизитам счета
+     *
+     * @param accountSignInfoRequisites Реквизиты счета
+     * @return информация о подписи счета
+     */
+    AccountSignInfoRequisitesResponse getSignInfoByRequisites(AccountSignInfoRequisites accountSignInfoRequisites);
 }
