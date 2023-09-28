@@ -1,11 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.fraud;
 
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartySendToAnalyzeRq;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.response.AnalyzeResponse;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.AnalyzeRequest;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.response.FullAnalyzeResponse;
 import ru.sberbank.pprb.sbbol.antifraud.api.exception.AnalyzeException;
 import ru.sberbank.pprb.sbbol.antifraud.api.exception.ApplicationException;
 import ru.sberbank.pprb.sbbol.antifraud.api.exception.ModelArgumentException;
-import ru.sberbank.pprb.sbbol.antifraud.rpc.counterparty.CounterPartyService;
+import ru.sberbank.pprb.sbbol.antifraud.rpc.document.DocumentWithOutSavingService;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudAdapterException;
 import ru.sberbank.pprb.sbbol.partners.fraud.exception.FraudApplicationException;
@@ -17,21 +17,18 @@ import static java.util.Objects.isNull;
 @Loggable
 public class FraudAdapterImpl implements FraudAdapter{
 
-    private final CounterPartyService fraudRpcProxy;
+    private final DocumentWithOutSavingService fraudRpcProxy;
 
-    public FraudAdapterImpl(CounterPartyService fraudRpcProxy) {
+    public FraudAdapterImpl(DocumentWithOutSavingService fraudRpcProxy) {
         this.fraudRpcProxy = fraudRpcProxy;
     }
 
     @Override
-    public AnalyzeResponse send(CounterPartySendToAnalyzeRq rq) {
+    public FullAnalyzeResponse send(AnalyzeRequest rq) {
         try {
             var response = fraudRpcProxy.analyzeOperation(rq);
             if (isNull(response)) {
                 throw new FraudResponseException("response is null");
-            }
-            if (isNull(response.getActionCode())) {
-                throw new FraudResponseException("response.actionCode is null");
             }
             return response;
         } catch (ModelArgumentException e) {

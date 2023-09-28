@@ -1,13 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.fraud;
 
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.ChannelIndicator;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.ClientDefinedChannelIndicator;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.DboOperation;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyClientDefinedAttributes;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyDeviceRequest;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyEventData;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyIdentificationData;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyMessageHeader;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.DeviceRequest;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.EventDataList;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.IdentificationData;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.MessageHeader;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper;
@@ -21,15 +19,14 @@ import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.ANALYZE_REQUEST_TYPE;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.DBO_OPERATION_NAME;
-import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.getClientDefinedEventType;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.toChannelIndicator;
 
 public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfiguration {
 
     protected abstract BaseFraudMetaDataMapper getFraudMetaDataMapper();
 
-    protected void checkCounterPartyMessageHeader(
-        CounterPartyMessageHeader actualMessageHeader,
+    protected void checkMessageHeader(
+        MessageHeader actualMessageHeader,
         FraudMetaData metaData
     ) {
         assertThat(actualMessageHeader)
@@ -40,15 +37,15 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
             .isEqualTo(metaData.getEventData().getTimeOfOccurrence().toLocalDateTime());
     }
 
-    protected void checkCounterPartyIdentificationData(
-        CounterPartyIdentificationData actualIdentificationData,
+    protected void checkIdentificationData(
+        IdentificationData actualIdentificationData,
         FraudClientData clientData,
         String clientTransactionId
     ) {
         assertThat(actualIdentificationData)
             .isNotNull();
         assertThat(actualIdentificationData.getDboOperation())
-            .isEqualTo(DboOperation.PARTNERS);
+            .isEqualTo(DboOperation.PARTNERS.toString());
         assertThat(actualIdentificationData.getClientTransactionId())
             .isEqualTo(clientTransactionId);
         assertThat(actualIdentificationData.getOrgName())
@@ -59,8 +56,8 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
             .isEqualTo(clientData.getLogin());
     }
 
-    protected void checkCounterPartyDeviceRequest(
-        CounterPartyDeviceRequest actualDeviceRequest,
+    protected void checkDeviceRequest(
+        DeviceRequest actualDeviceRequest,
         FraudDeviceRequest deviceRequest
     ) {
         assertThat(actualDeviceRequest)
@@ -85,33 +82,35 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
             .isEqualTo(deviceRequest.getMobileSdkData());
     }
 
-    protected void checkCounterPartyEventData(
-        CounterPartyEventData actualEventData,
+    protected void checkEventDataList(
+        EventDataList actualEventData,
         FraudEventData eventData,
         FraudEventType eventType
     ) {
         assertThat(actualEventData)
             .isNotNull();
-        assertThat(actualEventData.getEventType())
+        assertThat(actualEventData.getEventData())
+            .isNotNull();
+        assertThat(actualEventData.getEventData().getEventType())
             .isEqualTo(getFraudMetaDataMapper().toEventType(eventType));
-        assertThat(actualEventData.getTimeOfOccurrence())
+        assertThat(actualEventData.getEventData().getClientDefinedEventType())
+            .isEqualTo(getFraudMetaDataMapper().getClientDefinedEventType(eventData, eventType).toString());
+        assertThat(actualEventData.getEventData().getTimeOfOccurrence())
             .isEqualTo(eventData.getTimeOfOccurrence().toLocalDateTime());
-        assertThat(actualEventData.getClientDefinedEventType())
-            .isEqualTo(getClientDefinedEventType(eventData, eventType));
     }
 
     protected void checkChannelIndicator(
-        ChannelIndicator actualChannelIndicator,
+        String actualChannelIndicator,
         FraudMetaData metaData) {
         assertThat(actualChannelIndicator)
             .isEqualTo(toChannelIndicator(metaData));
     }
 
     protected void checkClientDefinedChannelIndicator(
-        ClientDefinedChannelIndicator actualClientDefinedChannelIndicator,
+        String actualClientDefinedChannelIndicator,
         FraudChannelInfo channelInfo
     ) {
-        assertThat(actualClientDefinedChannelIndicator.toString())
+        assertThat(actualClientDefinedChannelIndicator)
             .hasToString(channelInfo.getClientDefinedChannelIndicator().getValue());
     }
 

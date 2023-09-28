@@ -2,7 +2,7 @@
 mapstruct = "1.4.2.Final"
 micrometer = "1.7.5"
 spring-boot = "2.5.5"
-antifraud = "D-02.003.00_0003"
+antifraud = "D-02.005.00_0005"
 
 [libraries]
 antifraud-api = { module = "ru.sberbank.pprb.antifraud:antifraud-api", version.ref = "antifraud"}
