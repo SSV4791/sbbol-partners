@@ -110,6 +110,7 @@ class AccountSignMapperTest extends BaseUnitConfiguration {
         expected.setSignDate(Date.from(signEntity.getDateTimeOfSign().toInstant()));
         expected.setDigest(signEntity.getDigest());
         expected.setSignProfileId(Long.parseLong(signEntity.getSignProfileId()));
+        expected.setCryptoProfileId((signEntity.getCryptoProfileId()));
         expected.setPprbGuid(signEntity.getAccountUuid());
         expected.setDcsId("default");
 

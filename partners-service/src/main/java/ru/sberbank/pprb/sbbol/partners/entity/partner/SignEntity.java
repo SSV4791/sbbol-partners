@@ -51,8 +51,11 @@ public class SignEntity extends BaseEntity {
     @Column(name = "external_data_sign_file_id")
     private String externalDataSignFileId;
 
-    @Column(name = "sign_profile_Id")
+    @Column(name = "sign_profile_id")
     private String signProfileId;
+
+    @Column(name = "crypto_profile_id")
+    private String cryptoProfileId;
 
     @Column(name = "date_time_of_sign")
     private OffsetDateTime dateTimeOfSign;
@@ -135,6 +138,14 @@ public class SignEntity extends BaseEntity {
 
     public void setSignProfileId(String signProfileId) {
         this.signProfileId = signProfileId;
+    }
+
+    public String getCryptoProfileId() {
+        return cryptoProfileId;
+    }
+
+    public void setCryptoProfileId(String cryptoProfileId) {
+        this.cryptoProfileId = cryptoProfileId;
     }
 
     @Override

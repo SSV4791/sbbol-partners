@@ -34,6 +34,7 @@ public interface AccountSingMapper {
     @Mapping(target = "externalDataSignFileId", source = "externalDataSignFileId")
     @Mapping(target = "dateTimeOfSign", source = "dateTimeOfSign")
     @Mapping(target = "signProfileId", source = "signProfileId")
+    @Mapping(target = "cryptoProfileId", source = "cryptoProfileId")
     AccountSignDetail toSignAccount(SignEntity sign);
 
     @Mapping(target = "digitalId", source = "digitalId")
@@ -51,6 +52,7 @@ public interface AccountSingMapper {
 
     @Mapping(target = "pprbGuid", source = "accountUuid")
     @Mapping(target = "signProfileId", source = "signProfileId")
+    @Mapping(target = "cryptoProfileId", source = "cryptoProfileId")
     @Mapping(target = "signDate", source = "dateTimeOfSign", qualifiedByName = "toSignDate")
     @Mapping(target = "base64sign", source = "sign")
     @Mapping(target = "digest", source = "digest")
