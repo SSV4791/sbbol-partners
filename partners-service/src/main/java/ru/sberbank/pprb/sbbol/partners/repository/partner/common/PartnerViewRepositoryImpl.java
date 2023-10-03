@@ -291,8 +291,7 @@ public class PartnerViewRepositoryImpl
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(PartnerEntity_.DIGITAL_ID)),
-            builder.desc(root.get(PartnerEntity_.CREATE_DATE))
+            builder.desc(root.get(PartnerEntity_.LAST_MODIFIED_DATE))
         );
     }
 
