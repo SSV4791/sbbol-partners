@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.sberbank.pprb.sbbol.antifraud.rpc.counterparty.CounterPartyService;
+import ru.sberbank.pprb.sbbol.antifraud.rpc.document.DocumentWithOutSavingService;
 import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapter;
 import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapterImpl;
 
@@ -56,15 +56,15 @@ public class FraudAdapterConfiguration {
 
     @ConditionalOnProperty(prefix = "fraud", name = "enabled")
     @Bean
-    CounterPartyService fraudRpcProxy(JsonRpcHttpClient fraudRpcClient) {
+    DocumentWithOutSavingService fraudRpcProxy(JsonRpcHttpClient fraudRpcClient) {
         return ProxyUtil.createClientProxy(
             fraudRpcClient.getClass().getClassLoader(),
-            CounterPartyService.class,
+            DocumentWithOutSavingService.class,
             fraudRpcClient);
     }
 
     @Bean
-    FraudAdapter fraudAdapter(@Autowired(required = false) CounterPartyService fraudRpcProxy) {
+    FraudAdapter fraudAdapter(@Autowired(required = false) DocumentWithOutSavingService fraudRpcProxy) {
         return new FraudAdapterImpl(fraudRpcProxy);
     }
 }

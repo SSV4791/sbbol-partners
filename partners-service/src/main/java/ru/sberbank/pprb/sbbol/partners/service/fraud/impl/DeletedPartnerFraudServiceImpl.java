@@ -48,7 +48,7 @@ public class DeletedPartnerFraudServiceImpl implements FraudService<PartnerEntit
         if (!properties.isEnabled() || isNull(metaData) || !checkEvent(metaData)) {
             return;
         }
-        var fraudRequest = fraudMapper.mapToCounterPartySendToAnalyzeRq(metaData, partnerEntity);
+        var fraudRequest = fraudMapper.mapToAnalyzeRequest(metaData, partnerEntity);
         try {
             LOG.debug("Отправляем запрос В АС Агрегатор данных ФРОД-мониторинг: {}", fraudRequest);
             adapter.send(fraudRequest);

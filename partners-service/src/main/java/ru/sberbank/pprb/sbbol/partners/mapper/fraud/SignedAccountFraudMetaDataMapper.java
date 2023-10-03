@@ -5,20 +5,21 @@ import org.mapstruct.Context;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyClientDefinedAttributes;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyEventData;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartySendToAnalyzeRq;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.AnalyzeRequest;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.Attribute;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.EventDataList;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.model.FraudEventData;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 
+import java.util.List;
+
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Loggable
@@ -34,50 +35,36 @@ import static java.util.Objects.nonNull;
 public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMapper {
 
     @InheritConfiguration
-    @Mapping(target = "clientDefinedAttributeList", expression = "java(toCounterPartyClientDefinedAttributesForSignedAccount(metaData, partner, account))")
-    CounterPartySendToAnalyzeRq mapToCounterPartySendToAnalyzeRq(FraudMetaData metaData, @Context PartnerEntity partner, @Context AccountEntity account);
+    AnalyzeRequest mapToAnalyzeRequest(FraudMetaData metaData, @Context PartnerEntity partner, @Context AccountEntity account);
 
-    default CounterPartyClientDefinedAttributes toCounterPartyClientDefinedAttributesForSignedAccount(FraudMetaData metaData, PartnerEntity partner, AccountEntity account) {
-        var counterPartyClientDefinedAttributes = toCounterPartyClientDefinedAttributes(metaData, partner);
-        if (counterPartyClientDefinedAttributes == null) {
-            return null;
+    default void addSignedClientDefinedAttributeList(List<Attribute> attributes, FraudMetaData metaData) {
+        if (isNull(metaData)) {
+            return;
         }
-        if (account != null) {
-            if (account.getBank() != null) {
-                counterPartyClientDefinedAttributes.setReceiverBicSwift(account.getBank().getBic());
-            }
-            counterPartyClientDefinedAttributes.setReceiverAccount(account.getAccount());
-            counterPartyClientDefinedAttributes.setUserComment(account.getAccount());
-        }
-        if (metaData.getEventData() != null) {
-            counterPartyClientDefinedAttributes.setFirstSignTime(metaData.getEventData().getTimeOfOccurrence().toLocalDateTime());
-        }
-        if (metaData.getDeviceRequest() != null) {
-            counterPartyClientDefinedAttributes.setFirstSignIpAddress(metaData.getDeviceRequest().getIpAddress());
-        }
-        if (metaData.getClientData() != null) {
-            counterPartyClientDefinedAttributes.setFirstSignLogin(metaData.getClientData().getLogin());
-            counterPartyClientDefinedAttributes.setFirstSignPhone(metaData.getClientData().getPhone());
-            counterPartyClientDefinedAttributes.setFirstSignEmail(metaData.getClientData().getEmail());
-            counterPartyClientDefinedAttributes.setFirstSignImsi(metaData.getClientData().getImsi());
-        }
-        if (metaData.getCryptoProfileData() != null) {
-            counterPartyClientDefinedAttributes.setFirstSignCryptoprofile(metaData.getCryptoProfileData().getName());
-            counterPartyClientDefinedAttributes.setFirstSignCryptoprofileType(metaData.getCryptoProfileData().getType());
-            counterPartyClientDefinedAttributes.setFirstSignChannel(metaData.getCryptoProfileData().getSignChannel());
-            counterPartyClientDefinedAttributes.setFirstSignType(metaData.getCryptoProfileData().getTitleName());
-        }
-        counterPartyClientDefinedAttributes.setFirstSignSource(PPRB_BROWSER);
-        return counterPartyClientDefinedAttributes;
+        attributes.add(new Attribute("firstSignTime", metaData.getEventData().getTimeOfOccurrence().toLocalDateTime().toString(), DATE_TIME_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignIpAddress", metaData.getDeviceRequest().getIpAddress(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignLogin", metaData.getClientData().getLogin(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignPhone", metaData.getClientData().getPhone(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignEmail", metaData.getClientData().getEmail(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignImsi", metaData.getClientData().getImsi(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignCryptoprofile", metaData.getCryptoProfileData().getName(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignCryptoprofileType", metaData.getCryptoProfileData().getType(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignChannel", metaData.getCryptoProfileData().getSignChannel(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignType", metaData.getCryptoProfileData().getTitleName(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignSource", PPRB_BROWSER, STRING_ATTRIBUTE_DATA_TYPE));
     }
 
-    @Named("toEventData")
-    default CounterPartyEventData toEventData(FraudEventData eventData) {
-        return toEventData(FraudEventType.SIGN_ACCOUNT, eventData);
+    @Named("toEventDataList")
+    default EventDataList toEventDataList(FraudMetaData metaData) {
+        var eventDataList = toEventDataList(FraudEventType.SIGN_ACCOUNT, metaData);
+        addSignedClientDefinedAttributeList(eventDataList.getClientDefinedAttributeList().getFact(), metaData);
+        return eventDataList;
     }
 
     @AfterMapping
-    default void afterMappingCounterPartySendToAnalyzeRq(@MappingTarget CounterPartySendToAnalyzeRq rq, @Context PartnerEntity partner, @Context AccountEntity account) {
+    default void afterMappingAnalyzeRequest(@MappingTarget AnalyzeRequest rq, @Context PartnerEntity partner, @Context AccountEntity account) {
+        addClientDefinedAttributeList(rq.getEventDataList().getClientDefinedAttributeList().getFact(), partner);
+        addClientDefinedAttributeList(rq.getEventDataList().getClientDefinedAttributeList().getFact(), account);
         var identificationData = rq.getIdentificationData();
         if (nonNull(identificationData) && nonNull(account) && nonNull(account.getUuid())) {
             identificationData.setClientTransactionId(account.getUuid().toString());

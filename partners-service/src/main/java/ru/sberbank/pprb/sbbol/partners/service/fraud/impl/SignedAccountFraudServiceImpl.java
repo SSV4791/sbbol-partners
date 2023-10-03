@@ -70,13 +70,13 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
         }
         var partnerEntity = partnerRepository.getByDigitalIdAndUuid(accountEntity.getDigitalId(), accountEntity.getPartnerUuid())
             .orElseThrow(() -> new EntryNotFoundException("partner", accountEntity.getDigitalId(), accountEntity.getPartnerUuid()));
-        var request = fraudMapper.mapToCounterPartySendToAnalyzeRq(metaData, partnerEntity, accountEntity);
+        var request = fraudMapper.mapToAnalyzeRequest(metaData, partnerEntity, accountEntity);
         try {
             LOG.debug("Отправляем запрос В АС Агрегатор данных ФРОД-мониторинг: {}", request);
             var response = adapter.send(request);
             LOG.debug("Получили ответ от АС Агрегатора данных ФРОД-мониторинг: {}", response);
-            if (forbiddenFraudActionCodes.contains(response.getActionCode().toUpperCase(Locale.getDefault()))) {
-                throw new FraudDeniedException(response.getDetailledComment());
+            if (forbiddenFraudActionCodes.contains(fraudMapper.getAnalyzeResponseActionCode(response).toUpperCase(Locale.getDefault()))) {
+                throw new FraudDeniedException(fraudMapper.getAnalyzeResponseDetailledComment(response));
             }
         } catch (FraudModelArgumentException e) {
             throw new FraudModelValidationException(e.getMessage(), e);

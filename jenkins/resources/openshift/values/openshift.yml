@@ -74,7 +74,7 @@ os_project:
   fraud:
     enabled: false
     time_out: 5000
-    endpoint: /antifraud/v2/counterparty
+    endpoint: /antifraud/v2/document/analyze
 
   replication:
     sbbol:

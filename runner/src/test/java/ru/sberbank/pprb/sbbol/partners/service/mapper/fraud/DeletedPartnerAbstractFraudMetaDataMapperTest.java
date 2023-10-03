@@ -31,32 +31,28 @@ class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDat
         var clientData = metaData.getClientData();
         var deviceRequest = metaData.getDeviceRequest();
         var eventData = metaData.getEventData();
-        var requestData = metaData.getDeviceRequest();
 
-        var actualFraudRequest = fraudMapper.mapToCounterPartySendToAnalyzeRq(metaData, partnerEntity);
+        var actualFraudRequest = fraudMapper.mapToAnalyzeRequest(metaData, partnerEntity);
         assertThat(actualFraudRequest)
             .isNotNull();
 
         var actualMessageHeader = actualFraudRequest.getMessageHeader();
-        checkCounterPartyMessageHeader(actualMessageHeader, metaData);
+        checkMessageHeader(actualMessageHeader, metaData);
 
         var actualIdentificationData = actualFraudRequest.getIdentificationData();
-        checkCounterPartyIdentificationData(actualIdentificationData, clientData, partnerEntity.getUuid().toString());
+        checkIdentificationData(actualIdentificationData, clientData, partnerEntity.getUuid().toString());
 
         var actualDeviceRequest = actualFraudRequest.getDeviceRequest();
-        checkCounterPartyDeviceRequest(actualDeviceRequest, deviceRequest);
+        checkDeviceRequest(actualDeviceRequest, deviceRequest);
 
-        var actualEventDate = actualFraudRequest.getEventData();
-        checkCounterPartyEventData(actualEventDate, eventData, DELETE_PARTNER);
+        var actualEventDate = actualFraudRequest.getEventDataList();
+        checkEventDataList(actualEventDate, eventData, DELETE_PARTNER);
 
         var actualChannelIndicator = actualFraudRequest.getChannelIndicator();
         checkChannelIndicator(actualChannelIndicator, metaData);
 
         var actualClientDefinedChannelIndicator = actualFraudRequest.getClientDefinedChannelIndicator();
         checkClientDefinedChannelIndicator(actualClientDefinedChannelIndicator, metaData.getChannelInfo());
-
-        var actualClientDefinedAttributeList = actualFraudRequest.getClientDefinedAttributeList();
-        checkCounterPartyClientDefinedAttributes(actualClientDefinedAttributeList, clientData, partnerEntity, requestData);
     }
 
     protected void checkCounterPartyClientDefinedAttributes(

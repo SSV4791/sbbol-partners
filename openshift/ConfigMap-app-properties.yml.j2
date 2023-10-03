@@ -70,7 +70,7 @@ data:
     fraud.enabled={{ os_project.fraud.enabled | default('true') }}
     fraud.read_time_out={{ os_project.fraud.read_time_out | default('5000') }}
     fraud.connection_time_out={{ os_project.fraud.connection_time_out | default('1000') }}
-    fraud.endpoint={{ os_project.fraud.endpoint | default('/antifraud/v2/counterparty') }}
+    fraud.endpoint={{ os_project.fraud.endpoint | default('/antifraud/v2/document/analyze') }}
     fraud.url={% if int_entry.pprb.fraud is mapping %}{{ int_entry.pprb.fraud.host }}{% else %}{{ int_entry.pprb.fraud | map(attribute='host') | first }}{% endif %}:{% if int_entry.pprb.fraud is mapping %}{{ int_entry.pprb.fraud.istio_mesh_port }}{% else %}{{ int_entry.pprb.fraud | map(attribute='istio_mesh_port') | first | default('80') }}{% endif %}
 
     # Replication
