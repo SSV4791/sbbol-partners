@@ -7,13 +7,14 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
-import ru.sberbank.pprb.sbbol.partners.exception.ModelDuplicateException;
+import ru.sberbank.pprb.sbbol.partners.exception.CheckDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -29,6 +30,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -44,6 +46,7 @@ import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_UPDATE;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
@@ -53,6 +56,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
+    private final GuidsHistoryRepository guidsHistoryRepository;
     private final BudgetMaskService budgetMaskService;
     private final AccountMapper accountMapper;
     private final PartnerService partnerService;
@@ -61,6 +65,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
+        GuidsHistoryRepository guidsHistoryRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
         PartnerService partnerService,
@@ -68,6 +73,7 @@ public class AccountServiceImpl implements AccountService {
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
+        this.guidsHistoryRepository = guidsHistoryRepository;
         this.budgetMaskService = budgetMaskService;
         this.accountMapper = accountMapper;
         this.partnerService = partnerService;
@@ -109,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Audit(eventType = ACCOUNT_CREATE)
     public Account saveAccount(AccountCreate account) {
-        checkAccountDuplicate(account);
+        checkDuplicate(account);
         var digitalId = account.getDigitalId();
         partnerService.getPartner(digitalId, account.getPartnerId());
         var accountEntity = accountMapper.toAccount(account);
@@ -292,6 +298,11 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    private void checkDuplicate(AccountCreate account) {
+        checkAccountDuplicate(account);
+        checkExternalIdDuplicate(account.getDigitalId(), account.getExternalId());
+    }
+
     private void checkAccountDuplicate(AccountCreate account) {
         String bic = null;
         String corAccount = null;
@@ -303,9 +314,10 @@ public class AccountServiceImpl implements AccountService {
                 corAccount = bankAccount.getBankAccount();
             }
         }
+        var digitalId = account.getDigitalId();
         checkAccountDuplicate(
             null,
-            account.getDigitalId(),
+            digitalId,
             account.getPartnerId(),
             account.getAccount(),
             bic,
@@ -376,7 +388,16 @@ public class AccountServiceImpl implements AccountService {
         var search = accountMapper.prepareSearchField(partnerUuid, account, bic, corAccount);
         var accountEntity = accountRepository.findByDigitalIdAndSearch(digitalId, search);
         if (nonNull(accountEntity) && !accountEntity.getUuid().equals(accountUuid)) {
-            throw new ModelDuplicateException(DOCUMENT_NAME);
+            throw new CheckDuplicateException(ACCOUNT_DUPLICATE_EXCEPTION);
+        }
+    }
+
+    private void checkExternalIdDuplicate(String digitalId, UUID externalId) {
+        if (nonNull(externalId)) {
+            Optional<IdsHistoryEntity> idLink = guidsHistoryRepository.findByDigitalIdAndExternalId(digitalId, externalId);
+            if (idLink.isPresent()) {
+                throw new CheckDuplicateException(externalId);
+            }
         }
     }
 }

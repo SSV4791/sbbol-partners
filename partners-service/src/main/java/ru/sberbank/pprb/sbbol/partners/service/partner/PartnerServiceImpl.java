@@ -6,7 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.ModelDuplicateException;
+import ru.sberbank.pprb.sbbol.partners.exception.CheckDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
@@ -46,6 +46,7 @@ import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_DELE
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
@@ -377,7 +378,7 @@ public class PartnerServiceImpl implements PartnerService {
         var search = partnerMapper.prepareSearchField(inn, kpp, orgName, secondName, firstName, middleName);
         var partnerEntity = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
         if (nonNull(partnerEntity) && !partnerEntity.getUuid().equals(uuid)) {
-            throw new ModelDuplicateException(DOCUMENT_NAME);
+            throw new CheckDuplicateException(PARTNER_DUPLICATE_EXCEPTION);
         }
     }
 }
