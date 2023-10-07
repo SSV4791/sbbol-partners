@@ -85,7 +85,7 @@ import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValid
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOkpoNumber;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_MODEL_VALIDATION_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
@@ -1285,7 +1285,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+            .isEqualTo(PARTNER_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -1303,7 +1303,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+            .isEqualTo(PARTNER_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -1319,7 +1319,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+            .isEqualTo(PARTNER_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -1412,7 +1412,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         assertThat(error)
             .isNotNull();
         assertThat(error.getCode())
-            .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+            .isEqualTo(PARTNER_DUPLICATE_EXCEPTION.getValue());
     }
 
     @Test
@@ -2126,8 +2126,8 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .extract()
             .as(Error.class);
         var expectedError = new Error()
-            .code(MODEL_DUPLICATE_EXCEPTION.getValue())
-            .message(MessagesTranslator.toLocale("error.message.check.validation"))
+            .code(PARTNER_DUPLICATE_EXCEPTION.getValue())
+            .message(MessagesTranslator.toLocale("partner.duplicate"))
             .type(BUSINESS)
             .descriptions(Collections.emptyList());
         assertThat(actualError)

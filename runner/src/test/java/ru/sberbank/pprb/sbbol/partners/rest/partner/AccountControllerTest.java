@@ -56,7 +56,10 @@ import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXTERNAL_ID_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
@@ -1152,7 +1155,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
-                .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+                .isEqualTo(ACCOUNT_DUPLICATE_EXCEPTION.getValue());
         });
     }
 
@@ -1180,7 +1183,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
-                .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+                .isEqualTo(ACCOUNT_DUPLICATE_EXCEPTION.getValue());
         });
     }
 
@@ -1204,7 +1207,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
-                .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+                .isEqualTo(ACCOUNT_DUPLICATE_EXCEPTION.getValue());
         });
     }
 
@@ -1845,7 +1848,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error)
                 .isNotNull();
             assertThat(error.getCode())
-                .isEqualTo(MODEL_DUPLICATE_EXCEPTION.getValue());
+                .isEqualTo(ACCOUNT_DUPLICATE_EXCEPTION.getValue());
         });
     }
 
@@ -3024,6 +3027,43 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .isNotNull();
             assertThat(actualResponse.getMessage())
                 .contains("Invalid UUID string: " + externalIds.get(0));
+        });
+    }
+
+    @Test
+    @DisplayName("POST /partner/account  Создание счета партнера. Невалидный запрос. Дубль ExternalId")
+    void testCreateAccountDuplicateExternalId() {
+        var account = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner();
+            var validAccount = getValidAccount(partner.getId(), partner.getDigitalId());
+            validAccount.setExternalId(UUID.randomUUID());
+            return createValidAccount(validAccount);
+        });
+
+        var error = step("Выполнение post-запроса /partner/accounts, дубль externalId", () -> {
+            var acc = getValidAccount(account.getPartnerId(), account.getDigitalId());
+            var externalId = account.getExternalIds().stream()
+                .findFirst()
+                .orElseGet(UUID::randomUUID);
+            acc.setExternalId(externalId);
+                return post(
+                    baseRoutePath + "/account",
+                    HttpStatus.BAD_REQUEST,
+                    acc,
+                    Error.class
+                );
+            });
+
+        step("Проверка результата", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(EXTERNAL_ID_DUPLICATE_EXCEPTION.getValue());
+            assertThat(error.getMessage())
+                .isEqualTo(MessagesTranslator.toLocale("external_id.duplicate", account.getExternalIds().stream()
+                    .findFirst()
+                    .orElse(UUID.randomUUID()))
+                );
         });
     }
 

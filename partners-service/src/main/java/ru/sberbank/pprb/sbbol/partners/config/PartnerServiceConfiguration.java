@@ -139,6 +139,7 @@ public class PartnerServiceConfiguration {
     AccountService accountService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
+        GuidsHistoryRepository guidsHistoryRepository,
         BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
         PartnerService partnerService,
@@ -147,6 +148,7 @@ public class PartnerServiceConfiguration {
         return new AccountServiceImpl(
             accountRepository,
             accountSignRepository,
+            guidsHistoryRepository,
             budgetMaskService,
             accountMapper,
             partnerService,
