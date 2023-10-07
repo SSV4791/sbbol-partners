@@ -9,10 +9,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
+
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Entity
 @DynamicUpdate
@@ -45,6 +48,13 @@ public class ReplicationEntity extends BaseEntity {
 
     @Column(name = "retry")
     private int retry;
+
+    @PrePersist
+    private void initCreateDate() {
+        if (isEmpty(createDate)) {
+            this.createDate = OffsetDateTime.now();
+        }
+    }
 
     public ReplicationEntity digitalId(String digitalId) {
         this.digitalId = digitalId;
