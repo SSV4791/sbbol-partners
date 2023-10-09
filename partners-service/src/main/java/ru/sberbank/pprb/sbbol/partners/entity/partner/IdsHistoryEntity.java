@@ -19,7 +19,7 @@ import java.util.UUID;
     name = "ids_history",
     indexes = {
         @Index(name = "idx_ids_history_digital_id_external_id", columnList = "digital_id, external_id", unique = true),
-        @Index(name = "idx_ids_history_digital_id_pprb_entity_id", columnList = "digital_id, pprb_entity_id"),
+        @Index(name = "idx_ids_history_pprb_entity_id_digital_id", columnList = "pprb_entity_id, digital_id"),
     }
 )
 @Entity

@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       file: 1692625249805_update_column_region_address_table.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1696849380838_add_index_on_column_pprb_entity_id_for_ids_history.sql
+      relativeToChangelogFile: true
