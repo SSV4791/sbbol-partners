@@ -22,8 +22,7 @@ import java.util.UUID;
     name = "contact",
     indexes = {
         @Index(name = "contact_pkey", columnList = "uuid", unique = true),
-        @Index(name = "i_contact_partner_uuid", columnList = "partner_uuid"),
-        @Index(name = "i_contact_digital_id", columnList = "digital_id")
+        @Index(name = "i_contact_partner_uuid_digital_id", columnList = "partner_uuid,digital_id"),
     }
 )
 @DynamicUpdate

@@ -18,7 +18,7 @@ import java.util.UUID;
     name = "phone",
     indexes = {
         @Index(name = "phone_pkey", columnList = "uuid", unique = true),
-        @Index(name = "i_phone_unified_uuid", columnList = "unified_uuid")
+        @Index(name = "i_phone_unified_uuid_digital_id", columnList = "unified_uuid,digital_id")
     }
 )
 public class PhoneEntity extends PhoneBaseEntity {

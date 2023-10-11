@@ -17,6 +17,7 @@ import java.util.Objects;
 @Table(
     name = "document_type_dictionary",
     indexes = {
+        @Index(name = "document_type_dictionary_pkey", columnList = "uuid", unique = true),
         @Index(name = "i_document_type_dictionary_system_name", columnList = "system_name")
     }
 )

@@ -18,6 +18,7 @@ import java.util.UUID;
 @Table(
     name = "ids_history",
     indexes = {
+        @Index(name = "ids_history_pkey", columnList = "uuid", unique = true),
         @Index(name = "idx_ids_history_digital_id_external_id", columnList = "digital_id, external_id", unique = true),
         @Index(name = "idx_ids_history_pprb_entity_id_digital_id", columnList = "pprb_entity_id, digital_id"),
     }

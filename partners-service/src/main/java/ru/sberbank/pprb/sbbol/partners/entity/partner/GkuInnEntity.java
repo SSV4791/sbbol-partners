@@ -18,6 +18,7 @@ import static ru.sberbank.pprb.sbbol.partners.entity.partner.common.HashKeyResol
 @Table(
     name = "gku_inn_dictionary",
     indexes = {
+        @Index(name = "gku_inn_dictionary_pkey", columnList = "uuid", unique = true),
         @Index(name = "i_gku_inn_dictionary_inn", columnList = "inn")
     }
 )

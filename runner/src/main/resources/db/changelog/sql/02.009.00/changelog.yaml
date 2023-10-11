@@ -8,3 +8,9 @@ databaseChangeLog:
   - include:
       file: 1696228685174_add_new_field_crypto_profile_id_for_sign.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1696942249082_delete_not_used_index.sql
+      relativeToChangelogFile: true
+  - include:
+      file: 1696942682653_add_new_index.sql
+      relativeToChangelogFile: true

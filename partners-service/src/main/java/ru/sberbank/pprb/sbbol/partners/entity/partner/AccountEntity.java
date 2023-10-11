@@ -29,10 +29,7 @@ import java.util.UUID;
     name = "account",
     indexes = {
         @Index(name = "account_pkey", columnList = "uuid", unique = true),
-        @Index(name = "i_account_digital_id", columnList = "digital_id"),
-        @Index(name = "i_account_digital_id_partner_uuid", columnList = "digital_id, partner_uuid"),
-        @Index(name = "i_account_digital_id_partner_uuid_account", columnList = "digital_id, partner_uuid, account"),
-        @Index(name = "i_account_partner_uuid", columnList = "partner_uuid"),
+        @Index(name = "i_account_partner_uuid_digital_id", columnList = "partner_uuid, digital_id"),
         @Index(name = "idx_account_digital_id_partner_uuid_search", columnList = "digital_id, search", unique = true)
     }
 )
