@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface AccountAndPartnerRepository {
 
-    List<AccountEntity> findByRequest(AccountAndPartnerRequest request);
+    List<AccountEntity> findByRequestAttributes(AccountAndPartnerRequest request);
 }

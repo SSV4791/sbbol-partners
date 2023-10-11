@@ -32,7 +32,7 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
     }
 
     @Override
-    public List<AccountEntity> findByRequest(AccountAndPartnerRequest request) {
+    public List<AccountEntity> findByRequestAttributes(AccountAndPartnerRequest request) {
         return filter(request);
     }
 
@@ -65,7 +65,6 @@ public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntit
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(AccountEntity_.DIGITAL_ID)),
             builder.desc(root.get(AccountEntity_.CREATE_DATE))
         );
     }

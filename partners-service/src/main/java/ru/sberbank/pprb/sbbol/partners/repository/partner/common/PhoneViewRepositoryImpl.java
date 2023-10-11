@@ -39,9 +39,7 @@ public class PhoneViewRepositoryImpl extends BaseRepository<PhoneEntity, PhonesF
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(PhoneEntity_.DIGITAL_ID)),
-            builder.desc(root.get(PhoneEntity_.UNIFIED_UUID)),
-            builder.desc(root.get(PhoneEntity_.UUID))
+            builder.desc(root.get(PhoneEntity_.UNIFIED_UUID))
         );
     }
 
