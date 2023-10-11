@@ -11,7 +11,6 @@ import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerPhoneEntity;
@@ -45,6 +44,7 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.p
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
         BaseMapper.class,
+        GkuMapper.class,
         PartnerEmailMapper.class,
         PartnerPhoneMapper.class,
         StringMapper.class
@@ -69,11 +69,6 @@ public interface PartnerMapper {
     @Named("toCitizenshipType")
     static Citizenship toCitizenshipType(PartnerCitizenshipType citizenshipType) {
         return citizenshipType != null ? Citizenship.valueOf(citizenshipType.name()) : null;
-    }
-
-    @Named("isGku")
-    static Boolean isGku(GkuInnEntity isGkuInn) {
-        return isGkuInn != null;
     }
 
     @Mapping(target = "createDate", ignore = true)

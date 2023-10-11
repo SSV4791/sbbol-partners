@@ -15,9 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
-import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +32,6 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     private AccountMapper delegate;
 
     @Autowired
-    private GkuInnCacheableStorage gkuInnCacheableStorage;
-
-    @Autowired
     private BankMapper bankMapper;
 
     @Autowired
@@ -45,15 +40,15 @@ public abstract class AccountMapperDecorator implements AccountMapper {
     @Override
     public Account toAccount(AccountEntity account) {
         Account accountResponse = delegate.toAccount(account);
+        setBudgetMarker(accountResponse);
         fillExternalIds(account, accountResponse);
         return accountResponse;
     }
 
-    @Override
-    public Account toAccount(AccountEntity account, BudgetMaskService budgetMaskService) {
-        Account accountResponse = delegate.toAccount(account, budgetMaskService);
-        fillExternalIds(account, accountResponse);
-        return accountResponse;
+    private void fillExternalIds(AccountEntity account, Account accountResponse) {
+        for (IdsHistoryEntity idLink : account.getIdLinks()) {
+            accountResponse.addExternalIdsItem(idLink.getExternalId());
+        }
     }
 
     @Override
@@ -66,41 +61,18 @@ public abstract class AccountMapperDecorator implements AccountMapper {
             .collect(Collectors.toList());
     }
 
-    private void fillExternalIds(AccountEntity account, Account accountResponse) {
-        for (IdsHistoryEntity idLink : account.getIdLinks()) {
-            accountResponse.addExternalIdsItem(idLink.getExternalId());
-        }
-    }
-
     @Override
-    public AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto) {
-        var accountWithPartnerResponse = delegate.toAccountWithPartner(accountDto);
-        accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
+    public AccountWithPartnerResponse toAccountWithPartner(AccountEntity account) {
+        var accountWithPartnerResponse = delegate.toAccountWithPartner(account);
         setBudgetMarker(accountWithPartnerResponse.getAccount());
         return accountWithPartnerResponse;
-    }
-
-    public AccountWithPartnerResponse toAccountWithPartner(Partner partner) {
-        var accountWithPartnerResponse = delegate.toAccountWithPartner(partner);
-        accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
-        return accountWithPartnerResponse;
-    }
-
-    @Override
-    public List<AccountWithPartnerResponse> toAccountsWithPartner(Partner partner) {
-        var accountWithPartnerResponseList = delegate.toAccountsWithPartner(partner);
-        accountWithPartnerResponseList.forEach(accountWithPartnerResponse ->
-            accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn())));
-        return accountWithPartnerResponseList;
     }
 
     @Override
     public List<AccountWithPartnerResponse> toAccountsWithPartner(List<AccountEntity> accounts) {
         var accountWithPartnerResponseList = delegate.toAccountsWithPartner(accounts);
-        accountWithPartnerResponseList.forEach(accountWithPartnerResponse -> {
-            accountWithPartnerResponse.setGku(isGkuInn(accountWithPartnerResponse.getInn()));
-            setBudgetMarker(accountWithPartnerResponse.getAccount());
-        });
+        accountWithPartnerResponseList.forEach(accountWithPartnerResponse ->
+            setBudgetMarker(accountWithPartnerResponse.getAccount()));
         return accountWithPartnerResponseList;
     }
 
@@ -155,10 +127,6 @@ public abstract class AccountMapperDecorator implements AccountMapper {
         idHistoryEntity.setDigitalId(account.getDigitalId());
         idHistoryEntity.setAccount(account);
         account.setIdLinks(List.of(idHistoryEntity));
-    }
-
-    private boolean isGkuInn(String inn) {
-        return gkuInnCacheableStorage.isGkuInn(inn);
     }
 
     private boolean isBudget(Account account) {

@@ -2,7 +2,6 @@ package ru.sberbank.pprb.sbbol.partners.mapper.partner;
 
 import org.mapstruct.AfterMapping;
 import org.mapstruct.BeanMapping;
-import org.mapstruct.Context;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.InjectionStrategy;
@@ -21,11 +20,9 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
-import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,8 +30,9 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.s
 
 @Loggable
 @Mapper(uses = {
+    BankMapper.class,
     BaseMapper.class,
-    BankMapper.class
+    GkuMapper.class,
 },
     injectionStrategy = InjectionStrategy.CONSTRUCTOR
 )
@@ -54,9 +52,6 @@ public interface AccountMapper {
     AccountChange toAccount(AccountChangeFullModel account, String digitalId, UUID partnerId);
 
     AccountCreate toAccountCreate(AccountChangeFullModel account, String digitalId, UUID partnerId);
-
-    @InheritConfiguration(name = "toAccount")
-    Account toAccount(AccountEntity account, @Context BudgetMaskService budgetMaskService);
 
     default List<AccountEntity> toAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid) {
         return Collections.emptyList();
@@ -130,18 +125,9 @@ public interface AccountMapper {
         account.setSearch(search);
     }
 
-    @AfterMapping
-    default void mapBudgetMask(@MappingTarget Account account, @Context BudgetMaskService budgetMaskService) {
-        var bank = account.getBank();
-        if (bank != null) {
-            var bankAccount = Objects.nonNull(bank.getBankAccount()) ? bank.getBankAccount().getBankAccount() : null;
-            account.setBudget(budgetMaskService.isBudget(account.getAccount(), bank.getBic(), bankAccount));
-        }
-    }
-
     List<AccountWithPartnerResponse> toAccountsWithPartner(List<AccountEntity> accounts);
 
-    @Mapping(target = "account", source = "accountDto")
+    @Mapping(target = "account", source = "accountEntity")
     @Mapping(target = "id", source = "partner.uuid")
     @Mapping(target = "digitalId", source = "partner.digitalId")
     @Mapping(target = "legalForm", source = "partner.legalType")
@@ -153,8 +139,8 @@ public interface AccountMapper {
     @Mapping(target = "kpp", source = "partner.kpp")
     @Mapping(target = "comment", source = "partner.comment")
     @Mapping(target = "version", source = "partner.version")
-    @Mapping(target = "gku", ignore = true)
-    AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountDto);
+    @Mapping(target = "gku", source = "partner.gkuInnEntity", qualifiedByName = "isGku")
+    AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountEntity);
 
     default List<AccountWithPartnerResponse> toAccountsWithPartner(Partner partner) {
         return List.of(toAccountWithPartner(partner));
