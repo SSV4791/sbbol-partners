@@ -27,8 +27,13 @@
       "title": "Подпись"
     },
     "signProfileId": {
+      "deprecated": true,
       "type": "string",
       "title": "Идентификатор криптопрофиля"
+    },
+    "cryptoProfileId": {
+      "type": "string",
+      "title": "Идентификатор криптопрофиля Guid"
     },
     "externalDataFileId": {
       "type": "string",
