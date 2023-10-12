@@ -197,8 +197,8 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: '2.5'
-    commit_or_tag: '02.007.00_0017_i-test_2.5'
-    release_key: DCBBRAIN-4502
+    commit_or_tag: '02.008.00_0030_i-2.5'
+    release_key: DCBBRAIN-4503
     reverse_and_publish: false
     type: release
   jobs:

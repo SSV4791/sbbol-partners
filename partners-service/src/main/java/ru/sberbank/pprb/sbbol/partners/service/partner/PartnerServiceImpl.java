@@ -59,7 +59,6 @@ public class PartnerServiceImpl implements PartnerService {
     private final ContactRepository contactRepository;
     private final AddressRepository addressRepository;
     private final PartnerRepository partnerRepository;
-    private final BudgetMaskService budgetMaskService;
     private final FraudServiceManager fraudServiceManager;
     private final AccountMapper accountMapper;
     private final DocumentMapper documentMapper;
@@ -78,7 +77,6 @@ public class PartnerServiceImpl implements PartnerService {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        BudgetMaskService budgetMaskService,
         FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
         DocumentMapper documentMapper,
@@ -96,7 +94,6 @@ public class PartnerServiceImpl implements PartnerService {
         this.contactRepository = contactRepository;
         this.addressRepository = addressRepository;
         this.partnerRepository = partnerRepository;
-        this.budgetMaskService = budgetMaskService;
         this.fraudServiceManager = fraudServiceManager;
         this.accountMapper = accountMapper;
         this.documentMapper = documentMapper;
@@ -167,7 +164,7 @@ public class PartnerServiceImpl implements PartnerService {
         var partnerUuid = savedPartner.getUuid();
         var accounts = accountMapper.toAccounts(partner.getAccounts(), digitalId, partnerUuid).stream()
             .map(accountRepository::save)
-            .map(value -> accountMapper.toAccount(value, budgetMaskService))
+            .map(accountMapper::toAccount)
             .collect(Collectors.toList());
         var addresses = addressMapper.toAddress(partner.getAddress(), digitalId, partnerUuid).stream()
             .map(addressRepository::save)

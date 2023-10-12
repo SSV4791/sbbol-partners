@@ -40,7 +40,6 @@ public class RenterViewRepositoryImpl extends BaseRepository<PartnerEntity, Rent
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(PartnerEntity_.DIGITAL_ID)),
             builder.desc(root.get(PartnerEntity_.UUID))
         );
     }

@@ -12,9 +12,9 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
+import ru.sberbank.pprb.sbbol.partners.exception.CheckDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
-import ru.sberbank.pprb.sbbol.partners.exception.CheckDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -33,6 +33,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -57,7 +58,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
     private final GuidsHistoryRepository guidsHistoryRepository;
-    private final BudgetMaskService budgetMaskService;
     private final AccountMapper accountMapper;
     private final PartnerService partnerService;
     private final ReplicationService replicationService;
@@ -66,7 +66,6 @@ public class AccountServiceImpl implements AccountService {
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         GuidsHistoryRepository guidsHistoryRepository,
-        BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
         PartnerService partnerService,
         ReplicationService replicationService
@@ -74,7 +73,6 @@ public class AccountServiceImpl implements AccountService {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
         this.guidsHistoryRepository = guidsHistoryRepository;
-        this.budgetMaskService = budgetMaskService;
         this.accountMapper = accountMapper;
         this.partnerService = partnerService;
         this.replicationService = replicationService;
@@ -85,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
     public Account getAccount(String digitalId, UUID id) {
         var account = accountRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
-        return accountMapper.toAccount(account, budgetMaskService);
+        return accountMapper.toAccount(account);
     }
 
     @Override
@@ -94,7 +92,7 @@ public class AccountServiceImpl implements AccountService {
         var accountsResponse = new AccountsResponse();
         var response = accountRepository.findByFilter(accountsFilter);
         for (var entity : response) {
-            var item = accountMapper.toAccount(entity, budgetMaskService);
+            var item = accountMapper.toAccount(entity);
             accountsResponse.addAccountsItem(item);
         }
         var pagination = accountsFilter.getPagination();
@@ -121,7 +119,7 @@ public class AccountServiceImpl implements AccountService {
         var accountEntity = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(accountEntity);
-            var response = accountMapper.toAccount(savedAccount, budgetMaskService);
+            var response = accountMapper.toAccount(savedAccount);
             replicationService.createCounterparty(response);
             return response;
         } catch (DataIntegrityViolationException e) {
@@ -184,13 +182,13 @@ public class AccountServiceImpl implements AccountService {
         }
         foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());
         var savedAccount = accountRepository.save(foundAccount);
-        return accountMapper.toAccount(savedAccount, budgetMaskService);
+        return accountMapper.toAccount(savedAccount);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<AccountWithPartnerResponse> getAtRequisites(AccountAndPartnerRequest request) {
-        List<AccountEntity> accounts = accountRepository.findByRequest(request);
+        List<AccountEntity> accounts = accountRepository.findByRequestAttributes(request);
         if (CollectionUtils.isEmpty(accounts)) {
             var foundPartner = partnerService.findPartner(request.getDigitalId(), request.getName(), request.getInn(), request.getKpp());
             return accountMapper.toAccountsWithPartner(foundPartner);
@@ -202,7 +200,7 @@ public class AccountServiceImpl implements AccountService {
                 return accountMapper.toAccountsWithPartner(accounts);
             }
         }
-        List<AccountEntity> accountsWithKppField = accounts;
+        List<AccountEntity> accountsWithKppField = new ArrayList<>(accounts.size());
         if (nonNull(request.getKpp()) && !Objects.equals(request.getKpp(), "0")) {
             accountsWithKppField = accounts.stream()
                 .filter(value -> Objects.equals(value.getPartner().getKpp(), request.getKpp()))
@@ -211,7 +209,6 @@ public class AccountServiceImpl implements AccountService {
                 return accountMapper.toAccountsWithPartner(accountsWithKppField);
             }
         }
-
         List<AccountEntity> accountsWithPartnerNameField = findAccountByPartnerName(request, accountsWithKppField);
         if (CollectionUtils.isEmpty(accountsWithPartnerNameField)) {
             throw new EntryNotFoundException(DOCUMENT_NAME, request.getDigitalId());
@@ -287,7 +284,7 @@ public class AccountServiceImpl implements AccountService {
         }
         try {
             var savedAccount = accountRepository.save(accountEntity);
-            var response = accountMapper.toAccount(savedAccount, budgetMaskService);
+            var response = accountMapper.toAccount(savedAccount);
             response.setVersion(response.getVersion() + 1);
             replicationService.updateCounterparty(response);
             return response;

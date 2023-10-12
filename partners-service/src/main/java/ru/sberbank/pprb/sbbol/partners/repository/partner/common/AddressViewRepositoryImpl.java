@@ -43,7 +43,6 @@ public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, Add
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(AddressEntity_.DIGITAL_ID)),
             builder.desc(root.get(AddressEntity_.UUID))
         );
     }

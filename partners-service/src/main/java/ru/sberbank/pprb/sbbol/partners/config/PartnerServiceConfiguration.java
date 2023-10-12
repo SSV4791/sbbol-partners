@@ -140,7 +140,6 @@ public class PartnerServiceConfiguration {
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         GuidsHistoryRepository guidsHistoryRepository,
-        BudgetMaskService budgetMaskService,
         AccountMapper accountMapper,
         PartnerService partnerService,
         ReplicationService replicationService
@@ -149,7 +148,6 @@ public class PartnerServiceConfiguration {
             accountRepository,
             accountSignRepository,
             guidsHistoryRepository,
-            budgetMaskService,
             accountMapper,
             partnerService,
             replicationService
@@ -297,7 +295,6 @@ public class PartnerServiceConfiguration {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        BudgetMaskService budgetMaskService,
         FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
         DocumentMapper documentMapper,
@@ -316,7 +313,6 @@ public class PartnerServiceConfiguration {
             contactRepository,
             addressRepository,
             partnerRepository,
-            budgetMaskService,
             fraudServiceManager,
             accountMapper,
             documentMapper,

@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.partner;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,7 +15,6 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapperImpl_;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankAccountMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.BankMapperImpl_;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
@@ -29,7 +27,6 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
-import ru.sberbank.pprb.sbbol.partners.storage.GkuInnCacheableStorage;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,8 +34,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper.toLegalType;
 
 @ContextConfiguration(
     classes = {
@@ -55,15 +51,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
     private AccountMapper accountMapper;
 
     @MockBean
-    private GkuInnCacheableStorage gkuInnCacheableStorage;
-
-    @MockBean
     private BudgetMaskService budgetMaskService;
-
-    @BeforeEach
-    void initEach() {
-        when(gkuInnCacheableStorage.isGkuInn(any())).thenReturn(false);
-    }
 
     @Test
     @SuppressWarnings("unchecked")
@@ -154,7 +142,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
         bank.setAccount(account);
         var bankAccount = bank.getBankAccount();
         bankAccount.setBank(bank);
-        var actual = accountMapper.toAccount(account, budgetMaskService);
+        var actual = accountMapper.toAccount(account);
         assertThat(expected)
             .usingRecursiveComparison()
             .ignoringFields(
@@ -196,7 +184,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .id(accountEntity.getPartner().getUuid())
             .digitalId(accountEntity.getPartner().getDigitalId())
             .version(accountEntity.getPartner().getVersion())
-            .legalForm(PartnerMapper.toLegalType(accountEntity.getPartner().getLegalType()))
+            .legalForm(toLegalType(accountEntity.getPartner().getLegalType()))
             .inn(accountEntity.getPartner().getInn())
             .kpp(accountEntity.getPartner().getKpp())
             .firstName(accountEntity.getPartner().getFirstName())
@@ -204,7 +192,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
             .secondName(accountEntity.getPartner().getSecondName())
             .orgName(accountEntity.getPartner().getOrgName())
             .comment(accountEntity.getPartner().getComment())
-            .gku(false)
+            .gku(true)
             .account(
                 new Account()
                     .id(accountEntity.getUuid())

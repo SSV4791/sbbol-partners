@@ -40,7 +40,6 @@ public class ContactViewRepositoryImpl extends BaseRepository<ContactEntity, Con
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(ContactEntity_.DIGITAL_ID)),
             builder.desc(root.get(ContactEntity_.UUID))
         );
     }

@@ -39,9 +39,7 @@ public class EmailViewRepositoryImpl extends BaseRepository<EmailEntity, EmailsF
     @Override
     public List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(EmailEntity_.DIGITAL_ID)),
-            builder.desc(root.get(EmailEntity_.UNIFIED_UUID)),
-            builder.desc(root.get(EmailEntity_.UUID))
+            builder.desc(root.get(EmailEntity_.UNIFIED_UUID))
         );
     }
 

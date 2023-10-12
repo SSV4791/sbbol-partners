@@ -16,7 +16,7 @@ import java.util.Objects;
 @Table(
     name = "legal_form_document_type",
     indexes = {
-        @Index(name = "legal_form_document_type_pkey", columnList = "uuid"),
+        @Index(name = "legal_form_document_type_pkey", columnList = "uuid", unique = true),
         @Index(name = "i_document_type_uuid", columnList = "document_type_uuid")
     }
 )

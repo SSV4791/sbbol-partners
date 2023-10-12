@@ -76,7 +76,6 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(AccountEntity_.DIGITAL_ID)),
             builder.desc(root.get(AccountEntity_.CREATE_DATE))
         );
     }

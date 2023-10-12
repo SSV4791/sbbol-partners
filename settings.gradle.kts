@@ -36,21 +36,6 @@ pluginManagement {
     }
 }
 
-plugins {
-    id("com.gradle.enterprise") version "3.0"
-}
-
-gradleEnterprise {
-    buildScan {
-        server = "http://dev-sbbol2.sigma.sbrf.ru:8801"
-        allowUntrustedServer = true
-        isCaptureTaskInputFiles = true
-        gradle.taskGraph.whenReady {
-            publishAlwaysIf(!gradle.taskGraph.hasTask(":addCredentials"))
-        }
-    }
-}
-
 rootProject.name = "sbbol-partners"
 
 include(":docs")
