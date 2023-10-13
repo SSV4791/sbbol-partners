@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity_;
@@ -19,7 +18,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -66,8 +64,6 @@ public class AccountViewRepositoryImpl
         addBudgetPredicate(builder, predicates, root, filter);
         addGkuPredicate(predicates, root, filter);
         addPartnerSearchPredicate(builder, predicates, root, filter);
-        addBankAndBankAccountFetch(root);
-        addIdsHistoryFetch(root);
     }
 
     private void addDigitalIdPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
@@ -160,18 +156,6 @@ public class AccountViewRepositoryImpl
                     builder.upper(expression), "%" + filter.getPartnerSearch().toUpperCase(Locale.getDefault()) + "%")
             );
         }
-    }
-
-    private void addBankAndBankAccountFetch(Root<AccountEntity> root) {
-        var bankEntity = root.join(AccountEntity_.BANK);
-        var fetchedBankEntity = root.fetch(AccountEntity_.BANK);
-        bankEntity.join(BankEntity_.BANK_ACCOUNT);
-        fetchedBankEntity.fetch(BankEntity_.BANK_ACCOUNT, JoinType.LEFT);
-    }
-
-    private void addIdsHistoryFetch(Root<AccountEntity> root) {
-        root.join(AccountEntity_.ID_LINKS);
-        root.fetch(AccountEntity_.ID_LINKS, JoinType.LEFT);
     }
 
     @Override
