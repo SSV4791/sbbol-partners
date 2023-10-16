@@ -42,6 +42,7 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFul
         if (value.getLegalForm() == LegalForm.PHYSICAL_PERSON ||
             value.getLegalForm() == LegalForm.ENTREPRENEUR) {
             Iterator<AccountCreateFullModel> iterator = accounts.iterator();
+            var result = true;
             for (var i = 0; i < accounts.size(); i++) {
                 AccountCreateFullModel next = iterator.next();
                 var bank = next.getBank();
@@ -52,9 +53,12 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFul
                 if (bankAccount == null) {
                     return true;
                 }
-                buildMessage(context, String.format("accounts[%s].bank.bankAccount.bankAccount", i), message);
-                return !isBudgetCorrAccount(bankAccount.getBankAccount());
+                if (isBudgetCorrAccount(bankAccount.getBankAccount())) {
+                    buildMessage(context, String.format("accounts[%s].bank.bankAccount.bankAccount", i), message);
+                    result = false;
+                }
             }
+            return result;
         }
         return true;
     }
