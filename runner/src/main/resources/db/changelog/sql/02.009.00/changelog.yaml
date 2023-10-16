@@ -14,3 +14,6 @@ databaseChangeLog:
   - include:
       file: 1696942682653_add_new_index.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1697276539886_change_budget_mask.sql
+      relativeToChangelogFile: true
