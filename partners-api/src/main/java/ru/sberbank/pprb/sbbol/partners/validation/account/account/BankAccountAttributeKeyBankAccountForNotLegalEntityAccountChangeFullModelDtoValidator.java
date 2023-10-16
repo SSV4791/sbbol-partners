@@ -51,7 +51,7 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeFul
                 if (bankAccount == null) {
                     break;
                 }
-                if (!isBudgetCorrAccount(bankAccount.getBankAccount())) {
+                if (isBudgetCorrAccount(bankAccount.getBankAccount())) {
                     buildMessage(context, String.format("accounts[%s].bank.bankAccount.bankAccount", accountCounter), message);
                     result = false;
                 }
