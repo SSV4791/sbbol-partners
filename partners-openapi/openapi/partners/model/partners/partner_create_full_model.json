@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Партнер",
-  "x-extra-class-annotation": "@InnLengthValidation @InnExistValidation @PartnerNameValidation @OgrnLengthValidation @OkpoValidataion @BalanceTreasureAccountValidation @TreasureAccountCodeCurrencyValidation @TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation @BankAccountKeyValidation",
+  "x-extra-class-annotation": "@InnLengthValidation @PartnerNameValidation @OgrnLengthValidation @OkpoValidataion @BalanceTreasureAccountValidation @TreasureAccountCodeCurrencyValidation @TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation @BankAccountKeyValidation",
   "properties": {
     "digitalId": {
       "type": "string",
