@@ -4,22 +4,6 @@ docker:
     postgres: docker-internal.registry-ci.delta.sbrf.ru/ci02281165/ci03069386/postgres:13-alpine
     docs: docker-internal.registry-ci.delta.sbrf.ru/ci02281165/ci03069386/bellsoft/liberica-openjdk-rhel7.7-205:15.0.2-10
 
-credentials:
-  sonar: CAB-SA-DVO05789-sonar
-  jenkins: CAB-SA-DVO05789-jenkins
-  openshift_token: CAB-SA-DVO05789-openshift_token
-  service:
-    tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
-    approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
-  nexus_token:
-    tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
-    approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
-  checkmarx: CAB-SA-DVO05789-checkmarx
-  registry_delta:
-    tuz_path: CI00908578_CI00986346/AD/delta.sbrf.ru/creds/cab-sa-dvo05789
-    approle_path: CI00908578_CI00986346/A/CI02792425/JEN/MAIN/KV/approle
-  docs_publisher: CAB-SA-DVO05789-docs_publisher
-
 project_name: sbbol-partners
 
 liquibase:
@@ -32,7 +16,7 @@ liquibase:
 documentation:
   build:
     workdir: ''
-    user: cab-sa-dvo05789
+    user: CAB-SA-DVO05789
     outputdir: docs/build/docs
     command: >-
       ./gradlew
@@ -41,18 +25,6 @@ documentation:
       -Dgradle.wrapperUser=${env.TOKEN_NAME}
       -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
       build -x test
-
-test_ift:
-  cpu: 2
-  memory: '8g'
-  command: >-
-    ./gradlew
-    -PtokenName=${env.TOKEN_NAME}
-    -PtokenPassword=${env.TOKEN_PASSWORD}
-    -Dgradle.wrapperUser=${env.TOKEN_NAME}
-    -Dgradle.wrapperPassword=${env.TOKEN_PASSWORD}
-    -Dtest-layer=ift
-    test --info
 
 pr_check:
   openshift:
@@ -105,7 +77,7 @@ pr_check:
     memory: '8g'
     jenkins_job: 'OAFSIEKO/SBBOL/EFS/DEV/OpenShift/Deploy/sbbol-ufs/deploy-partners-DEV'
     label: 'prcheck'
-    branch: 'release/3.2'
+    branch: 'release/3.3'
     istio_tag: '2.5'
   build_gradle:
     match:
@@ -170,7 +142,7 @@ pr_check:
       -Dsonar.pullrequest.key=${params.pullRequestId}
       -Dsonar.pullrequest.branch=${pullRequest.fromRef.displayId}
       -Dsonar.pullrequest.base=${pullRequest.toRef.displayId}
-      -Dtest-layer=unit,api,configuration,cdcConsumer
+      -Dtest-layer=unit,api,configuration,cdcProvider
       -Dpactbroker.url=${env.PACT_BROKER_URL}
       -Dallure.jobrunId=${launch.jobRunId}
       -Dbuild.link=${env.BUILD_URL}
@@ -234,7 +206,7 @@ release:
         -PsonarToken=${env.SONAR_TOKEN}
         -Pversion=${env.VERSION}
         build qaReporterUpload sonarCoverage
-        -Dtest-layer=unit,api,configuration,cdcConsumer,cdcProvider
+        -Dtest-layer=unit,api,configuration,cdcProvider
         -Dsonar.branch.name=${params.branch}
         -Dpactbroker.url=${env.PACT_BROKER_URL}
         -Dpactbroker.auth.username=${env.PACT_USER}
