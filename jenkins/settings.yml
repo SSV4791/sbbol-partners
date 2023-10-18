@@ -16,7 +16,7 @@ liquibase:
 documentation:
   build:
     workdir: ''
-    user: CAB-SA-DVO05789
+    user: cab-sa-dvo05789
     outputdir: docs/build/docs
     command: >-
       ./gradlew
