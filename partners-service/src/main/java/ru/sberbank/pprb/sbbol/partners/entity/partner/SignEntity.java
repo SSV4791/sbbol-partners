@@ -55,7 +55,7 @@ public class SignEntity extends BaseEntity {
     private String signProfileId;
 
     @Column(name = "crypto_profile_id")
-    private String cryptoProfileId;
+    private UUID cryptoProfileId;
 
     @Column(name = "date_time_of_sign")
     private OffsetDateTime dateTimeOfSign;
@@ -140,11 +140,11 @@ public class SignEntity extends BaseEntity {
         this.signProfileId = signProfileId;
     }
 
-    public String getCryptoProfileId() {
+    public UUID getCryptoProfileId() {
         return cryptoProfileId;
     }
 
-    public void setCryptoProfileId(String cryptoProfileId) {
+    public void setCryptoProfileId(UUID cryptoProfileId) {
         this.cryptoProfileId = cryptoProfileId;
     }
 
