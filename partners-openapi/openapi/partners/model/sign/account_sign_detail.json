@@ -33,6 +33,7 @@
     },
     "cryptoProfileId": {
       "type": "string",
+      "format": "uuid",
       "title": "Идентификатор криптопрофиля Guid"
     },
     "externalDataFileId": {

@@ -22,7 +22,7 @@ public class CounterpartySignData implements Serializable {
     /**
      * ID криптопрофиля GUID
      */
-    private String cryptoProfileId;
+    private UUID cryptoProfileId;
 
     /**
      * Дата подписи
@@ -92,11 +92,11 @@ public class CounterpartySignData implements Serializable {
         this.dcsId = dcsId;
     }
 
-    public String getCryptoProfileId() {
+    public UUID getCryptoProfileId() {
         return cryptoProfileId;
     }
 
-    public void setCryptoProfileId(String cryptoProfileId) {
+    public void setCryptoProfileId(UUID cryptoProfileId) {
         this.cryptoProfileId = cryptoProfileId;
     }
 }
