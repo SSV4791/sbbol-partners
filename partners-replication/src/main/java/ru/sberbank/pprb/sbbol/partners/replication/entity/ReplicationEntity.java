@@ -49,6 +49,12 @@ public class ReplicationEntity extends BaseEntity {
     @Column(name = "retry")
     private int retry;
 
+    @Column(name = "request_id")
+    private String requestId;
+
+    @Column(name = "error_message", length = 3000)
+    private String errorMessage;
+
     @PrePersist
     private void initCreateDate() {
         if (isEmpty(createDate)) {
@@ -88,6 +94,16 @@ public class ReplicationEntity extends BaseEntity {
 
     public ReplicationEntity retry(int retry) {
         this.retry = retry;
+        return this;
+    }
+
+    public ReplicationEntity requestId(String requestId) {
+        this.requestId = requestId;
+        return this;
+    }
+
+    public ReplicationEntity errorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
         return this;
     }
 
@@ -155,6 +171,22 @@ public class ReplicationEntity extends BaseEntity {
         this.retry = retry;
     }
 
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -191,6 +223,8 @@ public class ReplicationEntity extends BaseEntity {
             ", createDate=" + createDate +
             ", entityStatus=" + entityStatus +
             ", retry=" + retry +
+            ", requestId='" + requestId + '\'' +
+            ", errorMessage='" + errorMessage + '\'' +
             '}';
     }
 }

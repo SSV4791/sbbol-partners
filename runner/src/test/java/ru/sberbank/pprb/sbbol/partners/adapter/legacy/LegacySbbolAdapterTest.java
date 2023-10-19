@@ -59,24 +59,24 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
 
 
     /**
-     * {@link LegacySbbolAdapter#update(String, Counterparty)}
+     * {@link LegacySbbolAdapter#update(String, Counterparty, String)}
      */
     @Test
     @DisplayName("Сббол Адаптер контрагенты. Проверка обновления контрагента")
     void updateTest() {
         var request = factory.manufacturePojo(Counterparty.class);
-        Counterparty result = adapter.update(DIGITAL_ID, request);
+        Counterparty result = adapter.update(DIGITAL_ID, request, null);
         checkCounterparty(result, request);
     }
 
     /**
-     * {@link LegacySbbolAdapter#create(String, Counterparty)}
+     * {@link LegacySbbolAdapter#create(String, Counterparty, String)}
      */
     @Test
     @DisplayName("Сббол Адаптер контрагенты. Проверка создания контрагента")
     void createTest() {
         var request = factory.manufacturePojo(Counterparty.class);
-        Counterparty result = adapter.create(DIGITAL_ID, request);
+        Counterparty result = adapter.create(DIGITAL_ID, request, null);
         checkCounterparty(result, request);
     }
 
@@ -91,12 +91,12 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
     }
 
     /**
-     * {@link LegacySbbolAdapter#delete(String, String)}
+     * {@link LegacySbbolAdapter#delete(String, String, String)}
      */
     @Test
     @DisplayName("Сббол Адаптер контрагенты. Проверка удаления по ППРБ гуиду")
     void deleteTest() {
-        assertDoesNotThrow(() -> adapter.delete(DIGITAL_ID, PPRB_GUID));
+        assertDoesNotThrow(() -> adapter.delete(DIGITAL_ID, PPRB_GUID, null));
     }
 
 
@@ -111,22 +111,22 @@ class LegacySbbolAdapterTest extends BaseUnitConfiguration {
     }
 
     /**
-     * {@link LegacySbbolAdapter#saveSign(String, CounterpartySignData)}
+     * {@link LegacySbbolAdapter#saveSign(String, CounterpartySignData, String)}
      */
     @Test
     @DisplayName("Сббол Адаптер контрагенты. Проверка сохранения подписи")
     void saveSignTest() {
         var request = factory.manufacturePojo(CounterpartySignData.class);
-        assertDoesNotThrow(() -> adapter.saveSign(DIGITAL_USER_ID, request));
+        assertDoesNotThrow(() -> adapter.saveSign(DIGITAL_USER_ID, request, null));
     }
 
     /**
-     * {@link LegacySbbolAdapter#removeSign(String, String)}
+     * {@link LegacySbbolAdapter#removeSign(String, String, String)}
      */
     @Test
     @DisplayName("Сббол Адаптер контрагенты. Проверка удаления подписи")
     void removeSignTest() {
-        assertDoesNotThrow(() -> adapter.removeSign(DIGITAL_USER_ID, PPRB_GUID));
+        assertDoesNotThrow(() -> adapter.removeSign(DIGITAL_USER_ID, PPRB_GUID, null));
     }
 
     /**

@@ -41,13 +41,19 @@ public abstract class AbstractReplicationAgent implements ReplicationAgent {
             updateReplicationEntity(entity, SUCCESS);
         } catch (Exception e) {
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
-            updateReplicationEntity(entity, ERROR);
+            updateReplicationEntity(entity, ERROR, e.getMessage());
         }
     }
 
     private void updateReplicationEntity(ReplicationEntity entity, ReplicationEntityStatus newEntityStatus) {
+        updateReplicationEntity(entity, newEntityStatus, null);
+    }
+
+    private void updateReplicationEntity(
+        ReplicationEntity entity, ReplicationEntityStatus newEntityStatus, String errorMessage) {
         entity.setEntityStatus(newEntityStatus);
         entity.setRetry(entity.getRetry() + 1);
+        entity.setErrorMessage(errorMessage);
         replicationRepository.save(entity);
     }
 

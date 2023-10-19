@@ -54,7 +54,7 @@ public class SbbolIntegrationWithSbbolConfiguration {
         counterpartyView.setPprbGuid(UUID.randomUUID().toString());
         counterpartyMapper = Mappers.getMapper(CounterpartyMapper.class);
         when(legacySbbolAdapter.checkNotMigration(any())).thenReturn(true);
-        when(legacySbbolAdapter.create(any(), any())).thenReturn(counterparty);
+        when(legacySbbolAdapter.create(any(), any(), any())).thenReturn(counterparty);
         when(legacySbbolAdapter.getByPprbGuid(any(), any()))
             .thenReturn((Counterparty) SerializationUtils.clone(counterparty))
             .thenReturn((Counterparty) SerializationUtils.clone(counterparty));
@@ -65,6 +65,6 @@ public class SbbolIntegrationWithSbbolConfiguration {
         updatedCounterparty = (Counterparty) SerializationUtils.clone(counterparty);
         updatedCounterparty.setAccount(newAcc);
         updatedCounterparty.setKpp(newKpp);
-        when(legacySbbolAdapter.update(any(), any())).thenReturn(updatedCounterparty);
+        when(legacySbbolAdapter.update(any(), any(), any())).thenReturn(updatedCounterparty);
     }
 }

@@ -29,6 +29,6 @@ public class DeletingCounterpartyReplicationAgent extends AbstractReplicationAge
     @Override
     protected void replicateToSbbol(ReplicationEntity entity) {
         var accountId = entity.getEntityData();
-        sbbolAdapter.delete(entity.getDigitalId(), accountId);
+        sbbolAdapter.delete(entity.getDigitalId(), accountId, entity.getRequestId());
     }
 }

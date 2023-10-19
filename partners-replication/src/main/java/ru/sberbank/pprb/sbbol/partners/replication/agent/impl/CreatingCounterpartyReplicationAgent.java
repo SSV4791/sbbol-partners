@@ -31,6 +31,6 @@ public class CreatingCounterpartyReplicationAgent extends AbstractReplicationAge
     @Override
     protected void replicateToSbbol(ReplicationEntity entity) throws JsonProcessingException {
         var counterparty = objectMapper.readValue(entity.getEntityData(), Counterparty.class);
-        sbbolAdapter.create(entity.getDigitalId(), counterparty);
+        sbbolAdapter.create(entity.getDigitalId(), counterparty, entity.getRequestId());
     }
 }
