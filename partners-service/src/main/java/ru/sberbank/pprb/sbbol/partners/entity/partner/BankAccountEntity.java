@@ -5,7 +5,6 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -28,7 +27,7 @@ public class BankAccountEntity extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "bank_uuid", nullable = false)
     private BankEntity bank;
 

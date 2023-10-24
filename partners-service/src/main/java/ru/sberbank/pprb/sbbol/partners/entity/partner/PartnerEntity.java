@@ -12,7 +12,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -69,7 +68,7 @@ public class PartnerEntity extends BaseEntity {
     @Column(name = "inn", length = 12)
     private String inn;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "inn", referencedColumnName = "inn", insertable = false, updatable = false)
     private GkuInnEntity gkuInnEntity;
 
