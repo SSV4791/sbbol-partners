@@ -45,7 +45,7 @@ public class DeletedPartnerFraudServiceImpl implements FraudService<PartnerEntit
 
     @Override
     public void sendEvent(FraudMetaData metaData, PartnerEntity partnerEntity) {
-        if (!properties.isEnabled() || isNull(metaData) || !checkEvent(metaData)) {
+        if (!properties.isEnabled() || isNull(metaData)) {
             return;
         }
         var fraudRequest = fraudMapper.mapToAnalyzeRequest(metaData, partnerEntity);

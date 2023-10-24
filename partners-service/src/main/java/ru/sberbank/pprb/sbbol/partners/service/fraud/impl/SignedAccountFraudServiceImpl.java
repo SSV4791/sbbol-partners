@@ -65,7 +65,7 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
 
     @Override
     public void sendEvent(FraudMetaData metaData, AccountEntity accountEntity) {
-        if (!properties.isEnabled() || isNull(metaData) || !checkEvent(metaData)) {
+        if (!properties.isEnabled() || isNull(metaData)) {
             return;
         }
         var partnerEntity = partnerRepository.getByDigitalIdAndUuid(accountEntity.getDigitalId(), accountEntity.getPartnerUuid())
