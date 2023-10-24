@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity_;
@@ -18,6 +19,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -54,16 +56,24 @@ public class AccountViewRepositoryImpl
         Root<AccountEntity> root,
         AccountsFilter filter
     ) {
+        addFetchPredicate(root);
         addDigitalIdPredicate(builder, predicates, root, filter);
         addUuidPredicate(builder, predicates, root, filter);
         addPartnerUuidPredicate(builder, predicates, root, filter);
-        addPartnerTypePredicate(builder, predicates, root);
+        Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
+        addPartnerTypePredicate(builder, predicates, partner);
+        addPartnerSearchPredicate(builder, predicates, root, partner, filter);
         addStatePredicate(builder, predicates, root, filter);
         addSearchPredicate(builder, predicates, root, filter);
         addChangeDatePredicate(builder, predicates, root, filter);
         addBudgetPredicate(builder, predicates, root, filter);
         addGkuPredicate(predicates, root, filter);
-        addPartnerSearchPredicate(builder, predicates, root, filter);
+    }
+
+    private void addFetchPredicate(Root<AccountEntity> root) {
+        root
+            .fetch(AccountEntity_.BANK, JoinType.INNER)
+            .fetch(BankEntity_.BANK_ACCOUNT, JoinType.LEFT);
     }
 
     private void addDigitalIdPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
@@ -78,9 +88,27 @@ public class AccountViewRepositoryImpl
         inPredicate(builder, predicates, root, AccountEntity_.PARTNER_UUID, filter.getPartnerIds());
     }
 
-    private void addPartnerTypePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root) {
-        Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
+    private void addPartnerTypePredicate(CriteriaBuilder builder, List<Predicate> predicates, Join<AccountEntity, PartnerEntity> partner) {
         predicates.add(builder.equal(partner.get(PartnerEntity_.TYPE), PartnerType.PARTNER));
+    }
+
+    private void addPartnerSearchPredicate(
+        CriteriaBuilder builder,
+        List<Predicate> predicates,
+        Root<AccountEntity> root,
+        Join<AccountEntity, PartnerEntity> partner,
+        AccountsFilter filter
+    ) {
+        if (isNotEmpty(filter.getPartnerSearch())) {
+            var expression = builder.concat(
+                builder.coalesce(partner.get(PartnerEntity_.SEARCH), ""),
+                builder.coalesce(root.get(AccountEntity_.ACCOUNT), "")
+            );
+            predicates.add(
+                builder.like(
+                    builder.upper(expression), "%" + filter.getPartnerSearch().toUpperCase(Locale.getDefault()) + "%")
+            );
+        }
     }
 
     private void addStatePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
@@ -141,20 +169,6 @@ public class AccountViewRepositoryImpl
             Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
             Join<PartnerEntity, GkuInnEntity> gku = partner.join(PartnerEntity_.GKU_INN_ENTITY);
             predicates.add(gku.get(GkuInnEntity_.INN).isNotNull());
-        }
-    }
-
-    private void addPartnerSearchPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
-        if (isNotEmpty(filter.getPartnerSearch())) {
-            Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
-            var expression = builder.concat(
-                builder.coalesce(partner.get(PartnerEntity_.SEARCH), ""),
-                builder.coalesce(root.get(AccountEntity_.ACCOUNT), "")
-            );
-            predicates.add(
-                builder.like(
-                    builder.upper(expression), "%" + filter.getPartnerSearch().toUpperCase(Locale.getDefault()) + "%")
-            );
         }
     }
 

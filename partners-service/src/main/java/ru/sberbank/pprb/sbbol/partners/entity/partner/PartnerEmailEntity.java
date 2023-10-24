@@ -19,7 +19,7 @@ import java.util.Objects;
     name = "email",
     indexes = {
         @Index(name = "email_pkey", columnList = "uuid", unique = true),
-        @Index(name = "i_email_unified_uuid", columnList = "unified_uuid")
+        @Index(name = "i_email_unified_uuid_digital_id", columnList = "unified_uuid,digital_id")
     }
 )
 public class PartnerEmailEntity extends EmailBaseEntity {
