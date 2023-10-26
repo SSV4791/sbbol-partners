@@ -41,7 +41,7 @@ public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMappe
         if (isNull(metaData)) {
             return;
         }
-        attributes.add(new Attribute("firstSignTime", metaData.getEventData().getTimeOfOccurrence().toLocalDateTime().toString(), DATE_TIME_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("firstSignTime", metaData.getEventData().getTimeOfOccurrence().toLocalDateTime().toString(), DATE_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("firstSignIpAddress", metaData.getDeviceRequest().getIpAddress(), STRING_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("firstSignLogin", metaData.getClientData().getLogin(), STRING_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("firstSignPhone", metaData.getClientData().getPhone(), STRING_ATTRIBUTE_DATA_TYPE));
