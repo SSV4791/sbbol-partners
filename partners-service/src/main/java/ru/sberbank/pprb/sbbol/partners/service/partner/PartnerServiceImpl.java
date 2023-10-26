@@ -22,13 +22,11 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
-import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
-import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import javax.validation.constraints.NotNull;
@@ -59,7 +57,6 @@ public class PartnerServiceImpl implements PartnerService {
     private final ContactRepository contactRepository;
     private final AddressRepository addressRepository;
     private final PartnerRepository partnerRepository;
-    private final FraudServiceManager fraudServiceManager;
     private final AccountMapper accountMapper;
     private final DocumentMapper documentMapper;
     private final AddressMapper addressMapper;
@@ -77,7 +74,6 @@ public class PartnerServiceImpl implements PartnerService {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
         DocumentMapper documentMapper,
         AddressMapper addressMapper,
@@ -94,7 +90,6 @@ public class PartnerServiceImpl implements PartnerService {
         this.contactRepository = contactRepository;
         this.addressRepository = addressRepository;
         this.partnerRepository = partnerRepository;
-        this.fraudServiceManager = fraudServiceManager;
         this.accountMapper = accountMapper;
         this.documentMapper = documentMapper;
         this.addressMapper = addressMapper;
@@ -261,11 +256,6 @@ public class PartnerServiceImpl implements PartnerService {
             PartnerEntity foundPartner = partnerRepository.getByDigitalIdAndUuid(digitalId, partnerId)
                 .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, partnerId));
-            if (nonNull(fraudMetaData)) {
-                fraudServiceManager
-                    .getService(FraudEventType.DELETE_PARTNER)
-                    .sendEvent(fraudMetaData, foundPartner);
-            }
             partnerRepository.delete(foundPartner);
             addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId));
             contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId));

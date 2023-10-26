@@ -19,10 +19,8 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisitesResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
-import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
-import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudServiceManager;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.List;
@@ -40,20 +38,17 @@ public class AccountSignServiceImpl implements AccountSignService {
 
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
-    private final FraudServiceManager fraudServiceManager;
     private final AccountSingMapper accountSingMapper;
     private final ReplicationService replicationService;
 
     public AccountSignServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        FraudServiceManager fraudServiceManager,
         AccountSingMapper accountSingMapper,
         ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
-        this.fraudServiceManager = fraudServiceManager;
         this.accountSingMapper = accountSingMapper;
         this.replicationService = replicationService;
     }
@@ -75,9 +70,6 @@ public class AccountSignServiceImpl implements AccountSignService {
                 throw new OptimisticLockException(account.getVersion(), accountSign.getAccountVersion());
             }
             var sign = accountSingMapper.toSing(accountSign, account.getPartnerUuid(), digitalId);
-            fraudServiceManager
-                .getService(FraudEventType.SIGN_ACCOUNT)
-                .sendEvent(fraudMetaData, account);
             try {
                 var savedSign = accountSignRepository.save(sign);
                 replicationService.saveSign(digitalId, accountsSign.getDigitalUserId(), savedSign.getAccountUuid());
