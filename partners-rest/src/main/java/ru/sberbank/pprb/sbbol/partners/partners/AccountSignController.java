@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfo;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsSignInfoResponse;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.FraudMonitoringService;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,15 +21,19 @@ import java.util.UUID;
 @RestController
 public class AccountSignController implements AccountsSignApi {
 
+    private final FraudMonitoringService fraudMonitoringService;
+
     private final AccountSignService accountSignService;
 
-    public AccountSignController(AccountSignService accountSignService) {
+    public AccountSignController(FraudMonitoringService fraudMonitoringService, AccountSignService accountSignService) {
+        this.fraudMonitoringService = fraudMonitoringService;
         this.accountSignService = accountSignService;
     }
 
     @FraudValid
     @Override
     public ResponseEntity<AccountsSignInfoResponse> create(FraudMetaData fraudMetaData, AccountsSignInfo accountsSignInfo) {
+        fraudMonitoringService.createAccountsSign(accountsSignInfo, fraudMetaData);
         return ResponseEntity.ok(accountSignService.createAccountsSign(accountsSignInfo, fraudMetaData));
     }
 

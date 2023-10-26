@@ -67,6 +67,8 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.DocumentTypeServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.EmailService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.FraudMonitoringService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.FraudMonitoringServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerAddressServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerDocumentServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerEmailServiceImpl;
@@ -136,6 +138,15 @@ public class PartnerServiceConfiguration {
     }
 
     @Bean
+    FraudMonitoringService fraudMonitoringService(
+        AccountRepository accountRepository,
+        PartnerRepository partnerRepository,
+        FraudServiceManager fraudServiceManager
+    ) {
+        return new FraudMonitoringServiceImpl(accountRepository, partnerRepository, fraudServiceManager);
+    }
+
+    @Bean
     AccountService accountService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
@@ -158,14 +169,12 @@ public class PartnerServiceConfiguration {
     AccountSignService accountSignService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        FraudServiceManager fraudServiceManager,
         AccountSingMapper accountSingMapper,
         ReplicationService replicationService
     ) {
         return new AccountSignServiceImpl(
             accountRepository,
             accountSignRepository,
-            fraudServiceManager,
             accountSingMapper,
             replicationService
         );
@@ -295,7 +304,6 @@ public class PartnerServiceConfiguration {
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        FraudServiceManager fraudServiceManager,
         AccountMapper accountMapper,
         DocumentMapper documentMapper,
         AddressMapper addressMapper,
@@ -313,7 +321,6 @@ public class PartnerServiceConfiguration {
             contactRepository,
             addressRepository,
             partnerRepository,
-            fraudServiceManager,
             accountMapper,
             documentMapper,
             addressMapper,

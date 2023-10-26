@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
+import ru.sberbank.pprb.sbbol.partners.service.partner.FraudMonitoringService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 
 import java.util.List;
@@ -23,9 +24,12 @@ import java.util.UUID;
 @RestController
 public class PartnerController implements PartnersApi {
 
+    private final FraudMonitoringService fraudMonitoringService;
+
     private final PartnerService partnerService;
 
-    public PartnerController(PartnerService partnerService) {
+    public PartnerController(FraudMonitoringService fraudMonitoringService, PartnerService partnerService) {
+        this.fraudMonitoringService = fraudMonitoringService;
         this.partnerService = partnerService;
     }
 
@@ -47,6 +51,7 @@ public class PartnerController implements PartnersApi {
     @FraudValid
     @Override
     public ResponseEntity<Void> delete(String digitalId, List<UUID> ids, FraudMetaData fraudMetaData) {
+        fraudMonitoringService.deletePartners(digitalId, ids, fraudMetaData);
         partnerService.deletePartners(digitalId, ids, fraudMetaData);
         return ResponseEntity.noContent().build();
     }
