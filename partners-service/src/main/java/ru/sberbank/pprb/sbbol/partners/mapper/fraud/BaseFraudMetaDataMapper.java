@@ -32,7 +32,7 @@ public interface BaseFraudMetaDataMapper {
 
     String STRING_ATTRIBUTE_DATA_TYPE = "STRING";
 
-    String DATE_TIME_ATTRIBUTE_DATA_TYPE = "DATETIME";
+    String DATE_ATTRIBUTE_DATA_TYPE = "DATE";
 
     String EVENT_TYPE_SIGN_COUNTERPARTY_ACCOUNT = "EDIT_PAYEE";
 
