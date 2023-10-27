@@ -107,7 +107,7 @@ public interface BaseFraudMetaDataMapper {
             return;
         }
         attributes.add(new Attribute("digitalId", clientData.getDigitalId(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("epkId", clientData.getEpkId(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute("ЕПК.ID", clientData.getEpkId(), STRING_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("payerInn", clientData.getInn(), STRING_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("payerName", clientData.getOrgName(), STRING_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("osbNumber", clientData.getGosbNumber(), STRING_ATTRIBUTE_DATA_TYPE));
