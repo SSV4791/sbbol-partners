@@ -113,7 +113,7 @@ public class ReplicationServiceImpl implements ReplicationService {
         try {
             handleCreatingCounterparty(digitalId, counterparty);
         } catch (SbbolException e) {
-            if (!replicationProperties.isEnable()) {
+            if (!isAsyncReplication()) {
                 throw e;
             }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
@@ -140,7 +140,7 @@ public class ReplicationServiceImpl implements ReplicationService {
         try {
             handleUpdatingCounterparty(digitalId, counterparty);
         } catch (SbbolException e) {
-            if (!replicationProperties.isEnable()) {
+            if (!isAsyncReplication()) {
                 throw e;
             }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
@@ -166,7 +166,7 @@ public class ReplicationServiceImpl implements ReplicationService {
         try {
             handleDeletingCounterparty(digitalId, accountId);
         } catch (SbbolException e) {
-            if (!replicationProperties.isEnable()) {
+            if (!isAsyncReplication()) {
                 throw e;
             }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
@@ -181,7 +181,7 @@ public class ReplicationServiceImpl implements ReplicationService {
         try {
             handleCreatingSign(digitalId, digitalUserId, counterpartySignData);
         } catch (SbbolException e) {
-            if (!replicationProperties.isEnable()) {
+            if (!isAsyncReplication()) {
                 throw e;
             }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
@@ -194,7 +194,7 @@ public class ReplicationServiceImpl implements ReplicationService {
         try {
             handleDeletingSign(digitalId, accountId);
         } catch (SbbolException e) {
-            if (!replicationProperties.isEnable()) {
+            if (!isAsyncReplication()) {
                 throw e;
             }
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
@@ -202,81 +202,106 @@ public class ReplicationServiceImpl implements ReplicationService {
     }
 
     private void handleCreatingCounterparty(String digitalId, Counterparty counterparty) {
-        LOG.debug("Сохраняем в очередь реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        var replicationEntity = saveReplicationEntityToMessageQueue(
-            digitalId,
-            mapUuid(counterparty.getPprbGuid()),
-            CREATING_COUNTERPARTY,
-            counterparty
-        );
-        LOG.debug("Отправляем реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
-        legacySbbolAdapter.create(digitalId, counterparty, xRequestId);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
-        raceConditionResolver.resolve(CREATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
+        if (isAsyncReplication()) {
+            LOG.debug("Сохраняем в очередь реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
+            var replicationEntity = saveReplicationEntityToMessageQueue(
+                digitalId,
+                mapUuid(counterparty.getPprbGuid()),
+                CREATING_COUNTERPARTY,
+                counterparty
+            );
+            LOG.debug("Отправляем реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
+            var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+            legacySbbolAdapter.create(digitalId, counterparty, xRequestId);
+            LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
+            raceConditionResolver.resolve(CREATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
+        } else {
+            LOG.debug("Отправляем реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
+            legacySbbolAdapter.create(digitalId, counterparty, getXRequestIdFromMDC());
+        }
     }
 
     private void handleUpdatingCounterparty(String digitalId, Counterparty counterparty) {
-        LOG.debug("Сохраняем в очередь реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        var replicationEntity = saveReplicationEntityToMessageQueue(
-            digitalId,
-            mapUuid(counterparty.getPprbGuid()),
-            UPDATING_COUNTERPARTY,
-            counterparty
-        );
-        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
-        LOG.debug("Отправляем реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        legacySbbolAdapter.update(digitalId, counterparty, xRequestId);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
-        raceConditionResolver.resolve(UPDATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
+        if (isAsyncReplication()) {
+            LOG.debug("Сохраняем в очередь реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
+            var replicationEntity = saveReplicationEntityToMessageQueue(
+                digitalId,
+                mapUuid(counterparty.getPprbGuid()),
+                UPDATING_COUNTERPARTY,
+                counterparty
+            );
+            var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+            LOG.debug("Отправляем реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
+            legacySbbolAdapter.update(digitalId, counterparty, xRequestId);
+            LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
+            raceConditionResolver.resolve(UPDATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
+        } else {
+            LOG.debug("Отправляем реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
+            legacySbbolAdapter.update(digitalId, counterparty, getXRequestIdFromMDC());
+        }
 
     }
 
     private void handleDeletingCounterparty(String digitalId, String counterpartyId) {
-        LOG.debug("Сохраняем в очередь реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
-        var replicationEntity = saveReplicationEntityToMessageQueue(
-            digitalId,
-            mapUuid(counterpartyId),
-            DELETING_COUNTERPARTY,
-            counterpartyId
-        );
-        LOG.debug("Отправляем реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
-        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
-        legacySbbolAdapter.delete(digitalId, counterpartyId, xRequestId);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", mapUuid(counterpartyId));
-        raceConditionResolver.resolve(DELETING_COUNTERPARTY, mapUuid(counterpartyId), digitalId);
+        if (isAsyncReplication()) {
+            LOG.debug("Сохраняем в очередь реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
+            var replicationEntity = saveReplicationEntityToMessageQueue(
+                digitalId,
+                mapUuid(counterpartyId),
+                DELETING_COUNTERPARTY,
+                counterpartyId
+            );
+            LOG.debug("Отправляем реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
+            var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+            legacySbbolAdapter.delete(digitalId, counterpartyId, xRequestId);
+            LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", mapUuid(counterpartyId));
+            raceConditionResolver.resolve(DELETING_COUNTERPARTY, mapUuid(counterpartyId), digitalId);
+        } else {
+            LOG.debug("Отправляем реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
+            legacySbbolAdapter.delete(digitalId, counterpartyId, getXRequestIdFromMDC());
+        }
     }
 
     private void handleCreatingSign(String digitalId, String digitalUserId, CounterpartySignData signData) {
-        LOG.debug("Сохраняем в очередь реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
-        var replicationEntity = saveReplicationEntityToMessageQueue(
-            digitalId,
-            digitalUserId,
-            signData.getPprbGuid(),
-            CREATING_SIGN,
-            signData
-        );
-        var counterpartyId = signData.getPprbGuid();
-        LOG.debug("Отправляем реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
-        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
-        legacySbbolAdapter.saveSign(digitalUserId, signData, xRequestId);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
-        raceConditionResolver.resolve(CREATING_SIGN, counterpartyId, digitalId);
+        if (isAsyncReplication()) {
+            LOG.debug("Сохраняем в очередь реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
+            var replicationEntity = saveReplicationEntityToMessageQueue(
+                digitalId,
+                digitalUserId,
+                signData.getPprbGuid(),
+                CREATING_SIGN,
+                signData
+            );
+            var counterpartyId = signData.getPprbGuid();
+            LOG.debug("Отправляем реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
+            var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+            legacySbbolAdapter.saveSign(digitalUserId, signData, xRequestId);
+            LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
+            raceConditionResolver.resolve(CREATING_SIGN, counterpartyId, digitalId);
+        } else {
+            LOG.debug("Отправляем реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
+            legacySbbolAdapter.saveSign(digitalUserId, signData, getXRequestIdFromMDC());
+        }
     }
 
     private void handleDeletingSign(String digitalId, String counterpartyId) {
-        LOG.debug("Сохраняем в очередь реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
-        var replicationEntity = saveReplicationEntityToMessageQueue(
-            digitalId,
-            mapUuid(counterpartyId),
-            DELETING_SIGN,
-            counterpartyId
-        );
-        LOG.debug("Отправляем реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
-        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
-        legacySbbolAdapter.removeSign(digitalId, counterpartyId, xRequestId);
-        LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
-        raceConditionResolver.resolve(DELETING_SIGN, mapUuid(counterpartyId), digitalId);
+        if (isAsyncReplication()) {
+            LOG.debug("Сохраняем в очередь реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
+            var replicationEntity = saveReplicationEntityToMessageQueue(
+                digitalId,
+                mapUuid(counterpartyId),
+                DELETING_SIGN,
+                counterpartyId
+            );
+            LOG.debug("Отправляем реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
+            var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+            legacySbbolAdapter.removeSign(digitalId, counterpartyId, xRequestId);
+            LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
+            raceConditionResolver.resolve(DELETING_SIGN, mapUuid(counterpartyId), digitalId);
+        } else {
+            LOG.debug("Отправляем реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
+            legacySbbolAdapter.removeSign(digitalId, counterpartyId, getXRequestIdFromMDC());
+        }
     }
 
     private <T> ReplicationEntity saveReplicationEntityToMessageQueue(
@@ -317,5 +342,9 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     private String getXRequestIdFromMDC() {
         return MDC.get("requestUid");
+    }
+
+    private boolean isAsyncReplication() {
+        return replicationProperties.isEnable();
     }
 }
