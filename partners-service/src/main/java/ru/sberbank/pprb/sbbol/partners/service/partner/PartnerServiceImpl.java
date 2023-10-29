@@ -129,14 +129,13 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Partner findPartner(@NotNull String digitalId, String name, String inn, String kpp) {
         var search = prepareSearchString(inn, kpp, name);
         var foundPartner = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
         if (Objects.isNull(foundPartner)) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId);
         }
-        return partnerMapper.toPartner(foundPartner);
+        return partnerMapper.toPartnerWithoutPhoneAndEmail(foundPartner);
     }
 
     @Override

@@ -61,6 +61,15 @@ public interface PartnerMapper {
     @Mapping(target = "gku", source = "gkuInnEntity", qualifiedByName = "isGku")
     Partner toPartner(PartnerEntity partner);
 
+    @Mapping(target = "id", source = "uuid")
+    @Mapping(target = "legalForm", source = "legalType", qualifiedByName = "toLegalType")
+    @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
+    @Mapping(target = "changeDate", source = "lastModifiedDate")
+    @Mapping(target = "gku", source = "gkuInnEntity", qualifiedByName = "isGku")
+    @Mapping(target = "phones", ignore = true)
+    @Mapping(target = "emails", ignore = true)
+    Partner toPartnerWithoutPhoneAndEmail(PartnerEntity partner);
+
     @Named("toLegalType")
     static LegalForm toLegalType(LegalType legalType) {
         return legalType != null ? LegalForm.valueOf(legalType.name()) : null;
