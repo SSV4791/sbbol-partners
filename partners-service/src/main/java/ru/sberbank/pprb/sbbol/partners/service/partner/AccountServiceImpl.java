@@ -115,7 +115,7 @@ public class AccountServiceImpl implements AccountService {
     public Account saveAccount(AccountCreate account) {
         checkDuplicate(account);
         var digitalId = account.getDigitalId();
-        partnerService.getPartner(digitalId, account.getPartnerId());
+        partnerService.existsPartner(digitalId, account.getPartnerId());
         var accountEntity = accountMapper.toAccount(account);
         try {
             var savedAccount = accountRepository.save(accountEntity);

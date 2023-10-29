@@ -46,7 +46,7 @@ import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper.*;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper.toLegalType;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
@@ -111,6 +111,13 @@ public class PartnerServiceImpl implements PartnerService {
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return partnerMapper.toPartner(partner);
+    }
+
+    @Override
+    public void existsPartner(String digitalId, UUID id) throws EntryNotFoundException {
+        if (!partnerRepository.existsByDigitalIdAndUuid(digitalId, id)) {
+            throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
+        }
     }
 
     @Override

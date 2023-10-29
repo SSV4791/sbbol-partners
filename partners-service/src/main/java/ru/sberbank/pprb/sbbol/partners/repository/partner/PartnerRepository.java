@@ -15,6 +15,14 @@ import java.util.UUID;
 public interface PartnerRepository extends CrudRepository<PartnerEntity, UUID>, PartnerViewRepository, RenterViewRepository {
 
     /**
+     * Проверка наличия Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета
+     * @param uuid      Идентификатор документа
+     */
+    boolean existsByDigitalIdAndUuid(String digitalId, UUID uuid);
+
+    /**
      * Получение Партнера
      *
      * @param digitalId Идентификатор личного кабинета

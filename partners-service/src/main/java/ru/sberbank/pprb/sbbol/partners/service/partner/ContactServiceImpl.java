@@ -80,7 +80,7 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public Contact saveContact(ContactCreate contact) {
-        partnerService.getPartner(contact.getDigitalId(), contact.getPartnerId());
+        partnerService.existsPartner(contact.getDigitalId(), contact.getPartnerId());
         var requestContact = contactMapper.toContact(contact);
         var saveContact = contactRepository.save(requestContact);
         return contactMapper.toContact(saveContact);

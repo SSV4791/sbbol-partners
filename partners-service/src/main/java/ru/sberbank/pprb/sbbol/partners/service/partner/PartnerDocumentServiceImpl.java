@@ -27,7 +27,7 @@ public class PartnerDocumentServiceImpl extends DocumentServiceImpl {
     @Transactional
     public Document saveDocument(DocumentCreate document) {
         var partnerId = document.getUnifiedId();
-        partnerService.getPartner(document.getDigitalId(), partnerId);
+        partnerService.existsPartner(document.getDigitalId(), partnerId);
         return super.saveDocument(document);
     }
 }
