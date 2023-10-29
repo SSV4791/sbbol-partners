@@ -6,6 +6,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -38,7 +39,7 @@ public class DocumentTypeEntity extends BaseEntity {
     @Column(name = "deleted")
     private Boolean deleted;
 
-    @OneToMany(mappedBy = "documentType", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "documentType", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentTypeLegalFormEntity> legalForms;
 
     public Boolean getDeleted() {

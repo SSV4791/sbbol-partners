@@ -5,7 +5,6 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -31,7 +30,7 @@ public class DocumentTypeLegalFormEntity extends BaseEntity {
     @Column(name = "legal_form", nullable = false, length = 100)
     private String legalForm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "document_type_uuid")
     private DocumentTypeEntity documentType;
 
