@@ -4,7 +4,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
-import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 
@@ -85,8 +84,8 @@ public class BaseTreasuryAccountValidator extends BaseValidator {
             return true;
         }
         try {
-            Partner partner = partnerService.getPartner(digitalId, partnerId);
-            if (partner.getLegalForm() != LegalForm.LEGAL_ENTITY) {
+            var partnerLegalForm = partnerService.getPartnerLegalForm(digitalId, partnerId);
+            if (LegalForm.LEGAL_ENTITY != partnerLegalForm) {
                 return true;
             }
         } catch (EntryNotFoundException ignore) {

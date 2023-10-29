@@ -5,8 +5,8 @@ import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
-import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckDuplicateException;
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
@@ -14,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
@@ -45,6 +46,7 @@ import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_FULL_MODEL_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_UPDATE;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper.*;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
@@ -109,6 +111,14 @@ public class PartnerServiceImpl implements PartnerService {
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return partnerMapper.toPartner(partner);
+    }
+
+    @Override
+    public LegalForm getPartnerLegalForm(String digitalId, UUID id) {
+        PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id)
+            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
+        return toLegalType(partner.getLegalType());
     }
 
     @Override
