@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.Ordered;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -18,9 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.util.Properties;
 
 @Configuration
-@EnableTransactionManagement(
-    order = Ordered.HIGHEST_PRECEDENCE
-)
+@EnableTransactionManagement
 @EnableJpaRepositories(value = {
     "ru.sberbank.pprb.sbbol.migration.gku.repository",
     "ru.sberbank.pprb.sbbol.partners.repository",
