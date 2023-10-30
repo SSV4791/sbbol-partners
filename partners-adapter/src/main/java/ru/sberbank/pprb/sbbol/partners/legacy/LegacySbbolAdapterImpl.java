@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static org.springframework.util.StringUtils.hasText;
+
 @Loggable
 public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
 
@@ -41,24 +43,20 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     private static final String GET_HOUSING_INN = ROOT_URL + "/housing/{digitalId}";
 
     private final RestTemplate restTemplate;
-    private final HttpHeaders httpHeaders;
     private final RetryTemplate retryTemplate;
 
     public LegacySbbolAdapterImpl(RestTemplate restTemplate, RetryTemplate retryTemplate) {
         this.restTemplate = restTemplate;
         this.retryTemplate = retryTemplate;
-        this.httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     }
 
     @Override
-    public void delete(String digitalId, String pprbGuid) {
+    public void delete(String digitalId, String pprbGuid, String xRequestId) {
         try {
             restTemplate.exchange(
                 DELETE,
                 HttpMethod.DELETE,
-                new HttpEntity<>(httpHeaders),
+                new HttpEntity<>(getHttpHeaders(xRequestId)),
                 Void.class,
                 digitalId,
                 pprbGuid);
@@ -70,12 +68,12 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
-    public Counterparty create(String digitalId, Counterparty counterparty) {
+    public Counterparty create(String digitalId, Counterparty counterparty, String xRequestId) {
         try {
             ResponseEntity<Counterparty> response = restTemplate.exchange(
                 CREATE,
                 HttpMethod.POST,
-                new HttpEntity<>(counterparty, httpHeaders),
+                new HttpEntity<>(counterparty, getHttpHeaders(xRequestId)),
                 new ParameterizedTypeReference<>() {
                 },
                 digitalId
@@ -89,12 +87,12 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
-    public Counterparty update(String digitalId, Counterparty counterparty) {
+    public Counterparty update(String digitalId, Counterparty counterparty, String xRequestId) {
         try {
             ResponseEntity<Counterparty> response = restTemplate.exchange(
                 UPDATE,
                 HttpMethod.PUT,
-                new HttpEntity<>(counterparty, httpHeaders),
+                new HttpEntity<>(counterparty, getHttpHeaders(xRequestId)),
                 new ParameterizedTypeReference<>() {
                 },
                 digitalId
@@ -113,7 +111,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             ResponseEntity<List<CounterpartyView>> response = restTemplate.exchange(
                 COUNTERPARTY_BY_DIGITAL_ID,
                 HttpMethod.GET,
-                new HttpEntity<>(httpHeaders),
+                new HttpEntity<>(getHttpHeaders()),
                 new ParameterizedTypeReference<>() {
                 },
                 digitalId
@@ -132,7 +130,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             ResponseEntity<Counterparty> response = restTemplate.exchange(
                 BY_PPRB_GUID,
                 HttpMethod.GET,
-                new HttpEntity<>(httpHeaders),
+                new HttpEntity<>(getHttpHeaders()),
                 new ParameterizedTypeReference<>() {
                 },
                 digitalId,
@@ -147,12 +145,12 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
-    public void saveSign(String digitalUserId, CounterpartySignData signData) {
+    public void saveSign(String digitalUserId, CounterpartySignData signData, String xRequestId) {
         try {
             restTemplate.exchange(
                 SIGN_SAVE,
                 HttpMethod.POST,
-                new HttpEntity<>(signData, httpHeaders),
+                new HttpEntity<>(signData, getHttpHeaders(xRequestId)),
                 Void.class,
                 digitalUserId
             );
@@ -164,12 +162,12 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
     }
 
     @Override
-    public void removeSign(String digitalId, String pprbGuid) {
+    public void removeSign(String digitalId, String pprbGuid, String xRequestId) {
         try {
             restTemplate.exchange(
                 SIGN_REMOVE,
                 HttpMethod.DELETE,
-                new HttpEntity<>(httpHeaders),
+                new HttpEntity<>(getHttpHeaders(xRequestId)),
                 Void.class,
                 digitalId,
                 pprbGuid);
@@ -186,7 +184,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             ResponseEntity<ListResponse<CounterpartyView>> response = restTemplate.exchange(
                 VIEW,
                 HttpMethod.POST,
-                new HttpEntity<>(filter, httpHeaders),
+                new HttpEntity<>(filter, getHttpHeaders()),
                 new ParameterizedTypeReference<>() {
                 },
                 digitalId
@@ -206,7 +204,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             ResponseEntity<Boolean> response = restTemplate.exchange(
                 CHECK_MIGRATION,
                 HttpMethod.GET,
-                new HttpEntity<>(httpHeaders),
+                new HttpEntity<>(getHttpHeaders()),
                 new ParameterizedTypeReference<>() {
                 },
                 digitalId
@@ -225,7 +223,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
             ResponseEntity<Set<String>> response = restTemplate.exchange(
                 GET_HOUSING_INN,
                 HttpMethod.POST,
-                new HttpEntity<>(counterpartyInns, httpHeaders),
+                new HttpEntity<>(counterpartyInns, getHttpHeaders()),
                 new ParameterizedTypeReference<>() {
                 },
                 digitalId
@@ -245,7 +243,7 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
                 restTemplate.exchange(
                     CHECK_REQUISITES,
                     HttpMethod.POST,
-                    new HttpEntity<>(request, httpHeaders),
+                    new HttpEntity<>(request, getHttpHeaders()),
                     new ParameterizedTypeReference<>() {}
                 )
             );
@@ -255,5 +253,19 @@ public class LegacySbbolAdapterImpl implements LegacySbbolAdapter {
         } catch (Exception e) {
             throw new SbbolException(e.getMessage(), e);
         }
+    }
+
+    private HttpHeaders getHttpHeaders() {
+        return getHttpHeaders(null);
+    }
+
+    private HttpHeaders getHttpHeaders(String xRequestId) {
+        var httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        if (hasText(xRequestId)) {
+            httpHeaders.set("x-request-id", xRequestId);
+        }
+        return httpHeaders;
     }
 }

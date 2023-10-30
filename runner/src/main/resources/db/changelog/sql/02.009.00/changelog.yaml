@@ -17,3 +17,6 @@ databaseChangeLog:
   - include:
       file: 1697276539886_change_budget_mask.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1697276539887_add_columns_for_sbbol_replication.sql
+      relativeToChangelogFile: true

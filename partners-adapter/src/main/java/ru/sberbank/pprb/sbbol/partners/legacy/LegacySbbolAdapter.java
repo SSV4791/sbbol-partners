@@ -21,26 +21,29 @@ public interface LegacySbbolAdapter {
      *
      * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
      * @param pprbGuid  идентификатор контрагента в ППРБ
+     * @param xRequestId  идентификатор запроса
      */
-    void delete(String digitalId, String pprbGuid);
+    void delete(String digitalId, String pprbGuid, String xRequestId);
 
     /**
      * Добавить нового контрагента
      *
      * @param digitalId    идентификатор договора ДБО организации в фабрике ППРБ
      * @param counterparty данные контрагента
+     * @param xRequestId  идентификатор запроса
      * @return Донные сохраненного контрагента
      */
-    Counterparty create(String digitalId, Counterparty counterparty);
+    Counterparty create(String digitalId, Counterparty counterparty, String xRequestId);
 
     /**
      * Изменение существующего контрагента
      *
      * @param digitalId    идентификатор договора ДБО организации в фабрике ППРБ
      * @param counterparty данные контрагента
+     * @param xRequestId  идентификатор запроса
      * @return Донные измененного контрагента
      */
-    Counterparty update(String digitalId, Counterparty counterparty);
+    Counterparty update(String digitalId, Counterparty counterparty, String xRequestId);
 
     /**
      * Получить контрагентов организации
@@ -64,16 +67,18 @@ public interface LegacySbbolAdapter {
      *
      * @param digitalUserId идентификатор пользователя подписавшего документ
      * @param signData      данные подписи контрагента
+     * @param xRequestId    идентификатор запроса
      */
-    void saveSign(String digitalUserId, CounterpartySignData signData);
+    void saveSign(String digitalUserId, CounterpartySignData signData, String xRequestId);
 
     /**
      * Удаление подписи контрагента
      *
      * @param digitalId идентификатор договора ДБО организации в фабрике ППРБ
      * @param pprbGuid  идентификатор контрагента в ППРБ
+     * @param xRequestId  идентификатор запроса
      */
-    void removeSign(String digitalId, String pprbGuid);
+    void removeSign(String digitalId, String pprbGuid, String xRequestId);
 
     /**
      * Получить контрагентов организации с пагинацией

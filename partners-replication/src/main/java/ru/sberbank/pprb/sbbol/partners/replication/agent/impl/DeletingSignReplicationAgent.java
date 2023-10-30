@@ -29,6 +29,6 @@ public class DeletingSignReplicationAgent extends AbstractReplicationAgent {
     @Override
     protected void replicateToSbbol(ReplicationEntity entity) {
         var accountId = entity.getEntityData();
-        sbbolAdapter.removeSign(entity.getDigitalId(), accountId);
+        sbbolAdapter.removeSign(entity.getDigitalId(), accountId, entity.getRequestId());
     }
 }

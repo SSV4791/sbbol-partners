@@ -2,6 +2,7 @@ package ru.sberbank.pprb.sbbol.partners.service.replication.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
@@ -13,6 +14,7 @@ import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountSingMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
+import ru.sberbank.pprb.sbbol.partners.replication.entity.ReplicationEntity;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType;
 import ru.sberbank.pprb.sbbol.partners.replication.exception.NotFoundReplicationEntityMapperException;
 import ru.sberbank.pprb.sbbol.partners.replication.mapper.ReplicationEntityMapperRegistry;
@@ -26,6 +28,7 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_COUNTERPARTY;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_SIGN;
@@ -200,28 +203,30 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     private void handleCreatingCounterparty(String digitalId, Counterparty counterparty) {
         LOG.debug("Сохраняем в очередь реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        saveReplicationEntityToMessageQueue(
+        var replicationEntity = saveReplicationEntityToMessageQueue(
             digitalId,
             mapUuid(counterparty.getPprbGuid()),
             CREATING_COUNTERPARTY,
             counterparty
         );
         LOG.debug("Отправляем реплику по созданию контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        legacySbbolAdapter.create(digitalId, counterparty);
+        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+        legacySbbolAdapter.create(digitalId, counterparty, xRequestId);
         LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
         raceConditionResolver.resolve(CREATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
     }
 
     private void handleUpdatingCounterparty(String digitalId, Counterparty counterparty) {
         LOG.debug("Сохраняем в очередь реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        saveReplicationEntityToMessageQueue(
+        var replicationEntity = saveReplicationEntityToMessageQueue(
             digitalId,
             mapUuid(counterparty.getPprbGuid()),
             UPDATING_COUNTERPARTY,
             counterparty
         );
+        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
         LOG.debug("Отправляем реплику по изменению контрагента в СББОЛ Legacy. digitalId={}. counterparty={}", digitalId, counterparty);
-        legacySbbolAdapter.update(digitalId, counterparty);
+        legacySbbolAdapter.update(digitalId, counterparty, xRequestId);
         LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterparty.getPprbGuid={}", mapUuid(counterparty.getPprbGuid()));
         raceConditionResolver.resolve(UPDATING_COUNTERPARTY, mapUuid(counterparty.getPprbGuid()), digitalId);
 
@@ -229,21 +234,22 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     private void handleDeletingCounterparty(String digitalId, String counterpartyId) {
         LOG.debug("Сохраняем в очередь реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
-        saveReplicationEntityToMessageQueue(
+        var replicationEntity = saveReplicationEntityToMessageQueue(
             digitalId,
             mapUuid(counterpartyId),
             DELETING_COUNTERPARTY,
             counterpartyId
         );
         LOG.debug("Отправляем реплику по удалению контрагента в СББОЛ Legacy. digitalId={}, сounterpartyId={}", digitalId, counterpartyId);
-        legacySbbolAdapter.delete(digitalId, counterpartyId);
+        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+        legacySbbolAdapter.delete(digitalId, counterpartyId, xRequestId);
         LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", mapUuid(counterpartyId));
         raceConditionResolver.resolve(DELETING_COUNTERPARTY, mapUuid(counterpartyId), digitalId);
     }
 
     private void handleCreatingSign(String digitalId, String digitalUserId, CounterpartySignData signData) {
         LOG.debug("Сохраняем в очередь реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
-        saveReplicationEntityToMessageQueue(
+        var replicationEntity = saveReplicationEntityToMessageQueue(
             digitalId,
             digitalUserId,
             signData.getPprbGuid(),
@@ -252,32 +258,34 @@ public class ReplicationServiceImpl implements ReplicationService {
         );
         var counterpartyId = signData.getPprbGuid();
         LOG.debug("Отправляем реплику по созданию подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, signData);
-        legacySbbolAdapter.saveSign(digitalUserId, signData);
+        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+        legacySbbolAdapter.saveSign(digitalUserId, signData, xRequestId);
         LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
         raceConditionResolver.resolve(CREATING_SIGN, counterpartyId, digitalId);
     }
 
     private void handleDeletingSign(String digitalId, String counterpartyId) {
         LOG.debug("Сохраняем в очередь реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
-        saveReplicationEntityToMessageQueue(
+        var replicationEntity = saveReplicationEntityToMessageQueue(
             digitalId,
             mapUuid(counterpartyId),
             DELETING_SIGN,
             counterpartyId
         );
         LOG.debug("Отправляем реплику по удалению подписи в СББОЛ Legacy. digitalId={}, signData={}", digitalId, counterpartyId);
-        legacySbbolAdapter.removeSign(digitalId, counterpartyId);
+        var xRequestId = isNull(replicationEntity) ? getXRequestIdFromMDC() : replicationEntity.getRequestId();
+        legacySbbolAdapter.removeSign(digitalId, counterpartyId, xRequestId);
         LOG.debug("Запускаем задание ReplicationRaceConditionResolver для counterpartyId={}", counterpartyId);
         raceConditionResolver.resolve(DELETING_SIGN, mapUuid(counterpartyId), digitalId);
     }
 
-    private <T> void saveReplicationEntityToMessageQueue(
+    private <T> ReplicationEntity saveReplicationEntityToMessageQueue(
         String digitalId,
         UUID entityId,
         ReplicationEntityType replicationEntityType,
         T replicationEntity
     ) {
-        saveReplicationEntityToMessageQueue(
+        return saveReplicationEntityToMessageQueue(
             digitalId,
             null,
             entityId,
@@ -286,7 +294,7 @@ public class ReplicationServiceImpl implements ReplicationService {
         );
     }
 
-    private <T> void saveReplicationEntityToMessageQueue(
+    private <T> ReplicationEntity saveReplicationEntityToMessageQueue(
         String digitalId,
         String digitalUserId,
         UUID entityId,
@@ -302,7 +310,12 @@ public class ReplicationServiceImpl implements ReplicationService {
                 entityId,
                 replicationEntityType,
                 replicationEntity);
-            replicationRepository.save(entity);
+            return replicationRepository.save(entity);
         }
+        return null;
+    }
+
+    private String getXRequestIdFromMDC() {
+        return MDC.get("requestUid");
     }
 }

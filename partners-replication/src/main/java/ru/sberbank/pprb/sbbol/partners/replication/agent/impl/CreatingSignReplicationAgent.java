@@ -31,6 +31,6 @@ public class CreatingSignReplicationAgent extends AbstractReplicationAgent {
     @Override
     protected void replicateToSbbol(ReplicationEntity entity) throws JsonProcessingException {
         var сounterpartySignData = objectMapper.readValue(entity.getEntityData(), CounterpartySignData.class);
-        sbbolAdapter.saveSign(entity.getDigitalUserId(), сounterpartySignData);
+        sbbolAdapter.saveSign(entity.getDigitalUserId(), сounterpartySignData, entity.getRequestId());
     }
 }

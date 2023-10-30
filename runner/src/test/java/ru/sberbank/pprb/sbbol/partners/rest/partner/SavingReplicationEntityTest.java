@@ -81,7 +81,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -108,7 +108,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         var request = PartnerControllerTest.getValidFullModelLegalEntityPartner();
         var createdPartner = post(
             baseRoutePath + "/full-model",
@@ -140,10 +140,10 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .update(any(), any());
+            .update(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -176,10 +176,10 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .update(any(), any());
+            .update(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -210,10 +210,10 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .delete(any(), any());
+            .delete(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -244,10 +244,10 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .delete(any(), any());
+            .delete(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -284,10 +284,10 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .saveSign(any(), any());
+            .saveSign(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -318,10 +318,10 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .removeSign(any(), any());
+            .removeSign(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -353,10 +353,10 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             .getByPprbGuid(any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .create(any(), any());
+            .create(any(), any(), any());
         doThrow(SbbolException.class)
             .when(legacySbbolAdapter)
-            .update(any(), any());
+            .update(any(), any(), any());
         var partner = createValidPartner();
         var account = createValidAccount(
             partner.getId(),
@@ -387,7 +387,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         );
         doReturn(new Counterparty())
             .when(legacySbbolAdapter)
-            .update(any(), any());
+            .update(any(), any(), any());
         changeAccount(updateAccount(updatedAccount));
         actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         assertThat(actualReplicationEntities)
@@ -409,7 +409,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         doReturn(null)
             .when(legacySbbolAdapter)
             .getByPprbGuid(any(), any());
-        when(legacySbbolAdapter.create(any(), any()))
+        when(legacySbbolAdapter.create(any(), any(), any()))
             .thenReturn(new Counterparty());
         var partner = createValidPartner();
         doReturn(new Counterparty())
@@ -478,7 +478,9 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
                         "version",
                         "lastModifiedDate",
                         "entityData",
-                        "createDate")
+                        "createDate",
+                        "requestId"
+                    )
                     .isEqualTo(expectedReplicationEntity);
             } else {
                 assertThat(actualReplicationEntity)
@@ -490,7 +492,9 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
                         "lastModifiedDate",
                         "entityData",
                         "createDate",
-                        "retry")
+                        "retry",
+                        "requestId"
+                    )
                     .isEqualTo(expectedReplicationEntity);
             }
         }
