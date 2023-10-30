@@ -4,7 +4,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PhoneEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.PhonesFilter;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -15,8 +14,8 @@ import java.util.List;
 
 public class PhoneViewRepositoryImpl extends BaseRepository<PhoneEntity, PhonesFilter> implements PhoneViewRepository {
 
-    public PhoneViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, PhoneEntity.class);
+    public PhoneViewRepositoryImpl() {
+        super(PhoneEntity.class);
     }
 
     @Override

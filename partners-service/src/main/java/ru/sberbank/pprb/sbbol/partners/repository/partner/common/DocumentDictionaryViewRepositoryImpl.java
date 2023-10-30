@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeLegalFormEntit
 import ru.sberbank.pprb.sbbol.partners.model.DocumentTypeFilter;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,8 +22,8 @@ import static java.util.stream.Collectors.toList;
 public class DocumentDictionaryViewRepositoryImpl
     extends BaseRepository<DocumentTypeEntity, DocumentTypeFilter> implements DocumentDictionaryViewRepository{
 
-    protected DocumentDictionaryViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, DocumentTypeEntity.class);
+    protected DocumentDictionaryViewRepositoryImpl() {
+        super(DocumentTypeEntity.class);
     }
 
     @Override

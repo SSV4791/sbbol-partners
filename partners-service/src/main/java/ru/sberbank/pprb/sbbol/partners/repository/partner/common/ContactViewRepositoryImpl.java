@@ -4,7 +4,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.ContactEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -15,8 +14,8 @@ import java.util.List;
 
 public class ContactViewRepositoryImpl extends BaseRepository<ContactEntity, ContactsFilter> implements ContactViewRepository {
 
-    public ContactViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, ContactEntity.class);
+    public ContactViewRepositoryImpl() {
+        super(ContactEntity.class);
     }
 
     @Override

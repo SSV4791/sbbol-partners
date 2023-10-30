@@ -5,7 +5,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.renter.model.RenterFilter;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -16,8 +15,8 @@ import java.util.List;
 
 public class RenterViewRepositoryImpl extends BaseRepository<PartnerEntity, RenterFilter> implements RenterViewRepository {
 
-    public RenterViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, PartnerEntity.class);
+    public RenterViewRepositoryImpl() {
+        super(PartnerEntity.class);
     }
 
     @Override

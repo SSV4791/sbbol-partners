@@ -14,7 +14,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.SearchDateTime;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.BudgetMaskDictionaryRepository;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -36,10 +35,9 @@ public class AccountViewRepositoryImpl
     private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;
 
     public AccountViewRepositoryImpl(
-        EntityManager entityManager,
         BudgetMaskDictionaryRepository budgetMaskDictionaryRepository
     ) {
-        super(entityManager, AccountEntity.class);
+        super(AccountEntity.class);
         this.budgetMaskDictionaryRepository = budgetMaskDictionaryRepository;
     }
 

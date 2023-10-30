@@ -12,7 +12,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -27,8 +26,8 @@ import java.util.Objects;
 public class AccountAndPartnerRepositoryImpl extends BaseRepository<AccountEntity, AccountAndPartnerRequest>
     implements AccountAndPartnerRepository {
 
-    protected AccountAndPartnerRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, AccountEntity.class);
+    protected AccountAndPartnerRepositoryImpl() {
+        super(AccountEntity.class);
     }
 
     @Override
