@@ -25,7 +25,7 @@ public class PartnerEmailServiceImpl extends EmailServiceImpl {
     @Transactional
     public Email saveEmail(EmailCreate email) {
         var partnerId = email.getUnifiedId();
-        partnerService.getPartner(email.getDigitalId(), partnerId);
+        partnerService.existsPartner(email.getDigitalId(), partnerId);
         return super.saveEmail(email);
     }
 }

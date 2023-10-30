@@ -24,7 +24,7 @@ public class PartnerAddressServiceImpl extends AddressServiceImpl {
     @Override
     @Transactional
     public Address saveAddress(AddressCreate address) {
-        partnerService.getPartner(address.getDigitalId(), address.getUnifiedId());
+        partnerService.existsPartner(address.getDigitalId(), address.getUnifiedId());
         return super.saveAddress(address);
     }
 }

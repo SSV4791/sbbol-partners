@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
+import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
+import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
@@ -25,6 +27,23 @@ public interface PartnerService {
      * @return Партнер
      */
     Partner getPartner(String digitalId, UUID id);
+
+    /**
+     * Проверка существования Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param id        Идентификатор Партнера
+     */
+    void existsPartner(String digitalId, UUID id) throws EntryNotFoundException;
+
+    /**
+     * Получение типа Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param id        Идентификатор Партнера
+     * @return Тип партнер
+     */
+    LegalForm getPartnerLegalForm(String digitalId, UUID id);
 
     /**
      * Получение списка Партнеров по заданному фильтру

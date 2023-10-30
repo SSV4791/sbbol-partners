@@ -25,7 +25,7 @@ public class PartnerPhoneServiceImpl extends PhoneServiceImpl {
     @Transactional
     public Phone savePhone(PhoneCreate phone) {
         var partnerId = phone.getUnifiedId();
-        partnerService.getPartner(phone.getDigitalId(), partnerId);
+        partnerService.existsPartner(phone.getDigitalId(), partnerId);
         return super.savePhone(phone);
     }
 }
