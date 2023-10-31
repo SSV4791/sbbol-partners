@@ -1,8 +1,5 @@
 databaseChangeLog:
   - include:
-      file: 1692625249905_normalization_partner_search.sql
-      relativeToChangelogFile: true
-  - include:
       file: 1692625249906_update_column_create_date_sbbol_replication.sql
       relativeToChangelogFile: true
   - include:
