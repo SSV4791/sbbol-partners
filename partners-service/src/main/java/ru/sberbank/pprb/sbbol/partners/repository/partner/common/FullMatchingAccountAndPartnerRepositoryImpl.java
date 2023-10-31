@@ -13,7 +13,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -34,10 +33,9 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
     private final PartnerMapper partnerMapper;
 
     protected FullMatchingAccountAndPartnerRepositoryImpl(
-        EntityManager entityManager,
         PartnerMapper partnerMapper
     ) {
-        super(entityManager, AccountEntity.class);
+        super(AccountEntity.class);
         this.partnerMapper = partnerMapper;
     }
 

@@ -4,7 +4,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.EmailEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.EmailsFilter;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -15,8 +14,8 @@ import java.util.List;
 
 public class EmailViewRepositoryImpl extends BaseRepository<EmailEntity, EmailsFilter> implements EmailViewRepository {
 
-    public EmailViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, EmailEntity.class);
+    public EmailViewRepositoryImpl() {
+        super(EmailEntity.class);
     }
 
     @Override

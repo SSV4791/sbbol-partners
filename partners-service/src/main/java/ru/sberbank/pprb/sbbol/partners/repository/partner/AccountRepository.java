@@ -55,7 +55,6 @@ public interface AccountRepository extends
      * @param partnerUuid Идентификатор партнера
      * @return Счёта партнера
      */
-
     List<AccountEntity> findByDigitalIdAndPartnerUuidAndPriorityAccountIsTrue(String digitalId, UUID partnerUuid);
 
     /**
@@ -64,6 +63,5 @@ public interface AccountRepository extends
      * @param digitalId Идентификатор личного кабинета
      * @param search    Данный для поиска
      */
-
     AccountEntity findByDigitalIdAndSearch(String digitalId, String search);
 }

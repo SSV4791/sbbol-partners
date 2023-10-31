@@ -6,7 +6,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.DocumentTypeEntity_;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -18,8 +17,8 @@ import java.util.List;
 
 public class DocumentViewRepositoryImpl extends BaseRepository<DocumentEntity, DocumentsFilter> implements DocumentViewRepository {
 
-    public DocumentViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, DocumentEntity.class);
+    public DocumentViewRepositoryImpl() {
+        super(DocumentEntity.class);
     }
 
     @Override

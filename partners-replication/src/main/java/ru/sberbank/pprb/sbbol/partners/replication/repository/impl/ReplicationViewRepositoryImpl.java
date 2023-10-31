@@ -20,8 +20,8 @@ public class ReplicationViewRepositoryImpl
     extends BaseRepository<ReplicationEntity, ReplicationFilter>
     implements ReplicationViewRepository {
 
-    protected ReplicationViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, ReplicationEntity.class);
+    protected ReplicationViewRepositoryImpl() {
+        super(ReplicationEntity.class);
     }
 
     @Override

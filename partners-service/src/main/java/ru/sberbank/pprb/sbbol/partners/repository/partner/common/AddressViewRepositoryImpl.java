@@ -5,7 +5,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.AddressEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -16,8 +15,8 @@ import java.util.List;
 
 public class AddressViewRepositoryImpl extends BaseRepository<AddressEntity, AddressesFilter> implements AddressViewRepository {
 
-    public AddressViewRepositoryImpl(EntityManager entityManager) {
-        super(entityManager, AddressEntity.class);
+    public AddressViewRepositoryImpl() {
+        super(AddressEntity.class);
     }
 
     @Override

@@ -7,7 +7,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -22,10 +21,8 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.s
 
 public class AccountSearchRepositoryImpl extends BaseRepository<AccountEntity, AccountSignInfoRequisites> implements AccountSearchRepository {
 
-    public AccountSearchRepositoryImpl(
-        EntityManager entityManager
-    ) {
-        super(entityManager, AccountEntity.class);
+    public AccountSearchRepositoryImpl() {
+        super(AccountEntity.class);
     }
 
     @Override

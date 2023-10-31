@@ -4,6 +4,7 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -16,11 +17,11 @@ import java.util.UUID;
 
 abstract class BaseRepository<T, F> {
 
-    private final EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
     private final Class<T> clazz;
 
-    protected BaseRepository(EntityManager entityManager, Class<T> clazz) {
-        this.entityManager = entityManager;
+    protected BaseRepository(Class<T> clazz) {
         this.clazz = clazz;
     }
 
