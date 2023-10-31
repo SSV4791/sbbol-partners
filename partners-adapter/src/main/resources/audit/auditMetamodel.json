@@ -439,6 +439,186 @@
       ]
     },
     {
+      "name": "partner_full_model_update_success",
+      "description": "Успешное обновление Партнера полной модели",
+      "success": "true",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "id",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "legalForm",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "orgName",
+          "description": "Наименование организации партнера"
+        },
+        {
+          "name": "firstName",
+          "description": "Имя партнера"
+        },
+        {
+          "name": "secondName",
+          "description": "Фамилия партнера"
+        },
+        {
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "accounts",
+          "description": "Список счетов с реквизитами"
+        },
+        {
+          "name": "documents",
+          "description": "Документы физического лица"
+        },
+        {
+          "name": "address",
+          "description": "Массив с юридическими\\фактическими адресами партнера"
+        },
+        {
+          "name": "contacts",
+          "description": "Контактные лица партнера"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "gku",
+          "description": "Признак поставщика ЖКУ"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        }
+      ]
+    },
+    {
+      "name": "partner_full_model_update_error",
+      "description": "Неуспешное обновление Партнера полной модели",
+      "success": "false",
+      "mode": "reliability",
+      "params": [
+        {
+          "name": "id",
+          "description": "Уникальный идентификатор Партнера"
+        },
+        {
+          "name": "digitalId",
+          "description": "Идентификатор личного кабинета клиента"
+        },
+        {
+          "name": "legalForm",
+          "description": "Правовая форма партнёра: ЮЛ\\ИП\\ФЛ"
+        },
+        {
+          "name": "version",
+          "description": "Версия документа"
+        },
+        {
+          "name": "orgName",
+          "description": "Наименование организации партнера"
+        },
+        {
+          "name": "firstName",
+          "description": "Имя партнера"
+        },
+        {
+          "name": "secondName",
+          "description": "Фамилия партнера"
+        },
+        {
+          "name": "middleName",
+          "description": "Отчество партнера"
+        },
+        {
+          "name": "inn",
+          "description": "ИНН"
+        },
+        {
+          "name": "kpp",
+          "description": "КПП"
+        },
+        {
+          "name": "ogrn",
+          "description": "ОГРН"
+        },
+        {
+          "name": "okpo",
+          "description": "ОКПО"
+        },
+        {
+          "name": "comment",
+          "description": "Комментарий"
+        },
+        {
+          "name": "citizenship",
+          "description": "Гражданство физического лица"
+        },
+        {
+          "name": "accounts",
+          "description": "Список счетов с реквизитами"
+        },
+        {
+          "name": "phones",
+          "description": "Номера телефонов партнера"
+        },
+        {
+          "name": "emails",
+          "description": "Адреса электронной почты партнера"
+        },
+        {
+          "name": "contacts",
+          "description": "Контактные лица партнера"
+        },
+        {
+          "name": "address",
+          "description": "Массив с юридическими\\фактическими адресами партнера"
+        },
+        {
+          "name": "documents",
+          "description": "Документы физического лица"
+        }
+      ]
+    },
+    {
       "name": "partner_create_success",
       "description": "Успешное создание Партнера",
       "success": "true",
