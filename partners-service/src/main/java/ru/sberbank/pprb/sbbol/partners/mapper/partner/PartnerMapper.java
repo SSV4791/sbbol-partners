@@ -26,6 +26,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,9 +67,7 @@ public interface PartnerMapper {
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "changeDate", source = "lastModifiedDate")
     @Mapping(target = "gku", source = "gkuInnEntity", qualifiedByName = "isGku")
-    @Mapping(target = "phones", ignore = true)
-    @Mapping(target = "emails", ignore = true)
-    Partner toPartnerWithoutPhoneAndEmail(PartnerEntity partner);
+    PartnerInfo toPartnerInfo(PartnerEntity partner);
 
     @Named("toLegalType")
     static LegalForm toLegalType(LegalType legalType) {

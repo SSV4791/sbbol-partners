@@ -6,7 +6,7 @@
     "partners": {
       "type": "array",
       "items": {
-        "$ref": "partner.json"
+        "$ref": "partner_info.json"
       },
       "title": "Партнеры"
     },

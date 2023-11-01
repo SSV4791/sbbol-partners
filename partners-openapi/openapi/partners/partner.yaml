@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners
-  version: 1.1.8
+  version: 1.1.9
   description: OpenAPI Specification for partners
 
 servers:

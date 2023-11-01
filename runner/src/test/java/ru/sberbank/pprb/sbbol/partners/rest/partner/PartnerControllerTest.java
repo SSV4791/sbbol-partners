@@ -47,6 +47,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFilterType;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Phone;
@@ -79,16 +80,16 @@ import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
-import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidCorrAccountNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidCorrAccountNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOkpoNumber;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_MODEL_VALIDATION_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidAccount;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.AccountControllerTest.createValidBudgetAccount;
@@ -893,10 +894,10 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        List<Partner> partners = response.getPartners();
+        List<PartnerInfo> partners = response.getPartners();
         assertThat(partners)
             .hasSameSizeAs(filter.getLegalForms());
-        for (Partner partner : partners) {
+        for (PartnerInfo partner : partners) {
             assertThat(filter.getLegalForms())
                 .contains(partner.getLegalForm());
         }
@@ -913,10 +914,10 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         );
         assertThat(response)
             .isNotNull();
-        List<Partner> partners = response.getPartners();
+        List<PartnerInfo> partners = response.getPartners();
         assertThat(partners)
             .hasSameSizeAs(filter.getIds());
-        for (Partner partner : partners) {
+        for (var partner : partners) {
             assertThat(filter.getIds())
                 .contains(partner.getId());
         }

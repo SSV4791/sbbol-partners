@@ -19,7 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
-import ru.sberbank.pprb.sbbol.partners.model.Partner;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
 
 import java.util.Collections;
 import java.util.List;
@@ -142,12 +142,12 @@ public interface AccountMapper {
     @Mapping(target = "gku", source = "partner.gkuInnEntity", qualifiedByName = "isGku")
     AccountWithPartnerResponse toAccountWithPartner(AccountEntity accountEntity);
 
-    default List<AccountWithPartnerResponse> toAccountsWithPartner(Partner partner) {
+    default List<AccountWithPartnerResponse> toAccountsWithPartner(PartnerInfo partner) {
         return List.of(toAccountWithPartner(partner));
     }
 
     @Mapping(target = "account", ignore = true)
-    AccountWithPartnerResponse toAccountWithPartner(Partner partner);
+    AccountWithPartnerResponse toAccountWithPartner(PartnerInfo partner);
 
     default String prepareSearchField(
         UUID partnerUUID,
