@@ -8,6 +8,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 
@@ -62,7 +63,7 @@ public interface PartnerService {
      * @param kpp       КПП Партнера
      * @return Партнер
      */
-    Partner findPartner(String digitalId, String name, String inn, String kpp);
+    PartnerInfo findPartner(String digitalId, String name, String inn, String kpp);
 
     /**
      * Создание нового Партнера со всеми дочерними сущностями

@@ -21,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
+import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
@@ -114,13 +115,17 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void existsPartner(String digitalId, UUID id) throws EntryNotFoundException {
-        if (!partnerRepository.existsByDigitalIdAndUuid(digitalId, id)) {
+        Optional<PartnerEntity> partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id)
+            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType());
+        if (partner.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
         }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LegalForm getPartnerLegalForm(String digitalId, UUID id) {
         PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id)
             .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
@@ -129,22 +134,22 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    public Partner findPartner(@NotNull String digitalId, String name, String inn, String kpp) {
+    @Transactional(readOnly = true)
+    public PartnerInfo findPartner(@NotNull String digitalId, String name, String inn, String kpp) {
         var search = prepareSearchString(inn, kpp, name);
         var foundPartner = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
         if (Objects.isNull(foundPartner)) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId);
         }
-        return partnerMapper.toPartnerWithoutPhoneAndEmail(foundPartner);
+        return partnerMapper.toPartnerInfo(foundPartner);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PartnersResponse getPartners(PartnersFilter partnersFilter) {
         PartnersResponse partnersResponse = new PartnersResponse();
         var response = partnerRepository.findByFilter(partnersFilter);
         for (PartnerEntity entity : response) {
-            partnersResponse.addPartnersItem(partnerMapper.toPartner(entity));
+            partnersResponse.addPartnersItem(partnerMapper.toPartnerInfo(entity));
         }
         var pagination = partnersFilter.getPagination();
         partnersResponse.setPagination(
@@ -157,11 +162,7 @@ public class PartnerServiceImpl implements PartnerService {
             partnersResponse.getPagination().hasNextPage(Boolean.TRUE);
             partnersResponse.getPartners().remove(size - 1);
         }
-        var partners = partnersResponse.getPartners();
-        if (isEmpty(partners)) {
-            return partnersResponse;
-        }
-        return partnersResponse.partners(partners);
+        return partnersResponse;
     }
 
     @Override

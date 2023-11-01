@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Облегченный партнер для списочной формы",
+  "x-extra-class-annotation": "@InnLengthValidation @PartnerNameValidation @OgrnLengthValidation @OkpoValidataion",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "title": "Уникальный идентификатор партнера"
+    },
+    "digitalId": {
+      "type": "string",
+      "title": "Идентификатор личного кабинета клиента",
+      "minLength": 1,
+      "maxLength": 40,
+      "x-not-empty": true
+    },
+    "changeDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2023-08-15T15:43:00.445053+03:00"
+    },
+    "version": {
+      "type": "integer",
+      "format": "int64",
+      "title": "Версия"
+    },
+    "legalForm": {
+      "$ref": "../common/legal_form.json"
+    },
+    "orgName": {
+      "type": "string",
+      "title": "Наименование организации партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 160,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "Имя партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]+",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "secondName": {
+      "type": "string",
+      "title": "Фамилия партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Отчество партнера",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\[\\\\\\]^_`{|}~\\r\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 50,
+      "x-length-message": "{validation.partner.max_symbols}"
+    },
+    "inn": {
+      "type": "string",
+      "pattern": "[0-9]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "title": "ИНН",
+      "x-extra-field-annotation": "@InnControlNumberValidation"
+    },
+    "kpp": {
+      "type": "string",
+      "title": "КПП",
+      "pattern": "[0-9A-Z]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}",
+      "maxLength": 9,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "x-extra-field-annotation": "@KppValidation"
+    },
+    "ogrn": {
+      "type": "string",
+      "title": "ОГРН",
+      "x-extra-field-annotation": "@OgrnKeyValidation"
+    },
+    "okpo": {
+      "type": "string",
+      "title": "ОКПО",
+      "pattern": "[0-9]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
+    },
+    "comment": {
+      "type": "string",
+      "title": "Комментарий пользователя",
+      "maxLength": 255,
+      "x-length-message": "{validation.partner.max_symbols}",
+      "pattern": "[A-Za-zА-Яа-я0-9Ёё!\\\"№#$%&'() *+,-./:;<=>?@\\\\[\\\\\\\\\\\\]^_`{|}~\\r\\n]*",
+      "x-pattern-message": "{validation.partner.illegal_symbols}"
+    },
+    "gku": {
+      "type": "boolean",
+      "title": "Признак ЖКУ",
+      "default": false
+    },
+    "citizenship": {
+      "$ref": "../common/citizenship.json"
+    }
+  },
+  "required": [
+    "id",
+    "digitalId",
+    "legalForm",
+    "version"
+  ]
+}
