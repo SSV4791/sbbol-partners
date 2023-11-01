@@ -81,6 +81,7 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "idLinks", ignore = true)
+    @Mapping(target = "partnerType", constant = "PARTNER")
     AccountEntity toAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source);
 
     default AccountStateType toSigned(boolean signed) {

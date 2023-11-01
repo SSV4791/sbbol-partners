@@ -69,6 +69,7 @@ public interface AccountMapper {
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "idLinks", ignore = true)
+    @Mapping(target = "partnerType", constant = "PARTNER")
     AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
 
     @Mapping(target = "uuid", ignore = true)
@@ -81,6 +82,7 @@ public interface AccountMapper {
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "idLinks", ignore = true)
+    @Mapping(target = "partnerType", constant = "PARTNER")
     AccountEntity toAccount(AccountCreate account);
 
     @Mapping(target = "uuid", ignore = true)

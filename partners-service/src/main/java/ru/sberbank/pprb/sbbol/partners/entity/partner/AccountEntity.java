@@ -4,6 +4,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.util.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -56,6 +57,10 @@ public class AccountEntity extends BaseEntity {
 
     @Column(name = "account", length = 20)
     private String account;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "partner_type", nullable = false, length = 254)
+    private PartnerType partnerType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", length = 10)
@@ -171,6 +176,14 @@ public class AccountEntity extends BaseEntity {
 
     public void setIdLinks(List<IdsHistoryEntity> idLinks) {
         this.idLinks = idLinks;
+    }
+
+    public PartnerType getPartnerType() {
+        return partnerType;
+    }
+
+    public void setPartnerType(PartnerType partnerType) {
+        this.partnerType = partnerType;
     }
 
     @Override

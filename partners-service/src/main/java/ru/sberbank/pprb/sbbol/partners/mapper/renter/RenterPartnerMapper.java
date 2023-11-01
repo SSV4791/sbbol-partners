@@ -118,6 +118,7 @@ public interface RenterPartnerMapper {
     @Mapping(target = "priorityAccount", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
+    @Mapping(target = "partnerType", constant = "RENTER")
     AccountEntity toAccount(Renter renter);
 
     @Named("toBank")

@@ -106,6 +106,9 @@ os_project:
     budget_mask_dictionary:
       cache:
         size: 10000
+    account:
+      include:
+        partner_type: false
 
   partner-type:
     account:
