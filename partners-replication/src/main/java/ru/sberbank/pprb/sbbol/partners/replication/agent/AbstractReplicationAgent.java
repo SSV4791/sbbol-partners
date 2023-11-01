@@ -9,6 +9,8 @@ import ru.sberbank.pprb.sbbol.partners.replication.entity.ReplicationEntity;
 import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus;
 import ru.sberbank.pprb.sbbol.partners.replication.repository.ReplicationRepository;
 
+import java.util.UUID;
+
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.ERROR;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.SUCCESS;
 
@@ -35,25 +37,26 @@ public abstract class AbstractReplicationAgent implements ReplicationAgent {
     }
 
     @Override
-    public void replicate(ReplicationEntity entity) {
+    public void replicate(ReplicationEntity entity, UUID sessionId) {
         try {
             replicateToSbbol(entity);
-            updateReplicationEntity(entity, SUCCESS);
+            updateReplicationEntity(entity, SUCCESS, sessionId);
         } catch (Exception e) {
             LOG.error(ERROR_MESSAGE_FOR_SBBOL_EXCEPTION, e.getMessage());
-            updateReplicationEntity(entity, ERROR, e.getMessage());
+            updateReplicationEntity(entity, ERROR, sessionId, e.getMessage());
         }
     }
 
-    private void updateReplicationEntity(ReplicationEntity entity, ReplicationEntityStatus newEntityStatus) {
-        updateReplicationEntity(entity, newEntityStatus, null);
+    private void updateReplicationEntity(ReplicationEntity entity, ReplicationEntityStatus newEntityStatus, UUID sessionId) {
+        updateReplicationEntity(entity, newEntityStatus, sessionId, null);
     }
 
     private void updateReplicationEntity(
-        ReplicationEntity entity, ReplicationEntityStatus newEntityStatus, String errorMessage) {
+        ReplicationEntity entity, ReplicationEntityStatus newEntityStatus, UUID sessionId, String errorMessage) {
         entity.setEntityStatus(newEntityStatus);
         entity.setRetry(entity.getRetry() + 1);
         entity.setErrorMessage(errorMessage);
+        entity.setSessionId(sessionId);
         replicationRepository.save(entity);
     }
 

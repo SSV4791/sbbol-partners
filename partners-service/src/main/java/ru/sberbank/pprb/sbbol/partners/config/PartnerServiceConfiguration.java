@@ -30,7 +30,6 @@ import ru.sberbank.pprb.sbbol.partners.mapper.renter.RenterPartnerMapper;
 import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
 import ru.sberbank.pprb.sbbol.partners.replication.mapper.ReplicationEntityMapperRegistry;
 import ru.sberbank.pprb.sbbol.partners.replication.repository.ReplicationRepository;
-import ru.sberbank.pprb.sbbol.partners.replication.resolver.ReplicationRaceConditionResolver;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
@@ -376,7 +375,6 @@ public class PartnerServiceConfiguration {
         CounterpartyMapper counterpartyMapper,
         ReplicationProperties replicationProperties,
         LegacySbbolAdapter legacySbbolAdapter,
-        ReplicationRaceConditionResolver raceConditionResolver,
         ReplicationEntityMapperRegistry mapperRegistry,
         ReplicationRepository replicationRepository
     ) {
@@ -388,7 +386,6 @@ public class PartnerServiceConfiguration {
             counterpartyMapper,
             replicationProperties,
             legacySbbolAdapter,
-            raceConditionResolver,
             mapperRegistry,
             replicationRepository
         );

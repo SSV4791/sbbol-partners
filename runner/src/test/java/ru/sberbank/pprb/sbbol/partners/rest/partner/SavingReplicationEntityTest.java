@@ -28,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.CANCEL;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.ERROR;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.INIT;
 import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityType.CREATING_COUNTERPARTY;
@@ -344,7 +343,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
     }
 
     @Test
-    void testRaceConditionResolver_whenUpdatingAccount() {
+    void testReplicationJob_whenUpdatingAccount() {
         doReturn(false)
             .when(legacySbbolAdapter)
             .checkNotMigration(any());
@@ -397,12 +396,12 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
             UPDATING_COUNTERPARTY,
             account.getDigitalId(),
             account.getId(),
-            CANCEL
+            ERROR
         );
     }
 
     @Test
-    void testRaceConditionResolver_whenCreatingAccount() {
+    void testReplicationJob_whenCreatingAccount() {
         doReturn(false)
             .when(legacySbbolAdapter)
             .checkNotMigration(any());
@@ -422,14 +421,7 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
         var actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         actualReplicationEntities = replicationRepository.findByEntityId(account.getId());
         assertThat(actualReplicationEntities)
-            .isNotNull();
-        checkReplicationEntityList(
-            actualReplicationEntities,
-            CREATING_COUNTERPARTY,
-            account.getDigitalId(),
-            account.getId(),
-            CANCEL
-        );
+            .isEmpty();
     }
 
     private void checkReplicationEntityList(
@@ -479,7 +471,8 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
                         "lastModifiedDate",
                         "entityData",
                         "createDate",
-                        "requestId"
+                        "requestId",
+                        "sessionId"
                     )
                     .isEqualTo(expectedReplicationEntity);
             } else {
@@ -493,7 +486,8 @@ class SavingReplicationEntityTest extends BaseAccountControllerTest {
                         "entityData",
                         "createDate",
                         "retry",
-                        "requestId"
+                        "requestId",
+                        "sessionId"
                     )
                     .isEqualTo(expectedReplicationEntity);
             }
