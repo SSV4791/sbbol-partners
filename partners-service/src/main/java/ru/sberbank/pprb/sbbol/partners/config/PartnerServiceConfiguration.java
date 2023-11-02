@@ -74,6 +74,8 @@ import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerEmailServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerPhoneServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PhoneService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.RenterAccountUpdaterService;
+import ru.sberbank.pprb.sbbol.partners.service.partner.RenterAccountUpdaterServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.PartnerServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterService;
 import ru.sberbank.pprb.sbbol.partners.service.renter.RenterServiceImpl;
@@ -394,5 +396,16 @@ public class PartnerServiceConfiguration {
     @Bean
     IdsHistoryService idsHistoryService(GuidsHistoryRepository idsHistoryRepository, IdsHistoryMapper idsHistoryMapper) {
         return new IdsHistoryServiceImpl(idsHistoryRepository, idsHistoryMapper);
+    }
+
+    @Bean
+    RenterAccountUpdaterService renterAccountUpdaterService(
+        PartnerRepository partnerRepository,
+        AccountRepository accountRepository
+    ) {
+        return new RenterAccountUpdaterServiceImpl(
+            partnerRepository,
+            accountRepository
+        );
     }
 }

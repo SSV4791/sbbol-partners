@@ -88,6 +88,12 @@ os_project:
         expired_period: 30
         threads: 1
 
+  scheduler:
+    account_updater:
+      enable: false
+      sleepTime: 60000
+      batchSize: 1000
+      cron: '0 0 17 ? * 6,7'
   service:
     legacy:
       cache:
@@ -100,6 +106,10 @@ os_project:
     budget_mask_dictionary:
       cache:
         size: 10000
+
+  partner-type:
+    account:
+      include: false
 
 registry_area: registry.sigma.sbrf.ru
 nexus_area: Nexus_PROD/CI02792425_sbbol-partners
