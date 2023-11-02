@@ -4,11 +4,12 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
-import ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus;
 import ru.sberbank.pprb.sbbol.partners.replication.handler.ReplicationEntityHandler;
 import ru.sberbank.pprb.sbbol.partners.replication.handler.ReplicationQueueHandler;
 import ru.sberbank.pprb.sbbol.partners.replication.repository.ReplicationRepository;
 import ru.sberbank.pprb.sbbol.partners.replication.repository.model.ReplicationFilter;
+
+import java.util.UUID;
 
 @Loggable
 public class ReplicationQueueHandlerImpl implements ReplicationQueueHandler {
@@ -30,11 +31,12 @@ public class ReplicationQueueHandlerImpl implements ReplicationQueueHandler {
     }
 
     @Override
-    public void handle(ReplicationEntityStatus entityStatus, int retry) {
+    public void handle(int retry) {
+        var sessionId = UUID.randomUUID();
         var batchSize = properties.getBatchSize();
         var filter = new ReplicationFilter()
-            .entityStatus(entityStatus)
-            .partition(retry)
+            .maxRetry(retry)
+            .sessionId(sessionId)
             .pagination(
                 new Pagination()
                     .offset(0)
@@ -46,7 +48,7 @@ public class ReplicationQueueHandlerImpl implements ReplicationQueueHandler {
                 break;
             }
             for (var entity : entities) {
-                entityHandler.handle(entity);
+                entityHandler.handle(entity, sessionId);
             }
         }
     }

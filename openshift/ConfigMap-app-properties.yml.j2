@@ -78,9 +78,6 @@ data:
     replication.sbbol.cron={{ os_project.replication.sbbol.cron | default('0 0 23 * * *') }}
     replication.sbbol.batchSize={{ os_project.replication.sbbol.batchSize | default('1000') }}
     replication.sbbol.retry={{ os_project.replication.sbbol.retry | default('2') }}
-    replication.sbbol.cleaner.enable={{ os_project.replication.sbbol.cleaner.enable | default('false') }}
-    replication.sbbol.cleaner.cron={{ os_project.replication.sbbol.cleaner.cron | default('0 0 23 * * *') }}
-    replication.sbbol.cleaner.expired-period={{ os_project.replication.sbbol.cleaner.expired_period | default('30') }}
     replication.sbbol.gku.executor.threads={{ os_project.replication.sbbol.gku.executor.threads | default('1') }}
 
     # Application Journal

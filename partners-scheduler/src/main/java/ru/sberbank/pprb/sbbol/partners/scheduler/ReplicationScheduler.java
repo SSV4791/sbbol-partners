@@ -9,7 +9,6 @@ import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobRegistry;
 import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobType;
 
 import static ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobType.REPLICATION;
-import static ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobType.REPLICATION_CLEANER;
 
 @Loggable
 public class ReplicationScheduler {
@@ -31,14 +30,6 @@ public class ReplicationScheduler {
     void replicate() {
         if (Boolean.TRUE.equals(replicationProperties.isEnable())) {
             run(REPLICATION);
-        }
-    }
-
-    @SchedulerLock(name = "sbbolReplicationCleaner")
-    @Scheduled(cron = "${replication.sbbol.cleaner.cron}")
-    void clear() {
-        if (Boolean.TRUE.equals(replicationProperties.getCleaner().getEnable())) {
-            run(REPLICATION_CLEANER);
         }
     }
 

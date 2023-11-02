@@ -55,6 +55,9 @@ public class ReplicationEntity extends BaseEntity {
     @Column(name = "error_message", length = 3000)
     private String errorMessage;
 
+    @Column(name = "session_id")
+    private UUID sessionId;
+
     @PrePersist
     private void initCreateDate() {
         if (isEmpty(createDate)) {
@@ -104,6 +107,11 @@ public class ReplicationEntity extends BaseEntity {
 
     public ReplicationEntity errorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+        return this;
+    }
+
+    public ReplicationEntity sessionId(UUID sessionId) {
+        this.sessionId = sessionId;
         return this;
     }
 
@@ -187,6 +195,14 @@ public class ReplicationEntity extends BaseEntity {
         this.errorMessage = errorMessage;
     }
 
+    public UUID getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -225,6 +241,7 @@ public class ReplicationEntity extends BaseEntity {
             ", retry=" + retry +
             ", requestId='" + requestId + '\'' +
             ", errorMessage='" + errorMessage + '\'' +
+            ", sessionId=" + sessionId +
             '}';
     }
 }

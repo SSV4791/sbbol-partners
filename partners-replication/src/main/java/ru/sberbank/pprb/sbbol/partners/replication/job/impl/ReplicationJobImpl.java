@@ -6,8 +6,6 @@ import ru.sberbank.pprb.sbbol.partners.replication.handler.ReplicationQueueHandl
 import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJob;
 import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobType;
 
-import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.ERROR;
-import static ru.sberbank.pprb.sbbol.partners.replication.entity.enums.ReplicationEntityStatus.INIT;
 import static ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobType.REPLICATION;
 
 @Loggable
@@ -28,19 +26,6 @@ public class ReplicationJobImpl implements ReplicationJob {
 
     @Override
     public void run() {
-        handleErrorQueues();
-        handleMainQueue();
-    }
-
-    private void handleErrorQueues() {
-        var partitionNumber =  properties.getRetry();
-        while (partitionNumber > 0) {
-            queueHandler.handle(ERROR, partitionNumber);
-            partitionNumber--;
-        }
-    }
-
-    private void handleMainQueue() {
-        queueHandler.handle(INIT, 0);
+        queueHandler.handle(properties.getRetry());
     }
 }

@@ -17,3 +17,6 @@ databaseChangeLog:
   - include:
       file: 1697276539887_add_columns_for_sbbol_replication.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1697276539888_add_column_session_id_for_sbbol_replication.sql
+      relativeToChangelogFile: true
