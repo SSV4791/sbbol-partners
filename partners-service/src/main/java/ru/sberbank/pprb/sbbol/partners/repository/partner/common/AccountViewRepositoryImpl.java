@@ -3,7 +3,6 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BudgetMaskEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity_;
@@ -18,7 +17,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -54,7 +52,6 @@ public class AccountViewRepositoryImpl
         Root<AccountEntity> root,
         AccountsFilter filter
     ) {
-        addFetchPredicate(root);
         addDigitalIdPredicate(builder, predicates, root, filter);
         addUuidPredicate(builder, predicates, root, filter);
         addPartnerUuidPredicate(builder, predicates, root, filter);
@@ -66,12 +63,6 @@ public class AccountViewRepositoryImpl
         addChangeDatePredicate(builder, predicates, root, filter);
         addBudgetPredicate(builder, predicates, root, filter);
         addGkuPredicate(predicates, root, filter);
-    }
-
-    private void addFetchPredicate(Root<AccountEntity> root) {
-        root
-            .fetch(AccountEntity_.BANK, JoinType.INNER)
-            .fetch(BankEntity_.BANK_ACCOUNT, JoinType.LEFT);
     }
 
     private void addDigitalIdPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
