@@ -339,11 +339,13 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "search",
                 "state",
                 "partner",
+                "partnerType",
                 "idLinks",
                 "bank.uuid",
                 "bank.lastModifiedDate",
                 "bank.account.uuid",
                 "bank.account.partner",
+                "bank.account.partnerType",
                 "bank.account.createDate",
                 "bank.account.lastModifiedDate",
                 "bank.account.search",
@@ -352,7 +354,6 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "bank.account.idLinks",
                 "bank.bankAccount.uuid",
                 "bank.bankAccount.lastModifiedDate"
-
             )
             .isEqualTo(expectedAccountEntity);
     }
@@ -381,6 +382,7 @@ class AccountMapperTest extends BaseUnitConfiguration {
                 "createDate",
                 "lastModifiedDate",
                 "priorityAccount",
+                "partnerType",
                 "search",
                 "state",
                 "partner",

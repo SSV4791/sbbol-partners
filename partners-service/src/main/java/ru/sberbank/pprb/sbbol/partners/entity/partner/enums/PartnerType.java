@@ -7,7 +7,6 @@ public enum PartnerType {
 
     RENTER("Арендатор"),
     PARTNER("Партнер"),
-    BENEFICIARY("Бенефициар"),
     ;
 
     private final String desc;

@@ -1,5 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
@@ -32,6 +33,9 @@ public class AccountViewRepositoryImpl
 
     private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;
 
+    @Value("${account.include.partner-type}")
+    protected boolean excludeJoinWithPartner;
+
     public AccountViewRepositoryImpl(
         BudgetMaskDictionaryRepository budgetMaskDictionaryRepository
     ) {
@@ -55,9 +59,17 @@ public class AccountViewRepositoryImpl
         addDigitalIdPredicate(builder, predicates, root, filter);
         addUuidPredicate(builder, predicates, root, filter);
         addPartnerUuidPredicate(builder, predicates, root, filter);
-        Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
-        addPartnerTypePredicate(builder, predicates, partner);
-        addPartnerSearchPredicate(builder, predicates, root, partner, filter);
+        if (excludeJoinWithPartner) {
+            addAccountTypePredicate(builder, predicates, root);
+            if (isNotEmpty(filter.getPartnerSearch())) {
+                Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
+                addPartnerSearchPredicate(builder, predicates, root, partner, filter);
+            }
+        } else { //TODO удалить else в релизе 2.010
+            Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
+            addPartnerTypePredicate(builder, predicates, partner);
+            addPartnerSearchPredicate(builder, predicates, root, partner, filter);
+        }
         addStatePredicate(builder, predicates, root, filter);
         addSearchPredicate(builder, predicates, root, filter);
         addChangeDatePredicate(builder, predicates, root, filter);
@@ -75,6 +87,11 @@ public class AccountViewRepositoryImpl
 
     private void addPartnerUuidPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
         inPredicate(builder, predicates, root, AccountEntity_.PARTNER_UUID, filter.getPartnerIds());
+    }
+
+    //без join-a на таблицу Partner
+    private void addAccountTypePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root) {
+        predicates.add(builder.equal(root.get(AccountEntity_.PARTNER_TYPE), PartnerType.PARTNER));
     }
 
     private void addPartnerTypePredicate(CriteriaBuilder builder, List<Predicate> predicates, Join<AccountEntity, PartnerEntity> partner) {

@@ -9,17 +9,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import ru.sberbank.pprb.sbbol.partners.replication.config.ReplicationProperties;
-import ru.sberbank.pprb.sbbol.partners.replication.job.ReplicationJobRegistry;
-import ru.sberbank.pprb.sbbol.partners.scheduler.ReplicationScheduler;
+import ru.sberbank.pprb.sbbol.partners.job.RenterAccountUpdaterJob;
+import ru.sberbank.pprb.sbbol.partners.scheduler.RenterAccountUpdaterScheduler;
+import ru.sberbank.pprb.sbbol.partners.service.partner.RenterAccountUpdaterService;
 
 import javax.sql.DataSource;
 
-@ConditionalOnProperty(prefix = "replication.sbbol", name = "enable")
+@ConditionalOnProperty(prefix = "scheduler.account-updater", name = "enable")
 @Configuration
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "10m")
-public class ReplicationSchedulerConfig {
+public class RenterAccountUpdaterSchedulerConfig {
 
     @ConditionalOnMissingBean
     @Bean
@@ -33,10 +33,15 @@ public class ReplicationSchedulerConfig {
     }
 
     @Bean
-    public ReplicationScheduler replicationScheduler(
-        ReplicationProperties replicationProperties,
-        ReplicationJobRegistry replicationJobRegistry
+    public RenterAccountUpdaterScheduler accountUpdaterScheduler(
+        RenterAccountUpdaterProperties renterAccountUpdaterProperties,
+        RenterAccountUpdaterJob renterAccountUpdaterJob
     ) {
-        return new ReplicationScheduler(replicationProperties, replicationJobRegistry);
+        return new RenterAccountUpdaterScheduler(renterAccountUpdaterProperties, renterAccountUpdaterJob);
+    }
+
+    @Bean
+    public RenterAccountUpdaterJob renterAccountUpdaterJob(RenterAccountUpdaterService renterAccountUpdaterService) {
+        return new RenterAccountUpdaterJob(renterAccountUpdaterService);
     }
 }

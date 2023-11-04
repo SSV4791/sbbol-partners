@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.PartnerViewRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.common.RenterUpdaterRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.common.RenterViewRepository;
 
 import java.util.List;
@@ -12,7 +13,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface PartnerRepository extends CrudRepository<PartnerEntity, UUID>, PartnerViewRepository, RenterViewRepository {
+public interface PartnerRepository extends
+    CrudRepository<PartnerEntity, UUID>,
+    PartnerViewRepository,
+    RenterViewRepository,
+    RenterUpdaterRepository {
 
     /**
      * Проверка наличия Партнера

@@ -8,6 +8,7 @@ plugins {
 dependencies {
     implementation(project(":partners-api"))
     implementation(project(":partners-replication"))
+    implementation(project(":partners-service"))
 
     implementation(platform(liveLibs.spring.boot.dependencies))
     implementation(liveLibs.shedlock.provider.jdbc.template)
