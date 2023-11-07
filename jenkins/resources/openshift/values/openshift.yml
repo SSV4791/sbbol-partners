@@ -106,13 +106,10 @@ os_project:
     budget_mask_dictionary:
       cache:
         size: 10000
-    account:
-      include:
-        partner_type: false
 
-  partner-type:
-    account:
-      include: false
+  account:
+    include:
+      partner_type: false
 
 registry_area: registry.sigma.sbrf.ru
 nexus_area: Nexus_PROD/CI02792425_sbbol-partners
