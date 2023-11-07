@@ -61,20 +61,21 @@ public class AccountViewRepositoryImpl
         addPartnerUuidPredicate(builder, predicates, root, filter);
         if (excludeJoinWithPartner) {
             addAccountTypePredicate(builder, predicates, root);
-            if (isNotEmpty(filter.getPartnerSearch())) {
+            if (isNotEmpty(filter.getPartnerSearch()) || Boolean.TRUE.equals(filter.getIsHousingServicesProvider())) {
                 Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
                 addPartnerSearchPredicate(builder, predicates, root, partner, filter);
+                addGkuPredicate(predicates, filter, partner);
             }
         } else { //TODO удалить else в релизе 2.010
             Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
             addPartnerTypePredicate(builder, predicates, partner);
             addPartnerSearchPredicate(builder, predicates, root, partner, filter);
+            addGkuPredicate(predicates, filter, partner);
         }
         addStatePredicate(builder, predicates, root, filter);
         addSearchPredicate(builder, predicates, root, filter);
         addChangeDatePredicate(builder, predicates, root, filter);
         addBudgetPredicate(builder, predicates, root, filter);
-        addGkuPredicate(predicates, root, filter);
     }
 
     private void addDigitalIdPredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
@@ -170,9 +171,8 @@ public class AccountViewRepositoryImpl
         }
     }
 
-    private void addGkuPredicate(List<Predicate> predicates, Root<AccountEntity> root, AccountsFilter filter) {
+    private void addGkuPredicate(List<Predicate> predicates, AccountsFilter filter, Join<AccountEntity, PartnerEntity> partner) {
         if (Boolean.TRUE.equals(filter.getIsHousingServicesProvider())) {
-            Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
             Join<PartnerEntity, GkuInnEntity> gku = partner.join(PartnerEntity_.GKU_INN_ENTITY);
             predicates.add(gku.get(GkuInnEntity_.INN).isNotNull());
         }
