@@ -17,6 +17,7 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -41,7 +42,12 @@ public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMappe
         if (isNull(metaData)) {
             return;
         }
-        attributes.add(new Attribute("firstSignTime", metaData.getEventData().getTimeOfOccurrence().toLocalDateTime().toString(), DATE_ATTRIBUTE_DATA_TYPE));
+        OffsetDateTime timeOfOccurrence = metaData.getEventData().getTimeOfOccurrence();
+        attributes.add(new Attribute("firstSignTime",
+            timeOfOccurrence != null ?
+                timeOfOccurrence.toLocalDateTime().toString() :
+                OffsetDateTime.now().toLocalDateTime().toString(), DATE_ATTRIBUTE_DATA_TYPE)
+        );
         attributes.add(new Attribute("firstSignIpAddress", metaData.getDeviceRequest().getIpAddress(), STRING_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("firstSignLogin", metaData.getClientData().getLogin(), STRING_ATTRIBUTE_DATA_TYPE));
         attributes.add(new Attribute("firstSignPhone", metaData.getClientData().getPhone(), STRING_ATTRIBUTE_DATA_TYPE));
