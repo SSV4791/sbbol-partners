@@ -20,12 +20,12 @@ public interface PartnerRepository extends
     RenterUpdaterRepository {
 
     /**
-     * Проверка наличия Партнера
+     * Получение Партнеров по digitalId
      *
      * @param digitalId Идентификатор личного кабинета
-     * @param uuid      Идентификатор документа
+     * @param type      Тип партнера
      */
-    boolean existsByDigitalIdAndUuid(String digitalId, UUID uuid);
+    List<PartnerEntity> findByDigitalIdAndType(String digitalId, PartnerType type);
 
     /**
      * Получение Партнера

@@ -35,6 +35,20 @@ public interface CorrespondentMigrationService {
     );
 
     /**
+     * Очистить мигрированных контрагентов
+     *
+     * @param digitalId      идентификатор организации
+     * @return список идентификаторов мигрированных контрагентов
+     */
+    @JsonRpcErrors({
+        @JsonRpcError(exception = InvalidFormatException.class, code = -32600),
+        @JsonRpcError(exception = InvalidTypeIdException.class, code = -32600),
+    })
+    void clear(
+        @JsonRpcParam(value = "digitalId") String digitalId
+    );
+
+    /**
      * Сохранение контрагентов при вызове из Legacy
      *
      * @param digitalId     идентификатор организации
@@ -78,5 +92,18 @@ public interface CorrespondentMigrationService {
     void migrateReplicationGuid(
         @JsonRpcParam(value = "digitalId") String digitalId,
         @JsonRpcParam(value = "candidates") List<MigrationReplicationGuidCandidate> candidates
+    );
+
+    /**
+     * Очистка репликационных guid контрагентов для поддержания вызовов из УПШ
+     *
+     * @param digitalId  идентификатор организации
+     */
+    @JsonRpcErrors({
+        @JsonRpcError(exception = InvalidFormatException.class, code = -32600),
+        @JsonRpcError(exception = InvalidTypeIdException.class, code = -32600),
+    })
+    void clearReplicationGuid(
+        @JsonRpcParam(value = "digitalId") String digitalId
     );
 }

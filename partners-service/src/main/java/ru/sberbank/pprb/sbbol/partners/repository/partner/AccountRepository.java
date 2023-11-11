@@ -22,6 +22,14 @@ public interface AccountRepository extends
     AccountSearchRepository {
 
     /**
+     * Получение счётов Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета
+     * @return счёта Партнера
+     */
+    List<AccountEntity> findByDigitalId(String digitalId);
+
+    /**
      * Получение счёта Партнера
      *
      * @param digitalId Идентификатор личного кабинета
