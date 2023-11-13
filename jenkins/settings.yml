@@ -43,7 +43,7 @@ pr_check:
         - 'partners-service/src/main/java/ru/sberbank/pprb/sbbol/partners/entity'
         - 'runner/src/test/java/ru/sberbank/pprb/sbbol/partners/replication/changevector'
     compare:
-      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.007.00_0017/CI02792425-D-02.007.00_0017-distrib.zip'
+      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.009.00_0024/CI02792425-D-02.009.00_0024-distrib.zip'
     workdir: vectors
     cpu: 2
     memory: '4g'
@@ -168,8 +168,8 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: '2.5'
-    commit_or_tag: '02.008.01_0000_i-2.5'
-    release_key: DCBBRAIN-4503
+    commit_or_tag: '02.009.00_0024_i-2.5'
+    release_key: DCBBRAIN-5355
     reverse_and_publish: false
     type: release
   jobs:

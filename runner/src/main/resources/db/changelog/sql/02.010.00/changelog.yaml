@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 1699868109130_add_index_to_sys_lastchangedate.sql
+      relativeToChangelogFile: true
