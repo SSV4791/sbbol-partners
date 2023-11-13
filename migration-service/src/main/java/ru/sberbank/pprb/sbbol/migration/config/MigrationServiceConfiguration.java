@@ -13,6 +13,9 @@ import ru.sberbank.pprb.sbbol.migration.gku.service.GkuMigrationService;
 import ru.sberbank.pprb.sbbol.migration.gku.service.GkuMigrationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.concurrent.ExecutorService;
@@ -24,6 +27,9 @@ public class MigrationServiceConfiguration {
     @Bean
     CorrespondentMigrationService correspondentMigrationService(
         PartnerRepository partnerRepository,
+        DocumentRepository documentRepository,
+        ContactRepository contactRepository,
+        AddressRepository addressRepository,
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         MigrationPartnerMapper migrationPartnerMapper
@@ -31,6 +37,9 @@ public class MigrationServiceConfiguration {
         return new CorrespondentMigrationServiceImpl(
             migrationPartnerMapper,
             partnerRepository,
+            documentRepository,
+            contactRepository,
+            addressRepository,
             accountRepository,
             accountSignRepository
         );

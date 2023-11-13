@@ -12,16 +12,21 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespond
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationReplicationGuidCandidate;
 import ru.sberbank.pprb.sbbol.migration.exception.MigrationException;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
@@ -35,18 +40,27 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     private static final Logger LOGGER = LoggerFactory.getLogger(CorrespondentMigrationServiceImpl.class);
 
     private final MigrationPartnerMapper migrationPartnerMapper;
-    private final PartnerRepository partnerRepository;
     private final AccountRepository accountRepository;
+    private final DocumentRepository documentRepository;
+    private final ContactRepository contactRepository;
+    private final AddressRepository addressRepository;
+    private final PartnerRepository partnerRepository;
     private final AccountSignRepository accountSignRepository;
 
     public CorrespondentMigrationServiceImpl(
         MigrationPartnerMapper migrationPartnerMapper,
         PartnerRepository partnerRepository,
+        DocumentRepository documentRepository,
+        ContactRepository contactRepository,
+        AddressRepository addressRepository,
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository
     ) {
         this.migrationPartnerMapper = migrationPartnerMapper;
         this.partnerRepository = partnerRepository;
+        this.documentRepository = documentRepository;
+        this.contactRepository = contactRepository;
+        this.addressRepository = addressRepository;
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
     }
@@ -82,6 +96,20 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         }
         LOGGER.debug("Для организации c digitalId: {}, мигрировано {} контрагентов", digitalId, migratedCorrespondentData.size());
         return new MigrationCorrespondentResponse(migratedCorrespondentData);
+    }
+
+    @Override
+    @Transactional
+    public void clear(String digitalId) {
+        List<PartnerEntity> partners = partnerRepository.findByDigitalIdAndType(digitalId, PartnerType.PARTNER);
+        for (var partner : partners) {
+            partnerRepository.delete(partner);
+            UUID partnerId = partner.getUuid();
+            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId));
+            contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId));
+            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId));
+            accountRepository.deleteAll(accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId));
+        }
     }
 
     @Override
@@ -175,5 +203,15 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
                 .orElseThrow(() -> new EntryNotFoundException("account", digitalId, candidate.getPprbGuid()));
             accountRepository.save(migrationPartnerMapper.fillIdLinks(account, candidate.getReplicationGuid()));
         });
+    }
+
+    @Override
+    @Transactional
+    public void clearReplicationGuid(String digitalId) {
+        List<AccountEntity> accounts = accountRepository.findByDigitalId(digitalId);
+        for (AccountEntity account : accounts) {
+            account.getIdLinks().clear();
+        }
+        accountRepository.saveAll(accounts);
     }
 }
