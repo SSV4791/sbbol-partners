@@ -21,8 +21,10 @@ import ru.sberbank.pprb.sbbol.partners.model.FraudEventData;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -43,6 +45,7 @@ public interface BaseFraudMetaDataMapper {
     String DBO_OPERATION_NAME = "PARTNERS";
 
     String PPRB_BROWSER = "PPRB_BROWSER";
+    int HOURS = 3;
 
     @Mapping(target = "messageHeader", source = "metaData", qualifiedByName = "toMessageHeader")
     @Mapping(target = "identificationData", source = "clientData")
@@ -211,5 +214,28 @@ public interface BaseFraudMetaDataMapper {
             partner.getFirstName(),
             partner.getMiddleName()
         );
+    }
+
+    default void addTimeToAnalyzeRequest(AnalyzeRequest rq) {
+        if (Objects.nonNull(rq.getEventDataList()) &&
+            Objects.nonNull(rq.getEventDataList().getEventData()) &&
+            Objects.nonNull(rq.getEventDataList().getEventData().getTimeOfOccurrence())
+        ) {
+            rq.getEventDataList().getEventData().setTimeOfOccurrence(
+                rq.getEventDataList().getEventData().getTimeOfOccurrence().plusHours(HOURS)
+            );
+        }
+        if (Objects.nonNull(rq.getMessageHeader()) &&
+            Objects.nonNull(rq.getMessageHeader().getTimeStamp())) {
+            rq.getMessageHeader().setTimeStamp(rq.getMessageHeader().getTimeStamp().plusHours(HOURS));
+        }
+        if (Objects.nonNull(rq.getEventDataList()) &&
+            Objects.nonNull(rq.getEventDataList().getClientDefinedAttributeList()) &&
+            Objects.nonNull(rq.getEventDataList().getClientDefinedAttributeList().getFact())) {
+            rq.getEventDataList().getClientDefinedAttributeList().getFact().stream()
+                .filter(attribute -> Objects.equals(attribute.getName(),"firstSignTime"))
+                .filter(attribute -> Objects.nonNull(attribute.getValue()))
+                .forEach(attribute -> attribute.setValue(LocalDateTime.parse(attribute.getValue()).plusHours(HOURS).toString()));
+        }
     }
 }

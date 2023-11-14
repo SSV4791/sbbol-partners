@@ -75,5 +75,6 @@ public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMappe
         if (nonNull(identificationData) && nonNull(account) && nonNull(account.getUuid())) {
             identificationData.setClientTransactionId(account.getUuid().toString());
         }
+        addTimeToAnalyzeRequest(rq);
     }
 }
