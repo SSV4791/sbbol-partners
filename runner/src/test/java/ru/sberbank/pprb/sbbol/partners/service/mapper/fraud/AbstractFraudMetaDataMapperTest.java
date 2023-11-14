@@ -23,6 +23,8 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapp
 
 public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfiguration {
 
+    public static final int HOURS = 3;
+
     protected abstract BaseFraudMetaDataMapper getFraudMetaDataMapper();
 
     protected void checkMessageHeader(
@@ -34,7 +36,7 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
         assertThat(actualMessageHeader.getRequestType())
             .isEqualTo(ANALYZE_REQUEST_TYPE);
         assertThat(actualMessageHeader.getTimeStamp())
-            .isEqualTo(metaData.getEventData().getTimeOfOccurrence().toLocalDateTime());
+            .isEqualTo(metaData.getEventData().getTimeOfOccurrence().toLocalDateTime().plusHours(HOURS));
     }
 
     protected void checkIdentificationData(
@@ -96,7 +98,7 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
         assertThat(actualEventData.getEventData().getClientDefinedEventType())
             .isEqualTo(getFraudMetaDataMapper().getClientDefinedEventType(eventData, eventType).toString());
         assertThat(actualEventData.getEventData().getTimeOfOccurrence())
-            .isEqualTo(eventData.getTimeOfOccurrence().toLocalDateTime());
+            .isEqualTo(eventData.getTimeOfOccurrence().toLocalDateTime().plusHours(HOURS));
     }
 
     protected void checkChannelIndicator(

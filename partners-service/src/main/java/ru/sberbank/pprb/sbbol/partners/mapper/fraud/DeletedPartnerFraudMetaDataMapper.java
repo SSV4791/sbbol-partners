@@ -44,5 +44,6 @@ public interface DeletedPartnerFraudMetaDataMapper extends BaseFraudMetaDataMapp
         if (nonNull(identificationData) && nonNull(partner) && nonNull(partner.getUuid())) {
             identificationData.setClientTransactionId(partner.getUuid().toString());
         }
+        addTimeToAnalyzeRequest(rq);
     }
 }
