@@ -22,6 +22,17 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_CHANNEL;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_CRYPTOPROFILE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_CRYPTOPROFILE_TYPE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_EMAIL;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_IMSI;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_IP_ADDRESS;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_LOGIN;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_PHONE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_SOURCE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_TIME;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_TYPE;
 
 @Loggable
 @Mapper(
@@ -43,21 +54,23 @@ public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMappe
             return;
         }
         OffsetDateTime timeOfOccurrence = metaData.getEventData().getTimeOfOccurrence();
-        attributes.add(new Attribute("firstSignTime",
+        attributes.add(new Attribute(
+            FIRST_SIGN_TIME.getAttributeName(),
             timeOfOccurrence != null ?
                 timeOfOccurrence.toLocalDateTime().toString() :
-                OffsetDateTime.now().toLocalDateTime().toString(), DATE_ATTRIBUTE_DATA_TYPE)
+                OffsetDateTime.now().toLocalDateTime().toString(),
+            FIRST_SIGN_TIME.getAttributeType())
         );
-        attributes.add(new Attribute("firstSignIpAddress", metaData.getDeviceRequest().getIpAddress(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignLogin", metaData.getClientData().getLogin(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignPhone", metaData.getClientData().getPhone(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignEmail", metaData.getClientData().getEmail(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignImsi", metaData.getClientData().getImsi(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignCryptoprofile", metaData.getCryptoProfileData().getName(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignCryptoprofileType", metaData.getCryptoProfileData().getType(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignChannel", metaData.getCryptoProfileData().getSignChannel(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignType", metaData.getCryptoProfileData().getTitleName(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("firstSignSource", PPRB_BROWSER, STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute(FIRST_SIGN_IP_ADDRESS.getAttributeName(), metaData.getDeviceRequest().getIpAddress(), FIRST_SIGN_IP_ADDRESS.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_LOGIN.getAttributeName(),  metaData.getClientData().getLogin(), FIRST_SIGN_LOGIN.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_PHONE.getAttributeName(), metaData.getClientData().getPhone(), FIRST_SIGN_PHONE.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_EMAIL.getAttributeName(), metaData.getClientData().getEmail(), FIRST_SIGN_EMAIL.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_IMSI.getAttributeName(), metaData.getClientData().getImsi(), FIRST_SIGN_IMSI.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_CRYPTOPROFILE.getAttributeName(), metaData.getCryptoProfileData().getName(), FIRST_SIGN_CRYPTOPROFILE.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_CRYPTOPROFILE_TYPE.getAttributeName(), metaData.getCryptoProfileData().getType(), FIRST_SIGN_CRYPTOPROFILE_TYPE.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_CHANNEL.getAttributeName(), metaData.getCryptoProfileData().getSignChannel(), FIRST_SIGN_CHANNEL.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_TYPE.getAttributeName(), metaData.getCryptoProfileData().getTitleName(), FIRST_SIGN_TYPE.getAttributeType()));
+        attributes.add(new Attribute(FIRST_SIGN_SOURCE.getAttributeName(), PPRB_BROWSER, FIRST_SIGN_SOURCE.getAttributeType()));
     }
 
     @Named("toEventDataList")

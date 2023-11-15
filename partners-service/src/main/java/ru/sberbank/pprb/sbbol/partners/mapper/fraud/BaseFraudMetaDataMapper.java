@@ -28,13 +28,29 @@ import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.COUNTER_PARTY_ID;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.DBO_OPERATION;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.DIGITAL_ID;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.EPK_ID;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_TIME;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.OSB_NUMBER;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.PAYER_INN;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.PAYER_NAME;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.PRIVATE_IP_ADDRESS;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.RECEIVER_ACCOUNT;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.RECEIVER_BIC_SWIFT;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.RECEIVER_INN;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.RECEIVER_NAME;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_EMAIL;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_IP_ADDRESS;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_LOGIN;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_PHONE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_SOURCE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.USER_COMMENT;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.VSP_NUMBER;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 public interface BaseFraudMetaDataMapper {
-
-    String STRING_ATTRIBUTE_DATA_TYPE = "STRING";
-
-    String DATE_ATTRIBUTE_DATA_TYPE = "DATE";
 
     String EVENT_TYPE_SIGN_COUNTERPARTY_ACCOUNT = "EDIT_PAYEE";
 
@@ -109,35 +125,35 @@ public interface BaseFraudMetaDataMapper {
         if (isNull(clientData)) {
             return;
         }
-        attributes.add(new Attribute("digitalId", clientData.getDigitalId(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("ЕПК.ID", clientData.getEpkId(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("payerInn", clientData.getInn(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("payerName", clientData.getOrgName(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("osbNumber", clientData.getGosbNumber(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("vspNumber", clientData.getVspNumber(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("dboOperationName", getDboOperationName(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("senderLogin", clientData.getLogin(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("senderEmail", clientData.getEmail(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("senderPhone", clientData.getPhone(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("senderSource", PPRB_BROWSER, STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute(DIGITAL_ID.getAttributeName(), clientData.getDigitalId(), DIGITAL_ID.getAttributeType()));
+        attributes.add(new Attribute(EPK_ID.getAttributeName(), clientData.getEpkId(), EPK_ID.getAttributeType()));
+        attributes.add(new Attribute(PAYER_INN.getAttributeName(), clientData.getInn(), PAYER_INN.getAttributeType()));
+        attributes.add(new Attribute(PAYER_NAME.getAttributeName(), clientData.getOrgName(), PAYER_NAME.getAttributeType()));
+        attributes.add(new Attribute(OSB_NUMBER.getAttributeName(), clientData.getGosbNumber(), OSB_NUMBER.getAttributeType()));
+        attributes.add(new Attribute(VSP_NUMBER.getAttributeName(), clientData.getVspNumber(), VSP_NUMBER.getAttributeType()));
+        attributes.add(new Attribute(DBO_OPERATION.getAttributeName(), getDboOperationName(), DBO_OPERATION.getAttributeType()));
+        attributes.add(new Attribute(SENDER_LOGIN.getAttributeName(), clientData.getLogin(), SENDER_LOGIN.getAttributeType()));
+        attributes.add(new Attribute(SENDER_EMAIL.getAttributeName(), clientData.getEmail(), SENDER_EMAIL.getAttributeType()));
+        attributes.add(new Attribute(SENDER_PHONE.getAttributeName(), clientData.getPhone(), SENDER_PHONE.getAttributeType()));
+        attributes.add(new Attribute(SENDER_SOURCE.getAttributeName(), PPRB_BROWSER, SENDER_SOURCE.getAttributeType()));
     }
 
     default void addClientDefinedAttributeList(List<Attribute> attributes, FraudDeviceRequest deviceRequest) {
         if (isNull(deviceRequest)) {
             return;
         }
-        attributes.add(new Attribute("privateIpAddress", deviceRequest.getPrivateIpAddress(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("senderIpAddress", deviceRequest.getIpAddress(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute(PRIVATE_IP_ADDRESS.getAttributeName(), deviceRequest.getPrivateIpAddress(), PRIVATE_IP_ADDRESS.getAttributeType()));
+        attributes.add(new Attribute(SENDER_IP_ADDRESS.getAttributeName(), deviceRequest.getIpAddress(), SENDER_IP_ADDRESS.getAttributeType()));
     }
 
     default void addClientDefinedAttributeList(List<Attribute> attributes, PartnerEntity partner) {
         if (isNull(partner)) {
             return;
         }
-        attributes.add(new Attribute("partnerId", partner.getUuid().toString(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("receiverName", getPartnerName(partner), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("receiverInn", partner.getInn(), STRING_ATTRIBUTE_DATA_TYPE));
-        attributes.add(new Attribute("userComment", partner.getComment(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute(COUNTER_PARTY_ID.getAttributeName(), partner.getUuid().toString(), COUNTER_PARTY_ID.getAttributeType()));
+        attributes.add(new Attribute(RECEIVER_NAME.getAttributeName(), getPartnerName(partner), RECEIVER_NAME.getAttributeType()));
+        attributes.add(new Attribute(RECEIVER_INN.getAttributeName(), partner.getInn(), RECEIVER_INN.getAttributeType()));
+        attributes.add(new Attribute(USER_COMMENT.getAttributeName(), partner.getComment(), USER_COMMENT.getAttributeType()));
     }
 
     default void addClientDefinedAttributeList(List<Attribute> attributes, AccountEntity account) {
@@ -145,9 +161,9 @@ public interface BaseFraudMetaDataMapper {
             return;
         }
         if (account.getBank() != null) {
-            attributes.add(new Attribute("receiverBicSwift", account.getBank().getBic(), STRING_ATTRIBUTE_DATA_TYPE));
+            attributes.add(new Attribute(RECEIVER_BIC_SWIFT.getAttributeName(), account.getBank().getBic(), RECEIVER_BIC_SWIFT.getAttributeType()));
         }
-        attributes.add(new Attribute("receiverAccount", account.getAccount(), STRING_ATTRIBUTE_DATA_TYPE));
+        attributes.add(new Attribute(RECEIVER_ACCOUNT.getAttributeName(), account.getAccount(), RECEIVER_ACCOUNT.getAttributeType()));
     }
 
     default EventData toEventData(FraudEventType eventType, FraudEventData eventData) {
@@ -233,7 +249,7 @@ public interface BaseFraudMetaDataMapper {
             Objects.nonNull(rq.getEventDataList().getClientDefinedAttributeList()) &&
             Objects.nonNull(rq.getEventDataList().getClientDefinedAttributeList().getFact())) {
             rq.getEventDataList().getClientDefinedAttributeList().getFact().stream()
-                .filter(attribute -> Objects.equals(attribute.getName(),"firstSignTime"))
+                .filter(attribute -> Objects.equals(attribute.getName(),FIRST_SIGN_TIME.getAttributeName()))
                 .filter(attribute -> Objects.nonNull(attribute.getValue()))
                 .forEach(attribute -> attribute.setValue(LocalDateTime.parse(attribute.getValue()).plusHours(HOURS).toString()));
         }
