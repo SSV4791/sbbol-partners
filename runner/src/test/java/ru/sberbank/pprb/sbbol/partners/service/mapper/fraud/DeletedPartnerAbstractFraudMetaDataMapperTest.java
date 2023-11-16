@@ -1,7 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.fraud;
 
 import org.junit.jupiter.api.Test;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyClientDefinedAttributes;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.ClientDefinedAttributeList;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.fraud.DeletedPartnerFraudMetaDataMapper;
@@ -14,6 +14,13 @@ import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.PPRB_BROWSER;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.DBO_OPERATION;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_EMAIL;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_IP_ADDRESS;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_LOGIN;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_PHONE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.SENDER_SOURCE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.DeletedPartnerFraudMetaDataMapper.DBO_OPERATION_NAME_FOR_DELETE_PARTNER;
 import static ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType.DELETE_PARTNER;
 
 class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDataMapperTest {
@@ -47,6 +54,7 @@ class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDat
 
         var actualEventDate = actualFraudRequest.getEventDataList();
         checkEventDataList(actualEventDate, eventData, DELETE_PARTNER);
+        checkClientDefinedAttributes(actualEventDate.getClientDefinedAttributeList(), clientData, partnerEntity, deviceRequest);
 
         var actualChannelIndicator = actualFraudRequest.getChannelIndicator();
         checkChannelIndicator(actualChannelIndicator, metaData);
@@ -55,23 +63,28 @@ class DeletedPartnerAbstractFraudMetaDataMapperTest extends AbstractFraudMetaDat
         checkClientDefinedChannelIndicator(actualClientDefinedChannelIndicator, metaData.getChannelInfo());
     }
 
-    protected void checkCounterPartyClientDefinedAttributes(
-        CounterPartyClientDefinedAttributes actualClientDefinedAttributeList,
+    protected void checkClientDefinedAttributes(
+        ClientDefinedAttributeList actualClientDefinedAttributeList,
         FraudClientData clientData,
         PartnerEntity partnerEntity,
         FraudDeviceRequest requestData
     ) {
-        super.checkCounterPartyClientDefinedAttributes(actualClientDefinedAttributeList, clientData, partnerEntity, requestData);
-        assertThat(actualClientDefinedAttributeList.getSenderIpAddress())
+        super.checkClientDefinedAttributes(actualClientDefinedAttributeList, clientData, partnerEntity, requestData);
+
+        var attributeMap = getClientDefinedAttributeMap(actualClientDefinedAttributeList.getFact());
+
+        assertThat(attributeMap.get(SENDER_IP_ADDRESS.getAttributeName()))
             .isEqualTo(requestData.getIpAddress());
-        assertThat(actualClientDefinedAttributeList.getSenderLogin())
+        assertThat(attributeMap.get(SENDER_LOGIN.getAttributeName()))
             .isEqualTo(clientData.getLogin());
-        assertThat(actualClientDefinedAttributeList.getSenderPhone())
+        assertThat(attributeMap.get(SENDER_PHONE.getAttributeName()))
             .isEqualTo(clientData.getPhone());
-        assertThat(actualClientDefinedAttributeList.getSenderEmail())
+        assertThat(attributeMap.get(SENDER_EMAIL.getAttributeName()))
             .isEqualTo(clientData.getEmail());
-        assertThat(actualClientDefinedAttributeList.getSenderSource())
+        assertThat(attributeMap.get(SENDER_SOURCE.getAttributeName()))
             .isEqualTo(PPRB_BROWSER);
+        assertThat(attributeMap.get(DBO_OPERATION.getAttributeName()))
+            .isEqualTo(DBO_OPERATION_NAME_FOR_DELETE_PARTNER);
     }
 
     @Override
