@@ -1,7 +1,9 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.fraud;
 
+import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.DboOperation;
-import ru.sberbank.pprb.sbbol.antifraud.api.analyze.counterparty.CounterPartyClientDefinedAttributes;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.Attribute;
+import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.ClientDefinedAttributeList;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.DeviceRequest;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.EventDataList;
 import ru.sberbank.pprb.sbbol.antifraud.api.analyze.request.IdentificationData;
@@ -16,10 +18,24 @@ import ru.sberbank.pprb.sbbol.partners.model.FraudEventData;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.ANALYZE_REQUEST_TYPE;
-import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.DBO_OPERATION_NAME;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.BaseFraudMetaDataMapper.toChannelIndicator;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.COUNTER_PARTY_ID;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.DIGITAL_ID;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.EPK_ID;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.OSB_NUMBER;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.PAYER_INN;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.PAYER_NAME;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.PRIVATE_IP_ADDRESS;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.RECEIVER_INN;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.RECEIVER_NAME;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.VSP_NUMBER;
 
 public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfiguration {
 
@@ -116,35 +132,44 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
             .hasToString(channelInfo.getClientDefinedChannelIndicator().getValue());
     }
 
-    protected void checkCounterPartyClientDefinedAttributes(
-        CounterPartyClientDefinedAttributes actualClientDefinedAttributeList,
+    protected void checkClientDefinedAttributes(
+        ClientDefinedAttributeList actualClientDefinedAttributeList,
         FraudClientData clientData,
         PartnerEntity partnerEntity,
         FraudDeviceRequest requestData
     ) {
         assertThat(actualClientDefinedAttributeList)
             .isNotNull();
-        assertThat(actualClientDefinedAttributeList.getCounterpartyId())
+
+        var attributeMap = getClientDefinedAttributeMap(actualClientDefinedAttributeList.getFact());
+
+        assertThat(attributeMap.get(COUNTER_PARTY_ID.getAttributeName()))
             .isEqualTo(partnerEntity.getUuid().toString());
-        assertThat(actualClientDefinedAttributeList.getDigitalId())
+        assertThat(attributeMap.get(DIGITAL_ID.getAttributeName()))
             .isEqualTo(clientData.getDigitalId());
-        assertThat(actualClientDefinedAttributeList.getEpkId())
+        assertThat(attributeMap.get(EPK_ID.getAttributeName()))
             .isEqualTo(clientData.getEpkId());
-        assertThat(actualClientDefinedAttributeList.getReceiverName())
+        assertThat(attributeMap.get(RECEIVER_NAME.getAttributeName()))
             .isEqualTo(getFraudMetaDataMapper().getPartnerName(partnerEntity));
-        assertThat(actualClientDefinedAttributeList.getReceiverInn())
+        assertThat(attributeMap.get(RECEIVER_INN.getAttributeName()))
             .isEqualTo(partnerEntity.getInn());
-        assertThat(actualClientDefinedAttributeList.getPayerInn())
+        assertThat(attributeMap.get(PAYER_INN.getAttributeName()))
             .isEqualTo(clientData.getInn());
-        assertThat(actualClientDefinedAttributeList.getPayerName())
+        assertThat(attributeMap.get(PAYER_NAME.getAttributeName()))
             .isEqualTo(clientData.getOrgName());
-        assertThat(actualClientDefinedAttributeList.getOsbNumber())
+        assertThat(attributeMap.get(OSB_NUMBER.getAttributeName()))
             .isEqualTo(clientData.getGosbNumber());
-        assertThat(actualClientDefinedAttributeList.getVspNumber())
+        assertThat(attributeMap.get(VSP_NUMBER.getAttributeName()))
             .isEqualTo(clientData.getVspNumber());
-        assertThat(actualClientDefinedAttributeList.getDboOperationName())
-            .isEqualTo(DBO_OPERATION_NAME);
-        assertThat(actualClientDefinedAttributeList.getPrivateIpAddress())
+        assertThat(attributeMap.get(PRIVATE_IP_ADDRESS.getAttributeName()))
             .isEqualTo(requestData.getPrivateIpAddress());
+    }
+
+    protected Map<String, String> getClientDefinedAttributeMap(List<Attribute> attributes) {
+        if (CollectionUtils.isEmpty(attributes)) {
+            return new HashMap<>();
+        }
+        return attributes.stream()
+            .collect(Collectors.toMap(Attribute::getName, Attribute::getValue));
     }
 }

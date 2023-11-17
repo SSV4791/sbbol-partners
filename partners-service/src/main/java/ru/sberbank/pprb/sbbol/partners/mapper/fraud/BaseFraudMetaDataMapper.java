@@ -29,7 +29,6 @@ import java.util.Objects;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.COUNTER_PARTY_ID;
-import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.DBO_OPERATION;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.DIGITAL_ID;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.EPK_ID;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_TIME;
@@ -58,9 +57,8 @@ public interface BaseFraudMetaDataMapper {
 
     String ANALYZE_REQUEST_TYPE = "ANALYZE";
 
-    String DBO_OPERATION_NAME = "PARTNERS";
-
     String PPRB_BROWSER = "PPRB_BROWSER";
+
     int HOURS = 3;
 
     @Mapping(target = "messageHeader", source = "metaData", qualifiedByName = "toMessageHeader")
@@ -131,7 +129,6 @@ public interface BaseFraudMetaDataMapper {
         attributes.add(new Attribute(PAYER_NAME.getAttributeName(), clientData.getOrgName(), PAYER_NAME.getAttributeType()));
         attributes.add(new Attribute(OSB_NUMBER.getAttributeName(), clientData.getGosbNumber(), OSB_NUMBER.getAttributeType()));
         attributes.add(new Attribute(VSP_NUMBER.getAttributeName(), clientData.getVspNumber(), VSP_NUMBER.getAttributeType()));
-        attributes.add(new Attribute(DBO_OPERATION.getAttributeName(), getDboOperationName(), DBO_OPERATION.getAttributeType()));
         attributes.add(new Attribute(SENDER_LOGIN.getAttributeName(), clientData.getLogin(), SENDER_LOGIN.getAttributeType()));
         attributes.add(new Attribute(SENDER_EMAIL.getAttributeName(), clientData.getEmail(), SENDER_EMAIL.getAttributeType()));
         attributes.add(new Attribute(SENDER_PHONE.getAttributeName(), clientData.getPhone(), SENDER_PHONE.getAttributeType()));
@@ -199,10 +196,6 @@ public interface BaseFraudMetaDataMapper {
             case SIGN_ACCOUNT -> ClientDefinedEventType.BROWSER_APPROVAL;
             case DELETE_PARTNER -> ClientDefinedEventType.BROWSER_REMOVE_PAYEE;
         };
-    }
-
-    default String getDboOperationName() {
-        return DBO_OPERATION_NAME;
     }
 
     default String getAnalyzeResponseActionCode(FullAnalyzeResponse fullAnalyzeResponse) {

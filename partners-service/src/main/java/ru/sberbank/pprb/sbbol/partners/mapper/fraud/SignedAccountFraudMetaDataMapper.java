@@ -22,6 +22,7 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.DBO_OPERATION;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_CHANNEL;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_CRYPTOPROFILE;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_CRYPTOPROFILE_TYPE;
@@ -46,13 +47,17 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttribut
 )
 public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMapper {
 
+    String DBO_OPERATION_NAME_FOR_SIGN_ACCOUNT = "Подтверждение счёта контрагента из справочника контрагентов";
+
     @InheritConfiguration
     AnalyzeRequest mapToAnalyzeRequest(FraudMetaData metaData, @Context PartnerEntity partner, @Context AccountEntity account);
 
-    default void addSignedClientDefinedAttributeList(List<Attribute> attributes, FraudMetaData metaData) {
+    private void addSignedClientDefinedAttributeList(List<Attribute> attributes, FraudMetaData metaData) {
         if (isNull(metaData)) {
             return;
         }
+        attributes.add(new Attribute(DBO_OPERATION.getAttributeName(), DBO_OPERATION_NAME_FOR_SIGN_ACCOUNT, DBO_OPERATION.getAttributeType()));
+
         OffsetDateTime timeOfOccurrence = metaData.getEventData().getTimeOfOccurrence();
         attributes.add(new Attribute(
             FIRST_SIGN_TIME.getAttributeName(),
@@ -61,6 +66,7 @@ public interface SignedAccountFraudMetaDataMapper extends BaseFraudMetaDataMappe
                 OffsetDateTime.now().toLocalDateTime().toString(),
             FIRST_SIGN_TIME.getAttributeType())
         );
+
         attributes.add(new Attribute(FIRST_SIGN_IP_ADDRESS.getAttributeName(), metaData.getDeviceRequest().getIpAddress(), FIRST_SIGN_IP_ADDRESS.getAttributeType()));
         attributes.add(new Attribute(FIRST_SIGN_LOGIN.getAttributeName(),  metaData.getClientData().getLogin(), FIRST_SIGN_LOGIN.getAttributeType()));
         attributes.add(new Attribute(FIRST_SIGN_PHONE.getAttributeName(), metaData.getClientData().getPhone(), FIRST_SIGN_PHONE.getAttributeType()));
