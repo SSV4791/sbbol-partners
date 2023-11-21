@@ -51,8 +51,13 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
             .isNotNull();
         assertThat(actualMessageHeader.getRequestType())
             .isEqualTo(ANALYZE_REQUEST_TYPE);
+        var expectedTimeStamp = BaseFraudMetaDataMapper.normalizationLocalDateTime(
+            metaData.getEventData()
+                .getTimeOfOccurrence()
+                .toLocalDateTime()
+        );
         assertThat(actualMessageHeader.getTimeStamp())
-            .isEqualTo(metaData.getEventData().getTimeOfOccurrence().toLocalDateTime().plusHours(HOURS));
+            .isEqualTo(expectedTimeStamp);
     }
 
     protected void checkIdentificationData(
@@ -113,8 +118,11 @@ public abstract class AbstractFraudMetaDataMapperTest extends BaseUnitConfigurat
             .isEqualTo(getFraudMetaDataMapper().toEventType(eventType));
         assertThat(actualEventData.getEventData().getClientDefinedEventType())
             .isEqualTo(getFraudMetaDataMapper().getClientDefinedEventType(eventData, eventType).toString());
+        var expectedTimeOfOccurrence = BaseFraudMetaDataMapper.normalizationLocalDateTime(
+            eventData.getTimeOfOccurrence().toLocalDateTime()
+        );
         assertThat(actualEventData.getEventData().getTimeOfOccurrence())
-            .isEqualTo(eventData.getTimeOfOccurrence().toLocalDateTime().plusHours(HOURS));
+            .isEqualTo(expectedTimeOfOccurrence);
     }
 
     protected void checkChannelIndicator(
