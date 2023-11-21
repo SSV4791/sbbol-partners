@@ -22,6 +22,7 @@ import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +61,8 @@ public interface BaseFraudMetaDataMapper {
     String PPRB_BROWSER = "PPRB_BROWSER";
 
     int HOURS = 3;
+
+    String PATTERN_LOCAL_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
     @Mapping(target = "messageHeader", source = "metaData", qualifiedByName = "toMessageHeader")
     @Mapping(target = "identificationData", source = "clientData")
@@ -231,12 +234,14 @@ public interface BaseFraudMetaDataMapper {
             Objects.nonNull(rq.getEventDataList().getEventData().getTimeOfOccurrence())
         ) {
             rq.getEventDataList().getEventData().setTimeOfOccurrence(
-                rq.getEventDataList().getEventData().getTimeOfOccurrence().plusHours(HOURS)
+                normalizationLocalDateTime(rq.getEventDataList().getEventData().getTimeOfOccurrence())
             );
         }
         if (Objects.nonNull(rq.getMessageHeader()) &&
             Objects.nonNull(rq.getMessageHeader().getTimeStamp())) {
-            rq.getMessageHeader().setTimeStamp(rq.getMessageHeader().getTimeStamp().plusHours(HOURS));
+            rq.getMessageHeader().setTimeStamp(
+                normalizationLocalDateTime(rq.getMessageHeader().getTimeStamp())
+            );
         }
         if (Objects.nonNull(rq.getEventDataList()) &&
             Objects.nonNull(rq.getEventDataList().getClientDefinedAttributeList()) &&
@@ -244,7 +249,16 @@ public interface BaseFraudMetaDataMapper {
             rq.getEventDataList().getClientDefinedAttributeList().getFact().stream()
                 .filter(attribute -> Objects.equals(attribute.getName(),FIRST_SIGN_TIME.getAttributeName()))
                 .filter(attribute -> Objects.nonNull(attribute.getValue()))
-                .forEach(attribute -> attribute.setValue(LocalDateTime.parse(attribute.getValue()).plusHours(HOURS).toString()));
+                .forEach(attribute -> attribute.setValue(normalizationLocalDateTime(attribute.getValue()).toString()));
         }
+    }
+
+    static LocalDateTime normalizationLocalDateTime(LocalDateTime localDateTime) {
+        var formatter = DateTimeFormatter.ofPattern(PATTERN_LOCAL_DATE_TIME);
+        return LocalDateTime.parse(localDateTime.format(formatter)).plusHours(HOURS);
+    }
+
+    static LocalDateTime normalizationLocalDateTime(String localDateTime) {
+        return normalizationLocalDateTime(LocalDateTime.parse(localDateTime));
     }
 }

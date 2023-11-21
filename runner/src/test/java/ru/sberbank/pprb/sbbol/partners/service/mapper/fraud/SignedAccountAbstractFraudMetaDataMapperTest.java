@@ -23,6 +23,7 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttribut
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_LOGIN;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_PHONE;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_SOURCE;
+import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_TIME;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttributeType.FIRST_SIGN_TYPE;
 import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.SignedAccountFraudMetaDataMapper.DBO_OPERATION_NAME_FOR_SIGN_ACCOUNT;
 import static ru.sberbank.pprb.sbbol.partners.model.fraud.FraudEventType.SIGN_ACCOUNT;
@@ -107,5 +108,12 @@ class SignedAccountAbstractFraudMetaDataMapperTest extends AbstractFraudMetaData
             .isEqualTo(metaData.getCryptoProfileData().getTitleName());
         assertThat(attributeMap.get(DBO_OPERATION.getAttributeName()))
             .isEqualTo(DBO_OPERATION_NAME_FOR_SIGN_ACCOUNT);
+        var expectedFirstSignTime = BaseFraudMetaDataMapper.normalizationLocalDateTime(
+            metaData.getEventData()
+                .getTimeOfOccurrence()
+                .toLocalDateTime()
+        );
+        assertThat(attributeMap.get( FIRST_SIGN_TIME.getAttributeName()))
+            .isEqualTo(expectedFirstSignTime.toString());
     }
 }
