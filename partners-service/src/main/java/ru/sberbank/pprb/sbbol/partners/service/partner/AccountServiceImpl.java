@@ -31,6 +31,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.dto.UuidDto;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.ArrayList;
@@ -383,7 +384,7 @@ public class AccountServiceImpl implements AccountService {
         String corAccount
     ) {
         var search = accountMapper.prepareSearchField(partnerUuid, account, bic, corAccount);
-        var accountEntity = accountRepository.findByDigitalIdAndSearch(digitalId, search);
+        var accountEntity = accountRepository.findByDigitalIdAndSearch(digitalId, search, UuidDto.class);
         if (nonNull(accountEntity) && !accountEntity.getUuid().equals(accountUuid)) {
             throw new CheckDuplicateException(ACCOUNT_DUPLICATE_EXCEPTION);
         }

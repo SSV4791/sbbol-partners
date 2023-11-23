@@ -29,6 +29,9 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.dto.PartnerLegalTypeDto;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.dto.PartnerTypeDto;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.dto.UuidDto;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import javax.validation.constraints.NotNull;
@@ -115,20 +118,18 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public void existsPartner(String digitalId, UUID id) throws EntryNotFoundException {
-        Optional<PartnerEntity> partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id)
-            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType());
+        var partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id, PartnerTypeDto.class)
+            .filter(partnerDto -> PartnerType.PARTNER == partnerDto.getType());
         if (partner.isEmpty()) {
             throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
         }
     }
 
     @Override
-    @Transactional(readOnly = true)
     public LegalForm getPartnerLegalForm(String digitalId, UUID id) {
-        PartnerEntity partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id)
-            .filter(partnerEntity -> PartnerType.PARTNER == partnerEntity.getType())
+        var partner = partnerRepository.getByDigitalIdAndUuid(digitalId, id, PartnerLegalTypeDto.class)
+            .filter(partnerDto -> PartnerType.PARTNER == partnerDto.getType())
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return toLegalType(partner.getLegalType());
     }
@@ -380,7 +381,7 @@ public class PartnerServiceImpl implements PartnerService {
         String middleName
     ) {
         var search = partnerMapper.prepareSearchField(inn, kpp, orgName, secondName, firstName, middleName);
-        var partnerEntity = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER);
+        var partnerEntity = partnerRepository.findByDigitalIdAndSearchAndType(digitalId, search, PartnerType.PARTNER, UuidDto.class);
         if (nonNull(partnerEntity) && !partnerEntity.getUuid().equals(uuid)) {
             throw new CheckDuplicateException(PARTNER_DUPLICATE_EXCEPTION);
         }
