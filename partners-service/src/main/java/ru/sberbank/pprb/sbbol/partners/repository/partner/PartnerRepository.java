@@ -37,6 +37,16 @@ public interface PartnerRepository extends
     Optional<PartnerEntity> getByDigitalIdAndUuid(String digitalId, UUID uuid);
 
     /**
+     * Получение Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета
+     * @param uuid      Идентификатор документа
+     * @param classDto  Тип возвращаемого объекта
+     * @return Партнер
+     */
+    <T> Optional<T> getByDigitalIdAndUuid(String digitalId, UUID uuid, Class<T> classDto);
+
+    /**
      * Получение Партнеров
      *
      * @param uuid Идентификатор документа
@@ -51,4 +61,13 @@ public interface PartnerRepository extends
      * @param search    Данные для поиска партнера
      */
     PartnerEntity findByDigitalIdAndSearchAndType(String digitalId, String search, PartnerType type);
+
+    /**
+     * Поиск партнера по ключевым параметрам
+     *
+     * @param digitalId Идентификатор личного кабинета
+     * @param search    Данные для поиска партнера
+     * @param classDto  Тип возвращаемого объекта
+     */
+    <T> T findByDigitalIdAndSearchAndType(String digitalId, String search, PartnerType type, Class<T> classDto);
 }

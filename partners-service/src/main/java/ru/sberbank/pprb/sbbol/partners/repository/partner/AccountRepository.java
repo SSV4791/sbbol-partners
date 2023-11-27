@@ -72,4 +72,13 @@ public interface AccountRepository extends
      * @param search    Данный для поиска
      */
     AccountEntity findByDigitalIdAndSearch(String digitalId, String search);
+
+    /**
+     * Поиск счетов Партнера по ключевым полям
+     *
+     * @param digitalId Идентификатор личного кабинета
+     * @param search    Данный для поиска
+     * @param classDto  Тип возвращаемого объекта
+     */
+    <T> T findByDigitalIdAndSearch(String digitalId, String search, Class<T> classDto);
 }
