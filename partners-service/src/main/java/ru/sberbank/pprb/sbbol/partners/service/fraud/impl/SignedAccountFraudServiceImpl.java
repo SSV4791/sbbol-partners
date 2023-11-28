@@ -20,7 +20,6 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.service.fraud.FraudService;
 
 import java.util.List;
-import java.util.Locale;
 
 import static java.util.Objects.isNull;
 
@@ -75,7 +74,8 @@ public class SignedAccountFraudServiceImpl implements FraudService<AccountEntity
             LOG.debug("Отправляем запрос В АС Агрегатор данных ФРОД-мониторинг: {}", request);
             var response = adapter.send(request);
             LOG.debug("Получили ответ от АС Агрегатора данных ФРОД-мониторинг: {}", response);
-            if (forbiddenFraudActionCodes.contains(fraudMapper.getAnalyzeResponseActionCode(response).toUpperCase(Locale.getDefault()))) {
+            var actionCode = fraudMapper.getAnalyzeResponseActionCode(response);
+            if (actionCode != null && forbiddenFraudActionCodes.contains(actionCode)) {
                 throw new FraudDeniedException(fraudMapper.getAnalyzeResponseDetailledComment(response));
             }
         } catch (FraudModelArgumentException e) {
