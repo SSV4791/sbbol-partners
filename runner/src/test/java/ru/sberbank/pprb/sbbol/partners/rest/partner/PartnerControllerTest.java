@@ -85,6 +85,7 @@ import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValid
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOgrnNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidOkpoNumber;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
@@ -2266,6 +2267,51 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .contains("Поле содержит недопустимый(-е) символ(-ы): АБВ");
     }
 
+    @Test
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Дубль по основным реквизитам")
+    void testUpdatePartnerFullModel_changePartnerAttributesDouble() {
+        var createdFullModelPartner = step("Создание первого Партнера", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            return post(
+                BASE_ROUTE_PATH + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class);
+        });
+        var createdFullModelPartnerDouble = step("Создание второго Партнера", () -> {
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setDigitalId(createdFullModelPartner.getDigitalId());
+            return post(
+                BASE_ROUTE_PATH + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class);
+        });
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление партнера", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartnerDouble);
+            partnerChange.setComment("Обновление комментария по партнеру");
+            partnerChange.setKpp(createdFullModelPartner.getKpp());
+            partnerChange.setInn(createdFullModelPartner.getInn());
+            partnerChange.setOrgName(createdFullModelPartner.getOrgName());
+            partnerChange.setSecondName(createdFullModelPartner.getSecondName());
+            partnerChange.setFirstName(createdFullModelPartner.getFirstName());
+            partnerChange.setMiddleName(createdFullModelPartner.getMiddleName());
+            return partnerChange;
+        });
+        var error = step("Выполняем запрос на обновление Партнер.", () ->
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
+                HttpStatus.BAD_REQUEST,
+                partnerChangeFullModel,
+                Error.class));
+        step("Проверка возвращаемого исключения", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(PARTNER_DUPLICATE_EXCEPTION.getValue());
+        });
+    }
+
     @ParameterizedTest
     @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление основных реквизитов")
     @MethodSource("partnerArgumentsForUpdatingPartnerFullModel")
@@ -3186,6 +3232,59 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 )
             )
         );
+    }
+
+    @Test
+    @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление счета на существующий")
+    void testUpdatePartnerFullModel_changeAccountsDuplicate() {
+        Set<Pair<String, String>> updatedAccounts = Set.of(
+            Pair.of("40702810000000000001", "40702810000000000001"),
+            Pair.of("40702810300000000002", "40702810000000000001"));
+        var createdFullModelPartner = step("Создание Партнера с счетами", () -> {
+            var initialAccounts = Set.of("40702810000000000001", "40702810300000000002");
+            var partnerCreateFullModel = getValidFullModelLegalEntityPartner();
+            partnerCreateFullModel.setAccounts(
+                initialAccounts.stream()
+                    .map(PartnerControllerTest::createAccountCreateFullModel)
+                    .collect(Collectors.toSet()));
+            return post(
+                BASE_ROUTE_PATH + "/full-model",
+                HttpStatus.CREATED,
+                partnerCreateFullModel,
+                PartnerFullModelResponse.class);
+        });
+        var accountChangeFullModelList = step("Подготавливаем список счетов для обновления", () ->
+            updatedAccounts.stream()
+                .map(updatedAccount -> {
+                    var existedAccount = createdFullModelPartner.getAccounts().stream()
+                        .filter(account -> account.getAccount().equals(updatedAccount.getLeft()))
+                        .findAny().orElse(null);
+
+                    return new AccountChangeFullModel()
+                        .id(existedAccount.getId())
+                        .version(existedAccount.getVersion())
+                        .account(updatedAccount.getRight())
+                        .bank(new BankChangeFullModel()
+                            .name("Наименование Банка")
+                            .bic("044525000"));
+                }).collect(Collectors.toSet()));
+        var partnerChangeFullModel = step("Подготавливаем запрос на обновление партнера", () -> {
+            var partnerChange = mapToPartnerUpdateFullModel(createdFullModelPartner);
+            partnerChange.setAccounts(accountChangeFullModelList);
+            return partnerChange;
+        });
+        var error = step("Выполняем запрос на обновление Партнера c счетами.", () ->
+            post(
+                FULL_MODEL_PARTNER_PATCH_URL,
+                HttpStatus.BAD_REQUEST,
+                partnerChangeFullModel,
+                Error.class));
+        step("Проверка возвращаемого исключения", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(ACCOUNT_DUPLICATE_EXCEPTION.getValue());
+        });
     }
 
 

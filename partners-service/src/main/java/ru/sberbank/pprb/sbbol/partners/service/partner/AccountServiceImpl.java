@@ -7,12 +7,10 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
-import ru.sberbank.pprb.sbbol.partners.exception.CheckDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
@@ -30,8 +28,6 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.dto.UuidDto;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.ArrayList;
@@ -43,12 +39,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_CREATE;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNT_UPDATE;
-import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.prepareSearchString;
 
 @Loggable
@@ -58,7 +52,6 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountSignRepository accountSignRepository;
-    private final GuidsHistoryRepository guidsHistoryRepository;
     private final AccountMapper accountMapper;
     private final PartnerService partnerService;
     private final ReplicationService replicationService;
@@ -66,14 +59,12 @@ public class AccountServiceImpl implements AccountService {
     public AccountServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        GuidsHistoryRepository guidsHistoryRepository,
         AccountMapper accountMapper,
         PartnerService partnerService,
         ReplicationService replicationService
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
-        this.guidsHistoryRepository = guidsHistoryRepository;
         this.accountMapper = accountMapper;
         this.partnerService = partnerService;
         this.replicationService = replicationService;
@@ -114,7 +105,6 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Audit(eventType = ACCOUNT_CREATE)
     public Account saveAccount(AccountCreate account) {
-        checkDuplicate(account);
         var digitalId = account.getDigitalId();
         partnerService.existsPartner(digitalId, account.getPartnerId());
         var accountEntity = accountMapper.toAccount(account);
@@ -134,7 +124,6 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Audit(eventType = ACCOUNT_UPDATE)
     public Account updateAccount(AccountChange account) {
-        checkAccountDuplicate(account);
         var foundAccount = findAccountEntity(account.getDigitalId(), account.getId(), account.getVersion());
         accountMapper.updateAccount(account, foundAccount);
         return saveAccount(foundAccount);
@@ -145,7 +134,6 @@ public class AccountServiceImpl implements AccountService {
     @Audit(eventType = ACCOUNT_UPDATE)
     public Account patchAccount(AccountChange account) {
         var foundAccount = findAccountEntity(account.getDigitalId(), account.getId(), account.getVersion());
-        checkAccountDuplicate(account, foundAccount);
         accountMapper.patchAccount(account, foundAccount);
         return saveAccount(foundAccount);
     }
@@ -293,109 +281,6 @@ public class AccountServiceImpl implements AccountService {
             throw e;
         } catch (RuntimeException e) {
             throw new EntrySaveException(DOCUMENT_NAME, e);
-        }
-    }
-
-    private void checkDuplicate(AccountCreate account) {
-        checkAccountDuplicate(account);
-        checkExternalIdDuplicate(account.getDigitalId(), account.getExternalId());
-    }
-
-    private void checkAccountDuplicate(AccountCreate account) {
-        String bic = null;
-        String corAccount = null;
-        var bank = account.getBank();
-        if (nonNull(bank)) {
-            bic = bank.getBic();
-            var bankAccount = bank.getBankAccount();
-            if (nonNull(bankAccount)) {
-                corAccount = bankAccount.getBankAccount();
-            }
-        }
-        var digitalId = account.getDigitalId();
-        checkAccountDuplicate(
-            null,
-            digitalId,
-            account.getPartnerId(),
-            account.getAccount(),
-            bic,
-            corAccount
-        );
-    }
-
-    private void checkAccountDuplicate(AccountChange account) {
-        String bic = null;
-        String corAccount = null;
-        var bank = account.getBank();
-        if (nonNull(bank)) {
-            bic = bank.getBic();
-            var bankAccount = bank.getBankAccount();
-            if (nonNull(bankAccount)) {
-                corAccount = bankAccount.getBankAccount();
-            }
-        }
-        checkAccountDuplicate(
-            account.getId(),
-            account.getDigitalId(),
-            account.getPartnerId(),
-            account.getAccount(),
-            bic,
-            corAccount
-        );
-    }
-
-    private void checkAccountDuplicate(AccountChange account, AccountEntity accountEntity) {
-        String bic = null;
-        String corAccount = null;
-        var bank = account.getBank();
-        if (nonNull(bank)) {
-            bic = bank.getBic();
-            var bankAccount = bank.getBankAccount();
-            if (nonNull(bankAccount)) {
-                corAccount = bankAccount.getBankAccount();
-            }
-        }
-        if (isNull(bic) || isNull(corAccount)) {
-            var bankEntity = accountEntity.getBank();
-            if (nonNull(bankEntity)) {
-                bic = Optional.ofNullable(bic).orElse(bankEntity.getBic());
-                var bankAccountEntity = bankEntity.getBankAccount();
-                if (nonNull(bankAccountEntity)) {
-                    corAccount = Optional.ofNullable(corAccount).orElse(bankAccountEntity.getAccount());
-                }
-            }
-        }
-        checkAccountDuplicate(
-            account.getId(),
-            account.getDigitalId(),
-            account.getPartnerId(),
-            account.getAccount(),
-            bic,
-            corAccount
-        );
-    }
-
-    private void checkAccountDuplicate(
-        UUID accountUuid,
-        String digitalId,
-        UUID partnerUuid,
-        String account,
-        String bic,
-        String corAccount
-    ) {
-        var search = accountMapper.prepareSearchField(partnerUuid, account, bic, corAccount);
-        var accountEntity = accountRepository.findByDigitalIdAndSearch(digitalId, search, UuidDto.class);
-        if (nonNull(accountEntity) && !accountEntity.getUuid().equals(accountUuid)) {
-            throw new CheckDuplicateException(ACCOUNT_DUPLICATE_EXCEPTION);
-        }
-    }
-
-    private void checkExternalIdDuplicate(String digitalId, UUID externalId) {
-        if (nonNull(externalId)) {
-            Optional<IdsHistoryEntity> idLink = guidsHistoryRepository.findByDigitalIdAndExternalId(digitalId, externalId);
-            if (idLink.isPresent()) {
-                throw new CheckDuplicateException(externalId);
-            }
         }
     }
 }

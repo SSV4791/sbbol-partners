@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.audit.AuditAdapter;
 import ru.sberbank.pprb.sbbol.partners.audit.model.EventType;
-import ru.sberbank.pprb.sbbol.partners.config.AuditConfiguration;
+import ru.sberbank.pprb.sbbol.partners.aspect.config.AuditConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.audit.agent.AuditEventMapperAgentRegistry;
 

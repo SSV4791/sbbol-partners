@@ -5,9 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
-import ru.sberbank.pprb.sbbol.partners.aspect.legacy.LegacyCheckAspect;
-import ru.sberbank.pprb.sbbol.partners.aspect.logger.LoggerAspect;
-import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValidatorAspect;
 import ru.sberbank.pprb.sbbol.partners.fraud.FraudAdapter;
 import ru.sberbank.pprb.sbbol.partners.fraud.config.FraudProperties;
 import ru.sberbank.pprb.sbbol.partners.legacy.LegacySbbolAdapter;
@@ -84,31 +81,11 @@ import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.impl.ReplicationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.storage.BudgetMaskCacheableStorage;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Validator;
 import java.util.List;
 
 @Configuration
 @EnableAspectJAutoProxy
 public class PartnerServiceConfiguration {
-
-    @Bean
-    FraudValidatorAspect fraudValidatorAspect(Validator validator) {
-        return new FraudValidatorAspect(validator);
-    }
-
-    @Bean
-    LoggerAspect loggedAspect() {
-        return new LoggerAspect();
-    }
-
-    @Bean
-    LegacyCheckAspect legacyCheckAspect(
-        @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") HttpServletRequest servletRequest,
-        LegacySbbolAdapter legacySbbolAdapter
-    ) {
-        return new LegacyCheckAspect(servletRequest, legacySbbolAdapter);
-    }
 
     @Bean
     FraudService deletedPartnerFraudService(
@@ -151,7 +128,6 @@ public class PartnerServiceConfiguration {
     AccountService accountService(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        GuidsHistoryRepository guidsHistoryRepository,
         AccountMapper accountMapper,
         PartnerService partnerService,
         ReplicationService replicationService
@@ -159,7 +135,6 @@ public class PartnerServiceConfiguration {
         return new AccountServiceImpl(
             accountRepository,
             accountSignRepository,
-            guidsHistoryRepository,
             accountMapper,
             partnerService,
             replicationService

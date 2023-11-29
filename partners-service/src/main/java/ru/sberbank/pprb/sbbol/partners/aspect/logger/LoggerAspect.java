@@ -11,10 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 
 import static java.util.Objects.nonNull;
 
 @Aspect
+@Order(200)
 public final class LoggerAspect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggerAspect.class);
