@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static java.util.Objects.isNull;
@@ -207,7 +208,7 @@ public interface BaseFraudMetaDataMapper {
             isNull(fullAnalyzeResponse.getRiskResult().getTriggeredRule())) {
             return null;
         }
-        return fullAnalyzeResponse.getRiskResult().getTriggeredRule().getActionCode();
+        return fullAnalyzeResponse.getRiskResult().getTriggeredRule().getActionCode().toUpperCase(Locale.getDefault());
     }
 
     default String getAnalyzeResponseDetailledComment(FullAnalyzeResponse fullAnalyzeResponse) {
