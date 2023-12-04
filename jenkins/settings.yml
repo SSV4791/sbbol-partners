@@ -150,7 +150,7 @@ pr_check:
 
 release:
   version_pattern: '\d{2}\.\d{3}\.\d{2}_\d{4}'
-  version_init: 02.008.00_0000
+  version_init: 02.011.00_0000
   repository: maven-distr-dev
   artifact_id: CI02792425
   group_id: CI00908578
@@ -168,8 +168,8 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: '2.5'
-    commit_or_tag: '02.009.00_0024_i-2.5'
-    release_key: DCBBRAIN-5355
+    commit_or_tag: '02.010.00_0003_i-2.5'
+    release_key: DCBBRAIN-5700
     reverse_and_publish: false
     type: release
   jobs:
