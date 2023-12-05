@@ -1,10 +1,11 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
-import com.sbt.pprb.integration.hibernate.standin.annotations.Replication;
-import com.sbt.pprb.integration.hibernate.standin.annotations.Standin;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
@@ -19,7 +20,7 @@ import java.util.UUID;
     name = "ids_history",
     indexes = {
         @Index(name = "ids_history_pkey", columnList = "uuid", unique = true),
-        @Index(name = "idx_ids_history_digital_id_external_id", columnList = "digital_id, external_id", unique = true),
+        @Index(name = "idx_ids_history_digital_id_external_id_parent_type", columnList = "digital_id, external_id, parent_type", unique = true),
         @Index(name = "idx_ids_history_pprb_entity_id_digital_id", columnList = "pprb_entity_id, digital_id"),
     }
 )
@@ -35,9 +36,9 @@ public class IdsHistoryEntity extends BaseEntity {
     @Column(name = "external_id", nullable = false)
     private UUID externalId;
 
-    @Standin(replication = Replication.DISABLED)
-    @Column(name = "pprb_entity_id", insertable = false, updatable = false)
-    private UUID pprbEntityId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "parent_type", nullable = false, length = 254)
+    private ParentType parentType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pprb_entity_id")
@@ -59,12 +60,12 @@ public class IdsHistoryEntity extends BaseEntity {
         this.externalId = externalId;
     }
 
-    public UUID getPprbEntityId() {
-        return pprbEntityId;
+    public ParentType getParentType() {
+        return parentType;
     }
 
-    public void setPprbEntityId(UUID pprbEntityId) {
-        this.pprbEntityId = pprbEntityId;
+    public void setParentType(ParentType parentType) {
+        this.parentType = parentType;
     }
 
     public AccountEntity getAccount() {

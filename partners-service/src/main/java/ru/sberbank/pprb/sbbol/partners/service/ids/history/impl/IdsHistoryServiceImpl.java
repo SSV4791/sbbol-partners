@@ -1,6 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.service.ids.history.impl;
 
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.IdsHistoryMapper;
 import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
@@ -22,9 +23,9 @@ public class IdsHistoryServiceImpl implements IdsHistoryService {
     }
 
     @Override
-    public ExternalInternalIdLinksResponse getInternalIds(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds) {
+    public ExternalInternalIdLinksResponse getAccountInternalIds(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds) {
         var idsHistoryEntities =
-            repository.findByDigitalIdAndExternalIdIn(digitalId, externalIds);
+            repository.findByDigitalIdAndParentTypeAndExternalIdIn(digitalId, ParentType.ACCOUNT, externalIds);
         return mapper.toAccountIdsByExternalIdsResponse(externalIds, idsHistoryEntities);
     }
 }

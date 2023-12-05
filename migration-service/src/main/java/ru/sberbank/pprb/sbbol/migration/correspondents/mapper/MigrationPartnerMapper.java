@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType.ACCOUNT;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.mapUuid;
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
 
@@ -244,6 +245,7 @@ public interface MigrationPartnerMapper {
         var externalUuid = StringUtils.isNotEmpty(externalId) ? mapUuid(externalId) : null;
         var idLink = new IdsHistoryEntity();
         idLink.setAccount(account);
+        idLink.setParentType(ACCOUNT);
         idLink.setExternalId(externalUuid);
         idLink.setDigitalId(account.getDigitalId());
         var idLinks = account.getIdLinks();
