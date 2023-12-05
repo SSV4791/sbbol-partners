@@ -1,4 +1,4 @@
-package ru.sberbank.pprb.sbbol.partners.config;
+package ru.sberbank.pprb.sbbol.partners.aspect.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -3058,10 +3058,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             assertThat(error.getCode())
                 .isEqualTo(EXTERNAL_ID_DUPLICATE_EXCEPTION.getValue());
             assertThat(error.getMessage())
-                .isEqualTo(MessagesTranslator.toLocale("external_id.duplicate", account.getExternalIds().stream()
-                    .findFirst()
-                    .orElse(UUID.randomUUID()))
-                );
+                .isEqualTo(MessagesTranslator.toLocale("external_id.duplicate"));
         });
     }
 

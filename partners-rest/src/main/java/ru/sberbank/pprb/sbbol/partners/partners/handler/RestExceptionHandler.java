@@ -22,7 +22,6 @@ import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.CheckValidationException;
-import ru.sberbank.pprb.sbbol.partners.exception.CheckDuplicateException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.FraudDeniedException;
@@ -49,14 +48,17 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ENTRY_SAVE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXTERNAL_ID_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_DENIED_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.FRAUD_MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MULTIPLE_FOUND_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.BUSINESS;
 import static ru.sberbank.pprb.sbbol.partners.model.Error.TypeEnum.CRITICAL;
 
@@ -65,7 +67,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestExceptionHandler.class);
 
+    private static final String ACCOUNT_DUPLICATE_MESSAGE = "account.duplicate";
+    private static final String ACCOUNT_INDEX = "idx_account_digital_id_partner_uuid_search";
     private static final String CHECK_VALIDATION_MESSAGE = "error.message.check.validation";
+    private static final String EXTERNAL_ID_DUPLICATE_MESSAGE = "external_id.duplicate";
+    private static final String EXTERNAL_ID_INDEX = "idx_ids_history_digital_id_external_id";
+    private static final String PARTNER_DUPLICATE_MESSAGE = "partner.duplicate";
+    private static final String PARTNER_INDEX = "idx_partner_digital_id_search";
 
     @ExceptionHandler({
         DataIntegrityViolationException.class
@@ -74,12 +82,29 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         DataIntegrityViolationException ex,
         HttpServletRequest httpRequest
     ) {
+        var errorCode = MODEL_DUPLICATE_EXCEPTION.getValue();
+        var errorText = MessagesTranslator.toLocale(CHECK_VALIDATION_MESSAGE);
+        var message = ex.getCause().getCause().getMessage();
+        if (message.contains("duplicate key")) {
+            if (message.contains(PARTNER_INDEX)) {
+                errorCode = PARTNER_DUPLICATE_EXCEPTION.getValue();
+                errorText = MessagesTranslator.toLocale(PARTNER_DUPLICATE_MESSAGE);
+            }
+            if (message.contains(ACCOUNT_INDEX)) {
+                errorCode = ACCOUNT_DUPLICATE_EXCEPTION.getValue();
+                errorText = MessagesTranslator.toLocale(ACCOUNT_DUPLICATE_MESSAGE);
+            }
+            if (message.contains(EXTERNAL_ID_INDEX)) {
+                errorCode = EXTERNAL_ID_DUPLICATE_EXCEPTION.getValue();
+                errorText = MessagesTranslator.toLocale(EXTERNAL_ID_DUPLICATE_MESSAGE);
+            }
+        }
         LOG.error("Нарушение ограничений уникальности в БД", ex);
         return buildResponsesEntity(
             HttpStatus.BAD_REQUEST,
             BUSINESS,
-            MODEL_DUPLICATE_EXCEPTION.getValue(),
-            MessagesTranslator.toLocale(CHECK_VALIDATION_MESSAGE),
+            errorCode,
+            errorText,
             Collections.emptyMap(),
             httpRequest.getRequestURL()
         );
@@ -129,7 +154,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         AccountAlreadySignedException.class,
         OptimisticLockException.class,
         CheckValidationException.class,
-        CheckDuplicateException.class
     })
     protected ResponseEntity<Object> handleBusinessException(
         BaseException ex,
