@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType.ACCOUNT;
+
 public abstract class AccountMapperDecorator implements AccountMapper {
 
     @Autowired
@@ -125,6 +127,7 @@ public abstract class AccountMapperDecorator implements AccountMapper {
         var idHistoryEntity = new IdsHistoryEntity();
         idHistoryEntity.setExternalId(accountUuid);
         idHistoryEntity.setDigitalId(account.getDigitalId());
+        idHistoryEntity.setParentType(ACCOUNT);
         idHistoryEntity.setAccount(account);
         account.setIdLinks(List.of(idHistoryEntity));
     }

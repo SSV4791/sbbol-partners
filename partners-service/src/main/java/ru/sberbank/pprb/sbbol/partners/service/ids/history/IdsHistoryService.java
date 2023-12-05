@@ -16,6 +16,8 @@ public interface IdsHistoryService {
      * @param externalIds список внешних идентификатор
      * @return Список внутренних идентификаторов
      */
-
-    ExternalInternalIdLinksResponse getInternalIds(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds);
+    ExternalInternalIdLinksResponse getAccountInternalIds(
+        @NotEmpty String digitalId,
+        @NotEmpty List<UUID> externalIds
+    );
 }

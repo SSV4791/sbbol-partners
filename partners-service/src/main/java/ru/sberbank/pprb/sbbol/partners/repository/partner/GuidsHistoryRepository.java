@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +21,9 @@ public interface GuidsHistoryRepository extends CrudRepository<IdsHistoryEntity,
 
     /**
      * @param digitalId   идентификатор личного кабинета
+     * @param parentType  тип родительской сущности
      * @param externalIds список внешних идентификаторов сущностей
      * @return список сущностей
      */
-    List<IdsHistoryEntity> findByDigitalIdAndExternalIdIn(String digitalId, List<UUID> externalIds);
+    List<IdsHistoryEntity> findByDigitalIdAndParentTypeAndExternalIdIn(String digitalId, ParentType parentType, List<UUID> externalIds);
 }

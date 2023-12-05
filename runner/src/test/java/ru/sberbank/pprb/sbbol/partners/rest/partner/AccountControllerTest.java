@@ -58,8 +58,6 @@ import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getBic;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.ACCOUNT_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.EXTERNAL_ID_DUPLICATE_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_DUPLICATE_EXCEPTION;
-import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.PARTNER_DUPLICATE_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_VALIDATION_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
@@ -1117,7 +1115,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         });
 
         var idsLink = step("Выполнение запроса", () ->
-            idsHistoryService.getInternalIds(account.getDigitalId(), List.of(account.getId())));
+            idsHistoryService.getAccountInternalIds(account.getDigitalId(), List.of(account.getId())));
 
         step("Проверка корректности ответа", () -> {
             assertThat(idsLink)
