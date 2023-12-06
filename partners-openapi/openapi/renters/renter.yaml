@@ -15,3 +15,5 @@ paths:
     $ref: view.yaml
   /sbbol-partners/renter/version:
     $ref: version.yaml
+  /sbbol-partners/renter/startrentermigration:
+    $ref: migration.yaml

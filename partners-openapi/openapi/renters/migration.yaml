@@ -1,0 +1,8 @@
+get:
+  operationId: startMigration
+  summary: Запуск миграции рентеров в целевую схему хранения партнёров фабрики
+  responses:
+    '200':
+      description: Успешный ответ
+    '400':
+      description: Bad Request

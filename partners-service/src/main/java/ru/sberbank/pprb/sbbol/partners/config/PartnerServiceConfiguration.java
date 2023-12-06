@@ -46,6 +46,8 @@ import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.FraudServiceManagerImp
 import ru.sberbank.pprb.sbbol.partners.service.fraud.impl.SignedAccountFraudServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.ids.history.impl.IdsHistoryServiceImpl;
+import ru.sberbank.pprb.sbbol.partners.service.migration.RenterMigrationService;
+import ru.sberbank.pprb.sbbol.partners.service.migration.RenterMigrationServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountServiceImpl;
 import ru.sberbank.pprb.sbbol.partners.service.partner.AccountSignService;
@@ -341,6 +343,11 @@ public class PartnerServiceConfiguration {
             validationService,
             renterPartnerMapper
         );
+    }
+
+    @Bean
+    RenterMigrationService renterMigrationService() {
+        return new RenterMigrationServiceImpl();
     }
 
     @Bean
