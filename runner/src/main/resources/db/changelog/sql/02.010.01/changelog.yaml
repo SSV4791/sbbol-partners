@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 1699868109140_add_index_to_account.sql
+      relativeToChangelogFile: true
