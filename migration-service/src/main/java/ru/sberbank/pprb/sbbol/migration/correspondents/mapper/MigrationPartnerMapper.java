@@ -67,6 +67,7 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "middleName", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "migrationDate", ignore = true)
     PartnerEntity toPartnerEntity(String digitalId, MigrationCorrespondentCandidate source);
 
     @Mapping(target = "uuid", ignore = true)
@@ -126,6 +127,7 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "middleName", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "migrationDate", ignore = true)
     void updatePartnerEntity(String digitalId, MigrationCorrespondentCandidate source, @MappingTarget PartnerEntity partner);
 
     default List<PartnerEmailEntity> toEmail(List<PartnerEmailEntity> emails, String email, String digitalId) {

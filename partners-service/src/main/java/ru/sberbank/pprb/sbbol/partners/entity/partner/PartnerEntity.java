@@ -19,6 +19,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import java.io.Serial;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +97,9 @@ public class PartnerEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartnerEmailEntity> emails;
+
+    @Column(name = "migration_date")
+    private LocalDateTime migrationDate;
 
     public OffsetDateTime getCreateDate() {
         return createDate;
@@ -245,6 +249,14 @@ public class PartnerEntity extends BaseEntity {
 
     public void setGkuInnEntity(GkuInnEntity gkuInnEntity) {
         this.gkuInnEntity = gkuInnEntity;
+    }
+
+    public LocalDateTime getMigrationDate() {
+        return migrationDate;
+    }
+
+    public void setMigrationDate(LocalDateTime migrationDate) {
+        this.migrationDate = migrationDate;
     }
 
     @Override

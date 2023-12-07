@@ -94,6 +94,7 @@ public interface PartnerMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
+    @Mapping(target = "migrationDate", ignore = true)
     PartnerEntity toPartner(PartnerCreate partner);
 
     default List<PartnerEmailEntity> toEmail(Set<String> emails, String digitalId) {
@@ -139,6 +140,7 @@ public interface PartnerMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
+    @Mapping(target = "migrationDate", ignore = true)
     PartnerEntity toPartner(PartnerCreateFullModel partner);
 
     @Named("toCitizenshipType")
@@ -158,6 +160,7 @@ public interface PartnerMapper {
     @Mapping(target = "citizenship", source = "citizenship", qualifiedByName = "toCitizenshipType")
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
+    @Mapping(target = "migrationDate", ignore = true)
     PartnerEntity toPartner(Partner partner);
 
     @Named("toLegalType")
@@ -177,6 +180,7 @@ public interface PartnerMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
+    @Mapping(target = "migrationDate", ignore = true)
     void updatePartner(Partner partner, @MappingTarget() PartnerEntity partnerEntity);
 
     @Mapping(target = "uuid", ignore = true)
@@ -191,6 +195,7 @@ public interface PartnerMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "gkuInnEntity", ignore = true)
+    @Mapping(target = "migrationDate", ignore = true)
     void patchPartner(PartnerChangeFullModel partner, @MappingTarget() PartnerEntity partnerEntity);
 
     @AfterMapping

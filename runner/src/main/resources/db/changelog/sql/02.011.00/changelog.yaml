@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: 1701699094698_update_index_idx_ids_history_digital_id_external_id.sql
       relativeToChangelogFile: true
+  - include:
+      file: 1701782592090_add_new_column_migration_date_for_partner.sql
+      relativeToChangelogFile: true
