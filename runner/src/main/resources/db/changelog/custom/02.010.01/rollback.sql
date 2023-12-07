@@ -1,0 +1,1 @@
+drop index if exists ix_account_dgtl_id_prt_type_sys_lstchgedate;
