@@ -167,10 +167,7 @@ public class PartnerServiceImpl implements PartnerService {
         var savedPartner = partnerRepository.save(partnerEntity);
         var digitalId = partner.getDigitalId();
         var partnerUuid = savedPartner.getUuid();
-        var accounts = accountMapper.toAccounts(partner.getAccounts(), digitalId, partnerUuid).stream()
-            .map(accountRepository::save)
-            .map(accountMapper::toAccount)
-            .collect(Collectors.toList());
+        var accounts = accountService.saveAccounts(partner.getAccounts(), digitalId, partnerUuid);
         var addresses = addressMapper.toAddress(partner.getAddress(), digitalId, partnerUuid).stream()
             .map(addressRepository::save)
             .map(addressMapper::toAddress)

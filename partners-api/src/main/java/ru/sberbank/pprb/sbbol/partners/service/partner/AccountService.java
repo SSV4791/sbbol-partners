@@ -5,6 +5,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
@@ -43,6 +44,16 @@ public interface AccountService {
      * @return Счёт
      */
     Account saveAccount(AccountCreate account);
+
+    /**
+     * Создание новых счётов Партнера
+     *
+     * @param accounts    счета
+     * @param digitalId   Идентификатор личного кабинета клиента
+     * @param partnerUuid Идентификатор партнера
+     * @return Счёт
+     */
+    List<Account> saveAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid);
 
     /**
      * Обновление счёта Партнера

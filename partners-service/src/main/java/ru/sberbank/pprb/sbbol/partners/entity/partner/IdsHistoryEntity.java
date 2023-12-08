@@ -1,5 +1,7 @@
 package ru.sberbank.pprb.sbbol.partners.entity.partner;
 
+import com.sbt.pprb.integration.hibernate.standin.annotations.Replication;
+import com.sbt.pprb.integration.hibernate.standin.annotations.Standin;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType;
 
 import javax.persistence.Column;
@@ -40,8 +42,12 @@ public class IdsHistoryEntity extends BaseEntity {
     @Column(name = "parent_type", nullable = false, length = 254)
     private ParentType parentType;
 
+    @Column(name = "pprb_entity_id")
+    private UUID pprbEntityId;
+
+    @Standin(replication = Replication.DISABLED)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pprb_entity_id")
+    @JoinColumn(name = "pprb_entity_id", updatable = false, insertable = false)
     private AccountEntity account;
 
     public String getDigitalId() {
@@ -68,6 +74,14 @@ public class IdsHistoryEntity extends BaseEntity {
         this.parentType = parentType;
     }
 
+    public UUID getPprbEntityId() {
+        return pprbEntityId;
+    }
+
+    public void setPprbEntityId(UUID pprbEntityId) {
+        this.pprbEntityId = pprbEntityId;
+    }
+
     public AccountEntity getAccount() {
         return account;
     }
@@ -79,7 +93,7 @@ public class IdsHistoryEntity extends BaseEntity {
     @PrePersist
     private void setExternalId() {
         if (Objects.isNull(externalId)) {
-            setExternalId(account.getUuid());
+            setExternalId(pprbEntityId);
         }
     }
 

@@ -82,7 +82,6 @@ public interface MigrationPartnerMapper {
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "createDate", ignore = true)
     @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "idLinks", ignore = true)
     @Mapping(target = "partnerType", constant = "PARTNER")
     AccountEntity toAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source);
 
@@ -243,25 +242,13 @@ public interface MigrationPartnerMapper {
         return StringUtils.isEmpty(value) ? null : value;
     }
 
-    default AccountEntity fillIdLinks(AccountEntity account, String externalId) {
+    default IdsHistoryEntity fillIdLinks(AccountEntity account, String externalId) {
         var externalUuid = StringUtils.isNotEmpty(externalId) ? mapUuid(externalId) : null;
         var idLink = new IdsHistoryEntity();
-        idLink.setAccount(account);
+        idLink.setPprbEntityId(account.getUuid());
         idLink.setParentType(ACCOUNT);
         idLink.setExternalId(externalUuid);
         idLink.setDigitalId(account.getDigitalId());
-        var idLinks = account.getIdLinks();
-        if (!CollectionUtils.isEmpty(idLinks) && Objects.nonNull(externalUuid)) {
-            long count = idLinks.stream()
-                .filter(link -> link.getExternalId().equals(externalUuid))
-                .count();
-            if (count != 0) {
-                return account;
-            }
-            idLinks.add(idLink);
-            return account;
-        }
-        account.getIdLinks().add(idLink);
-        return account;
+        return idLink;
     }
 }

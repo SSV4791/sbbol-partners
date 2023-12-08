@@ -42,6 +42,7 @@ import javax.persistence.metamodel.EntityType;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -225,7 +226,17 @@ class ChangeVectorTest {
                 }
             }
         }
+        Method getterMethod = ReflectionUtils.findMethod(entityClass, getGetterName(name));
+        if (getterMethod != null) {
+            Standin standin = getterMethod.getAnnotation(Standin.class);
+            if (standin != null) {
+                return standin.replication() == Replication.DISABLED;
+            }
+        }
         return false;
     }
 
+    private static String getGetterName(String propertyName) {
+        return "get" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+    }
 }

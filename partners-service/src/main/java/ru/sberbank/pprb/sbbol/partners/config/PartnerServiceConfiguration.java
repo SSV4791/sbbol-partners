@@ -132,14 +132,16 @@ public class PartnerServiceConfiguration {
         AccountSignRepository accountSignRepository,
         AccountMapper accountMapper,
         PartnerService partnerService,
-        ReplicationService replicationService
+        ReplicationService replicationService,
+        IdsHistoryService idsHistoryService
     ) {
         return new AccountServiceImpl(
             accountRepository,
             accountSignRepository,
             accountMapper,
             partnerService,
-            replicationService
+            replicationService,
+            idsHistoryService
         );
     }
 

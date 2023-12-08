@@ -37,7 +37,6 @@ import static ru.sberbank.pprb.sbbol.partners.mapper.fraud.ClientDefinedAttribut
 
 @Loggable
 @Mapper(
-    componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
         FraudClientDataMapper.class,

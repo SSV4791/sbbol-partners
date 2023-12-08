@@ -1,6 +1,8 @@
 package ru.sberbank.pprb.sbbol.partners.service.ids.history.impl;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.IdsHistoryMapper;
 import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
@@ -23,9 +25,32 @@ public class IdsHistoryServiceImpl implements IdsHistoryService {
     }
 
     @Override
-    public ExternalInternalIdLinksResponse getAccountInternalIds(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds) {
-        var idsHistoryEntities =
+    @Transactional(readOnly = true)
+    public List<UUID> getAccountByPprbUuid(@NotEmpty String digitalId, @NotEmpty UUID pprbUuid) {
+        List<IdsHistoryEntity> history = repository.findByDigitalIdAndParentTypeAndPprbEntityId(digitalId, ParentType.ACCOUNT, pprbUuid);
+        return mapper.toExternalUuids(history);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ExternalInternalIdLinksResponse getAccountsInternalIds(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds) {
+        var foundIdsHistory =
             repository.findByDigitalIdAndParentTypeAndExternalIdIn(digitalId, ParentType.ACCOUNT, externalIds);
-        return mapper.toAccountIdsByExternalIdsResponse(externalIds, idsHistoryEntities);
+        return mapper.toExternalInternalIdsResponse(externalIds, foundIdsHistory);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ExternalInternalIdLinksResponse getPartnersInternalId(@NotEmpty String digitalId, @NotEmpty List<UUID> externalIds) {
+        var foundIdsHistory =
+            repository.findByDigitalIdAndParentTypeAndExternalIdIn(digitalId, ParentType.PARTNER, externalIds);
+        return mapper.toExternalInternalIdsResponse(externalIds, foundIdsHistory);
+    }
+
+    @Override
+    @Transactional
+    public IdsHistoryEntity saveAccountIdLink(UUID externalId, UUID internalId, String digitalId) {
+        IdsHistoryEntity history = mapper.toAccountIdsHistoryEntity(externalId, internalId, digitalId);
+        return repository.save(history);
     }
 }

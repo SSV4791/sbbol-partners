@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Request for partners
-  version: 1.1.11
+  version: 1.2.0
   description: OpenAPI Specification for partners
 
 servers:
@@ -244,6 +244,49 @@ paths:
             application/json:
               schema:
                 $ref: 'model/partners/partners_response.json'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: 'model/common/error.json'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+
+  /partners/get-partnerId-by-externalIds/{digitalId}:
+    get:
+      tags:
+        - Partners
+      description: Получение идентификатора партнера по его внешнему идентификатору
+      operationId: get-internalId-by-externalIds
+      parameters:
+        - name: digitalId
+          in: path
+          required: true
+          schema:
+            type: string
+            x-not-empty: true
+            description: Идентификатор личного кабинета
+        - name: externalIds
+          in: query
+          required: true
+          schema:
+            type: array
+            maxItems: 200
+            items:
+              type: string
+              format: uuid
+              x-not-empty: true
+              description: Внешний идентификатор
+      responses:
+        200:
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: 'model/common/external_internal_id_links_response.json'
         400:
           description: Bad Request
           content:

@@ -42,7 +42,6 @@ import static ru.sberbank.pprb.sbbol.partners.entity.renter.DulType.SERVICEPASSP
  */
 @Deprecated(forRemoval = true)
 @Mapper(
-    componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
     uses = {
         BaseMapper.class,

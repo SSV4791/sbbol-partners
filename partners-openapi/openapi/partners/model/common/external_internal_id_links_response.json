@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "title": "Список свзязей внешних и внутренних идентификаторов",
+  "title": "Список связей внешних и внутренних идентификаторов",
   "properties": {
     "idLinks": {
       "type": "array",
