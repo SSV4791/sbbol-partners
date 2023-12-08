@@ -1,5 +1,3 @@
-import org.gradle.api.JavaVersion
-
 plugins {
     `java-library`
     id("idea-conventions")
@@ -13,8 +11,8 @@ subprojects {
 group = "ru.sberbank.pprb.sbbol.partners"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.withType<JavaCompile> {
