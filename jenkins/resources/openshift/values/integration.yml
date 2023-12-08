@@ -168,6 +168,7 @@ int:
         protocol: TLS
         url: https://ingress-ci02745214-digitalapi-ott.apps.dev-gen2.sigma.sbrf.ru
         health_path: /v1/health/info
+
     CI03045533_antifraud_aggregator:
       v1_0:
         name: antifraud-aggregator
@@ -178,6 +179,39 @@ int:
         mtls: true
         rotocol: HTTPS
         url: https://ingress-ci02281165-antifraud-ott.apps.dev-terra000006-idm.ocp.delta.sbrf.ru
+
+    CI03333548_digital_integration_layer:
+      v1_0:
+        - name: tkldq-efs000217-digital-integration-layer
+          protocol: TCP
+          resolution: STATIC
+          ott: false
+          mtls: true
+          url: http://10.53.164.226
+          host: tkldq-efs000217.vm.mos.cloud.sbrf.ru
+          ip: 10.53.164.226
+          port: 9093
+          egress_port: 2093
+        - name: tkldq-efs000218-digital-integration-layer
+          protocol: TCP
+          resolution: STATIC
+          ott: false
+          mtls: true
+          url: http://10.53.164.47
+          host: tkldq-efs000218.vm.mos.cloud.sbrf.ru
+          ip: 10.53.164.47
+          port: 9093
+          egress_port: 2094
+        - name: tkldq-efs000219-digital-integration-layer
+          protocol: TCP
+          resolution: STATIC
+          ott: false
+          mtls: true
+          url: http://10.53.164.224
+          host: tkldq-efs000219.vm.mos.cloud.sbrf.ru
+          ip: 10.53.164.224
+          port: 9093
+          egress_port: 2095
 
     tsa:
       kafka:

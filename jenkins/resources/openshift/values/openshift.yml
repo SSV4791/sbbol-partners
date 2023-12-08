@@ -129,3 +129,8 @@ app_journal:
   secret: secret-appjournalstubsettings
 
 appjournal_zone_id: PARTNERS
+
+app:
+  kafka:
+    enable: false
+    topic: "topic"
