@@ -24,10 +24,12 @@ tasks {
     register<Test>("generateVectorTest") {
         useJUnitPlatform()
         filter { includeTestsMatching("**changevector.generate.*") }
+        jvmArgs  ("--add-opens", "java.base/java.time=ALL-UNNAMED")
     }
     register<Test>("applyVectorTest") {
         useJUnitPlatform()
         filter { includeTestsMatching("**changevector.apply.*") }
+        jvmArgs  ("--add-opens", "java.base/java.time=ALL-UNNAMED")
     }
     register<Copy>("createCustom") {
         from(defaultTestPropertiesDirPath)

@@ -32,7 +32,6 @@ spec:
         sidecar.istio.io/proxyCPU: {{ os_project.istio.sidecar.requests.cpu | default("50m") }}
         sidecar.istio.io/proxyMemory: {{ os_project.istio.sidecar.requests.memory | default("150Mi") }}
         openshift.io/scc: restricted
-{% if secman.openshift.enabled is not defined or secman.openshift.enabled | bool %}
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/agent-init-first: 'false'
         vault.hashicorp.com/agent-pre-populate-only: 'false'
@@ -56,14 +55,11 @@ spec:
         vault.hashicorp.com/agent-inject-perms-{{ index }}{{ loop.index }}: '{{ secret.defaultMode | default("0400") }}'
 {% endfor %}
 {% endfor %}
-{% endif %}
       labels:
         secman: application-pod
         app: {{ os_project.name }}-{{ suffix_app_label }}
         version: {{ version | default('v1') }}
-{% if secman.openshift.enabled is not defined or secman.openshift.enabled | bool %}
         secman-injector: enabled
-{% endif %}
     spec:
       serviceAccountName: default
       securityContext:
@@ -119,20 +115,6 @@ spec:
               readOnly: true
             - name: logsshare
               mountPath: /app/logs
-{% if secman.openshift.enabled is defined and not secman.openshift.enabled | bool %}
-            - name: main-db-secret
-              mountPath: /deployments/credentials/main_db
-              readOnly: true
-            - name: standin-db-secret
-              mountPath: /deployments/credentials/si_db
-              readOnly: true
-            - name: app-journal-config
-              mountPath: /deployments/config/app_journal
-              readOnly: true
-            - name: kafka-ssl-secret
-              mountPath: /opt/keystore/kafka
-              readOnly: true
-{% endif %}
             - name: java-tmp-dir
               mountPath: /tmp
             - name: waiting-secrets
@@ -233,27 +215,6 @@ spec:
             name: cm-ds-fluentbit-{{ canary_suffix }}
         - name: logsshare
           emptyDir: {}
-{% if secman.openshift.enabled is defined and not secman.openshift.enabled | bool %}
-        - name: main-db-secret
-          secret:
-            secretName: pgdb-main-secret
-            defaultMode: 0400
-        - name: standin-db-secret
-          secret:
-            secretName: pgdb-si-secret
-            defaultMode: 0400
-            optional: true
-        - name: app-journal-config
-          secret:
-            secretName: {{ app_journal.secret }}
-            defaultMode: 0400
-            optional: true
-        - name: kafka-ssl-secret
-          secret:
-            secretName: kafka-ssl-secret
-            defaultMode: 0400
-            optional: true
-{% endif %}
         - name: java-tmp-dir
           emptyDir: {}
         - name: waiting-secrets
