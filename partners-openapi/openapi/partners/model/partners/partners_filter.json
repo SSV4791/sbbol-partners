@@ -19,6 +19,7 @@
       "maximum": 30
     },
     "search": {
+      "deprecation": true,
       "title": "Поиск партнера по имени, названию компании, инн",
       "type": "object",
       "$ref": "../search/search_partners.json"
