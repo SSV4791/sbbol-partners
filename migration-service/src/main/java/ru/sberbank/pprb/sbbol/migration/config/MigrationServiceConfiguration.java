@@ -16,6 +16,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.concurrent.ExecutorService;
@@ -32,7 +33,8 @@ public class MigrationServiceConfiguration {
         AddressRepository addressRepository,
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
-        MigrationPartnerMapper migrationPartnerMapper
+        MigrationPartnerMapper migrationPartnerMapper,
+        GuidsHistoryRepository guidsHistoryRepository
     ) {
         return new CorrespondentMigrationServiceImpl(
             migrationPartnerMapper,
@@ -41,7 +43,8 @@ public class MigrationServiceConfiguration {
             contactRepository,
             addressRepository,
             accountRepository,
-            accountSignRepository
+            accountSignRepository,
+            guidsHistoryRepository
         );
     }
 

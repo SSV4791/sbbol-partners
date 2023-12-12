@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import ru.sberbank.pprb.sbbol.renter.model.Pagination;
 
 @Deprecated
-@Mapper(componentModel = "spring")
+@Mapper
 public interface PartnersPaginationMapper {
 
     /**

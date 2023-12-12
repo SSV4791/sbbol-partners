@@ -61,13 +61,4 @@ public interface PartnerRepository extends
      * @param search    Данные для поиска партнера
      */
     PartnerEntity findByDigitalIdAndSearchAndType(String digitalId, String search, PartnerType type);
-
-    /**
-     * Поиск партнера по ключевым параметрам
-     *
-     * @param digitalId Идентификатор личного кабинета
-     * @param search    Данные для поиска партнера
-     * @param classDto  Тип возвращаемого объекта
-     */
-    <T> T findByDigitalIdAndSearchAndType(String digitalId, String search, PartnerType type, Class<T> classDto);
 }

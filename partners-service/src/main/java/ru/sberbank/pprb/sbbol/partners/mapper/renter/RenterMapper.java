@@ -14,7 +14,7 @@ import ru.sberbank.pprb.sbbol.renter.model.RenterAddress;
  * @deprecated {@link ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper}
  */
 @Deprecated(forRemoval = true)
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface RenterMapper {
 
     @Mapping(target = "id", ignore = true)

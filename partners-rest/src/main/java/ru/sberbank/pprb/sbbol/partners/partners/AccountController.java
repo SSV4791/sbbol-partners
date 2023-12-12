@@ -51,7 +51,7 @@ public class AccountController implements PartnerAccountsApi {
 
     @Override
     public ResponseEntity<ExternalInternalIdLinksResponse> getAccountIdsByExternalIds(String digitalId, List<UUID> externalIds) {
-        return ResponseEntity.ok(idsHistoryService.getAccountInternalIds(digitalId, externalIds));
+        return ResponseEntity.ok(idsHistoryService.getAccountsInternalIds(digitalId, externalIds));
     }
 
     @Override

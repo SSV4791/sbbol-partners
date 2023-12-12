@@ -1,29 +1,43 @@
 package ru.sberbank.pprb.sbbol.partners.service.mapper.counterparty;
 
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.counterparties.model.CounterpartySearchRequest;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankAccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.BankEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.Counterparty;
 import ru.sberbank.pprb.sbbol.partners.legacy.model.CounterpartyCheckRequisites;
 import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapper;
+import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl;
+import ru.sberbank.pprb.sbbol.partners.mapper.counterparty.CounterpartyMapperImpl_;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ContextConfiguration(
+    classes = {
+        CounterpartyMapperImpl.class,
+        CounterpartyMapperImpl_.class,
+    }
+)
 class CounterpartyMapperTest extends BaseUnitConfiguration {
 
-    private static final CounterpartyMapper mapper = Mappers.getMapper(CounterpartyMapper.class);
+    @Autowired
+    private CounterpartyMapper counterpartyMapper;
+
+    @MockBean
+    private IdsHistoryService idsHistoryService;
 
     @Test
     void toCounterpartyCheckRequisites() {
         var searchRequest = factory.manufacturePojo(CounterpartySearchRequest.class);
-        CounterpartyCheckRequisites response = mapper.toCounterpartyCheckRequisites(searchRequest);
+        CounterpartyCheckRequisites response = counterpartyMapper.toCounterpartyCheckRequisites(searchRequest);
         assertThat(searchRequest.getAccountNumber()).isEqualTo(response.getAccountNumber());
         assertThat(searchRequest.getBankAccount()).isEqualTo(response.getBankAccount());
         assertThat(searchRequest.getBankBic()).isEqualTo(response.getBankBic());
@@ -37,7 +51,7 @@ class CounterpartyMapperTest extends BaseUnitConfiguration {
     void toCounterpartyCheckRequisites_thenTaxNumberIsEmpty() {
         var searchRequest = factory.manufacturePojo(CounterpartySearchRequest.class);
         searchRequest.setTaxNumber("");
-        CounterpartyCheckRequisites response = mapper.toCounterpartyCheckRequisites(searchRequest);
+        CounterpartyCheckRequisites response = counterpartyMapper.toCounterpartyCheckRequisites(searchRequest);
         assertThat(searchRequest.getAccountNumber()).isEqualTo(response.getAccountNumber());
         assertThat(searchRequest.getBankAccount()).isEqualTo(response.getBankAccount());
         assertThat(searchRequest.getBankBic()).isEqualTo(response.getBankBic());
@@ -55,8 +69,7 @@ class CounterpartyMapperTest extends BaseUnitConfiguration {
         var bankAccount = factory.manufacturePojo(BankAccountEntity.class);
         bank.setBankAccount(bankAccount);
         account.setBank(bank);
-        account.setIdLinks(null);
-        Counterparty response = mapper.toCounterparty(partner, account);
+        Counterparty response = counterpartyMapper.toCounterparty(partner, account);
         if (LegalType.PHYSICAL_PERSON.equals(partner.getLegalType())) {
             assertThat(response.getName())
                 .isEqualTo(partner.getSecondName() + " " + partner.getFirstName() + " " + partner.getMiddleName());

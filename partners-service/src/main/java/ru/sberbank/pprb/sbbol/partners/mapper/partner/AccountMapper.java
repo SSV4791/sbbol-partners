@@ -21,9 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper.saveSearchString;
@@ -49,13 +47,12 @@ public interface AccountMapper {
     @Mapping(target = "budget", ignore = true)
     Account toAccount(AccountEntity account);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Account toAccount(AccountEntity account, UUID externalId);
+
     AccountChange toAccount(AccountChangeFullModel account, String digitalId, UUID partnerId);
 
     AccountCreate toAccountCreate(AccountChangeFullModel account, String digitalId, UUID partnerId);
-
-    default List<AccountEntity> toAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid) {
-        return Collections.emptyList();
-    }
 
     @Mapping(target = "partnerUuid", source = "partnerUuid")
     @Mapping(target = "digitalId", source = "digitalId")
@@ -68,7 +65,6 @@ public interface AccountMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
-    @Mapping(target = "idLinks", ignore = true)
     @Mapping(target = "partnerType", constant = "PARTNER")
     AccountEntity toAccount(AccountCreateFullModel account, String digitalId, UUID partnerUuid);
 
@@ -81,7 +77,6 @@ public interface AccountMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "search", ignore = true)
     @Mapping(target = "partner", ignore = true)
-    @Mapping(target = "idLinks", ignore = true)
     @Mapping(target = "partnerType", constant = "PARTNER")
     AccountEntity toAccount(AccountCreate account);
 

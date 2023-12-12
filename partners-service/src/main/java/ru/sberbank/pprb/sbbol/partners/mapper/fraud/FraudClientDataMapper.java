@@ -10,7 +10,6 @@ import ru.sberbank.pprb.sbbol.partners.model.FraudClientData;
 
 @Loggable
 @Mapper(
-    componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface FraudClientDataMapper {

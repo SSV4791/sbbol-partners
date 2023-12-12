@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.pprb.sbbol.partners.PartnersApi;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.aspect.validator.FraudValid;
+import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
@@ -14,6 +15,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.FraudMonitoringService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
 
@@ -27,15 +29,26 @@ public class PartnerController implements PartnersApi {
     private final FraudMonitoringService fraudMonitoringService;
 
     private final PartnerService partnerService;
+    private final IdsHistoryService idsHistoryService;
 
-    public PartnerController(FraudMonitoringService fraudMonitoringService, PartnerService partnerService) {
+    public PartnerController(
+        FraudMonitoringService fraudMonitoringService,
+        PartnerService partnerService,
+        IdsHistoryService idsHistoryService
+    ) {
         this.fraudMonitoringService = fraudMonitoringService;
         this.partnerService = partnerService;
+        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
     public ResponseEntity<Partner> getById(String digitalId, UUID id) {
         return ResponseEntity.ok(partnerService.getPartner(digitalId, id));
+    }
+
+    @Override
+    public ResponseEntity<ExternalInternalIdLinksResponse> getInternalIdByExternalIds(String digitalId, List<UUID> externalIds) {
+        return ResponseEntity.ok(idsHistoryService.getPartnersInternalId(digitalId, externalIds));
     }
 
     @Override

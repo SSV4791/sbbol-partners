@@ -1115,7 +1115,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
         });
 
         var idsLink = step("Выполнение запроса", () ->
-            idsHistoryService.getAccountInternalIds(account.getDigitalId(), List.of(account.getId())));
+            idsHistoryService.getAccountsInternalIds(account.getDigitalId(), List.of(account.getId())));
 
         step("Проверка корректности ответа", () -> {
             assertThat(idsLink)

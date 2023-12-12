@@ -12,6 +12,7 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespond
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationReplicationGuidCandidate;
 import ru.sberbank.pprb.sbbol.migration.exception.MigrationException;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
@@ -22,6 +23,7 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
     private final AddressRepository addressRepository;
     private final PartnerRepository partnerRepository;
     private final AccountSignRepository accountSignRepository;
+    private final GuidsHistoryRepository guidsHistoryRepository;
 
     public CorrespondentMigrationServiceImpl(
         MigrationPartnerMapper migrationPartnerMapper,
@@ -54,7 +57,8 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         ContactRepository contactRepository,
         AddressRepository addressRepository,
         AccountRepository accountRepository,
-        AccountSignRepository accountSignRepository
+        AccountSignRepository accountSignRepository,
+        GuidsHistoryRepository guidsHistoryRepository
     ) {
         this.migrationPartnerMapper = migrationPartnerMapper;
         this.partnerRepository = partnerRepository;
@@ -63,6 +67,7 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         this.addressRepository = addressRepository;
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
+        this.guidsHistoryRepository = guidsHistoryRepository;
     }
 
     @Override
@@ -201,17 +206,14 @@ public class CorrespondentMigrationServiceImpl implements CorrespondentMigration
         candidates.forEach(candidate -> {
             var account = accountRepository.getByDigitalIdAndUuid(digitalId, mapUuid(candidate.getPprbGuid()))
                 .orElseThrow(() -> new EntryNotFoundException("account", digitalId, candidate.getPprbGuid()));
-            accountRepository.save(migrationPartnerMapper.fillIdLinks(account, candidate.getReplicationGuid()));
+            guidsHistoryRepository.save(migrationPartnerMapper.fillIdLinks(account, candidate.getReplicationGuid()));
         });
     }
 
     @Override
     @Transactional
     public void clearReplicationGuid(String digitalId) {
-        List<AccountEntity> accounts = accountRepository.findByDigitalId(digitalId);
-        for (AccountEntity account : accounts) {
-            account.getIdLinks().clear();
-        }
-        accountRepository.saveAll(accounts);
+        List<IdsHistoryEntity> history = guidsHistoryRepository.findByDigitalId(digitalId);
+        guidsHistoryRepository.deleteAll(history);
     }
 }

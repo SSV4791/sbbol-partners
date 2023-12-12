@@ -58,11 +58,6 @@ public abstract class MigrationPartnerMapperDecorator implements MigrationPartne
         return partner;
     }
 
-    public AccountEntity toAccountEntity(String digitalId, UUID partnerUuid, MigrationCorrespondentCandidate source) {
-        var accountEntity = delegate.toAccountEntity(digitalId, partnerUuid, source);
-        return fillIdLinks(accountEntity, source.getReplicationGuid());
-    }
-
     @Override
     public void updatePartnerEntity(String digitalId, MigrationCorrespondentCandidate source, PartnerEntity partner) {
         delegate.updatePartnerEntity(digitalId, source, partner);

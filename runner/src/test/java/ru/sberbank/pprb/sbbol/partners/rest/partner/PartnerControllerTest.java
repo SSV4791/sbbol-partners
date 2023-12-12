@@ -18,6 +18,8 @@ import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
 import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.GkuInnEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.IdsHistoryEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.ParentType;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
@@ -39,6 +41,8 @@ import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Email;
 import ru.sberbank.pprb.sbbol.partners.model.EmailChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.Error;
+import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLink;
+import ru.sberbank.pprb.sbbol.partners.model.ExternalInternalIdLinksResponse;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
@@ -55,6 +59,7 @@ import ru.sberbank.pprb.sbbol.partners.model.PhoneChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.SearchPartners;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryRepository;
+import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterIdsArgumentsProvider;
@@ -110,8 +115,12 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     @Autowired
     private GkuInnDictionaryRepository innDictionaryRepository;
 
+    @Autowired
+    private GuidsHistoryRepository guidsHistoryRepository;
+
     private GkuInnEntity gkuInnEntity1;
     private GkuInnEntity gkuInnEntity2;
+    private IdsHistoryEntity idsHistoryEntity;
 
     @AfterEach
     void after() {
@@ -120,6 +129,9 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         }
         if (gkuInnEntity2 != null) {
             innDictionaryRepository.delete(gkuInnEntity2);
+        }
+        if (idsHistoryEntity != null) {
+            guidsHistoryRepository.delete(idsHistoryEntity);
         }
     }
 
@@ -3379,6 +3391,47 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
                 .usingRecursiveComparison()
                 .ignoringCollectionOrder()
                 .isEqualTo(expectedAccounts);
+        });
+    }
+
+    @Test
+    @DisplayName("GET /partners/get-partnerId-by-externalId/{digitalId}  Получение внутреннего идентификатора партнера по внешнему идентификатору")
+    void testGetPartnerIdByExternalId() {
+        var partner = step("Подготовка тестовых данных о связи внешнего и внутреннего идентификатора", () -> createValidPartner());
+        var externalId = step("Подготовка тестовых данных - создание externalId", () ->
+        {
+            idsHistoryEntity = new IdsHistoryEntity();
+            idsHistoryEntity.setDigitalId(partner.getDigitalId());
+            idsHistoryEntity.setExternalId(UUID.randomUUID());
+            idsHistoryEntity.setPprbEntityId(partner.getId());
+            idsHistoryEntity.setParentType(ParentType.PARTNER);
+            IdsHistoryEntity savedGuids = guidsHistoryRepository.save(idsHistoryEntity);
+            return savedGuids.getExternalId();
+        });
+
+        var expectedResponse = step("Подготовка ожидаемого ответа", () ->
+            new ExternalInternalIdLinksResponse()
+                .idLinks(List.of(
+                    new ExternalInternalIdLink()
+                        .externalId(externalId)
+                        .internalId(partner.getId()))
+                )
+        );
+
+        var actualResponse =
+            step("Выполнение post-запроса /partners/get-partnerId-by-externalIds/{digitalId}", () ->
+                get(
+                    "/partners/get-partnerId-by-externalIds/{digitalId}",
+                    HttpStatus.OK,
+                    ExternalInternalIdLinksResponse.class,
+                    Map.of("externalIds", externalId),
+                    partner.getDigitalId()));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(actualResponse)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(expectedResponse);
         });
     }
 

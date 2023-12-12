@@ -8,7 +8,6 @@ import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 
 @Loggable
 @Mapper(
-    componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface StringMapper {

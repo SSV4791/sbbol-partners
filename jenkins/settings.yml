@@ -37,7 +37,7 @@ pr_check:
         - 'partners-service/src/main/java/ru/sberbank/pprb/sbbol/partners/entity'
         - 'runner/src/test/java/ru/sberbank/pprb/sbbol/partners/replication/changevector'
     compare:
-      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.009.00_0024/CI02792425-D-02.009.00_0024-distrib.zip'
+      release_uri: 'https://nexus-ci.delta.sbrf.ru/repository/maven-distr/CI00908578/CI02792425/D-02.010.00_0003/CI02792425-D-02.010.00_0003-distrib.zip'
     workdir: vectors
     cpu: 2
     memory: '4g'

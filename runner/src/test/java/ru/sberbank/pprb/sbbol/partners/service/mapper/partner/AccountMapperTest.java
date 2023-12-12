@@ -26,6 +26,7 @@ import ru.sberbank.pprb.sbbol.partners.model.BankAccount;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.SignType;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.partner.BudgetMaskService;
 
 import java.util.List;
@@ -52,6 +53,9 @@ class AccountMapperTest extends BaseUnitConfiguration {
 
     @MockBean
     private BudgetMaskService budgetMaskService;
+
+    @MockBean
+    private IdsHistoryService idsHistoryService;
 
     @Test
     @SuppressWarnings("unchecked")

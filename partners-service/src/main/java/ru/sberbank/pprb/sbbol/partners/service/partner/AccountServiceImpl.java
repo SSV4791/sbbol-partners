@@ -1,7 +1,6 @@
 package ru.sberbank.pprb.sbbol.partners.service.partner;
 
 import org.jetbrains.annotations.NotNull;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.aspect.audit.Audit;
@@ -12,7 +11,6 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountAlreadySignedException;
 import ru.sberbank.pprb.sbbol.partners.exception.AccountPriorityOneMoreException;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.exception.EntrySaveException;
 import ru.sberbank.pprb.sbbol.partners.exception.MultipleEntryFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
@@ -21,6 +19,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountAndPartnerRequest;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChange;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
@@ -28,9 +27,11 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
+import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -55,19 +56,22 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final PartnerService partnerService;
     private final ReplicationService replicationService;
+    private final IdsHistoryService idsHistoryService;
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         AccountMapper accountMapper,
         PartnerService partnerService,
-        ReplicationService replicationService
+        ReplicationService replicationService,
+        IdsHistoryService idsHistoryService
     ) {
         this.accountRepository = accountRepository;
         this.accountSignRepository = accountSignRepository;
         this.accountMapper = accountMapper;
         this.partnerService = partnerService;
         this.replicationService = replicationService;
+        this.idsHistoryService = idsHistoryService;
     }
 
     @Override
@@ -108,16 +112,27 @@ public class AccountServiceImpl implements AccountService {
         var digitalId = account.getDigitalId();
         partnerService.existsPartner(digitalId, account.getPartnerId());
         var accountEntity = accountMapper.toAccount(account);
-        try {
-            var savedAccount = accountRepository.save(accountEntity);
-            var response = accountMapper.toAccount(savedAccount);
-            replicationService.createCounterparty(response);
-            return response;
-        } catch (DataIntegrityViolationException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            throw new EntrySaveException(DOCUMENT_NAME, e);
+        var savedAccount = accountRepository.save(accountEntity);
+        var history = idsHistoryService.saveAccountIdLink(account.getExternalId(), savedAccount.getUuid(), digitalId);
+        var response = accountMapper.toAccount(savedAccount, history.getExternalId());
+        replicationService.createCounterparty(response);
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public List<Account> saveAccounts(Set<AccountCreateFullModel> accounts, String digitalId, UUID partnerUuid) {
+        if (CollectionUtils.isEmpty(accounts)) {
+            return Collections.emptyList();
         }
+        var response = new ArrayList<Account>(accounts.size());
+        for (var account : accounts) {
+            var saveAccount = accountMapper.toAccount(account, digitalId, partnerUuid);
+            var savedAccount = accountRepository.save(saveAccount);
+            idsHistoryService.saveAccountIdLink(account.getExternalId(), savedAccount.getUuid(), digitalId);
+            response.add(accountMapper.toAccount(savedAccount));
+        }
+        return response;
     }
 
     @Override
@@ -145,16 +160,12 @@ public class AccountServiceImpl implements AccountService {
         for (var accountId : ids) {
             var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountId)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
-            try {
-                accountRepository.delete(foundAccount);
-                var foundAccountUuid = foundAccount.getUuid();
-                var accountSignEntity =
-                    accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccountUuid);
-                accountSignEntity.ifPresent(accountSignRepository::delete);
-                replicationService.deleteCounterparty(digitalId, foundAccountUuid.toString());
-            } catch (RuntimeException e) {
-                throw new EntrySaveException(DOCUMENT_NAME, e);
-            }
+            accountRepository.delete(foundAccount);
+            var foundAccountUuid = foundAccount.getUuid();
+            var accountSignEntity =
+                accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccountUuid);
+            accountSignEntity.ifPresent(accountSignRepository::delete);
+            replicationService.deleteCounterparty(digitalId, foundAccountUuid.toString());
         }
     }
 
@@ -271,16 +282,10 @@ public class AccountServiceImpl implements AccountService {
         if (AccountStateType.SIGNED == accountEntity.getState()) {
             throw new AccountAlreadySignedException(accountEntity.getAccount());
         }
-        try {
-            var savedAccount = accountRepository.save(accountEntity);
-            var response = accountMapper.toAccount(savedAccount);
-            response.setVersion(response.getVersion() + 1);
-            replicationService.updateCounterparty(response);
-            return response;
-        } catch (DataIntegrityViolationException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            throw new EntrySaveException(DOCUMENT_NAME, e);
-        }
+        var savedAccount = accountRepository.save(accountEntity);
+        var response = accountMapper.toAccount(savedAccount);
+        response.setVersion(response.getVersion() + 1);
+        replicationService.updateCounterparty(response);
+        return response;
     }
 }

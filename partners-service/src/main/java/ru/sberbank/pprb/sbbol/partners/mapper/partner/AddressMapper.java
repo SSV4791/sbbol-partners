@@ -62,23 +62,6 @@ public interface AddressMapper {
     @Mapping(target = "flat", source = "address.flat")
     AddressEntity toAddress(AddressCreateFullModel address, String digitalId, UUID unifiedUuid);
 
-    @Mapping(target = "uuid", source = "address.id")
-    @Mapping(target = "version", source = "address.version")
-    @Mapping(target = "unifiedUuid", source = "unifiedUuid")
-    @Mapping(target = "digitalId", source = "digitalId")
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "type", source = "address.type", qualifiedByName = "toAddressType")
-    @Mapping(target = "zipCode", source = "address.zipCode")
-    @Mapping(target = "regionCode", source = "address.regionCode")
-    @Mapping(target = "region", source = "address.region")
-    @Mapping(target = "city", source = "address.city")
-    @Mapping(target = "location", source = "address.location")
-    @Mapping(target = "street", source = "address.street")
-    @Mapping(target = "building", source = "address.building")
-    @Mapping(target = "buildingBlock", source = "address.buildingBlock")
-    @Mapping(target = "flat", source = "address.flat")
-    AddressEntity toAddressEntity(AddressChangeFullModel address, String digitalId, UUID unifiedUuid);
-
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", source = "unifiedId")
     @Mapping(target = "version", ignore = true)

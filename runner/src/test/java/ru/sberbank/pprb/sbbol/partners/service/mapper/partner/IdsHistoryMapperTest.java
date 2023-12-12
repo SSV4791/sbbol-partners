@@ -42,13 +42,13 @@ class IdsHistoryMapperTest extends BaseUnitConfiguration {
                 .addIdLinksItem(
                     new ExternalInternalIdLink()
                         .externalId(externalIds.get(0))
-                        .internalId(idsHistoryEntities.get(0).getAccount().getUuid())
+                        .internalId(idsHistoryEntities.get(0).getPprbEntityId())
                 )
                 .addIdLinksItem(
                     new ExternalInternalIdLink()
                         .externalId(externalIds.get(1))
                 ));
-        var actual = step("Выполнение маппинга", () -> mapper.toAccountIdsByExternalIdsResponse(externalIds, idsHistoryEntities));
+        var actual = step("Выполнение маппинга", () -> mapper.toExternalInternalIdsResponse(externalIds, idsHistoryEntities));
         step("Проверка результата", () ->
             assertThat(actual)
                 .isNotNull()
