@@ -163,7 +163,7 @@ release:
     params_branch: master
     params_folder: develop
     istio_tag: '2.5'
-    commit_or_tag: '02.010.00_0003_i-2.5'
+    commit_or_tag: '02.010.01_0001_i-2.5'
     release_key: DCBBRAIN-5700
     reverse_and_publish: false
     type: release
