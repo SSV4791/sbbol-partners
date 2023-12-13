@@ -1,27 +1,28 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
-import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountKeyValidation;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.service.partner.PartnerService;
+import ru.sberbank.pprb.sbbol.partners.service.legalform.LegalFormInspector;
 import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.Iterator;
-import java.util.Set;
+
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFullModelDtoValidator extends BaseTreasuryAccountValidator
     implements ConstraintValidator<BankAccountKeyValidation, PartnerCreateFullModel> {
 
+    private final LegalFormInspector legalFormInspector;
+
     private String message;
 
-    public BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFullModelDtoValidator(PartnerService partnerService) {
+    public BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFullModelDtoValidator(PartnerService partnerService, LegalFormInspector legalFormInspector) {
         super(partnerService);
+        this.legalFormInspector = legalFormInspector;
     }
 
     @Override
@@ -31,26 +32,29 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFul
 
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) throws EntryNotFoundException {
-        if (value == null) {
+        if (isEmpty(value)) {
             return true;
         }
 
-        Set<AccountCreateFullModel> accounts = value.getAccounts();
-        if (CollectionUtils.isEmpty(accounts)) {
+        var accounts = value.getAccounts();
+        if (isEmpty(accounts)) {
             return true;
         }
+
+        legalFormInspector.setLegalFormAndPartnerName(value);
+
         if (value.getLegalForm() == LegalForm.PHYSICAL_PERSON ||
             value.getLegalForm() == LegalForm.ENTREPRENEUR) {
-            Iterator<AccountCreateFullModel> iterator = accounts.iterator();
+            var iterator = accounts.iterator();
             var result = true;
             for (var i = 0; i < accounts.size(); i++) {
-                AccountCreateFullModel next = iterator.next();
+                var next = iterator.next();
                 var bank = next.getBank();
-                if (ObjectUtils.isEmpty(bank)) {
+                if (isEmpty(bank)) {
                     return true;
                 }
                 var bankAccount = bank.getBankAccount();
-                if (bankAccount == null) {
+                if (isEmpty(bankAccount)) {
                     return true;
                 }
                 if (isBudgetCorrAccount(bankAccount.getBankAccount())) {

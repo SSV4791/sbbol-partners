@@ -62,13 +62,14 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryReposi
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateArgumentsProvider;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateFullModelNotValidProvider;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateNotValidProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterIdsArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterLegalFormArgumentsProvider;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -135,33 +136,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         }
     }
 
-    @Test
-    void testCreatePartnerWithoutDigitalId() {
-        var partner = getValidLegalEntityPartner("");
-        var error = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-        assertThat(error)
-            .isNotNull();
-        assertThat(error.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        List<Descriptions> descriptions = error.getDescriptions();
-        assertThat(descriptions)
-            .isNotNull()
-            .size()
-            .isEqualTo(1);
-        Descriptions description = descriptions.stream()
-            .filter(value -> value.getField().equals("digitalId"))
-            .findFirst().orElse(null);
-        assertThat(description).isNotNull();
-        assertThat(description.getMessage()).contains("Поле обязательно для заполнения");
-        assertThat(description.getMessage()).contains("размер должен находиться в диапазоне от 1 до 40");
-        assertThat(description.getMessage()).size().isEqualTo(2);
-    }
-
     @ParameterizedTest
     @ArgumentsSource(PartnerCreateArgumentsProvider.class)
     @DisplayName("POST /partner Создание партнера")
@@ -194,31 +168,62 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         });
     }
 
-    @Test
-    void testCreatePartnerWithoutLegalForm() {
-        var partner = getValidLegalEntityPartner(randomAlphabetic(10))
-            .legalForm(null);
-        var error = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-        assertThat(error)
-            .isNotNull();
-        assertThat(error.getCode())
-            .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
-        List<Descriptions> descriptions = error.getDescriptions();
-        assertThat(descriptions)
-            .isNotNull()
-            .size()
-            .isEqualTo(1);
-        Descriptions description = descriptions.stream()
-            .filter(value -> value.getField().equals("legalForm"))
-            .findFirst().orElse(null);
-        assertThat(description).isNotNull();
-        assertThat(description.getMessage()).contains("Поле обязательно для заполнения");
-        assertThat(description.getMessage()).size().isEqualTo(1);
+    @ParameterizedTest
+    @ArgumentsSource(PartnerCreateNotValidProvider.class)
+    @DisplayName("POST /partner Создание партнера. Проверка валидации")
+    void testPartnerCreate_ValidationTest(PartnerCreate partner, List<Descriptions> expectedDescriptions) {
+        var error = step("Выполнение post-запроса /partner, код ответа 400", () ->
+            post(
+                BASE_ROUTE_PATH,
+                HttpStatus.BAD_REQUEST,
+                partner,
+                Error.class));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(error.getType())
+                .isEqualTo(BUSINESS);
+
+            for (Descriptions description : error.getDescriptions()) {
+                Collections.sort(description.getMessage());
+            }
+            for (Descriptions expected : expectedDescriptions) {
+                assertThat((error.getDescriptions()))
+                    .contains(expected);
+            }
+        });
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(PartnerCreateFullModelNotValidProvider.class)
+    @DisplayName("POST /partner/full-model Создание партнера по полной модели. Проверка валидации")
+    void testPartnerCreateFullModel_ValidationTest(PartnerCreateFullModel partner, List<Descriptions> expectedDescriptions) {
+        var error = step("Выполнение post-запроса /partner/full-model, код ответа 400", () ->
+            post(
+                BASE_ROUTE_PATH + "/full-model",
+                HttpStatus.BAD_REQUEST,
+                partner,
+                Error.class));
+
+        step("Проверка корректности ответа", () -> {
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getCode())
+                .isEqualTo(MODEL_VALIDATION_EXCEPTION.getValue());
+            assertThat(error.getType())
+                .isEqualTo(BUSINESS);
+
+            for (Descriptions description : error.getDescriptions()) {
+                Collections.sort(description.getMessage());
+            }
+            for (Descriptions expected : expectedDescriptions) {
+                assertThat((error.getDescriptions()))
+                    .contains(expected);
+            }
+        });
     }
 
     @Test
@@ -277,7 +282,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             )
             .isEqualTo(createPartner);
     }
-
 
     @Test
     void testGetSearchInnPartners() {
@@ -1346,44 +1350,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testCreatePartnerEmptyOrgName() {
-        var partner = getValidLegalEntityPartner();
-        partner.setOrgName("");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле обязательно для заполнения");
-    }
-
-    @Test
-    void testCreatePartnerInvalidCharsInOrgName() {
-        var partner = getValidLegalEntityPartner();
-        partner.setOrgName("[Наименование Ёё\\] [§±]");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): §±");
-    }
-
-    @Test
     void testUpdatePartner() {
         var partner = getValidLegalEntityPartner();
         var createdPartner = post(
@@ -1839,260 +1805,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void savePartnerFullModel_notValidateCodeCurrencyAndBalance() {
-        var request = getValidFullModelLegalEntityPartner();
-        AccountCreateFullModel accountCreateFullModel = podamFactory.manufacturePojo(AccountCreateFullModel.class);
-        accountCreateFullModel.setAccount("00101643145250000411");
-        request.setAccounts(Set.of(
-            accountCreateFullModel
-        ));
-        var error = post(
-            BASE_ROUTE_PATH + "/full-model",
-            HttpStatus.BAD_REQUEST,
-            request,
-            Error.class
-        );
-        assertThat(error)
-            .isNotNull();
-        List<String> errorsMessage = error.getDescriptions().stream()
-            .map(Descriptions::getMessage)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-        assertThat(errorsMessage)
-            .asList()
-            .contains("Единый казначейский счёт должен начинаться с 40102");
-    }
-
-    @Test
-    void savePartnerFullModel_physicalPersonNotSetBudgetCorrAccount() {
-        var request = getValidFullModelLegalEntityPartner()
-            .legalForm(LegalForm.PHYSICAL_PERSON);
-        AccountCreateFullModel accountCreateFullModel = podamFactory.manufacturePojo(AccountCreateFullModel.class);
-        accountCreateFullModel.getBank().getBankAccount().setBankAccount("40102643145250000411");
-        request.setAccounts(Set.of(
-            accountCreateFullModel
-        ));
-        var error = post(
-            BASE_ROUTE_PATH + "/full-model",
-            HttpStatus.BAD_REQUEST,
-            request,
-            Error.class
-        );
-        assertThat(error)
-            .isNotNull();
-        List<String> errorsMessage = error.getDescriptions().stream()
-            .map(Descriptions::getMessage)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-        assertThat(errorsMessage)
-            .contains("Единый казначейский счёт не должен использоваться для физического лица или ИП");
-    }
-
-    @Test
-    void savePartnerFullModelEmptyOrgName() {
-        var partner = getValidFullModelLegalEntityPartner();
-        partner.setOrgName("");
-        var error = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле обязательно для заполнения");
-    }
-
-    @Test
-    void savePartnerFullModelInvalidOrgName() {
-        var partner = getValidFullModelLegalEntityPartner();
-        partner.setOrgName("[Наименование Ёё \\] §±`~><");
-        var error = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): §±");
-    }
-
-    @Test
-    void savePartnerFullModelInvalidBankName() {
-        var partner = getValidFullModelLegalEntityPartner();
-        partner.getAccounts().forEach(x -> x.getBank().setName(""));
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH + "/full-model")
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains(MessagesTranslator.toLocale("javax.validation.constraints.NotNull.message"));
-
-        var partner1 = getValidFullModelLegalEntityPartner();
-        partner1.getAccounts().forEach(x -> x.getBank().setName("Наименование банка [§±]"));
-        var error1 = given()
-            .spec(requestSpec)
-            .body(partner1)
-            .when()
-            .post(BASE_ROUTE_PATH + "/full-model")
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.partner.illegal_symbols") + " [§±]");
-
-        var str = "0123456789";
-        var partner2 = getValidFullModelLegalEntityPartner();
-        partner2.getAccounts().forEach(x -> x.getBank().setName(str.repeat(17)));
-        var error2 = given()
-            .spec(requestSpec)
-            .body(partner2)
-            .when()
-            .post(BASE_ROUTE_PATH + "/full-model")
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error2.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Максимальное количество символов – 160");
-    }
-
-    @Test
-    void savePhysicalPartnerInvalidName() {
-        var partner = getValidPhysicalPersonPartner();
-        partner.setFirstName("[Имя Ёё] \\ §±`~><");
-        var error = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): §±");
-    }
-
-    @Test
-    void savePhysicalPartnerInvalidComment() {
-        var partner = getValidPhysicalPersonPartner();
-        partner.setComment("[Коммент Ёё §±]");
-        var error = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): [§±]");
-
-        var str = "0123456789";
-        partner.setComment(str.repeat(26));
-        var error1 = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Максимальное количество символов – 255");
-    }
-
-    @Test
-    void saveFullModelPartnerInvalidAccountComment() {
-        var partner = getValidFullModelLegalEntityPartner();
-        partner.getAccounts().forEach(x -> x.setComment("[Comment §± Ёё]"));
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH + "/full-model")
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): [§±]");
-
-        var str = "0123456789";
-        partner.getAccounts().forEach(x -> x.setComment(str.repeat(6)));
-        var error1 = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH + "/full-model")
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-
-        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Максимальное количество символов – 50");
-    }
-
-    @Test
-    void testSavePartnerWithInvalidKpp() {
-        var partner = getValidLegalEntityPartner();
-        partner.setKpp("1234567890");
-        var error = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Максимальное количество символов – 9");
-
-        partner.setKpp("[АБВ1234]");
-        var error1 = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): [АБВ]")
-            .contains("Введён неверный КПП");
-
-        partner.setKpp("003456789");
-        var error2 = post(
-            BASE_ROUTE_PATH,
-            HttpStatus.BAD_REQUEST,
-            partner,
-            Error.class
-        );
-        assertThat(error2.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Введён неверный КПП");
-    }
-
-    @Test
     void testSavePartnerWithNullOrEmptyKpp() {
         var partner = getValidLegalEntityPartner();
         partner.setKpp(null);
@@ -2149,134 +1861,143 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testSavePartner_whenInvalidOgrnLength() {
-        var partner = getValidLegalEntityPartner();
-        partner.setOgrn("11");
-        var error = given()
+    @DisplayName("Определение правового статуса. Успешное создание ФЛ")
+    void testSavePartner_whenLegalFormIsNull_PhysicalPerson() {
+        var partner = getValidPhysicalPersonPartner()
+            .legalForm(null)
+            .orgName("Иванов Иван Иванович")
+            .firstName(null)
+            .secondName(null)
+            .middleName(null);
+
+        var response = given()
             .spec(requestSpec)
             .body(partner)
             .when()
             .post(BASE_ROUTE_PATH)
             .then()
-            .spec(createBadRequestResponseSpec)
+            .spec(createResponseSpec)
             .extract()
-            .as(Error.class);
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.partner.legal_entity.ogrn.length"))
-            .contains(MessagesTranslator.toLocale("validation.partner.ogrn.control_number"));
+            .as(Partner.class);
+
+        assertThat(response.getLegalForm())
+            .isEqualTo(LegalForm.PHYSICAL_PERSON);
+        assertThat(response.getSecondName())
+            .isEqualTo("Иванов");
+        assertThat(response.getFirstName())
+            .isEqualTo("Иван");
+        assertThat(response.getMiddleName())
+            .isEqualTo("Иванович");
     }
 
     @Test
-    void testSavePartner_whenLegalFormIsNull() {
-        var partner = getValidLegalEntityPartner();
-        partner.setLegalForm(null);
-        var error = given()
+    @DisplayName("Определение правового статуса. Успешное создание ЮЛ")
+    void testSavePartner_whenLegalFormIsNull_LegalEntity() {
+        var partner = getValidLegalEntityPartner()
+            .inn(null)
+            .legalForm(null);
+
+        var response = given()
             .spec(requestSpec)
             .body(partner)
             .when()
             .post(BASE_ROUTE_PATH)
             .then()
-            .spec(createBadRequestResponseSpec)
+            .spec(createResponseSpec)
             .extract()
-            .as(Error.class);
-        var expectedDescription = new Descriptions().field("legalForm").message(List.of("Поле обязательно для заполнения"));
-        var expectedDescriptions = List.of(expectedDescription);
-        assertThat(error.getDescriptions())
-            .usingRecursiveComparison()
-            .isEqualTo(expectedDescriptions);
+            .as(Partner.class);
+
+        assertThat(response.getLegalForm())
+            .isEqualTo(LegalForm.LEGAL_ENTITY);
     }
 
     @Test
-    void testSaveFullModelPartner_whenLegalFormIsNull() {
-        var partner = getValidFullModelLegalEntityPartner();
-        partner.setLegalForm(null);
-        partner.setInn(getValidInnNumber(LegalForm.PHYSICAL_PERSON));
-        partner.setOkpo(getValidOkpoNumber(LegalForm.PHYSICAL_PERSON));
-        var error = given()
+    @DisplayName("Определение правового статуса. Определение статуса как ФЛ по ИНН, отсутствуют счета")
+    void testSaveFullModelPartner_whenLegalFormAndOrgNameIsNull() {
+        var partner = getValidFullModelLegalEntityPartner()
+            .legalForm(null)
+            .inn("263516479611")
+            .firstName(null)
+            .secondName(null)
+            .middleName(null)
+            .orgName("Иванов Иван Иванович")
+            .accounts(Set.of(
+                new AccountCreateFullModel()
+                    .bank(new BankCreate()
+                        .name("БАНК")
+                        .bic("123456789"))));
+
+        var response = given()
             .spec(requestSpec)
             .body(partner)
             .when()
             .post(BASE_ROUTE_PATH + "/full-model")
             .then()
-            .spec(createBadRequestResponseSpec)
+            .spec(createResponseSpec)
             .extract()
-            .as(Error.class);
+            .as(PartnerFullModelResponse.class);
 
-        var expectedDescription = new Descriptions().field("legalForm").message(List.of("Поле обязательно для заполнения"));
-        var expectedDescriptions = List.of(expectedDescription);
-        assertThat(error.getDescriptions())
-            .usingRecursiveComparison()
-            .isEqualTo(expectedDescriptions);
+        assertThat(response.getLegalForm())
+            .isEqualTo(LegalForm.PHYSICAL_PERSON);
+        assertThat(response.getFirstName())
+            .isEqualTo("Иван");
+        assertThat(response.getSecondName())
+            .isEqualTo("Иванов");
+        assertThat(response.getMiddleName())
+            .isEqualTo("Иванович");
     }
 
     @Test
-    void testSavePartner_whenInvalidOgrnKey() {
-        var partner = getValidLegalEntityPartner();
-        partner.setOgrn("1234567890123");
-        var error = given()
+    @DisplayName("Определение правового статуса. Определение статуса как ФЛ по счетам, один из счетов null")
+    void testSaveFullModelPartner_whenLegalFormAndOrgNameIsNull_AccountIsNull() {
+        var partner = getValidFullModelLegalEntityPartner()
+            .legalForm(null)
+            .inn("263516479611")
+            .firstName(null)
+            .secondName(null)
+            .middleName(null)
+            .orgName("Иванов Иван Иванович")
+            .accounts(Set.of(
+                new AccountCreateFullModel()
+                    .account(getValidAccountNumber("123525411"))
+                    .comment("Это тестовый комментарий")
+                    .bank(new BankCreate()
+                        .bic("123525411")
+                        .name(randomAlphabetic(10))
+                        .bankAccount(
+                            new BankAccountCreate()
+                                .bankAccount(getValidCorrAccountNumber("123525411")))
+                    ),
+                new AccountCreateFullModel()
+                    .account(null)
+                    .comment("Это тестовый комментарий")
+                    .bank(new BankCreate()
+                        .bic("123525411")
+                        .name(randomAlphabetic(10))
+                        .bankAccount(
+                            new BankAccountCreate()
+                                .bankAccount(getValidCorrAccountNumber("123525411")))
+                    )
+                ));
+
+        var response = given()
             .spec(requestSpec)
             .body(partner)
             .when()
-            .post(BASE_ROUTE_PATH)
+            .post(BASE_ROUTE_PATH + "/full-model")
             .then()
-            .spec(createBadRequestResponseSpec)
+            .spec(createResponseSpec)
             .extract()
-            .as(Error.class);
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.partner.ogrn.control_number"));
-    }
+            .as(PartnerFullModelResponse.class);
 
-    @Test
-    void testSavePartner_whenInvalidOkpoLength() {
-        var partner = getValidLegalEntityPartner();
-        partner.setOkpo("1234567890123");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.partner.legal_entity.okpo.length"));
-
-        var partner1 = getValidEntrepreneurPartner(randomAlphabetic(10));
-        partner1.setOkpo("123");
-        var error1 = given()
-            .spec(requestSpec)
-            .body(partner1)
-            .when()
-            .post(BASE_ROUTE_PATH)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-        assertThat(error1.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains(MessagesTranslator.toLocale("validation.partner.entrepreneur.okpo.length"));
-    }
-
-    @Test
-    void testSavePartner_whenInvalidCharsOkpo() {
-        var partner = getValidLegalEntityPartner();
-        partner.setOkpo("12345АБВ");
-        var error = given()
-            .spec(requestSpec)
-            .body(partner)
-            .when()
-            .post(BASE_ROUTE_PATH)
-            .then()
-            .spec(createBadRequestResponseSpec)
-            .extract()
-            .as(Error.class);
-        assertThat(error.getDescriptions().stream().map(Descriptions::getMessage).findAny().orElse(null))
-            .asList()
-            .contains("Поле содержит недопустимый(-е) символ(-ы): АБВ");
+        assertThat(response.getLegalForm())
+            .isEqualTo(LegalForm.PHYSICAL_PERSON);
+        assertThat(response.getFirstName())
+            .isEqualTo("Иван");
+        assertThat(response.getSecondName())
+            .isEqualTo("Иванов");
+        assertThat(response.getMiddleName())
+            .isEqualTo("Иванович");
     }
 
     @Test
@@ -3299,7 +3020,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         });
     }
 
-
     @ParameterizedTest
     @DisplayName("PATCH /partner/full-model обновление партнера с дочерними сущностями. Обновление счетов")
     @MethodSource("accountArgumentsForUpdatingPartnerFullModel")
@@ -3565,7 +3285,6 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         }
     }
 
-
     public static PartnerCreate getValidLegalEntityPartner() {
         return getValidLegalEntityPartner(randomAlphabetic(10));
     }
@@ -3586,7 +3305,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
         return getValidPartner(digitalId, LegalForm.PHYSICAL_PERSON);
     }
 
-    private static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
+    public static PartnerCreate getValidEntrepreneurPartner(String digitalId) {
         return getValidPartner(digitalId, LegalForm.ENTREPRENEUR);
     }
 
