@@ -57,12 +57,12 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         }
         addDigitalIdPredicate(builder, predicates, root, request.getDigitalId());
         addAccountPredicate(builder, predicates, root, request.getAccount());
+        addAccountTypePredicate(builder, predicates, root);
 
         Join<AccountEntity, PartnerEntity> partnerJoin = root.join(AccountEntity_.PARTNER, JoinType.INNER);
         addPartnerInnPredicate(builder, predicates, partnerJoin, request.getInn());
         addPartnerKppPredicate(builder, predicates, partnerJoin, request.getKpp());
         addPartnerNamePredicate(builder, predicates, partnerJoin, request.getName());
-        addPartnerTypePredicate(builder, predicates, partnerJoin, PartnerType.PARTNER);
 
         Join<AccountEntity, BankEntity> bankJoin = root.join(AccountEntity_.BANK, JoinType.INNER);
         addBankBicPredicate(builder, predicates, bankJoin, request.getBic());
@@ -74,7 +74,7 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(AccountEntity_.CREATE_DATE))
+            builder.desc(root.get(AccountEntity_.LAST_MODIFIED_DATE))
         );
     }
 
@@ -160,13 +160,12 @@ public class FullMatchingAccountAndPartnerRepositoryImpl extends BaseRepository<
         );
     }
 
-    private void addPartnerTypePredicate(
+    private void addAccountTypePredicate(
         CriteriaBuilder builder,
         List<Predicate> predicates,
-        Join<AccountEntity, PartnerEntity> partnerJoin,
-        PartnerType partnerType
+        Root<AccountEntity> root
     ) {
-        predicates.add(builder.equal(partnerJoin.get(PartnerEntity_.TYPE), partnerType));
+        predicates.add(builder.equal(root.get(AccountEntity_.PARTNER_TYPE), PartnerType.PARTNER));
     }
 
     private void addBankBicPredicate(

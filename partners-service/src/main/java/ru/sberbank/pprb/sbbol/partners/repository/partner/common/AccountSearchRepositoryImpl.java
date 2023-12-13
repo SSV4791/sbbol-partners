@@ -2,15 +2,12 @@ package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
-import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity_;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
 
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -40,13 +37,12 @@ public class AccountSearchRepositoryImpl extends BaseRepository<AccountEntity, A
     ) {
         addDigitalIdPredicate(builder, predicates, root, accountSignInfoRequisites);
         addSearchPredicate(builder, predicates, root, accountSignInfoRequisites);
-        addPartnerTypePredicate(builder, predicates, root);
+        addAccountTypePredicate(builder, predicates, root);
     }
 
     @Override
     List<Order> defaultOrder(CriteriaBuilder builder, Root<?> root) {
         return List.of(
-            builder.desc(root.get(AccountEntity_.DIGITAL_ID)),
             builder.desc(root.get(AccountEntity_.STATE))
         );
     }
@@ -56,9 +52,8 @@ public class AccountSearchRepositoryImpl extends BaseRepository<AccountEntity, A
         // Do nothing because filter does not have pagination
     }
 
-    private void addPartnerTypePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root) {
-        Join<AccountEntity, PartnerEntity> partner = root.join(AccountEntity_.PARTNER);
-        predicates.add(builder.equal(partner.get(PartnerEntity_.TYPE), PartnerType.PARTNER));
+    private void addAccountTypePredicate(CriteriaBuilder builder, List<Predicate> predicates, Root<AccountEntity> root) {
+        predicates.add(builder.equal(root.get(AccountEntity_.PARTNER_TYPE), PartnerType.PARTNER));
     }
 
     private void addDigitalIdPredicate(
