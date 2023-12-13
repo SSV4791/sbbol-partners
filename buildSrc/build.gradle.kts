@@ -25,8 +25,12 @@ dependencies {
     implementation("com.hubspot.jinjava:jinjava:2.4.12")
     implementation("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.2.0")
     implementation("org.yaml:snakeyaml:1.24")
-    implementation("ru.sbrf.build.gradle.dcb-test-plugin:gradle-plugin:4.1.3")
+    implementation("ru.sber.dcbqa.dcb-test-plugin:gradle-plugin:4.9.3")
     implementation("ru.sbt.meta:meta-gradle-plugin:2.0.0")
-    implementation("sbp.eip.metamodel:eip-metamodel-core:3.1.14-jdk11")
-    implementation("sbp.eip.metamodel:eip-metamodel-scanner-gradle-plugin:3.1.14-jdk11")
+    implementation("sbp.eip.metamodel:eip-metamodel-core:3.1.14-jdk11") {
+        exclude("com.fasterxml.jackson.core", "jackson-databind")
+    }
+    implementation("sbp.eip.metamodel:eip-metamodel-scanner-gradle-plugin:3.1.14-jdk11") {
+        exclude("com.fasterxml.jackson.core", "jackson-databind")
+    }
 }

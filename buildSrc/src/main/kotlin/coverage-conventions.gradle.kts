@@ -1,6 +1,6 @@
 plugins {
     id("org.sonarqube")
-    id("ru.sbrf.build.gradle.dcb-test-plugin")
+    id("ru.sber.dcbqa.dcb-test-plugin")
 }
 
 val coverageExclusions = listOf(
@@ -49,7 +49,11 @@ sonarqube {
 }
 
 dcbTestPlugin{
+    projectKey.set("sbbol-partners")
     jacocoCoverage{
         excludePackages.addAll(coverageExclusions)
+    }
+    dcbPortal {
+        closeRun.set(System.getProperty("close-test-run").equals("true", true))
     }
 }

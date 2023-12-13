@@ -1,8 +1,8 @@
 [versions]
+antifraud = "D-02.005.00_0005"
 mapstruct = "1.4.2.Final"
 micrometer = "1.7.5"
 spring-boot = "2.5.5"
-antifraud = "D-02.005.00_0005"
 
 [libraries]
 antifraud-api = { module = "ru.sberbank.pprb.antifraud:antifraud-api", version.ref = "antifraud"}
@@ -16,6 +16,7 @@ hibernate-jpamodelgen = { module = "org.hibernate:hibernate-jpamodelgen", versio
 http-healthcheck-starter = { module = "ru.sbrf.sbbol.starters:http-healthcheck-starter", version = "4.1" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.13.0" }
 jackson-databind-nullable = { module = "org.openapitools:jackson-databind-nullable", version = "0.2.2" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version = "2.13.0" }
 javax-annotation-api = { module = "javax.annotation:javax.annotation-api", version = "1.3.2" }
 javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version = "4.0.1" }
 javax-validation-api = { module = "javax.validation:validation-api", version = "2.0.1.Final" }
@@ -32,8 +33,8 @@ micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-p
 postgresql-core = { module = "org.postgresql:postgresql", version = "42.2.12" }
 sbp-hibernate-standin = { module = "sbp.integration.orm:sbp-hibernate-standin", version = "4.3.2" }
 sbp-jpa-model-support = { module = "sbp.com.sbt.dataspace:jpa-model-support", version = "4.3.34" }
-shedlock-spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version = "4.44.0" }
 shedlock-provider-jdbc-template = { module = "net.javacrumbs.shedlock:shedlock-provider-jdbc-template", version = "4.44.0" }
+shedlock-spring = { module = "net.javacrumbs.shedlock:shedlock-spring", version = "4.44.0" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "1.7.32" }
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
