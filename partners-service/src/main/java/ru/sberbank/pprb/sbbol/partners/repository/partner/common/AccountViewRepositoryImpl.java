@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.repository.partner.common;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity_;
@@ -32,9 +31,6 @@ public class AccountViewRepositoryImpl
     extends BaseRepository<AccountEntity, AccountsFilter> implements AccountViewRepository {
 
     private final BudgetMaskDictionaryRepository budgetMaskDictionaryRepository;
-
-    @Value("${account.include.partner-type}")
-    protected boolean excludeJoinWithPartner;
 
     public AccountViewRepositoryImpl(
         BudgetMaskDictionaryRepository budgetMaskDictionaryRepository
