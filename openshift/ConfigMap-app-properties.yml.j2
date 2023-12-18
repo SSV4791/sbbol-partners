@@ -83,6 +83,11 @@ data:
     scheduler.account-updater.batchSize={{ os_project.scheduler.account_updater.batchSize | default('1000') }}
     scheduler.account-updater.sleepTime={{ os_project.scheduler.account_updater.sleepTime | default('60000') }}
 
+    # Application Kafka
+    app.kafka.enable={{ app.kafka.enable | default('false') }}
+    app.kafka.bootstrap-servers={% for entry in int_entry.pprb.kafka %}{{ entry.ip }}:{{ entry.port }}{% if not loop.last %},{% endif %}{% endfor %}
+    app.kafka.topic={{ app.kafka.topic | default('DIGITALPARNTERS.CI02792425_COUNTERPARTIESMIGRATIONEVENT.V1') }}
+
     # Application Journal
     appjournal.moduleId=pprb4-digital-partners
 
