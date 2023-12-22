@@ -6,6 +6,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class BaseNameAttributeValidator extends BaseValidator {
 
@@ -20,7 +21,7 @@ public class BaseNameAttributeValidator extends BaseValidator {
     ) {
         if (legalForm != LegalForm.PHYSICAL_PERSON) {
             buildMessage(context, "orgName", MESSAGE);
-            return !isEmpty(orgName);
+            return isNotEmpty(orgName);
         } else {
             boolean valid = true;
             if (isEmpty(firstName)) {

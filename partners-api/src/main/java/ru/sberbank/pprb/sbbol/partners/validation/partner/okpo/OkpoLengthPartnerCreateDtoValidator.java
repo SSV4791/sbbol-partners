@@ -1,20 +1,29 @@
 package ru.sberbank.pprb.sbbol.partners.validation.partner.okpo;
 
-import org.apache.commons.lang3.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.model.OkpoValidataion;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
+import ru.sberbank.pprb.sbbol.partners.service.legalform.LegalFormInspector;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+
 public class OkpoLengthPartnerCreateDtoValidator extends BaseOkpoLengthValidator
     implements ConstraintValidator<OkpoValidataion, PartnerCreate> {
 
+    private final LegalFormInspector legalFormInspector;
+
+    public OkpoLengthPartnerCreateDtoValidator(LegalFormInspector legalFormInspector) {
+        this.legalFormInspector = legalFormInspector;
+    }
+
     @Override
     public boolean isValid(PartnerCreate value, ConstraintValidatorContext context) {
-        if (ObjectUtils.isEmpty(value)) {
+        if (isEmpty(value)) {
             return true;
         }
+        legalFormInspector.setLegalFormAndPartnerName(value);
         return isValid(context, value.getOkpo(), value.getLegalForm());
     }
 }

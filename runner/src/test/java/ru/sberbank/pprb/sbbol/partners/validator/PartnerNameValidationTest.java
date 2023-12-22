@@ -2,11 +2,15 @@ package ru.sberbank.pprb.sbbol.partners.validator;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Partner;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreate;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.service.config.ServiceConfiguration;
+import ru.sberbank.pprb.sbbol.partners.service.legalform.LegalFormInspector;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerCreateDtoValidator;
 import ru.sberbank.pprb.sbbol.partners.validation.partner.name.NameAttributePartnerDtoValidator;
@@ -19,7 +23,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
 
+@ContextConfiguration(
+    classes = ServiceConfiguration.class
+)
 class PartnerNameValidationTest extends BaseUnitConfiguration {
+
+    @Autowired
+    private LegalFormInspector legalFormInspector;
 
     @Mock
     private ConstraintValidatorContext context;
@@ -91,40 +101,13 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
     }
 
     @Test
-    void nameAttribute_partnerCreateDto_physicalPerson_secondNameIsNull() {
-        PartnerCreate partner = factory.manufacturePojo(PartnerCreate.class)
-            .secondName(null)
-            .legalForm(LegalForm.PHYSICAL_PERSON);
-
-        var validator =
-            spy(new NameAttributePartnerCreateDtoValidator());
-        doNothing()
-            .when((BaseValidator) validator).buildMessage(any(), any(), any());
-        assertFalse(validator.isValid(partner, context));
-    }
-
-    @Test
     void nameAttribute_partnerCreateDto_physicalPerson_firstNameIsNull() {
         PartnerCreate partner = factory.manufacturePojo(PartnerCreate.class)
             .firstName(null)
             .legalForm(LegalForm.PHYSICAL_PERSON);
 
         var validator =
-            spy(new NameAttributePartnerCreateDtoValidator());
-        doNothing()
-            .when((BaseValidator) validator).buildMessage(any(), any(), any());
-        assertFalse(validator.isValid(partner, context));
-    }
-
-    @Test
-    void nameAttribute_partnerCreateDto_physicalPerson_secondAndFirstNameIsNull() {
-        PartnerCreate partner = factory.manufacturePojo(PartnerCreate.class)
-            .firstName(null)
-            .secondName(null)
-            .legalForm(LegalForm.PHYSICAL_PERSON);
-
-        var validator =
-            spy(new NameAttributePartnerCreateDtoValidator());
+            spy(new NameAttributePartnerCreateDtoValidator(legalFormInspector));
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -137,7 +120,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.LEGAL_ENTITY);
 
         var validator =
-            spy(new NameAttributePartnerCreateDtoValidator());
+            spy(new NameAttributePartnerCreateDtoValidator(legalFormInspector));
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -150,20 +133,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.ENTREPRENEUR);
 
         var validator =
-            spy(new NameAttributePartnerCreateDtoValidator());
-        doNothing()
-            .when((BaseValidator) validator).buildMessage(any(), any(), any());
-        assertFalse(validator.isValid(partner, context));
-    }
-
-    @Test
-    void nameAttribute_partnerFullModelDto_physicalPerson_secondNameIsNull() {
-        PartnerCreateFullModel partner = factory.manufacturePojo(PartnerCreateFullModel.class)
-            .secondName(null)
-            .legalForm(LegalForm.PHYSICAL_PERSON);
-
-        var validator =
-            spy(new NameAttributePartnerCreateFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateDtoValidator(legalFormInspector));
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -176,21 +146,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.PHYSICAL_PERSON);
 
         var validator =
-            spy(new NameAttributePartnerCreateFullModelDtoValidator());
-        doNothing()
-            .when((BaseValidator) validator).buildMessage(any(), any(), any());
-        assertFalse(validator.isValid(partner, context));
-    }
-
-    @Test
-    void nameAttribute_partnerFullModelDto_physicalPerson_secondAndFirstNameIsNull() {
-        PartnerCreateFullModel partner = factory.manufacturePojo(PartnerCreateFullModel.class)
-            .firstName(null)
-            .secondName(null)
-            .legalForm(LegalForm.PHYSICAL_PERSON);
-
-        var validator =
-            spy(new NameAttributePartnerCreateFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator(legalFormInspector));
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -203,7 +159,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.LEGAL_ENTITY);
 
         var validator =
-            spy(new NameAttributePartnerCreateFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator(legalFormInspector));
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
@@ -216,7 +172,7 @@ class PartnerNameValidationTest extends BaseUnitConfiguration {
             .legalForm(LegalForm.ENTREPRENEUR);
 
         var validator =
-            spy(new NameAttributePartnerCreateFullModelDtoValidator());
+            spy(new NameAttributePartnerCreateFullModelDtoValidator(legalFormInspector));
         doNothing()
             .when((BaseValidator) validator).buildMessage(any(), any(), any());
         assertFalse(validator.isValid(partner, context));
