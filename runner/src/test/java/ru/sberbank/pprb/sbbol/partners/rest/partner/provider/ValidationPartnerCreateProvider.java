@@ -13,7 +13,7 @@ import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidLegalEntityPartner;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidPhysicalPersonPartner;
 
-public class PartnerCreateNotValidProvider implements ArgumentsProvider {
+public class ValidationPartnerCreateProvider implements ArgumentsProvider {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
