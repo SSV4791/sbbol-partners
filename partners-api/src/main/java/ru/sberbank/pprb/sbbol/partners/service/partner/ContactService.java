@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 
@@ -25,6 +26,15 @@ public interface ContactService {
     Contact getContact(String digitalId, UUID id);
 
     /**
+     * Получение контактов Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param partnerUuid Идентификатор партнера
+     * @return Список контактов
+     */
+    List<Contact> getContactsByPartnerUuid(String digitalId, UUID partnerUuid);
+
+    /**
      * Получение списка контактов партнеров по заданному фильтру
      *
      * @param contactsFilter фильтр для поиска контактов Партнера
@@ -39,6 +49,16 @@ public interface ContactService {
      * @return Контакт
      */
     Contact saveContact(ContactCreate contact);
+
+    /**
+     * Создание новых контактов
+     *
+     * @param digitalId идентификатор цифрового кабинета клиента
+     * @param unifiedUuid идентификатор владельца контакта
+     * @param contacts список создаваемых контактов
+     * @return Список созданных контактов
+     */
+    List<Contact> saveContacts(String digitalId, UUID unifiedUuid, Set<ContactCreateFullModel> contacts);
 
     /**
      * Обновление контакта Партнера
@@ -81,4 +101,12 @@ public interface ContactService {
      * @param ids       Идентификаторы контактов Партнера
      */
     void deleteContacts(String digitalId, List<UUID> ids);
+
+    /**
+     * Удаление контактов Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param partnerUuid Идентификатор Партнера
+     */
+    void deleteContactsByPartnerUuid(String digitalId, UUID partnerUuid);
 }

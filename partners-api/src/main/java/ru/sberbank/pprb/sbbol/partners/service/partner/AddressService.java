@@ -3,6 +3,7 @@ package ru.sberbank.pprb.sbbol.partners.service.partner;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AddressesResponse;
 
@@ -25,6 +26,15 @@ public interface AddressService {
     Address getAddress(String digitalId, UUID id);
 
     /**
+     * Получение адреса
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param unifiedUuid Идентификатор владельца адреса
+     * @return Список адресов
+     */
+    List<Address> getAddressesByUnifiedUuid(String digitalId, UUID unifiedUuid);
+
+    /**
      * Получение списка адресов по заданному фильтру
      *
      * @param addressesFilter фильтр для поиска адресов
@@ -39,6 +49,17 @@ public interface AddressService {
      * @return Адрес
      */
     Address saveAddress(AddressCreate address);
+
+    /**
+     * Создание новых адресов
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param unifiedUuid Идентификатор владельца адреса
+     * @param addresses Список создаваемых адресов
+     *
+     * @return Список созданных адресов
+     */
+    List<Address> saveAddresses(String digitalId, UUID unifiedUuid, Set<AddressCreateFullModel> addresses);
 
     /**
      * Обновление адреса
@@ -81,4 +102,12 @@ public interface AddressService {
      * @param ids       Идентификаторы адресов Контакта
      */
     void deleteAddresses(String digitalId, List<UUID> ids);
+
+    /**
+     * Удаление адресов
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param unifiedUuid Идентификатор владельца адресов
+     */
+    void deleteAddressesByUnifiedUuid(String digitalId, UUID unifiedUuid);
 }

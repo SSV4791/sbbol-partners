@@ -43,7 +43,7 @@ class AddressMapperTest extends BaseUnitConfiguration {
         var expected = factory.manufacturePojo(AddressCreateFullModel.class);
         var digitalId = factory.manufacturePojo(String.class);
         var unifiedUuid = factory.manufacturePojo(UUID.class);
-        AddressEntity actual = mapper.toAddress(expected, digitalId, unifiedUuid);
+        var actual = mapper.toAddress(expected, digitalId, unifiedUuid);
         assertThat(actual)
             .isNotNull();
         assertThat(expected)
@@ -52,7 +52,7 @@ class AddressMapperTest extends BaseUnitConfiguration {
         assertThat(digitalId)
             .isEqualTo(actual.getDigitalId());
         assertThat(unifiedUuid)
-            .isEqualTo(actual.getUnifiedUuid());
+            .isEqualTo(actual.getUnifiedId());
     }
 
     @Test

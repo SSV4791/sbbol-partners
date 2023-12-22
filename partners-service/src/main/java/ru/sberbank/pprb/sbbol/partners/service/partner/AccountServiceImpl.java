@@ -21,12 +21,13 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountSignRepository;
 import ru.sberbank.pprb.sbbol.partners.service.ids.history.IdsHistoryService;
 import ru.sberbank.pprb.sbbol.partners.service.replication.ReplicationService;
 
@@ -38,7 +39,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.ACCOUNTS_DELETE;
@@ -52,23 +52,23 @@ public class AccountServiceImpl implements AccountService {
     public static final String DOCUMENT_NAME = "account";
 
     private final AccountRepository accountRepository;
-    private final AccountSignRepository accountSignRepository;
     private final AccountMapper accountMapper;
+    private final AccountSignService accountSignService;
     private final PartnerService partnerService;
     private final ReplicationService replicationService;
     private final IdsHistoryService idsHistoryService;
 
     public AccountServiceImpl(
         AccountRepository accountRepository,
-        AccountSignRepository accountSignRepository,
         AccountMapper accountMapper,
+        AccountSignService accountSignService,
         PartnerService partnerService,
         ReplicationService replicationService,
         IdsHistoryService idsHistoryService
     ) {
         this.accountRepository = accountRepository;
-        this.accountSignRepository = accountSignRepository;
         this.accountMapper = accountMapper;
+        this.accountSignService = accountSignService;
         this.partnerService = partnerService;
         this.replicationService = replicationService;
         this.idsHistoryService = idsHistoryService;
@@ -80,6 +80,14 @@ public class AccountServiceImpl implements AccountService {
         var account = accountRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return accountMapper.toAccount(account);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Account> getAccountsByPartnerId(String digitalId, UUID partnerId) {
+        return accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId).stream()
+            .map(accountMapper::toAccount)
+            .toList();
     }
 
     @Override
@@ -160,12 +168,9 @@ public class AccountServiceImpl implements AccountService {
         for (var accountId : ids) {
             var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountId)
                 .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
+            accountSignService.deleteAccountsSign(digitalId, List.of(foundAccount.getUuid()));
             accountRepository.delete(foundAccount);
-            var foundAccountUuid = foundAccount.getUuid();
-            var accountSignEntity =
-                accountSignRepository.getByDigitalIdAndAccountUuid(digitalId, foundAccountUuid);
-            accountSignEntity.ifPresent(accountSignRepository::delete);
-            replicationService.deleteCounterparty(digitalId, foundAccountUuid.toString());
+            replicationService.deleteCounterparty(digitalId, foundAccount.getUuid().toString());
         }
     }
 
@@ -181,6 +186,16 @@ public class AccountServiceImpl implements AccountService {
             throw new AccountPriorityOneMoreException(foundAccount.getDigitalId(), foundAccount.getUuid());
         }
         foundAccount.setPriorityAccount(accountPriority.getPriorityAccount());
+        var savedAccount = accountRepository.save(foundAccount);
+        return accountMapper.toAccount(savedAccount);
+    }
+
+    @Override
+    @Transactional
+    public Account changeSignType(String digitalId, UUID accountId, SignType signType) {
+        var foundAccount = accountRepository.getByDigitalIdAndUuid(digitalId, accountId)
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, accountId));
+        foundAccount.setState(accountMapper.toAccountStateType(signType));
         var savedAccount = accountRepository.save(foundAccount);
         return accountMapper.toAccount(savedAccount);
     }
@@ -204,7 +219,7 @@ public class AccountServiceImpl implements AccountService {
         if (nonNull(request.getKpp()) && !Objects.equals(request.getKpp(), "0")) {
             accountsWithKppField = accounts.stream()
                 .filter(value -> Objects.equals(value.getPartner().getKpp(), request.getKpp()))
-                .collect(Collectors.toList());
+                .toList();
             if (accountsWithKppField.size() == 1) {
                 return accountMapper.toAccountsWithPartner(accountsWithKppField);
             }
@@ -233,6 +248,14 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.toAccountWithPartner(foundAccounts.get(0));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Account> getByRequisites(AccountSignInfoRequisites requisites) {
+        return accountRepository.findByRequisites(requisites).stream()
+            .map(accountMapper::toAccount)
+            .toList();
+    }
+
     @NotNull
     private List<AccountEntity> findAccountByPartnerName(AccountAndPartnerRequest request, List<AccountEntity> accounts) {
         return accounts.stream()
@@ -246,7 +269,7 @@ public class AccountServiceImpl implements AccountService {
                 return Objects.equals(orgNameLowerCase, nameLowerCase)
                     || Objects.equals(fioLowerCase, nameLowerCase);
             })
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override

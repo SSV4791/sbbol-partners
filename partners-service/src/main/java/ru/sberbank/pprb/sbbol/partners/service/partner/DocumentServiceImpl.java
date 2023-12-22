@@ -9,6 +9,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -20,6 +21,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import static java.util.Collections.emptyList;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 abstract class DocumentServiceImpl implements DocumentService {
 
@@ -45,6 +49,14 @@ abstract class DocumentServiceImpl implements DocumentService {
         var document = documentRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return documentMapper.toDocument(document);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Document> getDocumentsByUnifiedUuid(String digitalId, UUID unifiedUuid) {
+        return documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, unifiedUuid).stream()
+            .map(documentMapper::toDocument)
+            .toList();
     }
 
     @Override
@@ -84,6 +96,18 @@ abstract class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional
+    public List<Document> saveDocuments(String digitalId, UUID unifiedUuid, Set<DocumentCreateFullModel> documents) {
+        if (isEmpty(documents)) {
+            return emptyList();
+        }
+        return documents.stream()
+            .map(document -> documentMapper.toDocument(document, digitalId, unifiedUuid))
+            .map(this::saveDocument)
+            .toList();
+    }
+
+    @Override
+    @Transactional
     public Document updateDocument(DocumentChange document) {
         var foundDocument = findDocumentEntity(document.getDigitalId(), document.getId(), document.getVersion(), document.getDocumentTypeId());
         documentMapper.updateDocument(document, foundDocument);
@@ -107,6 +131,15 @@ abstract class DocumentServiceImpl implements DocumentService {
                 throw new EntryNotFoundException(DOCUMENT_NAME, digitalId, id);
             }
             documentRepository.delete(foundDocument.get());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteDocumentsByUnifiedUuid(String digitalId, UUID unifiedUuid) {
+        var documentEntities = documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, unifiedUuid);
+        if (!isEmpty(documentEntities)) {
+            documentRepository.deleteAll(documentEntities);
         }
     }
 

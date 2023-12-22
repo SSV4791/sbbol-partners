@@ -4,6 +4,7 @@ import ru.sberbank.pprb.sbbol.partners.model.Document;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChange;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentCreate;
+import ru.sberbank.pprb.sbbol.partners.model.DocumentCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.DocumentsResponse;
 
@@ -26,6 +27,15 @@ public interface DocumentService {
     Document getDocument(String digitalId, UUID id);
 
     /**
+     * Получение документа
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param unifiedUuid Идентификатор владельца документа
+     * @return Список документов
+     */
+    List<Document> getDocumentsByUnifiedUuid(String digitalId, UUID unifiedUuid);
+
+    /**
      * Получение списка документов партнеров по заданному фильтру
      *
      * @param documentsFilter фильтр для поиска документов
@@ -40,6 +50,16 @@ public interface DocumentService {
      * @return Документ
      */
     Document saveDocument(DocumentCreate document);
+
+    /**
+     * Создание новых документов
+     *
+     * @param digitalId идентификатор цифрового кабинета клиента
+     * @param unifiedUuid идентификатор владельца документа
+     * @param documents список данных документа
+     * @return Список созданных документов
+     */
+    List<Document> saveDocuments(String digitalId, UUID unifiedUuid, Set<DocumentCreateFullModel> documents);
 
     /**
      * Обновление документа
@@ -82,4 +102,12 @@ public interface DocumentService {
      * @param ids       Идентификаторы документов
      */
     void deleteDocuments(String digitalId, List<UUID> ids);
+
+    /**
+     * Удаление документа
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param unifiedUuid  Идентификатор владельца документа
+     */
+    void deleteDocumentsByUnifiedUuid(String digitalId, UUID unifiedUuid);
 }

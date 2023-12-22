@@ -129,16 +129,16 @@ public class PartnerServiceConfiguration {
     @Bean
     AccountService accountService(
         AccountRepository accountRepository,
-        AccountSignRepository accountSignRepository,
         AccountMapper accountMapper,
+        @Lazy AccountSignService accountSignService,
         PartnerService partnerService,
         ReplicationService replicationService,
         IdsHistoryService idsHistoryService
     ) {
         return new AccountServiceImpl(
             accountRepository,
-            accountSignRepository,
             accountMapper,
+            accountSignService,
             partnerService,
             replicationService,
             idsHistoryService
@@ -147,15 +147,15 @@ public class PartnerServiceConfiguration {
 
     @Bean
     AccountSignService accountSignService(
-        AccountRepository accountRepository,
         AccountSignRepository accountSignRepository,
         AccountSingMapper accountSingMapper,
+        AccountService accountService,
         ReplicationService replicationService
     ) {
         return new AccountSignServiceImpl(
-            accountRepository,
             accountSignRepository,
             accountSingMapper,
+            accountService,
             replicationService
         );
     }
@@ -195,17 +195,17 @@ public class PartnerServiceConfiguration {
     @Bean
     ContactService contactService(
         ContactRepository contactRepository,
-        AddressRepository addressRepository,
-        DocumentRepository documentRepository,
         ContactMapper contactMapper,
-        PartnerService partnerService
+        PartnerService partnerService,
+        AddressService contactAddressService,
+        DocumentService contactDocumentService
     ) {
         return new ContactServiceImpl(
             contactRepository,
-            addressRepository,
-            documentRepository,
             contactMapper,
-            partnerService
+            partnerService,
+            contactAddressService,
+            contactDocumentService
         );
     }
 
@@ -279,15 +279,7 @@ public class PartnerServiceConfiguration {
     @SuppressWarnings("java:S107")
     @Bean
     PartnerService partnerService(
-        AccountRepository accountRepository,
-        DocumentRepository documentRepository,
-        ContactRepository contactRepository,
-        AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        AccountMapper accountMapper,
-        DocumentMapper documentMapper,
-        AddressMapper addressMapper,
-        ContactMapper contactMapper,
         PartnerMapper partnerMapper,
         @Lazy ReplicationService replicationService,
         @Lazy AddressService partnerAddressService,
@@ -296,15 +288,7 @@ public class PartnerServiceConfiguration {
         @Lazy AccountService accountService
     ) {
         return new ru.sberbank.pprb.sbbol.partners.service.partner.PartnerServiceImpl(
-            accountRepository,
-            documentRepository,
-            contactRepository,
-            addressRepository,
             partnerRepository,
-            accountMapper,
-            documentMapper,
-            addressMapper,
-            contactMapper,
             partnerMapper,
             replicationService,
             partnerAddressService,

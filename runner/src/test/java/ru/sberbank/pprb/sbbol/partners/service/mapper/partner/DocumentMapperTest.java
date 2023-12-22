@@ -48,7 +48,7 @@ class DocumentMapperTest extends BaseUnitConfiguration {
             assertThat(actualObj.getDigitalId())
                 .isEqualTo(digitalId);
             assertThat(unifiedUuid)
-                .isEqualTo(actualObj.getUnifiedUuid());
+                .isEqualTo(actualObj.getUnifiedId());
         }
     }
 
@@ -66,7 +66,7 @@ class DocumentMapperTest extends BaseUnitConfiguration {
                 "documentTypeId"
             )
             .isEqualTo(actual);
-        assertThat(actual.getTypeUuid())
+        assertThat(actual.getDocumentTypeId())
             .isEqualTo(expected.getDocumentTypeId());
     }
 

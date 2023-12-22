@@ -7,9 +7,11 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountPriority;
+import ru.sberbank.pprb.sbbol.partners.model.AccountSignInfoRequisites;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.AccountsResponse;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 
 import java.util.List;
 import java.util.Set;
@@ -28,6 +30,15 @@ public interface AccountService {
      * @return Счёт
      */
     Account getAccount(String digitalId, UUID id);
+
+    /**
+     * Получение счёта Партнера
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param partnerId Идентификатор партнера
+     * @return Список счётов
+     */
+    List<Account> getAccountsByPartnerId(String digitalId, UUID partnerId);
 
     /**
      * Получение списка счётов партнеров по заданному фильтру
@@ -105,6 +116,15 @@ public interface AccountService {
     Account changePriority(AccountPriority accountPriority);
 
     /**
+     * Изменение статуса подписания счета
+     *
+     * @param digitalId Идентификатор личного кабинета клиента
+     * @param accountId Идентификатор счета Партнера
+     * @param signType Статус подписания
+     */
+    Account changeSignType(String digitalId, UUID accountId, SignType signType);
+
+    /**
      * Получение счетов партнера с партнером по запросу
      *
      * @param request параметры поиска счета с партнером
@@ -117,4 +137,11 @@ public interface AccountService {
      * @param request параметры поиска счета с партнером
      */
     AccountWithPartnerResponse getAtAllRequisites(AccountAndPartnerRequest request);
+
+    /**
+     * Получение счетов партнера по реквизитам
+     *
+     * @param requisites параметры поиска счетов
+     */
+    List<Account> getByRequisites(AccountSignInfoRequisites requisites);
 }

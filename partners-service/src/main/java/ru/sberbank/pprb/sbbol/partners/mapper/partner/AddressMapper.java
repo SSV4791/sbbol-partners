@@ -36,7 +36,7 @@ public interface AddressMapper {
         return addressType != null ? ru.sberbank.pprb.sbbol.partners.model.AddressType.valueOf(addressType.name()) : null;
     }
 
-    default List<AddressEntity> toAddress(Set<AddressCreateFullModel> addresses, String digitalId, UUID unifiedUuid) {
+    default List<AddressCreate> toAddress(Set<AddressCreateFullModel> addresses, String digitalId, UUID unifiedUuid) {
         if (CollectionUtils.isEmpty(addresses)) {
             return Collections.emptyList();
         }
@@ -45,12 +45,9 @@ public interface AddressMapper {
             .collect(Collectors.toList());
     }
 
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedUuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid")
     @Mapping(target = "digitalId", source = "digitalId")
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "type", source = "address.type", qualifiedByName = "toAddressType")
+    @Mapping(target = "type", source = "address.type")
     @Mapping(target = "zipCode", source = "address.zipCode")
     @Mapping(target = "regionCode", source = "address.regionCode")
     @Mapping(target = "region", source = "address.region")
@@ -60,7 +57,7 @@ public interface AddressMapper {
     @Mapping(target = "building", source = "address.building")
     @Mapping(target = "buildingBlock", source = "address.buildingBlock")
     @Mapping(target = "flat", source = "address.flat")
-    AddressEntity toAddress(AddressCreateFullModel address, String digitalId, UUID unifiedUuid);
+    AddressCreate toAddress(AddressCreateFullModel address, String digitalId, UUID unifiedUuid);
 
     @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "unifiedUuid", source = "unifiedId")

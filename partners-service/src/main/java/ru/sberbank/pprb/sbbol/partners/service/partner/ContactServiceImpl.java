@@ -9,12 +9,11 @@ import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
 import ru.sberbank.pprb.sbbol.partners.model.Contact;
 import ru.sberbank.pprb.sbbol.partners.model.ContactChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.ContactCreate;
+import ru.sberbank.pprb.sbbol.partners.model.ContactCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsFilter;
 import ru.sberbank.pprb.sbbol.partners.model.ContactsResponse;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,29 +21,32 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 @Loggable
 public class ContactServiceImpl implements ContactService {
 
     public static final String DOCUMENT_NAME = "contact";
 
     private final ContactRepository contactRepository;
-    private final AddressRepository addressRepository;
-    private final DocumentRepository documentRepository;
     private final ContactMapper contactMapper;
     private final PartnerService partnerService;
+    private final AddressService contactAddressService;
+    private final DocumentService contactDocumentService;
 
     public ContactServiceImpl(
         ContactRepository contactRepository,
-        AddressRepository addressRepository,
-        DocumentRepository documentRepository,
         ContactMapper contactMapper,
-        PartnerService partnerService
+        PartnerService partnerService,
+        AddressService contactAddressService,
+        DocumentService contactDocumentService
     ) {
         this.contactRepository = contactRepository;
-        this.addressRepository = addressRepository;
-        this.documentRepository = documentRepository;
         this.contactMapper = contactMapper;
         this.partnerService = partnerService;
+        this.contactAddressService = contactAddressService;
+        this.contactDocumentService = contactDocumentService;
     }
 
     @Override
@@ -53,6 +55,14 @@ public class ContactServiceImpl implements ContactService {
         var contact = contactRepository.getByDigitalIdAndUuid(digitalId, id)
             .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, id));
         return contactMapper.toContact(contact);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Contact> getContactsByPartnerUuid(String digitalId, UUID partnerUuid) {
+        return contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid).stream()
+            .map(contactMapper::toContact)
+            .toList();
     }
 
     @Override
@@ -88,6 +98,18 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
+    public List<Contact> saveContacts(String digitalId, UUID unifiedUuid, Set<ContactCreateFullModel> contacts) {
+        if (isEmpty(contacts)) {
+            return emptyList();
+        }
+        return contacts.stream()
+            .map(contact -> contactMapper.toContact(contact, digitalId, unifiedUuid))
+            .map(this::saveContact)
+            .toList();
+    }
+
+    @Override
+    @Transactional
     public Contact updateContact(Contact contact) {
         var foundContact = findContactEntity(contact.getDigitalId(), contact.getId(), contact.getVersion());
         contactMapper.updateContact(contact, foundContact);
@@ -104,14 +126,23 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public void deleteContacts(String digitalId, List<UUID> ids) {
-        for (var contactId : ids) {
-            var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactId)
-                .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactId));
-            contactRepository.delete(foundContact);
-            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactId));
-            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, contactId));
-        }
+    public void deleteContacts(String digitalId, List<UUID> contactIds) {
+        contactIds.forEach(contactId -> deleteContact(digitalId, contactId));
+    }
+
+    @Override
+    @Transactional
+    public void deleteContactsByPartnerUuid(String digitalId, UUID partnerUuid) {
+        contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerUuid)
+            .forEach(contact -> deleteContact(contact.getDigitalId(), contact.getUuid()));
+    }
+
+    private void deleteContact(String digitalId, UUID contactId) {
+        var foundContact = contactRepository.getByDigitalIdAndUuid(digitalId, contactId)
+            .orElseThrow(() -> new EntryNotFoundException(DOCUMENT_NAME, digitalId, contactId));
+        contactRepository.delete(foundContact);
+        contactAddressService.deleteAddressesByUnifiedUuid(digitalId, contactId);
+        contactDocumentService.deleteDocumentsByUnifiedUuid(digitalId, contactId);
     }
 
     @Override

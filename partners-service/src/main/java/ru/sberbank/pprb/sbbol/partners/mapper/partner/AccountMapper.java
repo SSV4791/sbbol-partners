@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.sberbank.pprb.sbbol.partners.aspect.logger.Loggable;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
+import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.AccountStateType;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.common.BaseMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.decorator.AccountMapperDecorator;
 import ru.sberbank.pprb.sbbol.partners.model.Account;
@@ -20,6 +21,7 @@ import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.AccountWithPartnerResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
+import ru.sberbank.pprb.sbbol.partners.model.SignType;
 
 import java.util.List;
 import java.util.UUID;
@@ -153,5 +155,12 @@ public interface AccountMapper {
         String corAccount
     ) {
         return saveSearchString(partnerUUID.toString(), account, bic, corAccount);
+    }
+
+    default AccountStateType toAccountStateType(SignType signType) {
+        return switch (signType) {
+            case NOT_SIGNED -> AccountStateType.NOT_SIGNED;
+            case SIGNED -> AccountStateType.SIGNED;
+        };
     }
 }
