@@ -46,7 +46,7 @@ public interface DocumentMapper {
         return certifierType != null ? CertifierType.valueOf(certifierType.name()) : null;
     }
 
-    default List<DocumentEntity> toDocuments(Set<DocumentCreateFullModel> documents, String digitalId, UUID unifiedUuid) {
+    default List<DocumentCreate> toDocuments(Set<DocumentCreateFullModel> documents, String digitalId, UUID unifiedUuid) {
         if (CollectionUtils.isEmpty(documents)) {
             return Collections.emptyList();
         }
@@ -55,14 +55,10 @@ public interface DocumentMapper {
             .collect(Collectors.toList());
     }
 
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "unifiedUuid", source = "unifiedUuid")
+    @Mapping(target = "unifiedId", source = "unifiedUuid")
     @Mapping(target = "digitalId", source = "digitalId")
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "type", ignore = true)
-    @Mapping(target = "certifierType", source = "document.certifierType", qualifiedByName = "toCertifierType")
-    @Mapping(target = "typeUuid", source = "document.documentTypeId")
+    @Mapping(target = "documentTypeId", source = "document.documentTypeId")
+    @Mapping(target = "certifierType", source = "document.certifierType")
     @Mapping(target = "series", source = "document.series")
     @Mapping(target = "number", source = "document.number")
     @Mapping(target = "dateIssue", source = "document.dateIssue")
@@ -70,7 +66,7 @@ public interface DocumentMapper {
     @Mapping(target = "divisionCode", source = "document.divisionCode")
     @Mapping(target = "certifierName", source = "document.certifierName")
     @Mapping(target = "positionCertifier", source = "document.positionCertifier")
-    DocumentEntity toDocument(DocumentCreateFullModel document, String digitalId, UUID unifiedUuid);
+    DocumentCreate toDocument(DocumentCreateFullModel document, String digitalId, UUID unifiedUuid);
 
     DocumentChange toDocument(DocumentChangeFullModel document, String digitalId, UUID unifiedId);
 

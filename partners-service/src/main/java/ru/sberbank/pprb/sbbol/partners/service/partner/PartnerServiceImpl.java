@@ -7,11 +7,8 @@ import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.PartnerType;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.exception.OptimisticLockException;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AccountMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.AddressMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.ContactMapper;
-import ru.sberbank.pprb.sbbol.partners.mapper.partner.DocumentMapper;
 import ru.sberbank.pprb.sbbol.partners.mapper.partner.PartnerMapper;
+import ru.sberbank.pprb.sbbol.partners.model.Account;
 import ru.sberbank.pprb.sbbol.partners.model.FraudMetaData;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.model.Pagination;
@@ -23,10 +20,6 @@ import ru.sberbank.pprb.sbbol.partners.model.PartnerFullModelResponse;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerInfo;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersFilter;
 import ru.sberbank.pprb.sbbol.partners.model.PartnersResponse;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.AccountRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.AddressRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.ContactRepository;
-import ru.sberbank.pprb.sbbol.partners.repository.partner.DocumentRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.PartnerRepository;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.dto.PartnerLegalTypeDto;
 import ru.sberbank.pprb.sbbol.partners.repository.partner.dto.PartnerTypeDto;
@@ -37,7 +30,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static ru.sberbank.pprb.sbbol.partners.audit.model.EventType.PARTNER_CREATE;
@@ -53,15 +45,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     private static final String DOCUMENT_NAME = "partner";
 
-    private final AccountRepository accountRepository;
-    private final DocumentRepository documentRepository;
-    private final ContactRepository contactRepository;
-    private final AddressRepository addressRepository;
     private final PartnerRepository partnerRepository;
-    private final AccountMapper accountMapper;
-    private final DocumentMapper documentMapper;
-    private final AddressMapper addressMapper;
-    private final ContactMapper contactMapper;
     private final PartnerMapper partnerMapper;
     private final ReplicationService replicationService;
     private final AddressService partnerAddressService;
@@ -70,15 +54,7 @@ public class PartnerServiceImpl implements PartnerService {
     private final AccountService accountService;
 
     public PartnerServiceImpl(
-        AccountRepository accountRepository,
-        DocumentRepository documentRepository,
-        ContactRepository contactRepository,
-        AddressRepository addressRepository,
         PartnerRepository partnerRepository,
-        AccountMapper accountMapper,
-        DocumentMapper documentMapper,
-        AddressMapper addressMapper,
-        ContactMapper contactMapper,
         PartnerMapper partnerMapper,
         ReplicationService replicationService,
         AddressService partnerAddressService,
@@ -86,15 +62,7 @@ public class PartnerServiceImpl implements PartnerService {
         ContactService contactService,
         AccountService accountService
     ) {
-        this.accountRepository = accountRepository;
-        this.documentRepository = documentRepository;
-        this.contactRepository = contactRepository;
-        this.addressRepository = addressRepository;
         this.partnerRepository = partnerRepository;
-        this.accountMapper = accountMapper;
-        this.documentMapper = documentMapper;
-        this.addressMapper = addressMapper;
-        this.contactMapper = contactMapper;
         this.partnerMapper = partnerMapper;
         this.replicationService = replicationService;
         this.partnerAddressService = partnerAddressService;
@@ -168,18 +136,9 @@ public class PartnerServiceImpl implements PartnerService {
         var digitalId = partner.getDigitalId();
         var partnerUuid = savedPartner.getUuid();
         var accounts = accountService.saveAccounts(partner.getAccounts(), digitalId, partnerUuid);
-        var addresses = addressMapper.toAddress(partner.getAddress(), digitalId, partnerUuid).stream()
-            .map(addressRepository::save)
-            .map(addressMapper::toAddress)
-            .collect(Collectors.toList());
-        var documents = documentMapper.toDocuments(partner.getDocuments(), digitalId, partnerUuid).stream()
-            .map(documentRepository::save)
-            .map(documentMapper::toDocument)
-            .collect(Collectors.toList());
-        var contacts = contactMapper.toContacts(partner.getContacts(), digitalId, partnerUuid).stream()
-            .map(contactRepository::save)
-            .map(contactMapper::toContact)
-            .collect(Collectors.toList());
+        var addresses = partnerAddressService.saveAddresses(digitalId, partnerUuid, partner.getAddress());
+        var documents = partnerDocumentService.saveDocuments(digitalId, partnerUuid, partner.getDocuments());
+        var contacts = contactService.saveContacts(digitalId, partnerUuid, partner.getContacts());
         if (!isEmpty(accounts)) {
             replicationService.createCounterparty(accounts);
         }
@@ -208,11 +167,8 @@ public class PartnerServiceImpl implements PartnerService {
         var foundPartner = findPartnerForPatch(digitalId, partnerId, partner.getVersion());
         partnerMapper.updatePartner(partner, foundPartner);
         var savePartner = partnerRepository.save(foundPartner);
-        var accountEntities = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId);
-        if (!isEmpty(accountEntities)) {
-            var accounts = accountMapper.toAccounts(accountEntities);
-            replicationService.updateCounterparty(accounts);
-        }
+        accountService.getAccountsByPartnerId(digitalId, partnerId)
+            .forEach(replicationService::updateCounterparty);
         return partnerMapper.toPartner(savePartner);
     }
 
@@ -229,18 +185,10 @@ public class PartnerServiceImpl implements PartnerService {
         partnerDocumentService.saveOrPatchDocuments(digitalId, partnerId, partner.getDocuments());
         contactService.saveOrPatchContacts(digitalId, partnerId, partner.getContacts());
         accountService.saveOrPatchAccounts(digitalId, partnerId, partner.getAccounts());
-        var addresses = addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId).stream()
-            .map(addressMapper::toAddress)
-            .collect(Collectors.toList());
-        var documents = documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId).stream()
-            .map(documentMapper::toDocument)
-            .collect(Collectors.toList());
-        var contacts = contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId).stream()
-            .map(contactMapper::toContact)
-            .collect(Collectors.toList());
-        var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId).stream()
-            .map(accountMapper::toAccount)
-            .collect(Collectors.toList());
+        var addresses = partnerAddressService.getAddressesByUnifiedUuid(digitalId, partnerId);
+        var documents = partnerDocumentService.getDocumentsByUnifiedUuid(digitalId, partnerId);
+        var contacts = contactService.getContactsByPartnerUuid(digitalId, partnerId);
+        var accounts = accountService.getAccountsByPartnerId(digitalId, partnerId);
         return partnerMapper.toPartnerFullResponse(savedPartner)
             .address(addresses)
             .documents(documents)
@@ -256,14 +204,15 @@ public class PartnerServiceImpl implements PartnerService {
         for (UUID partnerId : uuids) {
             PartnerEntity foundPartner = findPartnerByDigitalIdAndUuid(digitalId, partnerId);
             partnerRepository.delete(foundPartner);
-            addressRepository.deleteAll(addressRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId));
-            contactRepository.deleteAll(contactRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId));
-            documentRepository.deleteAll(documentRepository.findByDigitalIdAndUnifiedUuid(digitalId, partnerId));
-            var accounts = accountRepository.findByDigitalIdAndPartnerUuid(digitalId, partnerId);
-            if (!isEmpty(accounts)) {
-                accountRepository.deleteAll(accounts);
-                replicationService.deleteCounterparties(accounts);
-            }
+            partnerAddressService.deleteAddressesByUnifiedUuid(digitalId, partnerId);
+            contactService.deleteContactsByPartnerUuid(digitalId, partnerId);
+            partnerDocumentService.deleteDocumentsByUnifiedUuid(digitalId, partnerId);
+
+            var accountIds = accountService.getAccountsByPartnerId(digitalId, partnerId).stream()
+                .map(Account::getId)
+                .toList();
+            accountService.deleteAccounts(digitalId, accountIds);
+            replicationService.deleteCounterparties(digitalId, accountIds.stream().map(UUID::toString).toList());
         }
     }
 

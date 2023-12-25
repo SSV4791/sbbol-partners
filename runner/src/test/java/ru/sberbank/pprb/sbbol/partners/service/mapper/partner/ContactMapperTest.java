@@ -79,7 +79,7 @@ class ContactMapperTest extends BaseUnitConfiguration {
             assertThat(digitalId)
                 .isEqualTo(actualEntity.getDigitalId());
             assertThat(unifiedUuid)
-                .isEqualTo(actualEntity.getPartnerUuid());
+                .isEqualTo(actualEntity.getPartnerId());
         }
     }
 
@@ -103,23 +103,13 @@ class ContactMapperTest extends BaseUnitConfiguration {
         assertThat(digitalId)
             .isEqualTo(actual.getDigitalId());
         assertThat(unifiedUuid)
-            .isEqualTo(actual.getPartnerUuid());
-        assertThat(ContactMapper.toLegalType(expected.getLegalForm()))
-            .isEqualTo(actual.getType());
-
+            .isEqualTo(actual.getPartnerId());
+        assertThat(actual.getLegalForm())
+            .isEqualTo(expected.getLegalForm());
         assertThat(actual.getEmails())
-            .isNotNull();
-        for (var email : actual.getEmails()) {
-            assertThat(expected.getEmails())
-                .contains(email.getEmail());
-        }
-
+            .isEqualTo(expected.getEmails());
         assertThat(actual.getPhones())
-            .isNotNull();
-        for (var phone : actual.getPhones()) {
-            assertThat(expected.getPhones())
-                .contains(phone.getPhone());
-        }
+            .isEqualTo(expected.getPhones());
     }
 
     @Test

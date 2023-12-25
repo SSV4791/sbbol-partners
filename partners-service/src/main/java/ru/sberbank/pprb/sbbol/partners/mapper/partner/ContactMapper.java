@@ -88,7 +88,7 @@ public interface ContactMapper {
         }
     }
 
-    default List<ContactEntity> toContacts(Set<ContactCreateFullModel> contacts, String digitalId, UUID partnerUuid) {
+    default List<ContactCreate> toContacts(Set<ContactCreateFullModel> contacts, String digitalId, UUID partnerUuid) {
         if (CollectionUtils.isEmpty(contacts)) {
             return Collections.emptyList();
         }
@@ -97,20 +97,17 @@ public interface ContactMapper {
             .collect(Collectors.toList());
     }
 
-    @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "partnerUuid", source = "partnerUuid")
+    @Mapping(target = "partnerId", source = "partnerUuid")
     @Mapping(target = "digitalId", source = "digitalId")
-    @Mapping(target = "emails", expression = "java(toEmail(contact.getEmails(), digitalId))")
-    @Mapping(target = "phones", expression = "java(toPhone(contact.getPhones(), digitalId))")
-    @Mapping(target = "type", source = "contact.legalForm", qualifiedByName = "toLegalType")
-    @Mapping(target = "lastModifiedDate", ignore = true)
+    @Mapping(target = "emails", source = "contact.emails")
+    @Mapping(target = "phones", source = "contact.phones")
+    @Mapping(target = "legalForm", source = "contact.legalForm")
     @Mapping(target = "orgName", source = "contact.orgName")
     @Mapping(target = "firstName", source = "contact.firstName")
     @Mapping(target = "secondName", source = "contact.secondName")
     @Mapping(target = "middleName", source = "contact.middleName")
     @Mapping(target = "position", source = "contact.position")
-    ContactEntity toContact(ContactCreateFullModel contact, String digitalId, UUID partnerUuid);
+    ContactCreate toContact(ContactCreateFullModel contact, String digitalId, UUID partnerUuid);
 
     Contact toContact(ContactChangeFullModel contact, String digitalId, UUID partnerId);
 
