@@ -88,16 +88,16 @@ public class PartnerCreateNotValidProvider implements ArgumentsProvider {
             Arguments.of(
                 //9 testSavePartnerWithInvalidKpp /*2
                 getValidLegalEntityPartner()
-                    .kpp("[АБВ1234]"),
+                    .kpp("[\\]"),
                 List.of(new Descriptions()
                     .field("kpp")
                     .addMessageItem("Введён неверный КПП")
-                    .addMessageItem("Поле содержит недопустимый(-е) символ(-ы): [АБВ]"))
+                    .addMessageItem("Поле содержит недопустимый(-е) символ(-ы): [\\]"))
             ),
             Arguments.of(
                 //10 testSavePartnerWithInvalidKpp /*3
                 getValidLegalEntityPartner()
-                    .kpp("003456789"),
+                    .kpp("12345678"),
                 List.of(new Descriptions()
                     .field("kpp")
                     .addMessageItem("Введён неверный КПП"))

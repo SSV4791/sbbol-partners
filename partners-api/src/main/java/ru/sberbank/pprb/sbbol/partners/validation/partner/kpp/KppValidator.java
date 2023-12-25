@@ -6,12 +6,11 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.regex.Pattern;
 
 public class KppValidator extends BaseValidator
     implements ConstraintValidator<KppValidation, String> {
 
-    private static final Pattern PATTERN = Pattern.compile("[0-9]{4}[0-9A-Z]{2}[0-9]{3}");
+    private static final String PATTERN = "[0-9a-zA-Zа-яА-ЯЁё№! \"#$%&'()*+,-./:;<=>?@\\^_`{|}~\n\r]{9}";
     private static final String MESSAGE = "{validation.partner.kpp.format}";
 
     @Override
@@ -20,6 +19,6 @@ public class KppValidator extends BaseValidator
             return true;
         }
         buildMessage(context, MESSAGE);
-        return PATTERN.matcher(value).matches() && !"00".equals(StringUtils.truncate(value, 0, 2));
+        return value.matches(PATTERN);
     }
 }
