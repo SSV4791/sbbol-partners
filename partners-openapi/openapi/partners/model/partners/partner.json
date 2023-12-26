@@ -71,7 +71,7 @@
     "kpp": {
       "type": "string",
       "title": "КПП",
-      "pattern": "[0-9A-Z]*",
+      "pattern": "[0-9a-zA-Zа-яА-ЯЁё№! \"#$%&'()*+,-./:;<=>?@\\^_`{|}~\n\n]*",
       "x-pattern-message": "{validation.partner.illegal_symbols}",
       "maxLength": 9,
       "x-length-message": "{validation.partner.max_symbols}",

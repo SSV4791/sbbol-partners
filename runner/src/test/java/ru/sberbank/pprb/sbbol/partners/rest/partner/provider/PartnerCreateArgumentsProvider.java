@@ -30,6 +30,14 @@ public class PartnerCreateArgumentsProvider implements ArgumentsProvider {
                     .comment(null)
             ),
             Arguments.of(
+                getValidPartner(randomAlphabetic(10), LegalForm.LEGAL_ENTITY)
+                    .kpp("1ww^ц{ъ9p")
+            ),
+            Arguments.of(
+                getValidPartner(randomAlphabetic(10), LegalForm.LEGAL_ENTITY)
+                    .kpp("0")
+            ),
+            Arguments.of(
                 getValidPartner(randomAlphabetic(10), LegalForm.ENTREPRENEUR)
                     .firstName(null)
                     .secondName(null)
