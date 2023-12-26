@@ -2853,7 +2853,7 @@ class AccountControllerTest extends BaseAccountControllerTest {
             getValidLegalEntityPartner().kpp(dbKppValue));
         var partner = step("Создание партнера", () ->
             createValidPartner(creatingPartner));
-        Account account = step("Создание счета", () ->
+        var account = step("Создание счета", () ->
             createValidAccount(partner.getId(), partner.getDigitalId()));
 
         var request = step("Подготовка тестовых данных", () ->
@@ -2888,13 +2888,8 @@ class AccountControllerTest extends BaseAccountControllerTest {
             Account actualAccount = accountWithPartnerActual.getAccount();
             assertThat(actualAccount)
                 .isNotNull();
-            if (dbKppValue == null) {
-                assertThat(accountWithPartnerActual.getKpp())
-                    .isNull();
-            } else {
-                assertThat(accountWithPartnerActual.getKpp())
-                    .isEmpty();
-            }
+            assertThat(accountWithPartnerActual.getKpp())
+                .isNull();
         });
     }
 
@@ -3044,13 +3039,13 @@ class AccountControllerTest extends BaseAccountControllerTest {
                 .findFirst()
                 .orElseGet(UUID::randomUUID);
             acc.setExternalId(externalId);
-                return post(
-                    baseRoutePath + "/account",
-                    HttpStatus.BAD_REQUEST,
-                    acc,
-                    Error.class
-                );
-            });
+            return post(
+                baseRoutePath + "/account",
+                HttpStatus.BAD_REQUEST,
+                acc,
+                Error.class
+            );
+        });
 
         step("Проверка результата", () -> {
             assertThat(error)
