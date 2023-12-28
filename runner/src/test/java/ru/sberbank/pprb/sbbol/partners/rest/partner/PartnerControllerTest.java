@@ -62,8 +62,8 @@ import ru.sberbank.pprb.sbbol.partners.repository.partner.GkuInnDictionaryReposi
 import ru.sberbank.pprb.sbbol.partners.repository.partner.GuidsHistoryRepository;
 import ru.sberbank.pprb.sbbol.partners.rest.config.SbbolIntegrationWithOutSbbolConfiguration;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateArgumentsProvider;
-import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateFullModelNotValidProvider;
-import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerCreateNotValidProvider;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.ValidationPartnerCreateFullModelProvider;
+import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.ValidationPartnerCreateProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterIdsArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.rest.partner.provider.PartnerFilterLegalFormArgumentsProvider;
 import ru.sberbank.pprb.sbbol.renter.model.Renter;
@@ -169,7 +169,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @ParameterizedTest
-    @ArgumentsSource(PartnerCreateNotValidProvider.class)
+    @ArgumentsSource(ValidationPartnerCreateProvider.class)
     @DisplayName("POST /partner Создание партнера. Проверка валидации")
     void testPartnerCreate_ValidationTest(PartnerCreate partner, List<Descriptions> expectedDescriptions) {
         var error = step("Выполнение post-запроса /partner, код ответа 400", () ->
@@ -198,7 +198,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
     }
 
     @ParameterizedTest
-    @ArgumentsSource(PartnerCreateFullModelNotValidProvider.class)
+    @ArgumentsSource(ValidationPartnerCreateFullModelProvider.class)
     @DisplayName("POST /partner/full-model Создание партнера по полной модели. Проверка валидации")
     void testPartnerCreateFullModel_ValidationTest(PartnerCreateFullModel partner, List<Descriptions> expectedDescriptions) {
         var error = step("Выполнение post-запроса /partner/full-model, код ответа 400", () ->
@@ -1920,6 +1920,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .firstName(null)
             .secondName(null)
             .middleName(null)
+            .address(Set.of(new AddressCreateFullModel().type(AddressType.REGISTRATION_ADDRESS)))
             .orgName("Иванов Иван Иванович")
             .accounts(Set.of(
                 new AccountCreateFullModel()
@@ -1956,6 +1957,7 @@ public class PartnerControllerTest extends AbstractIntegrationTest {
             .firstName(null)
             .secondName(null)
             .middleName(null)
+            .address(Set.of(new AddressCreateFullModel().type(AddressType.RESIDENTIAL_ADDRESS)))
             .orgName("Иванов Иван Иванович")
             .accounts(Set.of(
                 new AccountCreateFullModel()

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import ru.sberbank.pprb.sbbol.partners.config.AbstractIntegrationTest;
+import ru.sberbank.pprb.sbbol.partners.config.MessagesTranslator;
 import ru.sberbank.pprb.sbbol.partners.model.Address;
 import ru.sberbank.pprb.sbbol.partners.model.AddressCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AddressType;
@@ -26,6 +27,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.MODEL_NOT_FOUND_EXCEPTION;
 import static ru.sberbank.pprb.sbbol.partners.exception.common.ErrorCode.OPTIMISTIC_LOCK_EXCEPTION;
+import static ru.sberbank.pprb.sbbol.partners.model.AddressType.*;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.createValidPartner;
 
 @ContextConfiguration(classes = SbbolIntegrationWithOutSbbolConfiguration.class)
@@ -91,7 +93,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             new AddressesFilter()
                 .digitalId(partner.getDigitalId())
                 .unifiedIds(List.of(partner.getId()))
-                .type(AddressType.LEGAL_ADDRESS)
+                .type(LEGAL_ADDRESS)
                 .pagination(new Pagination()
                     .count(4)
                     .offset(0)));
@@ -133,6 +135,32 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /partner/address создание адреса с невалидным типом")
+    void testCreatePartnerAddress_invalidType() {
+        var partner = step("Подготовка тестовых данных", () ->
+            createValidPartner(RandomStringUtils.randomAlphabetic(10)));
+
+        var error = step("Выполнение post-запроса /partner/address", () ->
+            post(
+                baseRoutePath + "/address",
+                HttpStatus.BAD_REQUEST,
+                getValidPartnerAddress(partner.getId(), partner.getDigitalId()).type(REGISTRATION_ADDRESS),
+                Error.class
+            ));
+
+        step("Проверка корректности ответа", () -> {
+            var expectedDescription = new Descriptions()
+                .field("type")
+                .addMessageItem(MessagesTranslator.toLocale("validation.partner.address.legal_entity_or_entrepreneur.type"));
+
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getDescriptions())
+                .contains(expectedDescription);
+        });
+    }
+
+    @Test
     @DisplayName("PUT /partner/address обновление адреса партнера")
     void testUpdatePartnerAddress() {
         var address = step("Подготовка тестовых данных", () -> {
@@ -154,6 +182,33 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
                 .isEqualTo(newUpdateAddress.getStreet());
             assertThat(newUpdateAddress.getStreet())
                 .isNotEqualTo(address.getStreet());
+        });
+    }
+
+    @Test
+    @DisplayName("PUT /partner/address обновление адреса партнера")
+    void testUpdatePartnerAddress_invalidType() {
+        var address = step("Подготовка тестовых данных", () -> {
+            var partner = createValidPartner(RandomStringUtils.randomAlphabetic(10));
+            return createValidAddress(partner.getId(), partner.getDigitalId());
+        });
+
+        var error = step("Выполнение put-запроса /partner/address", () ->
+            put(
+                baseRoutePath + "/address",
+                HttpStatus.BAD_REQUEST,
+                updateAddress(address).type(RESIDENTIAL_ADDRESS),
+                Error.class));
+
+        step("Проверка корректности ответа", () -> {
+            var expectedDescription = new Descriptions()
+                .field("type")
+                .addMessageItem(MessagesTranslator.toLocale("validation.partner.address.legal_entity_or_entrepreneur.type"));
+
+            assertThat(error)
+                .isNotNull();
+            assertThat(error.getDescriptions())
+                .contains(expectedDescription);
         });
     }
 
@@ -295,7 +350,7 @@ public class PartnerAddressControllerTest extends AbstractIntegrationTest {
             .region("6")
             .regionCode("7")
             .street("8")
-            .type(AddressType.LEGAL_ADDRESS)
+            .type(LEGAL_ADDRESS)
             .zipCode("9")
             ;
     }

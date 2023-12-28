@@ -1,10 +1,12 @@
 package ru.sberbank.pprb.sbbol.partners.validation.partner.okpo;
 
-import org.springframework.util.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.LegalForm;
 import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 
 import javax.validation.ConstraintValidatorContext;
+
+import static java.util.Objects.isNull;
+import static org.springframework.util.StringUtils.hasText;
 
 public class BaseOkpoLengthValidator extends BaseValidator {
 
@@ -14,7 +16,7 @@ public class BaseOkpoLengthValidator extends BaseValidator {
     private static final String MESSAGE_ENTREPRENEUR = "{validation.partner.entrepreneur.okpo.length}";
 
     public boolean isValid(ConstraintValidatorContext context, String okpo, LegalForm legalForm) {
-        if (!StringUtils.hasText(okpo) || legalForm == null) {
+        if (!hasText(okpo) || isNull(legalForm)) {
             return true;
         }
         if (legalForm == LegalForm.PHYSICAL_PERSON) {

@@ -1,12 +1,13 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
-import org.apache.commons.lang3.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.AccountRubCodeCurrencyValidation;
 import ru.sberbank.pprb.sbbol.partners.validation.account.BaseAccountRubCodeCurrencyValidator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import static java.util.Objects.isNull;
 
 public class AccountAttributeRurCodeCurrencyAccountCreateDtoValidator extends BaseAccountRubCodeCurrencyValidator
     implements ConstraintValidator<AccountRubCodeCurrencyValidation, AccountCreate> {
@@ -20,15 +21,15 @@ public class AccountAttributeRurCodeCurrencyAccountCreateDtoValidator extends Ba
     @Override
     public boolean isValid(AccountCreate value, ConstraintValidatorContext context) {
         buildMessage(context, "account", message);
-        if (ObjectUtils.isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
         var bank = value.getBank();
-        if (ObjectUtils.isEmpty(bank)) {
+        if (isNull(bank)) {
             return validate(value.getAccount(), null);
         }
         var bankAccount = bank.getBankAccount();
-        if (ObjectUtils.isEmpty(bankAccount)) {
+        if (isNull(bankAccount)) {
             return validate(value.getAccount(), null);
         }
         return validate(value.getAccount(), bankAccount.getBankAccount());

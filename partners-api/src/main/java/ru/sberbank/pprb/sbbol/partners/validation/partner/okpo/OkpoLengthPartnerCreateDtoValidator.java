@@ -7,7 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.service.legalform.LegalFormInspector;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static java.util.Objects.isNull;
 
 public class OkpoLengthPartnerCreateDtoValidator extends BaseOkpoLengthValidator
     implements ConstraintValidator<OkpoValidataion, PartnerCreate> {
@@ -20,7 +20,7 @@ public class OkpoLengthPartnerCreateDtoValidator extends BaseOkpoLengthValidator
 
     @Override
     public boolean isValid(PartnerCreate value, ConstraintValidatorContext context) {
-        if (isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
         legalFormInspector.setLegalFormAndPartnerName(value);

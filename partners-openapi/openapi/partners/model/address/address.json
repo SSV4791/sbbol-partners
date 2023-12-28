@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "title": "Адрес партнера",
+  "x-extra-class-annotation": "@AddressTypeValidation",
   "properties": {
     "id": {
       "type": "string",

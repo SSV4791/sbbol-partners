@@ -4,6 +4,8 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AddressCreateFullModel;
+import ru.sberbank.pprb.sbbol.partners.model.AddressType;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankCreate;
 import ru.sberbank.pprb.sbbol.partners.model.Descriptions;
@@ -15,10 +17,12 @@ import java.util.stream.Stream;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidAccountNumber;
 import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidCorrAccountNumber;
+import static ru.sberbank.pprb.sbbol.partners.config.PodamConfiguration.getValidInnNumber;
+import static ru.sberbank.pprb.sbbol.partners.model.LegalForm.LEGAL_ENTITY;
 import static ru.sberbank.pprb.sbbol.partners.model.LegalForm.PHYSICAL_PERSON;
 import static ru.sberbank.pprb.sbbol.partners.rest.partner.PartnerControllerTest.getValidFullModelLegalEntityPartner;
 
-public class PartnerCreateFullModelNotValidProvider implements ArgumentsProvider {
+public class ValidationPartnerCreateFullModelProvider implements ArgumentsProvider {
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
@@ -189,6 +193,40 @@ public class PartnerCreateFullModelNotValidProvider implements ArgumentsProvider
                     new Descriptions()
                         .field("orgName")
                         .addMessageItem("Поле обязательно для заполнения")
+                )
+            ),
+            Arguments.of(
+                //13 Определение правового статуса. Проверка валидации. Статус определен как ФЛ - тип адреса не соответствует
+                getValidFullModelLegalEntityPartner()
+                    .legalForm(null)
+                    .inn(getValidInnNumber(PHYSICAL_PERSON))
+                    .firstName(null)
+                    .secondName(null)
+                    .middleName(null)
+                    .address(null)
+                    .orgName("Иванов Иван Иванович")
+                    .address(Set.of(new AddressCreateFullModel().type(AddressType.LEGAL_ADDRESS))),
+                List.of(
+                    new Descriptions()
+                        .field("address[0].type")
+                        .addMessageItem("Указанный адрес не соответствует типу адреса для физлица")
+                )
+            ),
+            Arguments.of(
+                //14 Определение правового статуса. Проверка валидации. Статус определен как ЮЛ - тип адреса не соответствует
+                getValidFullModelLegalEntityPartner()
+                    .legalForm(null)
+                    .inn(getValidInnNumber(LEGAL_ENTITY))
+                    .firstName(null)
+                    .secondName(null)
+                    .middleName(null)
+                    .address(null)
+                    .orgName("Иванов Иван Иванович")
+                    .address(Set.of(new AddressCreateFullModel().type(AddressType.RESIDENTIAL_ADDRESS))),
+                List.of(
+                    new Descriptions()
+                        .field("address[0].type")
+                        .addMessageItem("Указанный адрес не соответствует типу адреса для юрлица или ИП")
                 )
             )
         );

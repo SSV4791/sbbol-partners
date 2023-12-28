@@ -11,6 +11,7 @@ import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountVal
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFullModelDtoValidator extends BaseTreasuryAccountValidator
@@ -32,7 +33,7 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateFul
 
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) throws EntryNotFoundException {
-        if (isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
 

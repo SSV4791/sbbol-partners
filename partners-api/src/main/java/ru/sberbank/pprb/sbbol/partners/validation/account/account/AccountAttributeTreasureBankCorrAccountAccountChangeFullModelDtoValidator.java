@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountChangeFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.PartnerChangeFullModel;
@@ -11,6 +10,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountVal
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Set;
+
+import static java.util.Objects.isNull;
 
 public class AccountAttributeTreasureBankCorrAccountAccountChangeFullModelDtoValidator extends BaseTreasuryAccountValidator
     implements ConstraintValidator<TreasureBankCorrAccountCodeCurrencyAndTreasureBalanceValidation, PartnerChangeFullModel> {
@@ -27,7 +28,7 @@ public class AccountAttributeTreasureBankCorrAccountAccountChangeFullModelDtoVal
 
     @Override
     public boolean isValid(PartnerChangeFullModel value, ConstraintValidatorContext context) {
-        if (value == null) {
+        if (isNull(value)) {
             return true;
         }
         Set<AccountChangeFullModel> accounts = value.getAccounts();
@@ -38,11 +39,11 @@ public class AccountAttributeTreasureBankCorrAccountAccountChangeFullModelDtoVal
         var accountCounter = 0;
         for (var account: accounts) {
             var bank = account.getBank();
-            if (ObjectUtils.isEmpty(bank)) {
+            if (isNull(bank)) {
                 break;
             }
             var bankAccount = bank.getBankAccount();
-            if (bankAccount == null) {
+            if (isNull(bankAccount)) {
                 break;
             }
             if (!validateCorrAccount(account.getAccount(), bankAccount.getBankAccount())) {

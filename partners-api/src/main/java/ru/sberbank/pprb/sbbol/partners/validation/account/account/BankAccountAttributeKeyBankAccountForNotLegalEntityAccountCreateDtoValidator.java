@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
-import org.apache.commons.lang3.ObjectUtils;
 import ru.sberbank.pprb.sbbol.partners.exception.EntryNotFoundException;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
 import ru.sberbank.pprb.sbbol.partners.model.BankAccountKeyValidation;
@@ -9,6 +8,9 @@ import ru.sberbank.pprb.sbbol.partners.validation.account.BaseTreasuryAccountVal
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateDtoValidator extends BaseTreasuryAccountValidator
     implements ConstraintValidator<BankAccountKeyValidation, AccountCreate> {
@@ -27,19 +29,19 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountCreateDto
     @Override
     public boolean isValid(AccountCreate value, ConstraintValidatorContext context) throws EntryNotFoundException {
         buildMessage(context, "bank.bankAccount.bankAccount", message);
-        if (ObjectUtils.isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
         String account = value.getAccount();
-        if (ObjectUtils.isEmpty(account)) {
+        if (isEmpty(account)) {
             return true;
         }
         var bank = value.getBank();
-        if (ObjectUtils.isEmpty(bank)) {
+        if (isNull(bank)) {
             return true;
         }
         var bankAccount = bank.getBankAccount();
-        if (ObjectUtils.isEmpty(bankAccount)) {
+        if (isNull(bankAccount)) {
             return true;
         }
         return isBudgetCorrAccount(value.getDigitalId(), value.getPartnerId(), bankAccount.getBankAccount());
