@@ -14,6 +14,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Set;
 
+import static java.util.Objects.isNull;
+
 public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeFullModelDtoValidator extends BaseTreasuryAccountValidator
     implements ConstraintValidator<BankAccountKeyValidation, PartnerChangeFullModel> {
 
@@ -30,7 +32,7 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeFul
 
     @Override
     public boolean isValid(PartnerChangeFullModel value, ConstraintValidatorContext context) throws EntryNotFoundException {
-        if (value == null) {
+        if (isNull(value)) {
             return true;
         }
 
@@ -44,11 +46,11 @@ public class BankAccountAttributeKeyBankAccountForNotLegalEntityAccountChangeFul
             var accountCounter = 0;
             for (var account: accounts) {
                 var bank = account.getBank();
-                if (ObjectUtils.isEmpty(bank)) {
+                if (isNull(bank)) {
                     break;
                 }
                 var bankAccount = bank.getBankAccount();
-                if (bankAccount == null) {
+                if (isNull(bankAccount)) {
                     break;
                 }
                 if (isBudgetCorrAccount(bankAccount.getBankAccount())) {

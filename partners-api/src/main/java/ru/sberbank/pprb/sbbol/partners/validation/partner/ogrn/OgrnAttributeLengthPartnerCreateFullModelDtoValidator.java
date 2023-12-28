@@ -7,7 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.service.legalform.LegalFormInspector;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static java.util.Objects.isNull;
 
 public class OgrnAttributeLengthPartnerCreateFullModelDtoValidator extends BaseOgrnLengthValidator
     implements ConstraintValidator<OgrnLengthValidation, PartnerCreateFullModel> {
@@ -20,7 +20,7 @@ public class OgrnAttributeLengthPartnerCreateFullModelDtoValidator extends BaseO
 
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
-        if (isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
         legalFormInspector.setLegalFormAndPartnerName(value);

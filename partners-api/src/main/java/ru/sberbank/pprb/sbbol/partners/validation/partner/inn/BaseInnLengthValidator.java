@@ -6,6 +6,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 
 import javax.validation.ConstraintValidatorContext;
 
+import static java.util.Objects.isNull;
+
 public class BaseInnLengthValidator extends BaseValidator {
 
     private static final int INN_5_VALID_LENGTH = 5;
@@ -15,7 +17,7 @@ public class BaseInnLengthValidator extends BaseValidator {
     private static final String MESSAGE_PHYSICAL_PERSON_OR_ENTREPRENEUR = "{validation.partner.physical_person_or_entrepreneur.inn.length}";
 
     public boolean isValid(ConstraintValidatorContext context, String inn, LegalForm legalForm) {
-        if (!StringUtils.hasText(inn) || legalForm == null) {
+        if (!StringUtils.hasText(inn) || isNull(legalForm)) {
             return true;
         }
         var innLength = inn.length();

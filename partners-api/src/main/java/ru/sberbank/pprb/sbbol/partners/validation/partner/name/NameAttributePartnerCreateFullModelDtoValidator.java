@@ -7,7 +7,7 @@ import ru.sberbank.pprb.sbbol.partners.service.legalform.LegalFormInspector;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static java.util.Objects.isNull;
 
 public class NameAttributePartnerCreateFullModelDtoValidator extends BaseNameCreateAttributeValidator
     implements ConstraintValidator<PartnerNameValidation, PartnerCreateFullModel> {
@@ -20,7 +20,7 @@ public class NameAttributePartnerCreateFullModelDtoValidator extends BaseNameCre
 
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
-        if (isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
         legalFormInspector.setLegalFormAndPartnerName(value);

@@ -9,6 +9,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.account.BaseAccountKeyValidato
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import static java.util.Objects.isNull;
+
 public class AccountAttributeKeyAccountChangeFullModelDtoValidator extends BaseAccountKeyValidator
     implements ConstraintValidator<AccountKeyValidation, AccountChangeFullModel> {
 
@@ -22,11 +24,11 @@ public class AccountAttributeKeyAccountChangeFullModelDtoValidator extends BaseA
     @Override
     public boolean isValid(AccountChangeFullModel value, ConstraintValidatorContext context) {
         buildMessage(context, "account", message);
-        if (ObjectUtils.isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
         var bank = value.getBank();
-        if (bank == null || StringUtils.isEmpty(bank.getBic())) {
+        if (isNull(bank) || StringUtils.isEmpty(bank.getBic())) {
             return true;
         }
         var account = value.getAccount();

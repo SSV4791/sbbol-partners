@@ -12,6 +12,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Set;
 
+import static java.util.Objects.isNull;
+
 public class AccountAttributeTreasureCodeCurrencyAccountChangeFullModelDtoValidator extends BaseTreasuryAccountValidator
     implements ConstraintValidator<TreasureAccountCodeCurrencyValidation, PartnerChangeFullModel> {
     private String message;
@@ -38,11 +40,11 @@ public class AccountAttributeTreasureCodeCurrencyAccountChangeFullModelDtoValida
         var accountCounter = 0;
         for (var account : accounts) {
             var bank = account.getBank();
-            if (ObjectUtils.isEmpty(bank)) {
+            if (isNull(bank)) {
                 break;
             }
             var bankAccount = bank.getBankAccount();
-            if (bankAccount == null) {
+            if (isNull(bankAccount)) {
                 break;
             }
             if (!validateCodeCurrency(account.getAccount(), bankAccount.getBankAccount())) {

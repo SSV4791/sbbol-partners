@@ -6,6 +6,9 @@ import ru.sberbank.pprb.sbbol.partners.validation.common.BaseValidator;
 
 import javax.validation.ConstraintValidatorContext;
 
+import static java.util.Objects.isNull;
+import static org.springframework.util.StringUtils.hasText;
+
 public class BaseOgrnLengthValidator extends BaseValidator {
 
     private static final int OGRN_13_VALID_LENGTH = 13;
@@ -14,7 +17,7 @@ public class BaseOgrnLengthValidator extends BaseValidator {
     private static final String MESSAGE_ENTREPRENEUR = "{validation.partner.physical_person_or_entrepreneur.ogrn.length}";
 
     public boolean isValid(ConstraintValidatorContext context, String ogrn, LegalForm legalForm) {
-        if (!StringUtils.hasText(ogrn) || legalForm == null) {
+        if (!hasText(ogrn) || isNull(legalForm)) {
             return true;
         }
         if (legalForm == LegalForm.PHYSICAL_PERSON) {

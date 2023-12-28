@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountKeyValidation;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreate;
@@ -8,6 +7,8 @@ import ru.sberbank.pprb.sbbol.partners.validation.account.BaseAccountKeyValidato
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import static java.util.Objects.isNull;
 
 public class AccountAttributeKeyAccountCreateDtoValidator extends BaseAccountKeyValidator
     implements ConstraintValidator<AccountKeyValidation, AccountCreate> {
@@ -22,11 +23,11 @@ public class AccountAttributeKeyAccountCreateDtoValidator extends BaseAccountKey
     @Override
     public boolean isValid(AccountCreate value, ConstraintValidatorContext context) {
         buildMessage(context, "account", message);
-        if (ObjectUtils.isEmpty(value)) {
+        if (isNull(value)) {
             return true;
         }
         var bank = value.getBank();
-        if (bank == null || StringUtils.isEmpty(bank.getBic())) {
+        if (isNull(bank) || StringUtils.isEmpty(bank.getBic())) {
             return true;
         }
         var account = value.getAccount();

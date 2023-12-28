@@ -1,6 +1,5 @@
 package ru.sberbank.pprb.sbbol.partners.validation.account.account;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 import ru.sberbank.pprb.sbbol.partners.model.AccountCreateFullModel;
 import ru.sberbank.pprb.sbbol.partners.model.BalanceTreasureAccountValidation;
@@ -12,6 +11,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Iterator;
 import java.util.Set;
+
+import static java.util.Objects.isNull;
 
 public class AccountAttributeBalanceTreasureAccountCreateFullModelDtoValidator extends BaseTreasuryAccountValidator
     implements ConstraintValidator<BalanceTreasureAccountValidation, PartnerCreateFullModel> {
@@ -28,7 +29,7 @@ public class AccountAttributeBalanceTreasureAccountCreateFullModelDtoValidator e
 
     @Override
     public boolean isValid(PartnerCreateFullModel value, ConstraintValidatorContext context) {
-        if (value == null) {
+        if (isNull(value)) {
             return true;
         }
         Set<AccountCreateFullModel> accounts = value.getAccounts();
@@ -39,11 +40,11 @@ public class AccountAttributeBalanceTreasureAccountCreateFullModelDtoValidator e
         for (var i = 0; i < accounts.size(); i++) {
             AccountCreateFullModel next = iterator.next();
             var bank = next.getBank();
-            if (ObjectUtils.isEmpty(bank)) {
+            if (isNull(bank)) {
                 return true;
             }
             var bankAccount = bank.getBankAccount();
-            if (ObjectUtils.isEmpty(bankAccount)) {
+            if (isNull(bankAccount)) {
                 return true;
             }
             buildMessage(context, String.format("accounts[%s].account", i), message);
