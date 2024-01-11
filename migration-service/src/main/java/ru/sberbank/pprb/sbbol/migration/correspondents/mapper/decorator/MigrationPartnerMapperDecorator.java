@@ -8,6 +8,7 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespond
 import ru.sberbank.pprb.sbbol.partners.entity.partner.AccountEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.enums.LegalType;
+import ru.sberbank.pprb.sbbol.partners.service.legalform.PartnerNameResolver;
 
 import java.util.List;
 import java.util.UUID;
@@ -50,6 +51,9 @@ public abstract class MigrationPartnerMapperDecorator implements MigrationPartne
     @Qualifier("delegate")
     private MigrationPartnerMapper delegate;
 
+    @Autowired
+    private PartnerNameResolver nameDetermination;
+
     @Override
     public PartnerEntity toPartnerEntity(String digitalId, MigrationCorrespondentCandidate source) {
         PartnerEntity partner = delegate.toPartnerEntity(digitalId, source);
@@ -61,6 +65,7 @@ public abstract class MigrationPartnerMapperDecorator implements MigrationPartne
     @Override
     public void updatePartnerEntity(String digitalId, MigrationCorrespondentCandidate source, PartnerEntity partner) {
         delegate.updatePartnerEntity(digitalId, source, partner);
+        setLegalTypeAndNamePartner(source, partner);
         afterMapping(partner);
     }
 
@@ -77,8 +82,18 @@ public abstract class MigrationPartnerMapperDecorator implements MigrationPartne
     private void setLegalTypeAndNamePartner(MigrationCorrespondentCandidate source, PartnerEntity partner) {
         LegalType legalType = toLegalType(source.getInn(), source.getAccount());
         partner.setLegalType(legalType);
-        partner.setOrgName(legalType != LegalType.PHYSICAL_PERSON ? source.getName() : null);
-        partner.setFirstName(legalType == LegalType.PHYSICAL_PERSON ? source.getName() : null);
+        if (legalType != LegalType.PHYSICAL_PERSON) {
+            partner.setOrgName(source.getName());
+            partner.setSecondName(null);
+            partner.setFirstName(null);
+            partner.setMiddleName(null);
+        } else {
+            var partnerName = nameDetermination.getPartnerName(source.getName());
+            partner.setOrgName(null);
+            partner.setSecondName(partnerName.secondName());
+            partner.setFirstName(partnerName.firstName());
+            partner.setMiddleName(partnerName.middleName());
+        }
     }
 
     public LegalType toLegalType(String inn, String account) {

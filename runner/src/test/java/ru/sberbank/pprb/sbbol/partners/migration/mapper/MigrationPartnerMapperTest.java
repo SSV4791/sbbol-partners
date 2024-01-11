@@ -10,6 +10,7 @@ import ru.sberbank.pprb.sbbol.migration.correspondents.mapper.MigrationPartnerMa
 import ru.sberbank.pprb.sbbol.migration.correspondents.model.MigrationCorrespondentCandidate;
 import ru.sberbank.pprb.sbbol.partners.config.BaseUnitConfiguration;
 import ru.sberbank.pprb.sbbol.partners.entity.partner.PartnerEntity;
+import ru.sberbank.pprb.sbbol.partners.service.legalform.PartnerNameResolver;
 
 import java.util.UUID;
 
@@ -18,7 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(
     classes = {
         MigrationPartnerMapperImpl.class,
-        MigrationPartnerMapperImpl_.class
+        MigrationPartnerMapperImpl_.class,
+        PartnerNameResolver.class
     }
 )
 class MigrationPartnerMapperTest extends BaseUnitConfiguration {
