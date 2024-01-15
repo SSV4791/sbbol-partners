@@ -237,6 +237,7 @@ public interface RenterPartnerMapper {
             return phones.stream()
                 .filter(phone -> Objects.equals(phone.getUuid(), phoneUuid))
                 .map(PartnerPhoneEntity::getPhone)
+                .filter(Objects::nonNull)
                 .findFirst().orElse(null);
         }
         return phones.get(0).getPhone();
@@ -254,6 +255,7 @@ public interface RenterPartnerMapper {
             return emails.stream()
                 .filter(email -> Objects.equals(email.getUuid(), emailUuid))
                 .map(PartnerEmailEntity::getEmail)
+                .filter(Objects::nonNull)
                 .findFirst().orElse(null);
         }
         return emails.get(0).getEmail();
